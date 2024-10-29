@@ -112,7 +112,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return(assignment_list)
         allow(assignment_list).to receive(:reject).and_return(assignment_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
-        allow(StudentTaskHelper).to receive(:find_teammates_by_user).with(course_participant.user).and_return(student1)
+        allow(StudentTaskHelper).to receive(:group_teammates_by_course_for_user).with(course_participant.user).and_return(student1)
         request_params = { course_id: 1 }
         user_session = { user: instructor }
         get :all_students_all_reviews, params: request_params, session: user_session
@@ -129,7 +129,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
-        allow(StudentTaskHelper).to receive(:find_teammates_by_user).with(course_participant.user).and_return(student1)
+        allow(StudentTaskHelper).to receive(:group_teammates_by_course_for_user).with(course_participant.user).and_return(student1)
         allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(empty_teammate_review)
@@ -150,7 +150,7 @@ describe Assessment360Controller do
         allow(course).to receive(:assignments).and_return(assignment_with_participants_list)
         allow(assignment_with_participants_list).to receive(:reject).and_return(assignment_with_participants_list)
         allow(course).to receive(:get_participants).and_return([course_participant]) # has participants
-        allow(StudentTaskHelper).to receive(:find_teammates_by_user).with(course_participant.user).and_return(student1)
+        allow(StudentTaskHelper).to receive(:group_teammates_by_course_for_user).with(course_participant.user).and_return(student1)
         allow(assignment_with_participants).to receive(:participants).and_return(participants_list)
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(course_participant).to receive(:teammate_reviews).and_return(teammate_review)

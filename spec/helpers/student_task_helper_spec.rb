@@ -201,16 +201,16 @@ end
 
   # Tests teamed students method which returns the unique students that are paired with the student at some point
   # within their course
-  describe '#find_teammates_by_user' do
+  describe '#group_teammates_by_course_for_user' do
     context 'when not in any team' do
       it 'returns empty' do
-        expect(student_task_helper.find_teammates_by_user(user3)).to eq({})
+        expect(student_task_helper.group_teammates_by_course_for_user(user3)).to eq({})
       end
     end
     context 'when assigned in a course_team ' do
       it 'returns empty' do
         allow(user).to receive(:teams).and_return([course_team])
-        expect(student_task_helper.find_teammates_by_user(user)).to eq({})
+        expect(student_task_helper.group_teammates_by_course_for_user(user)).to eq({})
       end
     end
     context 'when assigned in a assignment_team ' do
@@ -219,7 +219,7 @@ end
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
         allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
-        expect(student_task_helper.find_teammates_by_user(user)).to eq(assignment.course_id => [user2.fullname])
+        expect(student_task_helper.group_teammates_by_course_for_user(user)).to eq(assignment.course_id => [user2.fullname])
       end
     end
   end

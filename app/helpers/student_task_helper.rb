@@ -119,25 +119,22 @@ module StudentTaskHelper
     Time.now + 1.year
   end
 
-  def find_teammates_by_user(user, ip_address = nil)
-    students_teamed = {}
+  def for_teammates_in_each_team_of_user(user, ip_address = nil)
     user.teams.each do |team|
-      next unless team.is_a?(AssignmentTeam)
-      # Teammates in calibration assignment should not be counted in teaming requirement.
-      next if Assignment.find_by(id: team.parent_id).is_calibrated
-
-      teammates = []
+      # Teammates not in an assignment or in calibration assignment should not be counted in teaming requirement.
+      next if !team.is_a?(AssignmentTeam) || Assignment.find_by(id: team.parent_id).is_calibrated
       course_id = Assignment.find_by(id: team.parent_id).course_id
-      team_participants = Team.find(team.id).participants.reject { |p| p.name == user.name }
-      team_participants.each { |p| teammates << p.user.fullname(ip_address) }
-      next if teammates.empty?
+      teammate_names = Team.find(team.id).participants.reject { |p| p.name == user.name }.map { |p| p.user.fullname(ip_address)}
 
-      if students_teamed[course_id].nil?
-        students_teamed[course_id] = teammates
-      else
-        teammates.each { |teammate| students_teamed[course_id] << teammate }
-      end
-      students_teamed[course_id].uniq! if students_teamed.key?(course_id)
+      yield(course_id, teammate_names) unless teammate_names.nil? || teammate_names.empty?
+    end
+  end
+
+  def group_teammates_by_course_for_user(user, ip_address = nil)
+    students_teamed = {}
+    self.for_teammates_in_each_team_of_user(user, ip_address) do |course_id, teammate_names|
+      students_teamed[course_id] ||= []
+      students_teamed[course_id].concat(teammate_names).uniq!
     end
     students_teamed
   end

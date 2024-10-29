@@ -24,16 +24,17 @@ module ReviewMappingHelper
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
 
-    if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
-      elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
-      end
+    return 'red' unless Response.exists?(map_id: response_map.id)
+
+    determine_color(response_map, assignment_created, assignment_due_dates)
+  end
+
+  def determine_color(response_map, assignment_created, assignment_due_dates)
+    if response_map.try(:reviewer).try(:review_grade).nil?
+      return 'blue' if response_for_each_round?(response_map)
+      get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
     else
-      'red'
+      'brown'
     end
   end
 

@@ -100,7 +100,7 @@ describe LotteryController do
     end
   end
 
-  describe '#run_intelligent_assignment' do
+  describe '#auto_assign_teams' do
     before :each do
       session[:user] = build(:instructor)
       params = ActionController::Parameters.new(id: assignment.id)
@@ -110,12 +110,12 @@ describe LotteryController do
     end
     context 'with valid assignment id' do
       it 'should not set any error message in the flash' do
-        controller.run_intelligent_assignment
+        controller.auto_assign_teams
         expect(controller).not_to set_flash[:error]
       end
       it 'should redirect to list action in tree_display controller' do
         expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
-        controller.run_intelligent_assignment
+        controller.auto_assign_teams
       end
     end
     context 'with no participants' do
@@ -124,12 +124,12 @@ describe LotteryController do
         allow(RestClient).to receive(:post).and_raise(StandardError.new("No participants available for bidding"))
       end
       it 'should set error message in the flash' do
-        controller.run_intelligent_assignment
+        controller.auto_assign_teams
         expect(controller).to set_flash[:error]
       end
       it 'should redirect to list action in tree_display controller' do
         expect(controller).to receive(:redirect_to).with(controller: 'tree_display', action: 'list')
-        controller.run_intelligent_assignment
+        controller.auto_assign_teams
       end
     end
   end

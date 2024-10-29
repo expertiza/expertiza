@@ -89,4 +89,92 @@ module ResponseHelper
                                                       reviewee.reviewee_id)
     return total_score
   end
+
+  # This method is used to send email from a Reviewer to an Author.
+  # Email body and subject are inputted from Reviewer and passed to send_mail_to_author_reviewers method in MailerHelper.
+  def send_email
+    subject = params['send_email']['subject']
+    body = params['send_email']['email_body']
+    response = params['response']
+    email = params['email']
+
+    respond_to do |format|
+      if subject.blank? || body.blank?
+        flash[:error] = 'Please fill in the subject and the email content.'
+        format.html { redirect_to controller: 'response', action: 'author', response: response, email: email }
+        format.json { head :no_content }
+      else
+        # make a call to method invoking the email process
+        MailerHelper.send_mail_to_author_reviewers(subject, body, email)
+        flash[:success] = 'Email sent to the author.'
+        format.html { redirect_to controller: 'student_task', action: 'list' }
+        format.json { head :no_content }
+      end
+    end
+  end
+
+  # only two types of responses more should be added
+  def email(partial = 'new_submission')
+    defn = {}
+    defn[:body] = {}
+    defn[:body][:partial_name] = partial
+    response_map = ResponseMap.find map_id
+    participant = Participant.find(response_map.reviewer_id)
+    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
+    parent = if response_map.survey?
+               response_map.survey_parent
+             else
+               Assignment.find(participant.parent_id)
+             end
+    defn[:subject] = 'A new submission is available for ' + parent.name
+    response_map.email(defn, participant, parent)
+  end
+
+  def notify_instructor_on_difference
+    response_map = map
+    reviewer_participant_id = response_map.reviewer_id
+    reviewer_participant = AssignmentParticipant.find(reviewer_participant_id)
+    reviewer_name = User.find(reviewer_participant.user_id).fullname
+    reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
+    reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
+    reviewee_name = User.find(reviewee_participant.user_id).fullname
+    assignment = Assignment.find(reviewer_participant.parent_id)
+    Mailer.notify_grade_conflict_message(
+      to: assignment.instructor.email,
+      subject: 'Expertiza Notification: A review score is outside the acceptable range',
+      body: {
+        reviewer_name: reviewer_name,
+        type: 'review',
+        reviewee_name: reviewee_name,
+        new_score: aggregate_questionnaire_score.to_f / maximum_score,
+        assignment: assignment,
+        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
+        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
+        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
+      }
+    ).deliver_now
+  end
+
+  # compare the current response score with other scores on the same artifact, and test if the difference
+  # is significant enough to notify instructor.
+  # Precondition: the response object is associated with a ReviewResponseMap
+  ### "map_class.assessments_for" method need to be refactored
+  def significant_difference?
+    map_class = map.class
+    existing_responses = map_class.assessments_for(map.reviewee)
+    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
+    # if this response is the first on this artifact, there's no grade conflict
+    return false if count.zero?
+
+    # This score has already skipped the unfilled scorable question(s)
+    score = aggregate_questionnaire_score.to_f / maximum_score
+    questionnaire = questionnaire_by_answer(scores.first)
+    assignment = map.assignment
+    assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
+    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
+    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
+    # the range of average_score_on_same_artifact_from_others and score is [0,1]
+    # the range of allowed_difference_percentage is [0, 100]
+    (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
+  end
 end

@@ -62,10 +62,9 @@ class ResponsesController < ApplicationController
 
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response(@response)
-      items = sort_items(@questionnaire.questions)
 
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      create_answers(params, items) unless params[:responses].nil?
+      create_answers(params, @questionnaire.questions) unless params[:responses].nil?
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       end
@@ -131,8 +130,7 @@ class ResponsesController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    items = sort_items(@questionnaire.questions)
-    create_answers(params, items) if params[:responses]
+    create_answers(params, @questionnaire.questions) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
 
@@ -204,29 +202,6 @@ class ResponsesController < ApplicationController
     response_id = params[:response_id] if params.key?(:response_id)
     response = Response.find(response_id)
     render json: response
-  end
-
-  # This method is used to send email from a Reviewer to an Author.
-  # Email body and subject are inputted from Reviewer and passed to send_mail_to_author_reviewers method in MailerHelper.
-  def send_email
-    subject = params['send_email']['subject']
-    body = params['send_email']['email_body']
-    response = params['response']
-    email = params['email']
-
-    respond_to do |format|
-      if subject.blank? || body.blank?
-        flash[:error] = 'Please fill in the subject and the email content.'
-        format.html { redirect_to controller: 'response', action: 'author', response: response, email: email }
-        format.json { head :no_content }
-      else
-        # make a call to method invoking the email process
-        MailerHelper.send_mail_to_author_reviewers(subject, body, email)
-        flash[:success] = 'Email sent to the author.'
-        format.html { redirect_to controller: 'student_task', action: 'list' }
-        format.json { head :no_content }
-      end
-    end
   end
 
   def new_feedback

@@ -62,13 +62,13 @@ class TeamsParticipant < ApplicationRecord
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
     teams_participants = TeamsParticipant.where(user_id: user_id)
-    teams_participants.each do |teams_user|
-      if teams_user.team_id == nil
+    teams_participants.each do |teams_participant|
+      if teams_participant.team_id == nil
         next
       end
-      team = Team.find(teams_user.team_id)
+      team = Team.find(teams_participant.team_id)
       if team.parent_id == assignment_id
-        team_id = teams_user.team_id
+        team_id = teams_participant.team_id
         break
       end
     end

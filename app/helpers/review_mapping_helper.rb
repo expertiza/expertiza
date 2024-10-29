@@ -149,101 +149,133 @@ module ReviewMappingHelper
     end
   end
 
-  # gets minimum, maximum and average grade value for all the reviews present
-  def review_metrics(round, team_id)
-    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
-      %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+# Retrieves the minimum, maximum, and average grade values for the reviews in a given round
+def review_metrics(round, team_id)
+  # Set default values ('-----') for @max, @min, and @avg instance variables
+  %i[max min avg].each { |metric| instance_variable_set("@#{metric}", '-----') }
+
+  # Check if the metrics for the given team and round exist in @avg_and_ranges
+  if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |metric| @avg_and_ranges[team_id][round].key?(metric) }
+    
+    # Assign the metric values (or '-----' if they are nil) to the corresponding instance variables
+    %i[max min avg].each do |metric|
+      metric_value = @avg_and_ranges[team_id][round][metric]
+      value_to_set = metric_value.nil? ? '-----' : "#{metric_value.round(0)}%"
+      instance_variable_set("@#{metric}", value_to_set)
+    end
+  end
+end
+
+
+# Sorts the reviewers by the average volume of reviews in each round, in descending order
+def sort_reviewers_by_review_volume_desc
+  @reviewers.each do |reviewer|
+    # Get the volume of review comments for the given assignment and reviewer
+    review_comment_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
+    reviewer.avg_volume_per_round = []
+    # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
+    review_comment_volumes.each_with_index do |volume, round|
+      if round.zero?
+        reviewer.overall_average_volume = volume
+      else
+        # Store the review volumes for the remaining rounds
+        reviewer.avg_volume_per_round.push(volume)
       end
     end
   end
+  @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
+  @all_reviewers_avg_volume_per_round = []
+  # Calculate the overall average review volume across all reviewers
+  @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.overall_average_volume } / (@reviewers.blank? ? 1 : @reviewers.length)
+  # For each round, calculate the average volume of reviews across all reviewers
+  @num_review_rounds.times do |round|
+    avg_volume_for_round = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.avg_volume_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    @all_reviewers_avg_volume_per_round.push(avg_volume_for_round)
+  end
+  # Sort the reviewers by their overall average review volume in descending order
+  @reviewers.sort! { |r1, r2| r2.overall_average_volume <=> r1.overall_average_volume }
+end
 
-  # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
-      review_volumes.each_index do |i|
-        if i.zero?
-          r.overall_avg_vol = review_volumes[0]
-        else
-          r.avg_vol_per_round.push(review_volumes[i])
-        end
-      end
-    end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+
+  
+# moves data of reviews in each round from a current round
+def initialize_chart_elements(reviewer)
+  round = 0
+  labels = []
+  reviewer_data = []
+  all_reviewers_data = []
+
+  # Iterate through each round and collect data if the volume for all reviewers is greater than 0
+  @num_rounds.times do |rnd|
+    avg_volume_all_reviewers = @all_reviewers_avg_vol_per_round[rnd]
+    # Skip rounds with no data for all reviewers
+    next unless avg_volume_all_reviewers > 0
+    round += 1
+    labels.push round
+    reviewer_data.push reviewer.avg_vol_per_round[rnd]
+    all_reviewers_data.push avg_volume_all_reviewers
   end
 
-  # moves data of reviews in each round from a current round
-  def initialize_chart_elements(reviewer)
-    round = 0
-    labels = []
-    reviewer_data = []
-    all_reviewers_data = []
+  # Add 'Total' label and overall averages at the end
+  labels.push 'Total'
+  reviewer_data.push reviewer.overall_avg_vol
+  all_reviewers_data.push @all_reviewers_overall_avg_vol
+  [labels, reviewer_data, all_reviewers_data]
+end
 
-    # display avg volume for all reviewers per round
-    @num_rounds.times do |rnd|
-      next unless @all_reviewers_avg_vol_per_round[rnd] > 0
 
-      round += 1
-      labels.push round
-      reviewer_data.push reviewer.avg_vol_per_round[rnd]
-      all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
-    end
+ # Generates the bar chart displaying reviewer volume metrics
+def display_volume_metric_chart(reviewer)
+  labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
+  data = chart_data(labels, reviewer_data, all_reviewers_data)
+  options = chart_options
+  bar_chart data, options
+end
 
-    labels.push 'Total'
-    reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
-    [labels, reviewer_data, all_reviewers_data]
-  end
-
-  # The data of all the reviews is displayed in the form of a bar chart
-  def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
+# Prepares the chart data, including labels and datasets for reviewer volume metrics
+def chart_data(labels, reviewer_data, all_reviewers_data)
+  {
+    labels: labels,
+    datasets: [
+      {
+        # Individual reviewer's volume
+        label: 'vol.', 
+        backgroundColor: 'rgba(255,99,132,0.8)',
+        borderWidth: 1,
+        data: reviewer_data,
+        yAxisID: 'bar-y-axis1'
       },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
+      {
+        # Average volume for all reviewers
+        label: 'avg. vol.', 
+        backgroundColor: 'rgba(255,206,86,0.8)',
+        borderWidth: 1,
+        data: all_reviewers_data,
+        yAxisID: 'bar-y-axis2'
+      }
+    ]
+  }
+end
+
+# Configures chart display options, including axes, legends, and grid lines
+def chart_options
+  {
+    legend: {
+      position: 'top',
+      labels: {
+        usePointStyle: true
+      }
+    },
+    width: '200',
+    height: '225',
+    scales: {
+      yAxes: [
+        {
           stacked: true,
           id: 'bar-y-axis1',
           barThickness: 10
-        }, {
+        },
+        {
           display: false,
           stacked: true,
           id: 'bar-y-axis2',
@@ -254,62 +286,85 @@ module ReviewMappingHelper
           gridLines: {
             offsetGridLines: true
           }
-        }],
-        xAxes: [{
+        }
+      ],
+      xAxes: [
+        {
           stacked: false,
           ticks: {
             beginAtZero: true,
             stepSize: 50,
             max: 400
           }
-        }]
-      }
-    }
-    bar_chart data, options
-  end
-
-  # E2082 Generate chart for review tagging time intervals
-  def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
-    threshold = 30
-    intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
-    end
-    # build the parameters for the chart
-    data = {
-      labels: [*1..intervals.length],
-      datasets: [
-        {
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          data: intervals,
-          label: 'time intervals'
-        },
-        unless intervals.empty?
-          {
-            data: Array.new(intervals.length, interval_mean),
-            label: 'Mean time spent'
-          }
-        end
+        }
       ]
     }
-    options = {
-      width: '200',
-      height: '125',
-      scales: {
-        yAxes: [{
+  }
+end
+
+# Generates a line chart displaying time intervals for review tagging
+def display_tagging_interval_chart(intervals)
+  intervals = filter_intervals(intervals)
+  return if intervals.empty?  # Skip chart generation if there are no valid intervals
+  
+  interval_mean = calculate_mean(intervals)
+  data = chart_data(intervals, interval_mean)
+  options = chart_options
+  
+  line_chart data, options
+end
+
+# Filters out intervals exceeding the threshold time
+def filter_intervals(intervals, threshold = 30)
+  intervals.select { |interval| interval < threshold }
+end
+
+# Calculates the mean of the intervals
+def calculate_mean(intervals)
+  intervals.reduce(:+) / intervals.size.to_f
+end
+
+# Prepares the data for the chart, including intervals and mean if applicable
+def chart_data(intervals, interval_mean)
+  {
+    labels: (1..intervals.length).to_a, # Labels each interval sequentially
+    datasets: [
+      {
+        backgroundColor: 'rgba(255,99,132,0.8)',
+        data: intervals,
+        label: 'time intervals'
+      },
+      {
+        data: Array.new(intervals.length, interval_mean),
+        label: 'Mean time spent'
+      }
+    ]
+  }
+end
+
+# Configures chart display options, including axis settings
+def chart_options
+  {
+    width: '200',
+    height: '125',
+    scales: {
+      yAxes: [
+        {
           stacked: false,
           ticks: {
             beginAtZero: true
           }
-        }],
-        xAxes: [{
+        }
+      ],
+      xAxes: [
+        {
           stacked: false
-        }]
-      }
+        }
+      ]
     }
-    line_chart data, options
-  end
+  }
+end
+
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
   def calculate_key_chart_information(intervals)
@@ -344,21 +399,43 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(response_map_id, question_id)
-    assignment = Assignment.find(@id)
-    curr_round = assignment.try(:num_review_rounds)
-    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
-    comments = answer_with_link.try(:comments)
-    html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
-    html.html_safe
-  end
+# Lists the hyperlink submission in peer review comments for a specific response and question.
+# This is designed for assignments where instructors want to quickly check if students pasted a link.
+def list_hyperlink_submission(response_map_id, question_id)
+  assignment = fetch_assignment
+  current_round = fetch_current_round(assignment)
+  
+  return ''.html_safe unless current_round # Return safe empty HTML if no current round is found
+
+  comments = fetch_hyperlink_comment(response_map_id, question_id, current_round)
+  
+  generate_hyperlink_html(comments)
+end
+
+# Fetches the assignment based on the instance variable @id
+def fetch_assignment
+  Assignment.find(@id)
+end
+
+# Retrieves the current review round number, if available
+def fetch_current_round(assignment)
+  assignment.try(:num_review_rounds)
+end
+
+# Fetches the hyperlink comment from the response and answer records
+def fetch_hyperlink_comment(response_map_id, question_id, current_round)
+  response = Response.find_by(map_id: response_map_id, round: current_round)
+  answer = Answer.find_by(response_id: response.id, question_id: question_id) if response
+  answer.try(:comments)
+end
+
+# Generates HTML for displaying the hyperlink if it exists and starts with 'http'
+def generate_hyperlink_html(comments)
+  return ''.html_safe unless comments.present? && comments.start_with?('http')
+  
+  display_hyperlink_in_peer_review_question(comments).html_safe
+end
+
 
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
@@ -395,19 +472,17 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
-  #
-  # for calibration report
-  #
-  def get_css_style_for_calibration_report(diff)
-    # diff - difference between stu's answer and instructor's answer
-    dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
-    css_class = if dict.key?(diff.abs)
-                  dict[diff.abs]
-                else
-                  'c1'
-                end
-    css_class
-  end
+# Determines the CSS class for a calibration report based on the difference 
+# between a student's answer and the instructor's answer.
+# A smaller difference indicates a closer match to the instructor's answer.
+def get_css_style_for_calibration_report(diff)
+  # CSS class mapping based on the absolute difference value
+  css_class_mapping = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
+
+  # Return the CSS class based on the difference, defaulting to 'c1' for larger differences
+  css_class_mapping.fetch(diff.abs, 'c1')
+end
+
 
   class ReviewStrategy
     attr_accessor :participants, :teams

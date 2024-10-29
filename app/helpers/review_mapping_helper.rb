@@ -88,10 +88,15 @@ module ReviewMappingHelper
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
-      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      subm_created_at = submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date)
     end
     !subm_created_at.try(:first).try(:created_at).nil?
+  end
+
+  # checks the last round submission date if there is more than one round
+  def submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date)
+    submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+    submission.where(created_at: submission_due_last_round..submission_due_date)
   end
 
   # returns hyperlink of the assignment that has been submitted on the due date

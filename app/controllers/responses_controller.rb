@@ -313,7 +313,7 @@ class ResponsesController < ApplicationController
 
   #this method is called within the view,new,edit actions to set vaariables for the view
   def set_action_parameters(header,next_action,params_return,current_response,current_map,modified_object)
-    #setting variables for the view
+    #setting variables for rendering view
     @header = header
     @next_action = next_action
     @return = params_return
@@ -330,7 +330,11 @@ class ResponsesController < ApplicationController
     
     # if user is not filling a new rubric, the @response object should be available.
     # we can find the questionnaire from the question_id in answers
-    current_questionnaire = questionnaire_from_response(current_response)
+    if header=='New'
+      current_questionnaire=questionnaire_from_response_map(@map,@contributor,@assignment)
+    else
+      current_questionnaire = questionnaire_from_response(current_response)
+    end
     @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
     @min = current_questionnaire.min_question_score
     @max = current_questionnaire.max_question_score
@@ -345,6 +349,6 @@ class ResponsesController < ApplicationController
       end
     end
     
-    @review_questions = sort_items(current_questionnaire.questions)
+    @review_questions = sort_questions(current_questionnaire.questions)
   end
 end

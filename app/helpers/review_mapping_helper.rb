@@ -3,40 +3,34 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  #
-  # gets the response map data such as reviewer id, reviewed object id and type for the review report
-  #
+  # gets the response map data such as reviewer id, reviewed object id and type for use in the review report
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
+    row_number = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
     response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
+      row_number += 1 if Team.exists?(id: ri.reviewee_id)
       responses = ri.response
       (1..@assignment.num_review_rounds).each do |round|
         instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
-    [response_maps, rspan]
+    [response_maps, row_number]
   end
 
-  #
   # gets the team name's color according to review and assignment submission status
-  #
   def get_team_color(response_map)
-    # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
-    # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning colour based on conditions
+
     if Response.exists?(map_id: response_map.id)
       if !response_map.try(:reviewer).try(:review_grade).nil?
         'brown'
       elsif response_for_each_round?(response_map)
         'blue'
       else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
+        get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
       end
     else
       'red'
@@ -44,7 +38,7 @@ module ReviewMappingHelper
   end
 
   # loops through the number of assignment review rounds and obtains the team colour
-  def obtain_team_color(response_map, assignment_created, assignment_due_dates)
+  def get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
       get_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
@@ -67,8 +61,8 @@ module ReviewMappingHelper
     if valid_submission_link?(link)
       color.push 'green'
     else
-      link_updated_at = get_link_updated_at(link)
-      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      link_updated_date = get_link_updated_at(link)
+      color.push updated_since_last_submission?(round, assignment_due_dates, link_updated_date) ? 'purple' : 'green'
     end
   end
 
@@ -77,14 +71,14 @@ module ReviewMappingHelper
     link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
   end
 
-  # checks if a review was submitted in every round and gives the total responses count
+  # checks if a review was submitted in every round
   def response_for_each_round?(response_map)
-    num_responses = 0
+    response_count = 0
     total_num_rounds = @assignment.num_review_rounds
     (1..total_num_rounds).each do |round|
-      num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+      response_count += 1 if Response.exists?(map_id: response_map.id, round: round)
     end
-    num_responses == total_num_rounds
+    response_count == total_num_rounds
   end
 
   # checks if a work was submitted within a given round
@@ -116,7 +110,7 @@ module ReviewMappingHelper
   end
 
   # checks if a link was updated since last round submission
-  def link_updated_since_last?(round, due_dates, link_updated_at)
+  def updated_since_last_submission?(round, due_dates, link_updated_at)
     submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
@@ -135,24 +129,13 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
-
-  # gets the review score awarded based on each round of the review
-
+  # get the review score for a specific team and a specific reviewer
   def get_awarded_review_score(reviewer_id, team_id)
-    # Storing redundantly computed value in num_rounds variable
-    num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
-    (1..num_rounds).each do |round|
+    round_count = @assignment.num_review_rounds
+
+    (1..round_count).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
+
+    (1..round_count).each do |round|
       # Changing values of instance variable based on below condition
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
         instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')

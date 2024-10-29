@@ -65,9 +65,14 @@ module StudentTaskHelper
   end
 
   def generate_timeline(assignment, participant)
-    due_date_modifier = ->(dd) { { label: (dd.deadline_type.name + ' Deadline').humanize, updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M') } }
+    due_date_modifier = lambda { |dd| 
+      { 
+        label: (dd.deadline_type.name + ' Deadline').humanize,
+        updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M') 
+      } 
+    }
 
-    response_modifier = ->(response, label) {
+    response_modifier = lambda { |response, label|
       {
         id: response.id,
         label: label,
@@ -114,10 +119,14 @@ module StudentTaskHelper
     Time.now + 1.year
   end
 
+  def is_calibration_assignment?(team)
+    Assignment.find_by(id: team.parent_id).is_calibrated
+  end
+
   def for_teammates_in_each_team_of_user(user, ip_address = nil)
     user.teams.each do |team|
       # Teammates not in an assignment or in calibration assignment should not be counted in teaming requirement.
-      next if !team.is_a?(AssignmentTeam) || Assignment.find_by(id: team.parent_id).is_calibrated
+      next if !team.is_a?(AssignmentTeam) || is_calibration_assignment?(team)
       course_id = Assignment.find_by(id: team.parent_id).course_id
       teammate_names = Team.find(team.id).participants.reject { |p| p.name == user.name }.map { |p| p.user.fullname(ip_address) }
 
@@ -127,7 +136,7 @@ module StudentTaskHelper
 
   def group_teammates_by_course_for_user(user, ip_address = nil)
     students_teamed = {}
-    self.for_teammates_in_each_team_of_user(user, ip_address) do |course_id, teammate_names|
+    for_teammates_in_each_team_of_user(user, ip_address) do |course_id, teammate_names|
       students_teamed[course_id] ||= []
       students_teamed[course_id].concat(teammate_names).uniq!
     end

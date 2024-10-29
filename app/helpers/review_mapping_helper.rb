@@ -29,7 +29,7 @@ module ReviewMappingHelper
     determine_color(response_map, assignment_created, assignment_due_dates)
   end
 
-  def determine_color(response_map, assignment_created, assignment_due_dates)
+  private def determine_color(response_map, assignment_created, assignment_due_dates)
     if response_map.try(:reviewer).try(:review_grade).nil?
       return 'blue' if response_for_each_round?(response_map)
       get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
@@ -57,7 +57,7 @@ module ReviewMappingHelper
   end
 
   # checks the submission link to determine if it exists and assigns team colour
-  def process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
+  private def process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
     link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     if valid_submission_link?(link)
       color.push 'green'
@@ -68,7 +68,7 @@ module ReviewMappingHelper
   end
 
   # checks if the submission list exists or fits with standard url format of http:// or https:// and contains keyword "wiki"
-  def valid_submission_link?(link)
+  private def valid_submission_link?(link)
     link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
   end
 
@@ -94,7 +94,7 @@ module ReviewMappingHelper
   end
 
   # checks the last round submission date if there is more than one round
-  def submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date)
+  private def submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date)
     submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     submission.where(created_at: submission_due_last_round..submission_due_date)
   end

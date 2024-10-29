@@ -160,14 +160,14 @@ describe StudentTaskHelper do
     end
 
     it 'retrieves and sorts tasks by stage_deadline' do
-      tasks = student_task_helper.retrieve_tasks_for_user(user)   
+      tasks = student_task_helper.retrieve_tasks_for_user(user)
       expect(tasks.size).to eq(2)
       expect(tasks.first.stage_deadline).to eq(Time.parse('2024-11-01 12:00:00'))
       expect(tasks.last.stage_deadline).to eq(Time.parse('2024-12-01 12:00:00'))
     end
 
     it 'creates StudentTask objects for each participant' do
-      tasks = student_task_helper.retrieve_tasks_for_user(user)   
+      tasks = student_task_helper.retrieve_tasks_for_user(user) 
       tasks.each do |task|
         expect(task).to be_an_instance_of(StudentTask)
         expect(task.participant).to be_in([participant4, participant5])

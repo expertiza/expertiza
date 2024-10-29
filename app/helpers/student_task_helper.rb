@@ -1,4 +1,6 @@
 module StudentTaskHelper
+  TIME_FORMAT = '%a, %d %b %Y %H:%M'
+
   def get_review_grade_info(participant)
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
        participant.try(:review_grade).try(:comment_for_reviewer).nil?
@@ -49,13 +51,6 @@ module StudentTaskHelper
     end
   end
 
-  def fetch_response_from(model_class, participant_id)
-    model_class.where(reviewer_id: participant_id).find_each do |rm|
-      response = Response.where(map_id: rm.id).last
-      yield response unless response.nil?
-    end
-  end
-
   def for_each_peer_review(participant_id, &block)
     fetch_response_from(ReviewResponseMap, participant_id, &block)
   end
@@ -65,36 +60,10 @@ module StudentTaskHelper
   end
 
   def generate_timeline(assignment, participant)
-    due_date_modifier = lambda { |dd| 
-      { 
-        label: (dd.deadline_type.name + ' Deadline').humanize,
-        updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M') 
-      } 
-    }
-
-    response_modifier = lambda { |response, label|
-      {
-        id: response.id,
-        label: label,
-        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
-      }
-    }
-
-    timeline_list = []
-
-    for_each_due_date_of_assignment(assignment) do |due_date|
-      timeline_list << due_date_modifier.call(due_date)
-    end
-
-    for_each_peer_review(participant.get_reviewer.try(:id)) do |response|
-      timeline_list << response_modifier.call(response, "Round #{response.round} Peer Review".humanize)
-    end
-
-    for_each_author_feedback(participant.try(:id)) do |response|
-      timeline_list << response_modifier.call(response, 'Author feedback')
-    end
-
-    timeline_list.sort_by { |f| Time.zone.parse f[:updated_at] }
+    [].concat(generate_due_date_timeline(assignment))
+      .concat(generate_peer_review_timeline(participant))
+      .concat(generate_author_feedback_timeline(participant))
+      .sort_by { |f| Time.zone.parse f[:updated_at] }
   end
 
   def create_student_task_for_participant(participant)
@@ -119,17 +88,30 @@ module StudentTaskHelper
     Time.now + 1.year
   end
 
-  def is_calibration_assignment?(team)
+  def calibration_assignment?(team)
     Assignment.find_by(id: team.parent_id).is_calibrated
+  end
+
+  def course_id_for_team(team)
+    Assignment.find_by(id: team.parent_id).course_id
+  end
+
+  def teammate_names_for_team(team, user, ip_address)
+    Team.find(team.id).participants
+      .reject { |p| p.name == user.name }
+      .map { |p| p.user.fullname(ip_address) }
+  end
+
+  def valid_assignment_team?(team)
+    # Teammates not in an assignment or in calibration assignment should not be counted in teaming requirement.
+    team.is_a?(AssignmentTeam) && !calibration_assignment?(team)
   end
 
   def for_teammates_in_each_team_of_user(user, ip_address = nil)
     user.teams.each do |team|
-      # Teammates not in an assignment or in calibration assignment should not be counted in teaming requirement.
-      next if !team.is_a?(AssignmentTeam) || is_calibration_assignment?(team)
-      course_id = Assignment.find_by(id: team.parent_id).course_id
-      teammate_names = Team.find(team.id).participants.reject { |p| p.name == user.name }.map { |p| p.user.fullname(ip_address) }
-
+      next unless valid_assignment_team?(team)
+      course_id = course_id_for_team(team)
+      teammate_names = teammate_names_for_team(team, user, ip_address)
       yield(course_id, teammate_names) unless teammate_names.nil? || teammate_names.empty?
     end
   end
@@ -141,5 +123,60 @@ module StudentTaskHelper
       students_teamed[course_id].concat(teammate_names).uniq!
     end
     students_teamed
+  end
+
+  private
+  def map_with_parser(fn, data, parser)
+    result = []
+    fn.call(data) do |elem|
+      result << parser.call(elem)
+    end
+    result
+  end
+
+  def parse_due_date_to_timeline(due_date)
+    {
+      label: (due_date.deadline_type.name + ' Deadline').humanize,
+      updated_at: due_date.due_at.strftime(TIME_FORMAT)
+    }
+  end
+  
+  def parse_response_to_timeline(response, label)
+    {
+      id: response.id,
+      label: (eval label),
+      updated_at: response.updated_at.strftime(TIME_FORMAT)
+    }
+  end
+
+  def generate_due_date_timeline(assignment)
+    map_with_parser(
+      method(:for_each_due_date_of_assignment),
+      assignment,
+      ->(due_date) { parse_due_date_to_timeline(due_date) }
+    )
+  end
+
+  def generate_peer_review_timeline(participant_id)
+    map_with_parser(
+      method(:for_each_peer_review), 
+      participant_id, 
+      ->(response) { parse_response_to_timeline(response, '"Round #{response.round} Peer Review".humanize') }
+    )
+  end
+
+  def generate_author_feedback_timeline(participant_id)
+    map_with_parser(
+      method(:for_each_author_feedback), 
+      participant_id, 
+      ->(response) { parse_response_to_timeline(response, 'Author feedback') }
+    )
+  end
+
+  def fetch_response_from(model_class, participant_id)
+    model_class.where(reviewer_id: participant_id).find_each do |rm|
+      response = Response.where(map_id: rm.id).last
+      yield response unless response.nil?
+    end
   end
 end

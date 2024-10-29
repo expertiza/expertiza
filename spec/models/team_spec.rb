@@ -91,7 +91,7 @@ describe Team do
   describe '#add_member' do
     context 'when parameterized user has already joined in current team' do
       it 'raise an error' do
-        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.username} is already a member of the team #{team.name}")
+        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
       end
     end
 

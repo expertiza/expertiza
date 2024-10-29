@@ -246,21 +246,32 @@ class SignUpSheetController < ApplicationController
   def signup_as_instructor_action
   user = User.find_by(name: params[:username])
 
-  # Early return if user is not found
+  # Check if the user is nil (i.e., user not found in the database)
+  # If user is nil, display an error message to the user indicating the student does not exist
+  # Log the information for debugging or tracking purposes
+  # Redirect the user back to the 'edit' page of the current assignment
   if user.nil?
     flash[:error] = 'That student does not exist!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Student does not exist')
     return redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  # Early return if user is not registered for the assignment
+  # Check if there is an AssignmentParticipant record with the given user ID and assignment ID
+  # If no such record exists, display an error message indicating the student is not registered for the assignment
+  # Log this information for debugging or tracking purposes, including the user ID
+  # Redirect the user back to the 'edit' page of the current assignment
   unless AssignmentParticipant.exists?(user_id: user.id, parent_id: params[:assignment_id])
     flash[:error] = 'The student is not registered for the assignment!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Student is not registered for the assignment: #{user.id}")
     return redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  # Check if signup is successful or not
+  # Attempt to sign up the student for the specified topic using the signup_team method
+  # If successful, display a success message indicating the student has been signed up for the topic
+  # Log the action for tracking, including the topic ID
+  # If the signup fails (e.g., the student is already signed up for a topic), display an error message
+  # Log this information for tracking purposes
+  # Redirect the user back to the 'edit' page of the current assignment
   if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
     flash[:success] = 'You have successfully signed up the student for the topic!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Instructor signed up student for topic: #{params[:topic_id]}")
@@ -272,8 +283,14 @@ class SignUpSheetController < ApplicationController
   redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
 end
 
-  # this function is used to delete a previous signup
-
+  # Define the delete_signup action
+  # Fetch the participant, assignment, and drop topic deadline based on the given parameters
+  # Define error messages for situations where the topic cannot be dropped (due to submission or deadline)
+  # Check if the participant is allowed to drop the topic based on the submission status and deadline
+  # If dropping the topic is allowed, find the user's team for the assignment and delete their signup for the specified topic
+  # Display a success message indicating the topic has been dropped
+  # Log this action for tracking purposes, including the topic ID
+  # Redirect the user to the 'list' page for the current assignment
   def delete_signup
 
     participant, assignment, drop_topic_deadline = fetch_participant_and_assignment(params[:id])
@@ -289,7 +306,14 @@ end
     redirect_to action: 'list', id: params[:id]
   end
 
-
+  # Find the team associated with the given team ID parameter
+  # Retrieve the assignment, participant, and drop topic deadline based on the team
+  # Define error messages for scenarios where the student cannot be removed (due to submission or deadline)
+  # Check if the participant can be removed from the topic based on submission status and deadline constraints
+  # If removal is allowed, delete the student's signup for the specified topic using the team's ID
+  # Display a success message indicating the student has been dropped from the topic
+  # Log this action for tracking purposes, including the topic ID
+  # Redirect the instructor back to the 'edit' page of the assignment
   def delete_signup_as_instructor
 
     team = Team.find(params[:id])

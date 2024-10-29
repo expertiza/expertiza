@@ -53,9 +53,7 @@ describe StudentTaskHelper do
           timeline_list = []
           due_date.due_at = nil
           assignment.due_dates = [due_date]
-          student_task_helper.for_each_due_date_of_assignment(assignment) do |due_date|
-            timeline_list << due_date_modifier.call(due_date)
-          end
+          student_task_helper.for_each_due_date_of_assignment(assignment) { |due_date| timeline_list << due_date_modifier.call(due_date) }
           expect(timeline_list).to eq([])
         end
       end
@@ -167,7 +165,7 @@ describe StudentTaskHelper do
     end
 
     it 'creates StudentTask objects for each participant' do
-      tasks = student_task_helper.retrieve_tasks_for_user(user) 
+      tasks = student_task_helper.retrieve_tasks_for_user(user)
       tasks.each do |task|
         expect(task).to be_an_instance_of(StudentTask)
         expect(task.participant).to be_in([participant4, participant5])

@@ -110,8 +110,10 @@ module StudentTaskHelper
   def for_teammates_in_each_team_of_user(user, ip_address = nil)
     user.teams.each do |team|
       next unless valid_assignment_team?(team)
+
       course_id = course_id_for_team(team)
       teammate_names = teammate_names_for_team(team, user, ip_address)
+
       yield(course_id, teammate_names) unless teammate_names.nil? || teammate_names.empty?
     end
   end
@@ -141,7 +143,7 @@ module StudentTaskHelper
       updated_at: due_date.due_at.strftime(TIME_FORMAT)
     }
   end
-  
+
   def parse_response_to_timeline(response, label)
     {
       id: response.id,

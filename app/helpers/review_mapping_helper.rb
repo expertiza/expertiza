@@ -132,9 +132,9 @@ module ReviewMappingHelper
   # get the review score for a specific team and a specific reviewer
   def get_awarded_review_score(reviewer_id, team_id)
     round_count = @assignment.num_review_rounds
-    # Setting values of instance variables
+
     (1..round_count).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
+
     (1..round_count).each do |round|
       # Changing values of instance variable based on below condition
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0

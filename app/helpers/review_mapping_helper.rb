@@ -172,14 +172,14 @@ def sort_reviewers_by_review_volume_desc
   @reviewers.each do |reviewer|
     # Get the volume of review comments for the given assignment and reviewer
     review_comment_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
-    reviewer.avg_volume_per_round = []
+    reviewer.avg_vol_per_round = []
     # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
     review_comment_volumes.each_with_index do |volume, round|
       if round.zero?
-        reviewer.overall_average_volume = volume
+        reviewer.avg_vol_per_round = volume
       else
         # Store the review volumes for the remaining rounds
-        reviewer.avg_volume_per_round.push(volume)
+        reviewer.avg_vol_per_round.push(volume)
       end
     end
   end
@@ -404,11 +404,8 @@ end
 def list_hyperlink_submission(response_map_id, question_id)
   assignment = fetch_assignment
   current_round = fetch_current_round(assignment)
-  
-  return ''.html_safe unless current_round # Return safe empty HTML if no current round is found
 
   comments = fetch_hyperlink_comment(response_map_id, question_id, current_round)
-  
   generate_hyperlink_html(comments)
 end
 
@@ -424,16 +421,16 @@ end
 
 # Fetches the hyperlink comment from the response and answer records
 def fetch_hyperlink_comment(response_map_id, question_id, current_round)
-  response = Response.find_by(map_id: response_map_id, round: current_round)
-  answer = Answer.find_by(response_id: response.id, question_id: question_id) if response
+  response = Response.where(map_id: response_map_id, round: current_round).first
+  answer = Answer.where(response_id: response.id, question_id: question_id).first if response
   answer.try(:comments)
 end
 
 # Generates HTML for displaying the hyperlink if it exists and starts with 'http'
 def generate_hyperlink_html(comments)
-  return ''.html_safe unless comments.present? && comments.start_with?('http')
-  
-  display_hyperlink_in_peer_review_question(comments).html_safe
+  html = ''
+  html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
+  html.html_safe
 end
 
 

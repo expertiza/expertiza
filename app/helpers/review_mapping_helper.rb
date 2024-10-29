@@ -186,14 +186,14 @@ def sort_reviewers_by_review_volume_desc
   @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
   @all_reviewers_avg_volume_per_round = []
   # Calculate the overall average review volume across all reviewers
-  @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.overall_average_volume } / (@reviewers.blank? ? 1 : @reviewers.length)
+  @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
   # For each round, calculate the average volume of reviews across all reviewers
   @num_review_rounds.times do |round|
-    avg_volume_for_round = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.avg_volume_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
+    avg_volume_for_round = @reviewers.inject(0) { |sum, reviewer| sum + reviewer.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length)
     @all_reviewers_avg_volume_per_round.push(avg_volume_for_round)
   end
   # Sort the reviewers by their overall average review volume in descending order
-  @reviewers.sort! { |r1, r2| r2.overall_average_volume <=> r1.overall_average_volume }
+  @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
 end
 
 

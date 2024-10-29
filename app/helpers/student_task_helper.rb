@@ -114,11 +114,9 @@ module StudentTaskHelper
   end
 
   def parse_stage_deadline(part)
-    begin
-      Time.parse(part)
-    rescue StandardError
-      Time.now + 1.year
-    end
+    Time.parse(part)
+  rescue StandardError
+    Time.now + 1.year
   end
 
   def find_teammates_by_user(user, ip_address = nil)

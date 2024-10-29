@@ -9,12 +9,16 @@ describe StudentTaskHelper do
   let(:assignment2) { build(:assignment, name: 'assignment2', directory_path: 'assignment2') }
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }
   let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: assignment.id) }
+  let(:participant3) { instance_double('Participant', assignment: assignment, topic: topic, current_stage: 'submission', stage_deadline: '2024-12-31 12:00:00') }
+  let(:participant4) { instance_double('Participant1', assignment: assignment, topic: topic, current_stage: 'review', stage_deadline: '2024-12-01 12:00:00') }
+  let(:participant5) { instance_double('Participant1', assignment: assignment, topic: topic, current_stage: 'submission', stage_deadline: '2024-11-01 12:00:00') }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, users: [user, user2]) }
   let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, users: [user3]) }
   let(:course) { build(:course) }
   let(:course_team) { create(:course_team, id: 3, name: 'course team 1', parent_id: course.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team2) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map) }
+  let(:topic) { instance_double('Topic') }
   let(:response_modifier) do
     ->(response, label) {
       {
@@ -138,6 +142,62 @@ describe StudentTaskHelper do
       end
     end
   end
+
+    describe '#create_student_task_for_participant' do
+    it 'creates a StudentTask with the correct attributes' do
+      student_task = student_task_helper.create_student_task_for_participant(participant3)
+      expect(student_task).to be_an_instance_of(StudentTask)
+      expect(student_task.participant).to eq(participant3)
+      expect(student_task.assignment).to eq(assignment)
+      expect(student_task.topic).to eq(topic)
+      expect(student_task.current_stage).to eq('submission')
+      expect(student_task.stage_deadline).to eq(Time.parse('2024-12-31 12:00:00'))
+    end
+  end
+
+  describe '#retrieve_tasks_for_user' do
+    before do
+      allow(user).to receive_message_chain(:assignment_participants, :includes).and_return([participant4, participant5])
+    end
+
+    it 'retrieves and sorts tasks by stage_deadline' do
+      tasks = student_task_helper.retrieve_tasks_for_user(user)
+      
+      expect(tasks.size).to eq(2)
+      expect(tasks.first.stage_deadline).to eq(Time.parse('2024-11-01 12:00:00'))
+      expect(tasks.last.stage_deadline).to eq(Time.parse('2024-12-01 12:00:00'))
+    end
+
+    it 'creates StudentTask objects for each participant' do
+      tasks = student_task_helper.retrieve_tasks_for_user(user)
+      
+      tasks.each do |task|
+        expect(task).to be_an_instance_of(StudentTask)
+        expect(task.participant).to be_in([participant4, participant5])
+        expect(task.assignment).to eq(assignment)
+        expect(task.topic).to eq(topic)
+      end
+    end
+  end
+
+  describe '#parse_stage_deadline' do
+  context 'If a valid time value is given' do
+    it 'parse the provided time correctly' do
+      given_time = '2024-12-31 12:00:00'
+      parsed_time = student_task_helper.parse_stage_deadline(given_time)
+      expect(parsed_time).to eq(Time.parse(given_time))
+    end
+  end
+
+  context 'If given time string is invalid' do
+    it 'return current time plus 1 year' do
+      given_time = 'invalid-time-string'
+      overhead_time = Time.now + 1.year
+      parsed_time = student_task_helper.parse_stage_deadline(given_time)
+      expect(parsed_time).to be_within(1.second).of(overhead_time)
+    end
+  end
+end
 
   # Tests teamed students method which returns the unique students that are paired with the student at some point
   # within their course

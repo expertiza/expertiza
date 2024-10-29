@@ -8,16 +8,38 @@ describe StudentTaskHelper do
   let(:assignment) { build(:assignment, name: 'assignment', directory_path: 'assignment') }
   let(:assignment2) { build(:assignment, name: 'assignment2', directory_path: 'assignment2') }
   let(:participant) { build(:participant, id: 1, user_id: user.id, parent_id: assignment.id) }
+  let(:participant2) { build(:participant, id: 2, user_id: user2.id, parent_id: assignment.id) }
+  let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, users: [user, user2]) }
   let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, users: [user3]) }
+  let(:course) { build(:course) }
+  let(:course_team) { create(:course_team, id: 3, name: 'course team 1', parent_id: course.id) }
   let(:review_response_map) { build(:review_response_map, assignment: assignment, reviewer: participant, reviewee: team2) }
   let(:response) { build(:response, id: 1, map_id: 1, response_map: review_response_map) }
-
+  let(:response_modifier) do
+    ->(response, label) {
+      {
+        id: response.id,
+        label: label,
+        updated_at: response.updated_at.strftime('%a, %d %b %Y %H:%M')
+      }
+    }
+  end
+  
   # Gets the due dates of an assignment
-  describe '#update_timeline_with_assignment_deadlines' do
+  describe '#for_each_due_date_of_assignment' do
+    let(:due_date_modifier) do
+      ->(dd) {
+        { label: (dd.deadline_type.name + ' Deadline').humanize,
+          updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M')
+        }
+      }
+    end
     context 'when called with assignment having empty due dates' do
       it 'return empty time_list array' do
         timeline_list = []
-        student_task_helper.update_timeline_with_assignment_deadlines(assignment, timeline_list)
+        student_task_helper.for_each_due_date_of_assignment(assignment) do |due_date|
+          timeline_list << due_date_modifier.call(due_date)
+        end
         expect(timeline_list).to eq([])
       end
     end
@@ -28,7 +50,9 @@ describe StudentTaskHelper do
           timeline_list = []
           due_date.due_at = nil
           assignment.due_dates = [due_date]
-          student_task_helper.update_timeline_with_assignment_deadlines(assignment, timeline_list)
+          student_task_helper.for_each_due_date_of_assignment(assignment) do |due_date|
+            timeline_list << due_date_modifier.call(due_date)
+          end
           expect(timeline_list).to eq([])
         end
       end
@@ -37,7 +61,9 @@ describe StudentTaskHelper do
           allow(due_date).to receive(:deadline_type).and_return(deadline_type)
           timeline_list = []
           assignment.due_dates = [due_date]
-          student_task_helper.update_timeline_with_assignment_deadlines(assignment, timeline_list)
+          student_task_helper.for_each_due_date_of_assignment(assignment) do |due_date|
+            timeline_list << due_date_modifier.call(due_date)
+          end
           expect(timeline_list).to eq([{
                                         label: (due_date.deadline_type.name + ' Deadline').humanize,
                                         updated_at: due_date.due_at.strftime('%a, %d %b %Y %H:%M')
@@ -48,11 +74,13 @@ describe StudentTaskHelper do
   end
 
   # Verifies fetching of peer review data of a user and a timeline
-  describe '#update_timeline_with_peer_reviews' do
+  describe '#for_each_peer_review' do
     context 'when no review response mapped' do
       it 'returns empty' do
         timeline_list = []
-        student_task_helper.update_timeline_with_peer_reviews(user2, timeline_list)
+        for_each_peer_review(user2) do |response|
+          timeline_list << response_modifier.call(response, "Round #{response.round} Peer Review".humanize)
+        end
         expect(timeline_list).to eq([])
       end
     end
@@ -65,17 +93,22 @@ describe StudentTaskHelper do
         allow(response).to receive(:round).and_return(1)
         allow(response).to receive(:updated_at).and_return(Time.new(2019))
         timevalue = Time.new(2019).strftime('%a, %d %b %Y %H:%M')
-        expect(student_task_helper.update_timeline_with_peer_reviews(1, timeline_list)).to eq([{ id: 1, label: 'Round 1 peer review', updated_at: timevalue }])
+        for_each_peer_review(1) do |resp|
+          timeline_list << response_modifier.call(resp, "Round #{resp.round} Peer Review".humanize)
+        end
+        expect(timeline_list).to eq([{ id: 1, label: 'Round 1 peer review', updated_at: timevalue }])
       end
     end
   end
 
   # Verifies retrieval of feedback from author
-  describe '#update_timeline_with_author_feedbacks' do
+  describe '#for_each_author_feedback' do
     context 'when no feedback response mapped' do
       it 'returns empty' do
         timeline_list = []
-        student_task_helper.update_timeline_with_author_feedbacks(user2, timeline_list)
+        for_each_author_feedback(user2) do |response|
+          timeline_list << response_modifier.call(response, "Author feedback")
+        end
         expect(timeline_list).to eq([])
       end
     end
@@ -87,7 +120,11 @@ describe StudentTaskHelper do
         allow(Response).to receive_message_chain(:where, :last).with(map_id: 1).with(no_args).and_return(response)
         allow(response).to receive(:updated_at).and_return(Time.now)
         timevalue = Time.now.strftime('%a, %d %b %Y %H:%M')
-        expect(student_task_helper.update_timeline_with_author_feedbacks(1, timeline_list)).to eq([{ id: 1, label: 'Author feedback', updated_at: timevalue }])
+        timeline_list = []
+        for_each_author_feedback(1) do |response|
+          timeline_list << response_modifier.call(response, "Author feedback")
+        end
+        expect(timeline_list).to eq([{ id: 1, label: 'Author feedback', updated_at: timevalue }])
       end
     end
   end
@@ -98,6 +135,31 @@ describe StudentTaskHelper do
       it 'returns nil' do
         allow(participant).to receive(:get_reviewer).and_return(participant)
         expect(student_task_helper.generate_timeline(assignment, participant)).to eq([])
+      end
+    end
+  end
+
+  # Tests teamed students method which returns the unique students that are paired with the student at some point
+  # within their course
+  describe '#find_teammates_by_user' do
+    context 'when not in any team' do
+      it 'returns empty' do
+        expect(student_task_helper.find_teammates_by_user(user3)).to eq({})
+      end
+    end
+    context 'when assigned in a course_team ' do
+      it 'returns empty' do
+        allow(user).to receive(:teams).and_return([course_team])
+        expect(student_task_helper.find_teammates_by_user(user)).to eq({})
+      end
+    end
+    context 'when assigned in a assignment_team ' do
+      it 'returns the students they are teamed with' do
+        allow(user).to receive(:teams).and_return([team])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: assignment.id).and_return(participant)
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: 5, parent_id: assignment.id).and_return(participant2)
+        allow(Assignment).to receive(:find_by).with(id: team.parent_id).and_return(assignment)
+        expect(student_task_helper.find_teammates_by_user(user)).to eq(assignment.course_id => [user2.fullname])
       end
     end
   end

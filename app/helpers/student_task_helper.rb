@@ -45,7 +45,7 @@ module StudentTaskHelper
 
   def for_each_due_date_of_assignment(assignment)
     assignment.due_dates.each do |dd|
-      yield dd
+      yield dd unless dd.due_at.nil?
     end
   end
 
@@ -56,20 +56,20 @@ module StudentTaskHelper
     end
   end
 
-  def for_each_peer_review(participant_id)
-    fetch_response_from(ReviewResponseMap, participant_id)
+  def for_each_peer_review(participant_id, &block)
+    fetch_response_from(ReviewResponseMap, participant_id, &block)
   end
 
-  def for_each_author_feedback(participant_id)
-    fetch_response_from(FeedbackResponseMap, participant_id)
+  def for_each_author_feedback(participant_id, &block)
+    fetch_response_from(FeedbackResponseMap, participant_id, &block)
   end
 
   def generate_timeline(assignment, participant)
 
     due_date_modifier = ->(dd) {
       { label: (dd.deadline_type.name + ' Deadline').humanize,
-        updated_at: dd.due_at&.strftime('%a, %d %b %Y %H:%M')
-      }.compact
+        updated_at: dd.due_at.strftime('%a, %d %b %Y %H:%M')
+      }
     }
 
     response_modifier = ->(response, label) {
@@ -119,7 +119,7 @@ module StudentTaskHelper
     Time.now + 1.year
   end
 
-  def self.find_teammates_by_user(user, ip_address = nil)
+  def find_teammates_by_user(user, ip_address = nil)
     students_teamed = {}
     user.teams.each do |team|
       next unless team.is_a?(AssignmentTeam)

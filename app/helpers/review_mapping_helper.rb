@@ -400,21 +400,43 @@ end
     html.html_safe
   end
 
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
-  def list_hyperlink_submission(response_map_id, question_id)
-    assignment = Assignment.find(@id)
-    curr_round = assignment.try(:num_review_rounds)
-    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
-    comments = answer_with_link.try(:comments)
-    html = ''
-    html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
-    html.html_safe
-  end
+# Lists the hyperlink submission in peer review comments for a specific response and question.
+# This is designed for assignments where instructors want to quickly check if students pasted a link.
+def list_hyperlink_submission(response_map_id, question_id)
+  assignment = fetch_assignment
+  current_round = fetch_current_round(assignment)
+  
+  return ''.html_safe unless current_round # Return safe empty HTML if no current round is found
+
+  comments = fetch_hyperlink_comment(response_map_id, question_id, current_round)
+  
+  generate_hyperlink_html(comments)
+end
+
+# Fetches the assignment based on the instance variable @id
+def fetch_assignment
+  Assignment.find(@id)
+end
+
+# Retrieves the current review round number, if available
+def fetch_current_round(assignment)
+  assignment.try(:num_review_rounds)
+end
+
+# Fetches the hyperlink comment from the response and answer records
+def fetch_hyperlink_comment(response_map_id, question_id, current_round)
+  response = Response.find_by(map_id: response_map_id, round: current_round)
+  answer = Answer.find_by(response_id: response.id, question_id: question_id) if response
+  answer.try(:comments)
+end
+
+# Generates HTML for displaying the hyperlink if it exists and starts with 'http'
+def generate_hyperlink_html(comments)
+  return ''.html_safe unless comments.present? && comments.start_with?('http')
+  
+  display_hyperlink_in_peer_review_question(comments).html_safe
+end
+
 
   # gets review and feedback responses for all rounds for the feedback report
   def get_each_review_and_feedback_response_map(author)
@@ -451,19 +473,17 @@ end
     @rspan = @review_responses.length
   end
 
-  #
-  # for calibration report
-  #
-  def get_css_style_for_calibration_report(diff)
-    # diff - difference between stu's answer and instructor's answer
-    dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
-    css_class = if dict.key?(diff.abs)
-                  dict[diff.abs]
-                else
-                  'c1'
-                end
-    css_class
-  end
+# Determines the CSS class for a calibration report based on the difference 
+# between a student's answer and the instructor's answer.
+# A smaller difference indicates a closer match to the instructor's answer.
+def get_css_style_for_calibration_report(diff)
+  # CSS class mapping based on the absolute difference value
+  css_class_mapping = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
+
+  # Return the CSS class based on the difference, defaulting to 'c1' for larger differences
+  css_class_mapping.fetch(diff.abs, 'c1')
+end
+
 
   class ReviewStrategy
     attr_accessor :participants, :teams

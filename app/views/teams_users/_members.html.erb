@@ -1,7 +1,7 @@
 <ul class="team_members">
   <% @users.each do | user |-%>
     <li class="team_members">
-      <div class="name"><%= user.name(session[:ip]).strip %></div>
+      <div class="name"><%= user.username(session[:ip]).strip %></div>
     </li>
   <% end -%>
 </ul>

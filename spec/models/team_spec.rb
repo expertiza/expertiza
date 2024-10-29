@@ -3,7 +3,7 @@ describe Team do
   let(:participant) { build(:participant, user_id: 1) }
   let(:participant2) { build(:participant, user_id: 2) }
   let(:participant3) { build(:participant, user_id: 3) }
-  let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
+  let(:user) { build(:student, id: 1, username: 'no name', name: 'no one', participants: [participant]) }
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
@@ -91,7 +91,7 @@ describe Team do
   describe '#add_member' do
     context 'when parameterized user has already joined in current team' do
       it 'raise an error' do
-        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.name} is already a member of the team #{team.name}")
+        expect { team.add_member(user) }.to raise_error(RuntimeError, "The user #{user.username} is already a member of the team #{team.name}")
       end
     end
 
@@ -161,9 +161,9 @@ describe Team do
   end
 
   describe '.import_team_members' do
-    context 'when cannot find a user by name' do
+    context 'when cannot find a user by username' do
       it 'raises an ImportError' do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
+        allow(User).to receive(:find_by).with(username: 'no name').and_return(nil)
         expect { team.import_team_members(teammembers: ['no name']) }.to raise_error(ImportError,
                                                                                      "The user 'no name' was not found. <a href='/users/new'>Create</a> this user?")
       end
@@ -171,7 +171,7 @@ describe Team do
 
     context 'when can find certain user' do
       it 'adds the user to current team' do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
+        allow(User).to receive(:find_by).with(username: 'no name').and_return(user)
         allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
         expect(team.import_team_members(teammembers: ['no name'])).to eq(['no name'])

@@ -255,7 +255,7 @@ hi_IN:
       team_name_up: "टीम का नाम:"
       team_members: "टीम के सदस्या"
       username: "यूजरनाम "
-      fullname: "पूरा नाम"
+      name: "पूरा नाम"
       email_address: "ईमेल  एड्रेस"
       review_action: "रिव्यु एक्शन"
       send_invite: "निमंत्रण भेजें"

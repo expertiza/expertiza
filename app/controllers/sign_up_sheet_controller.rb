@@ -243,7 +243,7 @@ class SignUpSheetController < ApplicationController
   def signup_as_instructor; end
 
   def signup_as_instructor_action
-    user = User.find_by(name: params[:username])
+    user = User.find_by(username: params[:username])
     if user.nil? # validate invalid user
       flash[:error] = 'That student does not exist!'
     else
@@ -414,7 +414,7 @@ class SignUpSheetController < ApplicationController
       @results.each do |result|
         @team_members = ''
         TeamsUser.where(team_id: result[:team_id]).each do |teamuser|
-          @team_members += User.find(teamuser.user_id).name + ' '
+          @team_members += User.find(teamuser.user_id).username + ' '
         end
       end
       # @team_members = find_team_members(topic)

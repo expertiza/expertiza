@@ -65,12 +65,12 @@ class LtiController < ApplicationController
   def authenticate_and_login_user(username)
     begin
       # Gets the user if they exist in Expertiza, else null
-      user = User.find_by(name: username)
+      user = User.find_by(username: username)
       if user
         # Log the user in
         session[:user] = user  # Store the entire user object, not just the username
         AuthController.set_current_role(user.role_id, session)
-        ExpertizaLogger.info LoggerMessage.new('', user.name, 'Login successful via LTI')
+        ExpertizaLogger.info LoggerMessage.new('', user.username, 'Login successful via LTI')
         redirect_to "#{ENV['EXPERTIZA_BASE_URL']}/student_task/list", notice: 'Logged in successfully via LTI'
       else
         redirect_to root_path, alert: 'User not found in Expertiza. Please register first.'

@@ -112,10 +112,10 @@ module ReviewMappingHelper
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
   end
 
-  # For assignments with 1 team member, the following method returns user's fullname else it returns "team name" that a particular reviewee belongs to.
+  # For assignments with 1 team member, the following method returns user's name else it returns "team name" that a particular reviewee belongs to.
   def get_team_reviewed_link_name(max_team_size, _response, reviewee_id, ip_address)
     team_reviewed_link_name = if max_team_size == 1
-                                TeamsUser.where(team_id: reviewee_id).first.user.fullname(ip_address)
+                                TeamsUser.where(team_id: reviewee_id).first.user.name(ip_address)
                               else
                                 # E1991 : check anonymized view here
                                 Team.find(reviewee_id).name

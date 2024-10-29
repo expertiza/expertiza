@@ -11,7 +11,7 @@ def deploy_course_survey(start_date, end_date, survey_name)
   expect(page).to have_content('Manage content')
   create_course_questionnaire survey_name
   survey = Questionnaire.where(name: survey_name)
-  instructor = User.where(name: 'instructor6').first
+  instructor = User.where(username: 'instructor6').first
   course = Course.where(instructor_id: instructor.id).first
   visit '/survey_deployment/new?id=' + course.id.to_s + '&type=CourseSurveyDeployment'
   expect(page).to have_content('New Survey Deployment')

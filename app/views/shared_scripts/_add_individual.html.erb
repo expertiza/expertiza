@@ -1,5 +1,5 @@
 <%= form_tag form_action, :id => "part_add", :method => 'post', :class => "form-inline", :remote => remote do %>
-  Enter a user login: <%= text_field_with_auto_complete :user, :name, {:size => 20, :class => "form-control", :style => "width: 250px"} %>
+  Enter a user login: <%= text_field_with_auto_complete :user, :username, {:size => 20, :class => "form-control", :style => "width: 250px"} %>
 	<%= hidden_field_tag(obj_type, obj_id) %>
 	<%= hidden_field_tag('model', model) %>
         <!-- E726 Fall2012 Changes Begin -->

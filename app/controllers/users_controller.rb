@@ -42,8 +42,8 @@ class UsersController < ApplicationController
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)
-    @users = User.where('name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%", role.get_available_roles, user.id)
-    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    @users = User.where('username LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:username]}%", role.get_available_roles, user.id)
+    render inline: "<%= auto_complete_result @users, 'username' %>", layout: false
   end
 
   # for anonymized view for demo purposes
@@ -67,9 +67,9 @@ class UsersController < ApplicationController
     if letter.present? && search_by.present?
       case search_by.to_i
       when 1 # Search by username
+        @paginated_users = paginate_list.where('username LIKE ?', "%#{letter}%")
+      when 2 # Search by name
         @paginated_users = paginate_list.where('name LIKE ?', "%#{letter}%")
-      when 2 # Search by fullname
-        @paginated_users = paginate_list.where('fullname LIKE ?', "%#{letter}%")
       when 3 # Search by email
         @paginated_users = paginate_list.where('email LIKE ?', "%#{letter}%")
       else
@@ -82,9 +82,9 @@ class UsersController < ApplicationController
 
   # for displaying users which are being searched for editing purposes after checking whether current user is authorized to do so
   def show_if_authorized
-    @user = User.find_by(name: params[:user][:name])
+    @user = User.find_by(username: params[:user][:username])
     if @user.nil?
-      flash[:note] = params[:user][:name] + ' does not exist.'
+      flash[:note] = params[:user][:username] + ' does not exist.'
       redirect_to action: 'list'
     else
       role
@@ -121,9 +121,9 @@ class UsersController < ApplicationController
 
   def create
     # if the user name already exists, register the user by email address
-    check = User.find_by(name: params[:user][:name])
+    check = User.find_by(username: params[:user][:username])
     if check
-      params[:user][:name] = params[:user][:email]
+      params[:user][:username] = params[:user][:email]
       flash[:note] = "That username already exists. Username has been set to the user's email address"
     end
     is_user = true
@@ -140,7 +140,7 @@ class UsersController < ApplicationController
       # TAs and Students do not need a default. TAs inherit the default from the instructor,
       # Students do not have any checks for this information.
       AssignmentQuestionnaire.create(user_id: @user.id) if (@user.role.name == 'Instructor') || (@user.role.name == 'Administrator')
-      undo_link("The user \"#{@user.name}\" has been successfully created. ")
+      undo_link("The user \"#{@user.username}\" has been successfully created. ")
       redirect_to action: 'list'
     else
       foreign
@@ -165,10 +165,10 @@ class UsersController < ApplicationController
     # update username, when the user cannot be deleted
     # rename occurs in 'show' page, not in 'edit' page
     # eg. /users/5408?name=5408
-    @user.name += '_hidden' if request.original_fullpath == "/users/#{@user.id}?name=#{@user.id}"
+    @user.username += '_hidden' if request.original_fullpath == "/users/#{@user.id}?username=#{@user.id}"
 
     if @user.update_attributes(params[:user])
-      flash[:success] = "The user \"#{@user.name}\" has been successfully updated."
+      flash[:success] = "The user \"#{@user.username}\" has been successfully updated."
       redirect_to @user
     else
       render action: 'edit'
@@ -183,7 +183,7 @@ class UsersController < ApplicationController
       AssignmentQuestionnaire.where(user_id: @user.id).each(&:destroy)
       # Participant.delete(true)
       @user.destroy
-      flash[:note] = "The user \"#{@user.name}\" has been successfully deleted."
+      flash[:note] = "The user \"#{@user.username}\" has been successfully deleted."
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -214,11 +214,11 @@ class UsersController < ApplicationController
 
   # add user etc_icons_on_homepage
   def user_params
-    params.require(:user).permit(:name,
+    params.require(:user).permit(:username,
                                  :crypted_password,
                                  :role_id,
                                  :password_salt,
-                                 :fullname,
+                                 :name,
                                  :email,
                                  :parent_id,
                                  :private_by_default,
@@ -249,7 +249,7 @@ class UsersController < ApplicationController
 
   # For filtering the users list with proper search and pagination.
   def paginate_list
-    paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
+    paginate_options = { '1' => 25, '2' => 50, '3' => 100, '4' => User.count}
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
@@ -259,7 +259,11 @@ class UsersController < ApplicationController
 
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-    @per_page = 3
+
+    # Sets the number of users to display per page based on the 'per_page' parameter from the request.
+    # If no 'per_page' parameter is provided, it defaults to '4', which corresponds to displaying all users on one page.
+    @per_page = params[:per_page] || '4'
+
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 

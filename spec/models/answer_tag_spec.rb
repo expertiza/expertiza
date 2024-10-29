@@ -10,7 +10,7 @@ describe AnswerTag do
   let(:tag_prompt_cb) { TagPrompt.create id: 1, prompt: '??', desc: 'desc', control_type: 'checkbox' }
   let(:tag_deploy) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt, question_type: 'Criterion' }
   let(:tag_deploy_cb) { TagPromptDeployment.create id: 1, tag_prompt: tag_prompt_cb, question_type: 'Criterion' }
-  let(:user) { User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678' }
+  let(:user) { User.new username: 'abc', name: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678' }
 
   it 'is invalid without valid attributes' do
     expect(AnswerTag.new).not_to be_valid

@@ -1,5 +1,5 @@
 describe Authority do
-  let(:user1) { create(:student, name: 'expertizauser', id: 1) }
+  let(:user1) { create(:student, username: 'expertizauser', id: 1) }
   let(:admin) { build(:admin) }
   describe '#initialize' do
     it 'sets the current user' do

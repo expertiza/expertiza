@@ -8,8 +8,8 @@ describe PopupController do
 
   let(:instructor) { build_stubbed(:instructor, id: 6) }
   let(:team) { build_stubbed(:assignment_team, id: 1, name: 'team1', assignment: assignment) }
-  let(:student) { build_stubbed(:student, id: 1, name: 'student') }
-  let(:student2) { build_stubbed(:student, id: 2, name: 'student2') }
+  let(:student) { build_stubbed(:student, id: 1, username: 'student') }
+  let(:student2) { build_stubbed(:student, id: 2, username: 'student2') }
   let(:participant) { build_stubbed(:participant, id: 1, user_id: 1, user: student, assignment: assignment) }
   let(:participant2) { build_stubbed(:participant, id: 2, user: student2, assignment: assignment) }
   let(:response) { build_stubbed(:response, id: 1) }
@@ -123,15 +123,15 @@ describe PopupController do
   describe '#reviewer_details_popup' do
     it 'render reviewer_details_popup page successfully' do
       participant = double(:participant, user_id: 1)
-      user = double(:user, fullname: 'Test User', name: 'Test', email: 'test@gmail.com', handle: 1)
+      user = double(:user, name: 'Test User', username: 'Test', email: 'test@gmail.com', handle: 1)
       allow(Participant).to receive(:find).with('1').and_return(participant)
       allow(User).to receive(:find).with(participant.user_id).and_return(user)
       request_params = { id: 1, assignment_id: 1 }
       user_session = { user: instructor }
       get :reviewer_details_popup, params: request_params, session: user_session
       expect(@response).to have_http_status(200)
-      expect(user.fullname).to eq('Test User')
-      expect(user.name).to eq('Test')
+      expect(user.name).to eq('Test User')
+      expect(user.username).to eq('Test')
       expect(user.email).to eq('test@gmail.com')
       expect(user.handle).to eq(1)
     end

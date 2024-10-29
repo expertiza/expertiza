@@ -1,7 +1,7 @@
 describe Assignment do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team], max_team_size: 2) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:student) { build(:student, id: 3, name: 'no one') }
+  let(:student) { build(:student, id: 3, username: 'no one') }
   let(:review_response_map) { build(:review_response_map, response: [response], reviewer: build(:participant), reviewee: build(:assignment_team)) }
   let(:teammate_review_response_map) { build(:review_response_map, type: 'TeammateReviewResponseMap') }
   let(:participant) { build(:participant, id: 1) }
@@ -344,7 +344,7 @@ describe Assignment do
   describe '#add_participant' do
     context 'when user is nil' do
       it 'raises an error' do
-        allow(User).to receive(:find_by).with(name: 'no one').and_return(nil)
+        allow(User).to receive(:find_by).with(username: 'no one').and_return(nil)
         allow_any_instance_of(Assignment).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
         expect { assignment.add_participant('no one', nil, nil, nil, nil) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create</a> the user first})
       end
@@ -352,7 +352,7 @@ describe Assignment do
 
     context 'when the user is already a participant of current assignment' do
       it 'raises an error' do
-        allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
+        allow(User).to receive(:find_by).with(username: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(participant)
         expect { assignment.add_participant('no one', nil, nil, nil, nil) }.to raise_error(RuntimeError, /The user no one is already a participant/)
       end
@@ -360,7 +360,7 @@ describe Assignment do
 
     context 'when AssignmentParticipant was created successfully' do
       it 'returns true' do
-        allow(User).to receive(:find_by).with(name: 'no one').and_return(student)
+        allow(User).to receive(:find_by).with(username: 'no one').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(parent_id: 1, user_id: 3).and_return(nil)
         allow(AssignmentParticipant).to receive(:create).with(parent_id: 1, user_id: 3, permission_granted: 0,
                                                               can_submit: true, can_review: true, can_take_quiz: false, can_mentor: false).and_return(participant)
@@ -586,7 +586,7 @@ describe Assignment do
     before(:each) do
       create(:assignment)
       create(:assignment_team, name: 'team1')
-      @student = create(:student, name: 'student1')
+      @student = create(:student, username: 'student1')
       create(:participant, user: @student)
       create(:questionnaire)
       create(:question)

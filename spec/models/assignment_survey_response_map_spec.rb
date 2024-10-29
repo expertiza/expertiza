@@ -1,10 +1,10 @@
 describe AssignmentSurveyResponseMap, type: :model do
-  let(:participant) { build(:participant, user_id: 1, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
+  let(:participant) { build(:participant, user_id: 1, user: build(:student, username: 'Jane', name: 'Doe, Jane', id: 1)) }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
   let(:previous_day) { (Time.now.getlocal - 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:next_day) { (Time.now.getlocal + 1 * 86_400).strftime('%Y-%m-%d %H:%M:%S') }
   let(:assignment) { build(:assignment, id: 1, name: 'Assignment1') }
-  let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', name: 'Jane', fullname: 'Doe, Jane', id: 1) }
+  let(:user) { build(:student, email: 'expertiza.debugging@gmail.com', username: 'Jane', name: 'Doe, Jane', id: 1) }
   before(:each) do
     survey_deployment = AssignmentSurveyDeployment.new questionnaire_id: 1, start_date: previous_day, end_date: next_day, parent_id: '12345678', type: 'AssignmentSurveyDeployment'
     @assignment_survey_response_map = AssignmentSurveyResponseMap.new

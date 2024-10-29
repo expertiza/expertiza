@@ -17,7 +17,7 @@ describe Assessment360Controller do
   let(:assignment_list) { [assignment] }
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:course_participant) { build(:course_participant, user_id: 1) }
-  let(:student1) { build(:student, id: 1, name: :lily) }
+  let(:student1) { build(:student, id: 1, username: :lily) }
   let(:assignment_with_participants) do
     build(:assignment,
           id: 1,

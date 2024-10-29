@@ -51,10 +51,10 @@ class ConferenceController < ApplicationController
 
   def add_conference_user
     # check if user is already present with given username in system
-    existing_user = User.find_by(name: params[:user][:name])
+    existing_user = User.find_by(username: params[:user][:username])
     # if user exist then add user as participant to assignment else create account and then add as participant
     if existing_user.nil?
-      if !User.find_by(email: params[:user][:email]).nil? || (params[:user][:name].nil? || params[:user][:name].empty?)
+      if !User.find_by(email: params[:user][:email]).nil? || (params[:user][:username].nil? || params[:user][:username].empty?)
         flash[:error] = 'A user with username of this email already exists, Please provide a unique email to continue.'
         # redirect_to request.referrer
         return false

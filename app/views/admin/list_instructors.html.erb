@@ -3,14 +3,14 @@
 <%= will_paginate @users %>
 
 <table>
-  <tr><th>Name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
+  <tr><th>User name</th><th>Full Name</th><th>Email Address</th><th>Parent</th></tr>
   <% for user in @users%>
     <tr>
-      <td><%= link_to user.name(session[:ip]), :action => 'show_instructor',
+      <td><%= link_to user.username(session[:ip]), :action => 'show_instructor',
         :id => user.id %></td>
-      <td><%= user.fullname(session[:ip]) %></td>
+      <td><%= user.name(session[:ip]) %></td>
       <td><%= user.email(session[:ip]) %></td>
-      <td><%= (User.find(user.parent_id)).name  %></td>
+      <td><%= (User.find(user.parent_id)).username  %></td>
     </tr>
   <% end -%>
 </table>

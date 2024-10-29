@@ -12,9 +12,9 @@ end
 
 describe CourseAnalytic do
   let(:course) { build(:course, id: 1, name: 'ECE517') }
-  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
-  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
+  let(:participant) { build(:participant, user: build(:student, username: 'Jane', name: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, username: 'John', name: 'Doe, John', id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, username: 'King', name: 'Titan, King', id: 3)) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:assignment2) { build(:assignment, id: 2, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:assignment3) { build(:assignment, id: 3, name: 'no assignment', participants: [participant], teams: [team]) }

@@ -8,7 +8,7 @@ module ManageTeamHelper
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
       ExpertizaLogger.error LoggerMessage.new('ManageTeamHelper', '', 'User being added to the team does not exist!', request)
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+      flash[:error] = "\"#{params[:user][:username].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
     # find the team with 'team_id' form database and add new user to team
     team = Team.find(team_id)

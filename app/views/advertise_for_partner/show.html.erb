@@ -18,8 +18,8 @@
   </tr>
   <% for member in @student.team.participants %>
     <tr>
+      <td><%= member.user.username(session[:ip]) %></td>
       <td><%= member.user.name(session[:ip]) %></td>
-      <td><%= member.user.fullname(session[:ip]) %></td>
       <td><%= member.user.email(session[:ip]) %></td>
       <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
 

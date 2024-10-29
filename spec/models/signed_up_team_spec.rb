@@ -4,10 +4,10 @@ describe SignUpTopic do
   let(:topic) { build(:topic) }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', users: [user, user2]) }
   let(:user) { create(:student) }
-  let(:user2) { create(:student, name: 'qwertyui', id: 5) }
+  let(:user2) { create(:student, username: 'qwertyui', id: 5) }
   
   describe '.drop_signup_record' do
-    let(:instructor) { User.create!(name: 'Instructor', fullname: 'FullInstructor', email: 'instructor@example.com', password: 'securepassword', password_confirmation: 'securepassword') }
+    let(:instructor) { User.create!(username: 'Instructor', name: 'FullInstructor', email: 'instructor@example.com', password: 'securepassword', password_confirmation: 'securepassword') }
     let(:assignment) { Assignment.create!(name: 'Test Assignment', instructor_id: instructor.id, directory_path: 'test/path') }
     let(:topic) { SignUpTopic.create!(topic_name: 'Sample Topic', assignment: assignment) }
     let(:team) { Team.create!(name: 'Sample Team') }

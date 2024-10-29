@@ -19,14 +19,14 @@ class User < ApplicationRecord
   has_many :track_notifications, dependent: :destroy
   belongs_to :parent, class_name: 'User'
   belongs_to :role
-  validates :name, presence: true
-  validates :name, uniqueness: true
-  validates :name, format: { without: /\s/ }
+  validates :username, presence: true
+  validates :username, uniqueness: { case_sensitive: false }
+  validates :username, format: { without: /\s/ }
 
   validates :email, presence: { message: "can't be blank" }
   validates :email, format: { with: /\A[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\z/i, allow_blank: true }
 
-  validates :fullname, presence: true
+  validates :name, presence: true
 
   before_validation :randomize_password, if: ->(user) { user.new_record? && user.password.blank? } # AuthLogic
 
@@ -48,9 +48,9 @@ class User < ApplicationRecord
     object_type.where(['instructor_id = ?', user_id])
   end
 
-  def get_available_users(name)
+  def get_available_users(username)
     lesser_roles = role.get_parents
-    all_users = User.all(conditions: ['name LIKE ?', "#{name}%"], limit: 20) # higher limit, since we're filtering
+    all_users = User.all(conditions: ['username LIKE ?', "#{username}%"], limit: 20) # higher limit, since we're filtering
     visible_users = all_users.select { |user| lesser_roles.include? user.role }
     visible_users[0, 10] # the first 10
   end
@@ -107,21 +107,21 @@ class User < ApplicationRecord
   # from their anonymized names. The process of obtaining
   # real name is exactly opposite of what we'd do to get
   # anonymized name from their real name.
-  def self.real_user_from_anonymized_name(anonymized_name)
-    user = User.find_by(name: anonymized_name)
+  def self.real_user_from_anonymized_username(anonymized_username)
+    user = User.find_by(username: anonymized_username)
     user
   end
 
-  def name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:name]
+  def username(ip_address = nil)
+    User.anonymized_view?(ip_address) ? role.name + ' ' + id.to_s : self[:username]
   end
 
-  def fullname(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:fullname]
+  def name(ip_address = nil)
+    User.anonymized_view?(ip_address) ? role.name + ', ' + id.to_s : self[:name]
   end
 
   def first_name(ip_address = nil)
-    User.anonymized_view?(ip_address) ? role.name : fullname.try(:[], /,.+/).try(:[], /\w+/) || ''
+    User.anonymized_view?(ip_address) ? role.name : name.try(:[], /,.+/).try(:[], /\w+/) || ''
   end
 
   def email(ip_address = nil)
@@ -164,13 +164,13 @@ class User < ApplicationRecord
   def self.import(row_hash, _row_header, session, _id = nil)
     raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least username, full name, email." if row_hash.length < 3
 
-    user = User.find_by_name(row_hash[:username])
+    user = User.find_by_username(row_hash[:username])
     if user.nil?
       attributes = ImportFileHelper.define_attributes(row_hash)
       user = ImportFileHelper.create_new_user(attributes, session)
     else
       user.email = row_hash[:email]
-      user.fullname = row_hash[:fullname]
+      user.name = row_hash[:name]
       user.parent_id = (session[:user]).id
       user.save
     end
@@ -195,7 +195,7 @@ class User < ApplicationRecord
     if user.nil?
       items = login.split('@')
       short_name = items[0]
-      user_list = User.where('name = ?', short_name)
+      user_list = User.where('username = ?', short_name)
       user = user_list.first if user_list.any? && user_list.length == 1
     end
     user
@@ -257,9 +257,9 @@ class User < ApplicationRecord
     users = User.all
     users.each do |user|
       tcsv = []
-      tcsv.push(user.name, user.fullname, user.email) if options['personal_details'] == 'true'
+      tcsv.push(user.username, user.name, user.email) if options['personal_details'] == 'true'
       tcsv.push(user.role.name) if options['role'] == 'true'
-      tcsv.push(user.parent.name) if options['parent'] == 'true'
+      tcsv.push(user.parent.username) if options['parent'] == 'true'
       tcsv.push(user.email_on_submission, user.email_on_review, user.email_on_review_of_review, user.copy_of_emails) if options['email_options'] == 'true'
       tcsv.push(user.etc_icons_on_homepage) if options['etc_icons_on_homepage'] == 'true'
       tcsv.push(user.handle) if options['handle'] == 'true'
@@ -273,7 +273,7 @@ class User < ApplicationRecord
 
   def self.export_fields(options)
     fields = []
-    fields.push('name', 'full name', 'email') if options['personal_details'] == 'true'
+    fields.push('username', 'full name', 'email') if options['personal_details'] == 'true'
     fields.push('role') if options['role'] == 'true'
     fields.push('parent') if options['parent'] == 'true'
     fields.push('email on submission', 'email on review', 'email on metareview', 'copy of emails') if options['email_options'] == 'true'
@@ -286,7 +286,7 @@ class User < ApplicationRecord
     user = if params[:user_id]
              User.find(params[:user_id])
            else
-             User.find_by name: params[:user][:name]
+             User.find_by username: params[:user][:username]
            end
     if user.nil?
       newuser = url_for controller: 'users', action: 'new'
@@ -312,14 +312,14 @@ class User < ApplicationRecord
   end
 
   def self.search_users(role, user_id, letter, search_by)
-    key_word = { '1' => 'name', '2' => 'fullname', '3' => 'email' }
+    key_word = { '1' => 'username', '2' => 'name', '3' => 'email' }
     sql = "(role_id in (?) or id = ?) and #{key_word[search_by]} like ?"
     if key_word.include? search_by
       search_filter = '%' + letter + '%'
-      users = User.order('name').where(sql, role.get_available_roles, user_id, search_filter)
+      users = User.order('username').where(sql, role.get_available_roles, user_id, search_filter)
     else # default used when clicking on letters
       search_filter = letter + '%'
-      users = User.order('name').where('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, user_id, search_filter)
+      users = User.order('username').where('(role_id in (?) or id = ?) and username like ?', role.get_available_roles, user_id, search_filter)
     end
     users
   end

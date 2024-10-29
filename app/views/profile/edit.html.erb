@@ -4,7 +4,7 @@
 
 <%= form_for @user, url: profile_index_path, method: :patch do |f| %>
 <table class="table borderless table-not-full-width">
-  <%= render :partial => 'users/name' %>
+  <%= render :partial => 'users/username' %>
   <%= render :partial => 'users/password' %>
   <tr><td><i><font size=-2><%=t ".password_msg"%></font></i></td><td></td></tr>
   <%= render :partial => 'users/email' %>

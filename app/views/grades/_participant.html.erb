@@ -14,7 +14,7 @@
 %>
 
 <TR <% if team %> id="<%= prefix %>" style="display:none; background-color: white;" <% end %>>
-    <TD><%= link_to participant.name(session[:ip]), impersonate_impersonate_path(:user => {:name => User.find(participant.user_id).name}), :method => :post %> (<%= participant.fullname(session[:ip]) %>)<BR/>
+    <TD><%= link_to participant.name(session[:ip]), impersonate_impersonate_path(:user => {:username => User.find(participant.user_id).username}), :method => :post %> (<%= participant.fullname(session[:ip]) %>)<BR/>
         <% if (controller.action_name != "view_my_scores" and index == team_size - 1) or controller.action_name == "view_my_scores" %>
             <FONT SIZE="-1"><a href="#" id="<%=prefix%>_filesLink" name="<%=prefix%>_filesLink" onClick="toggleElement('<%=prefix%>_files','submission');return false;"><%=t ".show_submission"%></a>
             <% if @topic_id %> (<%= SignUpTopic.find(@topic_id).topic_identifier %>)<% end %>

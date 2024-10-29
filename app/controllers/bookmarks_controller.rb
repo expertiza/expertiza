@@ -32,10 +32,10 @@ class BookmarksController < ApplicationController
     params[:url] = params[:url].gsub!(%r{https://}, '') if params[:url].start_with?('https://')
     begin
       Bookmark.create(url: create_bookmark_params[:url], title: create_bookmark_params[:title], description: create_bookmark_params[:description], user_id: session[:user].id, topic_id: create_bookmark_params[:topic_id])
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully created!', request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Your bookmark has been successfully created!', request)
       flash[:success] = 'Your bookmark has been successfully created!'
     rescue StandardError
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, $ERROR_INFO, request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, $ERROR_INFO, request)
       flash[:error] = $ERROR_INFO
     end
     redirect_to action: 'list', id: params[:topic_id]
@@ -48,7 +48,7 @@ class BookmarksController < ApplicationController
   def update
     @bookmark = Bookmark.find(params[:id])
     @bookmark.update_attributes(url: update_bookmark_params[:bookmark][:url], title: update_bookmark_params[:bookmark][:title], description: update_bookmark_params[:bookmark][:description])
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully updated!', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Your bookmark has been successfully updated!', request)
     flash[:success] = 'Your bookmark has been successfully updated!'
     redirect_to action: 'list', id: @bookmark.topic_id
   end
@@ -56,7 +56,7 @@ class BookmarksController < ApplicationController
   def destroy
     @bookmark = Bookmark.find(params[:id])
     @bookmark.destroy
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Your bookmark has been successfully deleted!', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Your bookmark has been successfully deleted!', request)
     flash[:success] = 'Your bookmark has been successfully deleted!'
     redirect_to action: 'list', id: @bookmark.topic_id
   end

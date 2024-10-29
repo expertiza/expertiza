@@ -1,5 +1,5 @@
 module StudentTaskHelper
-  TIME_FORMAT = '%a, %d %b %Y %H:%M'
+  TIME_FORMAT = '%a, %d %b %Y %H:%M'.freeze
 
   def get_review_grade_info(participant)
     if participant.try(:review_grade).try(:grade_for_reviewer).nil? ||
@@ -98,8 +98,8 @@ module StudentTaskHelper
 
   def teammate_names_for_team(team, user, ip_address)
     Team.find(team.id).participants
-      .reject { |p| p.name == user.name }
-      .map { |p| p.user.fullname(ip_address) }
+        .reject { |p| p.name == user.name }
+        .map { |p| p.user.fullname(ip_address) }
   end
 
   def valid_assignment_team?(team)
@@ -126,6 +126,7 @@ module StudentTaskHelper
   end
 
   private
+
   def map_with_parser(fn, data, parser)
     result = []
     fn.call(data) do |elem|
@@ -144,7 +145,7 @@ module StudentTaskHelper
   def parse_response_to_timeline(response, label)
     {
       id: response.id,
-      label: (eval label),
+      label: label,
       updated_at: response.updated_at.strftime(TIME_FORMAT)
     }
   end
@@ -159,16 +160,16 @@ module StudentTaskHelper
 
   def generate_peer_review_timeline(participant_id)
     map_with_parser(
-      method(:for_each_peer_review), 
-      participant_id, 
-      ->(response) { parse_response_to_timeline(response, '"Round #{response.round} Peer Review".humanize') }
+      method(:for_each_peer_review),
+      participant_id,
+      ->(response) { parse_response_to_timeline(response, "Round #{response.round} Peer Review".humanize) }
     )
   end
 
   def generate_author_feedback_timeline(participant_id)
     map_with_parser(
-      method(:for_each_author_feedback), 
-      participant_id, 
+      method(:for_each_author_feedback),
+      participant_id,
       ->(response) { parse_response_to_timeline(response, 'Author feedback') }
     )
   end

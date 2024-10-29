@@ -28,7 +28,6 @@ class ResponsesController < ApplicationController
   # Prepare the parameters when student clicks "Edit"
   # response questions with answers and scores are rendered in the edit page based on the version number
   def edit
-    #Added for E1973, team-based reviewing
     #Lock a response if the user is authorized to edit the current response
     current_response = Response.find(params[:id])
     current_map = current_response.map
@@ -37,42 +36,11 @@ class ResponsesController < ApplicationController
       return
     end
  
-    #setting variables for rendering view
-    @header = 'Edit'
-    @next_action = 'update'
-    @return = params[:return]
-    @map = current_response.map
-    @modified_object = current_response.response_id
-    @title = current_map.get_title
-    if current_map.survey?
-      @survey_parent = current_map.survey_parent
-    else
-      @assignment = current_map.assignment
-    end
-    @participant = current_map.reviewer
-    @contributor = current_map.contributor
+    set_action_parameters('Edit','update',params[:return],current_response,current_map,current_response.response_id)
     
-    # if user is not filling a new rubric, the @response object should be available.
-    # we can find the questionnaire from the question_id in answers
-    current_questionnaire = questionnaire_from_response(current_response)
-    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
-    @min = current_questionnaire.min_question_score
-    @max = current_questionnaire.max_question_score
-    
-    # The new response is created here so that the controller has access to it in the new method
-    # This response object is populated later in the new method 
-    if current_questionnaire
-      #Sometimes the response is already created and the new controller is called again (page refresh)
-      @response = Response.where(map_id: current_map.id, round: @current_round.to_i).order(updated_at: :desc).first
-      if @response.nil?
-        @response = Response.create(map_id: current_map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
-      end
-    end
-    
-    questions = current_questionnaire.questions
     @review_scores = []
-    questions.each do |question|
-      @review_scores << Answer.where(response_id: @response.response_id, question_id: question.id).first
+    @review_questions.each do |item|
+      @review_scores << Answer.where(response_id: @response.response_id, question_id: item.id).first
     end
     
     @questionnaire = questionnaire_from_response(@response)
@@ -94,10 +62,10 @@ class ResponsesController < ApplicationController
 
       @response.update_attribute('additional_comment', params[:review][:comments])
       @questionnaire = questionnaire_from_response(@response)
-      questions = sort_questions(@questionnaire.questions)
+      items = sort_items(@questionnaire.questions)
 
       # for some rubrics, there might be no questions but only file submission (Dr. Ayala's rubric)
-      create_answers(params, questions) unless params[:responses].nil?
+      create_answers(params, items) unless params[:responses].nil?
       if params['isSubmit'] && params['isSubmit'] == 'Yes'
         @response.update_attribute('is_submitted', true)
       end
@@ -115,35 +83,7 @@ class ResponsesController < ApplicationController
   end
 
   def new
-    @header = 'New'
-    @next_action = 'create'
-    @return = params[:return]
-    @map = ResponseMap.find(params[:id])
-    @modified_object = @map.id
-    @title = @map.get_title
-    if @map.survey?
-      @survey_parent = @map.survey_parent
-    else
-      @assignment = @map.assignment
-    end
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    
-    #get the questionnaire from the response map -> new_response=questionnaire_from_response_map
-    current_questionnaire=questionnaire_from_response_map(@map,@contributor,@assignment)
-    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
-    @min = current_questionnaire.min_question_score
-    @max = current_questionnaire.max_question_score
-    
-    # The new response is created here so that the controller has access to it in the new method
-    # This response object is populated later in the new method
-    if current_questionnaire
-      #Sometimes the response is already created and the new controller is called again (page refresh)
-      @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-      if @response.nil?
-        @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
-      end
-    end
+    set_action_parameters('New','create',params[:return],@response,ResponseMap.find(params[:id]),ResponseMap.find(params[:id]).id)
     
     @feedback = params[:feedback]
     if @assignment
@@ -191,8 +131,8 @@ class ResponsesController < ApplicationController
 
     # :version_num=>@version)
     # Change the order for displaying questions for editing response views.
-    questions = sort_questions(@questionnaire.questions)
-    create_answers(params, questions) if params[:responses]
+    items = sort_items(@questionnaire.questions)
+    create_answers(params, items) if params[:responses]
     msg = 'Your response was successfully saved.'
     error_msg = ''
 
@@ -217,27 +157,7 @@ class ResponsesController < ApplicationController
 
   # view response
   def view
-    @title = @map.get_title
-    if @map.survey?
-      @survey_parent = @map.survey_parent
-    else
-      @assignment = @map.assignment
-    end
-    @participant = @map.reviewer
-    @contributor = @map.contributor
-    current_questionnaire = questionnaire_from_response(current_response)
-    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
-    @min = current_questionnaire.min_question_score
-    @max = current_questionnaire.max_question_score
-    # The new response is created here so that the controller has access to it in the new method
-    # This response object is populated later in the new method
-    if current_questionnaire
-      #Sometimes the response is already created and the new controller is called again (page refresh)
-      @response = Response.where(map_id: @map.id, round: @current_round.to_i).order(updated_at: :desc).first
-      if @response.nil?
-        @response = Response.create(map_id: @map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
-      end
-    end
+    set_action_parameters(@header,@next_action,params_return,@response,@map,@modified_object)
   end
 
   # E2218: Method to check if that action is allowed for the user.
@@ -406,8 +326,8 @@ class ResponsesController < ApplicationController
 
   # This method initialize answers for the questions in the response
   # Iterates over each questions and create corresponding answer for that
-  def init_answers(questions)
-    questions.each do |q|
+  def init_answers(items)
+    items.each do |q|
       # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
       answer = Answer.where(response_id: @response.id, question_id: q.id).first
       if answer.nil?
@@ -450,6 +370,6 @@ class ResponsesController < ApplicationController
       end
     end
     
-    @review_questions = sort_questions(current_questionnaire.questions)
-end
+    @review_questions = sort_items(current_questionnaire.questions)
+  end
 end

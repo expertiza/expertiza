@@ -74,8 +74,8 @@ module ResponseHelper
   end
 
   # sorts the questions passed by sequence number in ascending order
-  def sort_questions(questions)
-    questions.sort_by(&:seq)
+  def sort_items(items)
+    items.sort_by(&:seq)
   end
 
   # Assigns total contribution for cake question across all reviewers to a hash map

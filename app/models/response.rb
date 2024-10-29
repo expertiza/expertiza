@@ -60,9 +60,9 @@ class Response < ApplicationRecord
     # we accept nil as answer for scorable questions, and they will not be counted towards the total score
     sum = 0
     scores.each do |s|
-      question = Question.find(s.question_id)
+      item = Question.find(s.question_id)
       # For quiz responses, the weights will be 1 or 0, depending on if correct
-      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      sum += s.answer * item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -88,8 +88,8 @@ class Response < ApplicationRecord
     # answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
-      question = Question.find(s.question_id)
-      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      item = Question.find(s.question_id)
+      total_weight += item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -293,10 +293,10 @@ class Response < ApplicationRecord
     unless answers.empty?
       questionnaire = questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort_by(&:seq)
+      items = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: map.assignment.id) : nil
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
+      code = add_table_rows questionnaire_max, items, answers, code, tag_prompt_deployments, current_user
     end
     comment = if additional_comment.nil?
                 ''
@@ -308,23 +308,23 @@ class Response < ApplicationRecord
     code
   end
 
-  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
+  def add_table_rows(questionnaire_max, items, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
-    questions.each do |question|
-      count += 1 if !question.is_a?(QuestionnaireHeader) && (question.break_before == true)
-      answer = answers.find { |a| a.question_id == question.id }
+    items.each do |item|
+      count += 1 if !item.is_a?(QuestionnaireHeader) && (item.break_before == true)
+      answer = answers.find { |a| a.question_id == item.id }
       row_class = count.even? ? 'info' : 'warning'
-      row_class = '' if question.is_a? QuestionnaireHeader
+      row_class = '' if item.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? || question.is_a?(QuestionnaireHeader)
-        code += if question.instance_of? Criterion
+      if !answer.nil? || item.is_a?(QuestionnaireHeader)
+        code += if item.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
-                elsif question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max) || ''
+                  item.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
+                elsif item.instance_of? Scale
+                  item.view_completed_question(count, answer, questionnaire_max) || ''
                 else
-                  question.view_completed_question(count, answer) || ''
+                  item.view_completed_question(count, answer) || ''
                 end
       end
       code += '</td></tr>'

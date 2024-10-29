@@ -415,4 +415,41 @@ class ResponsesController < ApplicationController
       end
     end
   end
+
+  #this method is called within the view,new,edit actions to set vaariables for the view
+  def set_action_parameters(header,next_action,params_return,current_response,current_map,modified_object)
+    #setting variables for the view
+    @header = header
+    @next_action = next_action
+    @return = params_return
+    @map = current_map
+    @modified_object = modified_object
+    @title = current_map.get_title
+    if current_map.survey?
+      @survey_parent = current_map.survey_parent
+    else
+      @assignment = current_map.assignment
+    end
+    @participant = current_map.reviewer
+    @contributor = current_map.contributor
+    
+    # if user is not filling a new rubric, the @response object should be available.
+    # we can find the questionnaire from the question_id in answers
+    current_questionnaire = questionnaire_from_response(current_response)
+    @dropdown_or_scale = get_dropdown_or_scale(@assignment,current_questionnaire)
+    @min = current_questionnaire.min_question_score
+    @max = current_questionnaire.max_question_score
+    
+    # The new response is created here so that the controller has access to it in the new method
+    # This response object is populated later in the new method 
+    if current_questionnaire
+      #Sometimes the response is already created and the new controller is called again (page refresh)
+      @response = Response.where(map_id: current_map.id, round: @current_round.to_i).order(updated_at: :desc).first
+      if @response.nil?
+        @response = Response.create(map_id: current_map.id, additional_comment: '', round: @current_round.to_i, is_submitted: 0)
+      end
+    end
+    
+    @review_questions = sort_questions(current_questionnaire.questions)
+end
 end

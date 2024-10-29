@@ -392,4 +392,31 @@ describe UsersController do
       expect(response).to redirect_to('/tree_display/drill')
     end
   end
+
+  context '#paginate_list' do
+    before do
+      # Seed the database with a number of users for pagination tests
+      FactoryBot.create_list(:test_user, 110)
+    end
+
+    it 'displays 25 users per page when per_page is 25' do
+      get :list, params: { per_page: '1' }
+      expect(assigns(:paginated_users).length).to eq(25)
+    end
+
+    it 'displays 50 users per page when per_page is 50' do
+      get :list, params: { per_page: '2' }
+      expect(assigns(:paginated_users).length).to eq(50)
+    end
+
+    it 'displays 100 users per page when per_page is 100' do
+      get :list, params: { per_page: '3' }
+      expect(assigns(:paginated_users).length).to eq(100)
+    end
+
+    it 'displays all users on a single page when per_page is "all"' do
+      get :list, params: { per_page: '4' }
+      expect(assigns(:paginated_users).length).to eq(110)
+    end
+  end
 end

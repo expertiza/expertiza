@@ -640,9 +640,9 @@ FactoryBot.define do
   end
 
   factory :test_user, class: User do
-    username 'username'
+    sequence(:username) { |n| "username#{n}" }
     name 'full name'
-    email 'abc@mailinator.com'
+    sequence(:email) { |n| "user#{n}@mailinator.com" }
   end
 
   factory :survey_deployment, class: SurveyDeployment do

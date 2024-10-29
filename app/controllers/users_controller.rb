@@ -249,7 +249,7 @@ class UsersController < ApplicationController
 
   # For filtering the users list with proper search and pagination.
   def paginate_list
-    paginate_options = { '1' => 25, '2' => 50, '3' => 100 }
+    paginate_options = { '1' => 25, '2' => 50, '3' => 100, '4' => User.count}
 
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
@@ -259,7 +259,11 @@ class UsersController < ApplicationController
 
     # The type of condition for the search depends on what the user has selected from the search_by dropdown
     @search_by = params[:search_by]
-    @per_page = 3
+
+    # Sets the number of users to display per page based on the 'per_page' parameter from the request.
+    # If no 'per_page' parameter is provided, it defaults to '4', which corresponds to displaying all users on one page.
+    @per_page = params[:per_page] || '4'
+
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 

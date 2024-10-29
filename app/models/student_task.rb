@@ -79,27 +79,4 @@ class StudentTask
   def started?
     @started ||= incomplete? && revision?
   end
-
-  def self.find_teammates_by_user(user, ip_address = nil)
-    students_teamed = {}
-    user.teams.each do |team|
-      next unless team.is_a?(AssignmentTeam)
-      # Teammates in calibration assignment should not be counted in teaming requirement.
-      next if Assignment.find_by(id: team.parent_id).is_calibrated
-
-      teammates = []
-      course_id = Assignment.find_by(id: team.parent_id).course_id
-      team_participants = Team.find(team.id).participants.reject { |p| p.name == user.name }
-      team_participants.each { |p| teammates << p.user.fullname(ip_address) }
-      next if teammates.empty?
-
-      if students_teamed[course_id].nil?
-        students_teamed[course_id] = teammates
-      else
-        teammates.each { |teammate| students_teamed[course_id] << teammate }
-      end
-      students_teamed[course_id].uniq! if students_teamed.key?(course_id)
-    end
-    students_teamed
-  end
 end

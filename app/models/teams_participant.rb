@@ -4,74 +4,71 @@ class TeamsParticipant < ApplicationRecord
   belongs_to :participant
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
-  # attr_accessible :user_id, :team_id # unnecessary protected attributes
 
+  # Returns the name of the user associated with this TeamsParticipant.
+  # Appends '(Mentor)' if the user is identified as a mentor to indicate in UI
   def name(ip_address = nil)
     name = user.name(ip_address)
-
-    # E2115 Mentor Management
-    # Indicate that someone is a Mentor in the UI. The view code is
-    # often hard to follow, and this is the best place we could find
-    # for this to go.
     name += ' (Mentor)' if MentorManagement.user_a_mentor?(user)
     name
   end
 
+  # Deletes the associated team user node, removes the team if empty, 
+  # and then destroys this TeamsParticipant instance
   def delete
-    TeamUserNode.find_by(node_object_id: id).destroy
+    remove_team_user_node
+    remove_team_if_participants_empty
+    remove_teams_participant_instance
+  end
+
+  def remove_team_user_node
+    team_user_node = TeamUserNode.find_by(node_object_id: id)
+    team_user_node&.destroy
+  end
+
+  def remove_team_if_participants_empty
     team = self.team
-    destroy
     team.delete if team.teams_participants.empty?
   end
 
-  def get_team_members(team_id); end
+  def remove_teams_participant_instance
+    destroy
+  end
 
-  # Removes entry in the TeamUsers table for the given user and given team id
-  def self.remove_team(user_id, team_id)
-    team_participant = TeamsParticipant.where('user_id = ? and team_id = ?', user_id, team_id).first
+  # Removes the entry in the TeamsParticipant table for the given user and team IDs
+  def self.remove_team_participant(user_id, team_id)
+    team_participant = TeamsParticipant.find_by(user_id: user_id, team_id: team_id)
     team_participant&.destroy
   end
 
-  # Returns the first entry in the TeamUsers table for a given team id
-  def self.first_by_team_id(team_id)
-    TeamsParticipant.where('team_id = ?', team_id).first
+  # Returns the first TeamsParticipant entry for the given team ID
+  def self.first_participant_for_team(team_id)
+    TeamsParticipant.find_by(team_id:, team_id)
   end
 
-  # Determines whether a team is empty of not
+  # Determines whether a team is empty by checking if it has any members
   def self.team_empty?(team_id)
-    team_members = TeamsParticipant.where('team_id = ?', team_id)
+    team_members = TeamsParticipant.where(team_id: team_id)
     team_members.blank?
   end
 
-  # Add member to the team they were invited to and accepted the invite for
-  def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
+  # Adds a member to the team they were invited to and accepted the invite for
+  def self.add_accepted_invitee_to_team(inviter_user_id, invited_user_id, assignment_id)
     can_add_member = false
-    users_teams = TeamsParticipant.where(['user_id = ?', invitee_user_id])
-    users_teams.each do |team|
-      new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
-      unless new_team.nil?
-        can_add_member = new_team.add_member(User.find(invited_user_id), assignment_id)
-      end
+    participants_teams = TeamsParticipant.where(user_id: inviter_user_id) # Fetches all teams the inviter is a participant of
+    participants_teams.each do |team|
+      assigned_team = AssignmentTeam.find_by(id: team.team_id, parent_id: assignment_id) # Finds the team for given assignment
+      can_add_member = assigned_team&.add_member(User.find(invited_user_id), assignment_id) if assigned_team
     end
     can_add_member
   end
 
-  # 2015-5-27 [zhewei]:
-  # We just remove the topic_id field from the participants table.
-  def self.team_id(assignment_id, user_id)
+  # Finds the team ID for a given assignment and user
+  def self.find_team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
-    team_id = nil
-    teams_participants = TeamsParticipant.where(user_id: user_id)
-    teams_participants.each do |teams_participant|
-      if teams_participant.team_id == nil
-        next
-      end
-      team = Team.find(teams_participant.team_id)
-      if team.parent_id == assignment_id
-        team_id = teams_participant.team_id
-        break
-      end
-    end
-    team_id
+    TeamsParticipant.where(user_id: user_id).find do |participant|
+      team = Team.find_by(id: participant.team_id) if participant.team_id # Finds the team associated with the participant
+      team&.parent_id == assignment_id # Checks if the team's parent ID matches given assignment ID
+    end&.team_id  
   end
 end

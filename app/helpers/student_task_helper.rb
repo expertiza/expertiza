@@ -116,7 +116,7 @@ module StudentTaskHelper
   def for_teammates_in_each_team_of_user(user, ip_address = nil)
     user.teams.each do |team|
       if valid_assignment_team?(team)
-        result = get_teammate_names_and_course_id_for_team(team, user, ip_address)
+        result = get_course_id_and_teammate_names_for_team(team, user, ip_address)
         yield(result) if result
       end
     end
@@ -164,18 +164,18 @@ module StudentTaskHelper
     )
   end
 
-  def generate_peer_review_timeline(participant_id)
+  def generate_peer_review_timeline(participant)
     map_with_parser(
       method(:for_each_peer_review),
-      participant_id,
+      participant.get_reviewer.try(:id),
       ->(response) { parse_response_to_timeline(response, "Round #{response.round} Peer Review".humanize) }
     )
   end
 
-  def generate_author_feedback_timeline(participant_id)
+  def generate_author_feedback_timeline(participant)
     map_with_parser(
       method(:for_each_author_feedback),
-      participant_id,
+      participant.try(:id),
       ->(response) { parse_response_to_timeline(response, 'Author feedback') }
     )
   end

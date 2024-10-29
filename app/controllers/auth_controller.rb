@@ -6,7 +6,7 @@ class AuthController < ApplicationController
   verify method: :post, only: %i[login logout],
          redirect_to: { action: :list }
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'login', 'logout', 'login_failed'
       true

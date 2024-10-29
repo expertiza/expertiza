@@ -3,7 +3,7 @@ class ParticipantsController < ApplicationController
   include ParticipantsHelper
   autocomplete :user, :name
 
-  def is_action_permitted?
+  def action_allowed?
     if %w[change_handle update_duties].include? params[:action]
       current_user_has_student_privileges?
     else
@@ -11,7 +11,7 @@ class ParticipantsController < ApplicationController
     end
   end
 
-  def set_locale_for_student
+  def controller_locale
     locale_for_student
   end
 

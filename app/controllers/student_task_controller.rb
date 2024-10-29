@@ -3,7 +3,7 @@ class StudentTaskController < ApplicationController
 
   helper :submitted_content
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_student_privileges?
   end
 
@@ -19,7 +19,7 @@ class StudentTaskController < ApplicationController
     ta_role.include? original_user.role_id
   end
 
-  def set_locale_for_student
+  def controller_locale
     locale_for_student
   end
 

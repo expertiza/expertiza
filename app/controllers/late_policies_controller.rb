@@ -5,7 +5,7 @@ class LatePoliciesController < ApplicationController
   include AuthorizationHelper
 
   # This method checks the privileges of the current user to perform a certain action.
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     # If the action is creating a new late policy then verifies the current user has the prvilages to perform the action or not.
     when 'new', 'create', 'index'

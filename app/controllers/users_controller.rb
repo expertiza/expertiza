@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'list_pending_requested'
       current_user_has_admin_privileges?

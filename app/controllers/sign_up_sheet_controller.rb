@@ -15,7 +15,7 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'rgl/topsort'
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
       (current_user_has_student_privileges? &&
@@ -36,7 +36,7 @@ class SignUpSheetController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :list }
 
-  def set_locale_for_student
+  def controller_locale
     locale_for_student
   end
 
@@ -55,9 +55,9 @@ class SignUpSheetController < ApplicationController
   def create
     topic = SignUpTopic.where(topic_name: params[:topic][:topic_name], assignment_id: params[:id]).first
     if topic.nil?
-      initialize_new_sign_up_topic
+      setup_new_topic
     else
-      update_sign_up_topic topic
+      update_existing_topic topic
     end
   end
 
@@ -137,7 +137,7 @@ class SignUpSheetController < ApplicationController
   # Contains links that let an admin or Instructor edit, delete, view enrolled/waitlisted members for each topic
   # Also contains links to delete topics and modify the deadlines for individual topics. Staggered means that different topics can have different deadlines.
   def add_signup_topics
-    load_sign_up_topics_for_assignment(params[:id])
+    load_add_signup_topics(params[:id])
     SignUpSheet.add_signup_topic(params[:id])
   end
 
@@ -146,7 +146,7 @@ class SignUpSheetController < ApplicationController
   end
 
   # retrieves all the data associated with the given assignment. Includes all topics,
-  def load_sign_up_topics_for_assignment(assignment_id)
+  def load_add_signup_topics(assignment_id)
     @id = assignment_id
     @sign_up_topics = SignUpTopic.where('assignment_id = ?', assignment_id)
     @slots_filled = SignUpTopic.find_slots_filled(assignment_id)
@@ -161,7 +161,7 @@ class SignUpSheetController < ApplicationController
   end
 
 
-  def initialize_new_sign_up_topic
+  def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
     @sign_up_topic.topic_name = params[:topic][:topic_name]
@@ -463,8 +463,8 @@ class SignUpSheetController < ApplicationController
 
   private
 
-  def initialize_new_sign_up_topic
-    initialize_new_sign_up_topic
+  def setup_new_topic
+    set_values_for_new_topic
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
     if @sign_up_topic.save
       undo_link "The topic: \"#{@sign_up_topic.topic_name}\" has been created successfully. "
@@ -474,7 +474,7 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-  def update_sign_up_topic(topic)
+  def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
     update_max_choosers(topic)
     topic.category = params[:topic][:category]

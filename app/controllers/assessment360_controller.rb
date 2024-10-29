@@ -4,7 +4,7 @@ class Assessment360Controller < ApplicationController
   include Scoring
   include PenaltyHelper
   # Added the @instructor to display the instructor name in the home page of the 360 degree assessment
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_ta_privileges?
   end
 

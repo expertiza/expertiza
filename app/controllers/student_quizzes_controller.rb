@@ -1,7 +1,7 @@
 class StudentQuizzesController < ApplicationController
   include AuthorizationHelper
 
-  def is_action_permitted?
+  def action_allowed?
     if current_user_is_a? 'Student'
       if action_name.eql? 'index'
         are_needed_authorizations_present?(params[:id], 'reviewer', 'submitter')

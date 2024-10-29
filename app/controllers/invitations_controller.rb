@@ -5,7 +5,7 @@ class InvitationsController < ApplicationController
   before_action :check_user_before_invitation, only: [:create]
   before_action :check_team_before_accept, only: [:accept]
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_student_privileges?
   end
 

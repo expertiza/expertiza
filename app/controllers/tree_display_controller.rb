@@ -4,7 +4,7 @@ class TreeDisplayController < ApplicationController
   include AuthorizationHelper
 
   # Checks controller permissions
-  def is_action_permitted?
+  def action_allowed?
     true
   end
 

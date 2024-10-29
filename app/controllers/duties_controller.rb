@@ -4,7 +4,7 @@ class DutiesController < ApplicationController
   include AuthorizationHelper
 
   # duties can be created/modified by Teaching Assistants, Instructor, Admin, Super Admin
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_ta_privileges?
   end
 

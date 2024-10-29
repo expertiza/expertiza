@@ -18,7 +18,7 @@ class StudentTeamsController < ApplicationController
   before_action :team, only: %i[edit update]
   before_action :student, only: %i[view update edit create remove_participant]
 
-  def is_action_permitted?
+  def action_allowed?
     # note, this code replaces the following line that cannot be called before action allowed?
     return false unless current_user_has_student_privileges?
 
@@ -38,7 +38,7 @@ class StudentTeamsController < ApplicationController
     end
   end
 
-  def set_locale_for_student
+  def controller_locale
     locale_for_student
   end
 

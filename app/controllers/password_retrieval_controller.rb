@@ -1,5 +1,5 @@
 class PasswordRetrievalController < ApplicationController
-  def is_action_permitted?
+  def action_allowed?
     true
   end
 

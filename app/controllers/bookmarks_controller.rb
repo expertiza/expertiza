@@ -4,7 +4,7 @@ class BookmarksController < ApplicationController
   helper_method :specific_average_score
   helper_method :total_average_score
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'list'
       current_role_name =~ /^(Student|Instructor|Teaching Assistant)$/

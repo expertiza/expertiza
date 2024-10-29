@@ -1,7 +1,7 @@
 class AdminController < ApplicationController
   include AuthorizationHelper
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'list_instructors'
       current_user_has_admin_privileges?

@@ -2,7 +2,7 @@ class QuizQuestionnairesController < QuestionnairesController
   include AuthorizationHelper
 
   # Quiz questionnaire edit option to be allowed for student
-  def is_action_permitted?
+  def action_allowed?
     if params[:action] == 'edit'
       @questionnaire = Questionnaire.find(params[:id])
       current_user_has_admin_privileges? || current_user_is_a?('Student')

@@ -31,8 +31,8 @@ class ApplicationController < ActionController::Base
         if current_user.locale != 'no_pref'
           return current_user.locale
           # If the user doesn't have any preference, the locale is taken from the course locale, if the current page is a course specific page or else default locale is used
-        elsif current_user_role? && current_user_role.student? && respond_to?(:set_locale_for_student)
-          return set_locale_for_student
+        elsif current_user_role? && current_user_role.student? && respond_to?(:controller_locale)
+          return controller_locale
         end
       else
         return I18n.default_locale

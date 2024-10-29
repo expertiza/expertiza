@@ -4,7 +4,7 @@ class SubmittedContentController < ApplicationController
 
   include AuthorizationHelper
 
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'edit'
       current_user_has_student_privileges? &&
@@ -17,7 +17,7 @@ class SubmittedContentController < ApplicationController
     end
   end
 
-  def set_locale_for_student
+  def controller_locale
     locale_for_student
   end
 

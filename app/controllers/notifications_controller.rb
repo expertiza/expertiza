@@ -6,7 +6,7 @@ class NotificationsController < ApplicationController
   include AuthorizationHelper
 
   # Give permission to manage notifications to appropriate roles
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_ta_privileges?
   end
 

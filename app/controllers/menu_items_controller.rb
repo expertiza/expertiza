@@ -1,7 +1,7 @@
 require 'menu'
 
 class MenuItemsController < ApplicationController
-  def is_action_permitted?
+  def action_allowed?
     case params[:action]
     when 'link'
       true

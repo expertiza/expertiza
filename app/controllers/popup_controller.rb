@@ -3,7 +3,7 @@ class PopupController < ApplicationController
   include AuthorizationHelper
   ASSIGNMENT_NAME_SIMILARITY_THRESHOLD = 0.50
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_ta_privileges?
   end
 

@@ -1,7 +1,7 @@
 class ExportFileController < ApplicationController
   include AuthorizationHelper
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_ta_privileges?
   end
 

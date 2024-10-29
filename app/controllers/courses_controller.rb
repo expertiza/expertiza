@@ -11,7 +11,7 @@ class CoursesController < ApplicationController
   autocomplete :user, :name
   require 'fileutils'
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_instructor_privileges?
   end
 

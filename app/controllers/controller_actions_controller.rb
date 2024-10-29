@@ -5,7 +5,7 @@ class ControllerActionsController < ApplicationController
   verify method: :post, only: %i[destroy create update],
          redirect_to: { action: :index }
 
-  def is_action_permitted?
+  def action_allowed?
     current_user_has_super_admin_privileges?
   end
 

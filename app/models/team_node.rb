@@ -18,6 +18,6 @@ class TeamNode < Node
   end
 
   def get_children(_sortvar = nil, _sortorder = nil, _user_id = nil, _parent_id = nil, _search = nil)
-    TeamUserNode.get(node_object_id)
+    TeamParticipantNode.get(node_object_id)
   end
 end

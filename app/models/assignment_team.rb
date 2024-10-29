@@ -284,6 +284,6 @@ class AssignmentTeam < Team
     t_user = TeamsParticipant.create(team_id: id, user_id: user_id)
     SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
 end

@@ -2,7 +2,7 @@ class TeamsParticipant < ApplicationRecord
   belongs_to :user #kept for backward compatibility
   belongs_to :team
   belongs_to :participant
-  has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
+  has_one :team_participant_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
 
   # Returns the name of the user associated with this TeamsParticipant.
@@ -16,14 +16,14 @@ class TeamsParticipant < ApplicationRecord
   # Deletes the associated team user node, removes the team if empty, 
   # and then destroys this TeamsParticipant instance
   def delete
-    remove_team_user_node
+    remove_team_participant_node
     remove_team_if_participants_empty
     remove_teams_participant_instance
   end
 
-  def remove_team_user_node
-    team_user_node = TeamUserNode.find_by(node_object_id: id)
-    team_user_node&.destroy
+  def remove_team_participant_node
+    team_participant_node = TeamParticipantNode.find_by(node_object_id: id)
+    team_participant_node&.destroy
   end
 
   def remove_team_if_participants_empty

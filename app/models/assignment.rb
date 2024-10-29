@@ -189,8 +189,8 @@ class Assignment < ApplicationRecord
   # Check whether review, metareview, etc.. is allowed
   # The permissions of TopicDueDate is the same as AssignmentDueDate.
   # Here, column is usually something like 'review_allowed_id'
-  def check_condition(column, topic_id = nil)
-    next_due_date = DueDate.get_next_due_date(id, topic_id)
+  def check_condition(column, topic_id = nil, deadline_type_id)
+    next_due_date = DueDate.get_next_due_date(id, topic_id, deadline_type_id)
     return false if next_due_date.nil?
 
     right_id = next_due_date.send column
@@ -200,22 +200,22 @@ class Assignment < ApplicationRecord
 
   # Determine if the next due date from now allows for submissions
   def submission_allowed(topic_id = nil)
-    check_condition('submission_allowed_id', topic_id)
+    check_condition('submission_allowed_id', topic_id, 1)
   end
 
   # Determine if the next due date from now allows to take the quizzes
   def quiz_allowed(topic_id = nil)
-    check_condition('quiz_allowed_id', topic_id)
+    check_condition('quiz_allowed_id', topic_id, 11)
   end
 
   # Determine if the next due date from now allows for reviews
   def can_review(topic_id = nil)
-    check_condition('review_allowed_id', topic_id)
+    check_condition('review_allowed_id', topic_id, 2)
   end
 
   # Determine if the next due date from now allows for metareviews
   def metareview_allowed(topic_id = nil)
-    check_condition('review_of_review_allowed_id', topic_id)
+    check_condition('review_of_review_allowed_id', topic_id, 5)
   end
 
   # Deletes all instances created as part of assignment and finally destroys itself.

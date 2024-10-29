@@ -1,5 +1,5 @@
 <%= form_for :hyperlinks, url: '/submitted_content/remove_hyperlink' do |f| %>
-  <% unless stage == "Finished" %>
+  <% if stage != "Finished" && @can_submit%>
     <% team_id = TeamsUser.team_id(participant.parent_id, participant.user_id) %>
     <% display_to_author = Team.exists?(team_id) && Team.find(team_id).user?(@current_user)%>
 

@@ -22,7 +22,7 @@
 <br/><br/>
 
 <% if files.length > 0 || stage != "Finished"  %>
-  <% if same_team_flag && stage != "Finished" %>
+  <% if same_team_flag && stage != "Finished" && @can_submit%>
     <h4>&#8226; <%=t ".submit_file"%></h4>
     <%= form_tag({:controller=>'submitted_content',:action=>'submit_file',:id => participant.id, :origin => origin ||= nil, :response_map_id => response_map_id ||= nil},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
       <!--<input type="checkbox" name="unzip" value=""/> Unzip submission-->

@@ -65,8 +65,8 @@ module ReviewMappingHelper
     if valid_submission_link?(link)
       color.push 'green'
     else
-      link_updated_at = get_link_updated_at(link)
-      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
+      link_updated_date = get_link_updated_at(link)
+      color.push link_updated_since_last?(round, assignment_due_dates, link_updated_date) ? 'purple' : 'green'
     end
   end
 
@@ -75,7 +75,7 @@ module ReviewMappingHelper
     link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
   end
 
-  # checks if a review was submitted in every round and gives the total responses count
+  # checks if a review was submitted in every round
   def response_for_each_round?(response_map)
     num_responses = 0
     total_num_rounds = @assignment.num_review_rounds

@@ -43,7 +43,7 @@ class TeamsParticipant < ApplicationRecord
 
   # Returns the first TeamsParticipant entry for the given team ID
   def self.first_participant_for_team(team_id)
-    TeamsParticipant.find_by(team_id:, team_id)
+    TeamsParticipant.find_by(team_id: team_id)
   end
 
   # Determines whether a team is empty by checking if it has any members

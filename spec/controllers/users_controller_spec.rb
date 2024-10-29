@@ -335,42 +335,36 @@ describe UsersController do
   context '#destroy' do
     it 'check if user was successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
-      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
-      allow(User).to receive(:destroy).with(any_args).and_return(true)
-      post :destroy
+      allow(AssignmentParticipant).to receive(:where).and_return(double(each: nil))
+      allow(TeamsParticipant).to receive(:where).and_return(double(each: nil))
+      allow(AssignmentQuestionnaire).to receive(:where).and_return(double(each: nil))
+      allow(student1).to receive(:destroy).and_return(true)
+      
+      post :destroy, params: { id: student1.id }
       expect(flash[:note]).to be_present
     end
 
     it 'check if user was not successfully destroyed' do
-      allow(User).to receive(:find).with(any_args).and_return(nil)
-      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
-      allow(User).to receive(:destroy).with(any_args).and_return(true)
-      post :destroy
+      allow(User).to receive(:find).and_raise(StandardError.new("User not found"))
+      post :destroy, params: { id: 999 }  # Use a non-existent ID
       expect(flash[:error]).to be_present
     end
-
+    
     it 'check if successful destroy leads to redirect' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
-      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
-      allow(User).to receive(:destroy).with(any_args).and_return(true)
-      post :destroy
-      expect(response).to redirect_to :action=> :list
+      allow(AssignmentParticipant).to receive(:where).and_return(double(each: nil))
+      allow(TeamsParticipant).to receive(:where).and_return(double(each: nil))
+      allow(AssignmentQuestionnaire).to receive(:where).and_return(double(each: nil))
+      allow(student1).to receive(:destroy).and_return(true)
+      
+      post :destroy, params: { id: student1.id }
+      expect(response).to redirect_to action: :list
     end
-
+    
     it 'check if error during destroy leads to redirect' do
-      allow(User).to receive(:find).with(any_args).and_return(nil)
-      allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
-      allow(User).to receive(:destroy).with(any_args).and_return(true)
-      post :destroy
-      expect(response).to redirect_to :action=> :list
+      allow(User).to receive(:find).and_raise(StandardError.new("User not found"))
+      post :destroy, params: { id: 999 }  # Use a non-existent ID
+      expect(response).to redirect_to action: :list
     end
 
   end

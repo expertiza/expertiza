@@ -4,7 +4,7 @@ import json
 import pandas as pd
 import glob
 
-def _convert(directory):
+def _convert_py(directory):
         # Check if the file is a Ruby file
     if filename.endswith('.rb'):
         # Define the new filename with .py extension
@@ -14,8 +14,25 @@ def _convert(directory):
         new_file = os.path.join(directory, new_filename)
         # Rename the file
         os.rename(old_file, new_file)
-        print(f'Renamed: {filename} -> {new_filename}')
 
+def _convert_rb(directory):
+        # Check if the file is a Python file
+    if filename.endswith('.py'):
+        # Define the new filename with .rb extension
+        new_filename = filename.replace('.py', '.rb')
+        # Get full paths
+        old_file = os.path.join(directory, filename)
+        new_file = os.path.join(directory, new_filename)
+        # Rename the file
+        os.rename(old_file, new_file)
+    
+def _remove_json(directory):
+    # Use glob to find all .json files in the directory
+    json_files = glob.glob(os.path.join(directory, "*.json"))
+
+    # Loop through each file and remove it
+    for file_path in json_files:
+        os.remove(file_path)
 
 # Function to extract specified fields from JSON
 def _extract_all_json_to_csv(folder_path):
@@ -50,11 +67,11 @@ directoryController =  r'C:\Users\jacck\Documents\Github\expertiza\app\controlle
 
 # Loop through each file in the models folder
 for filename in os.listdir(directoryModels):
-    _convert(directoryModels)
+    _convert_py(directoryModels)
 
 # Loop through each file in the controller folder
 for filename in os.listdir(directoryController):
-    _convert(directoryController)
+    _convert_py(directoryController)
 
 # Define the Rust analysis command
 # need to run the open source project locally: https://github.com/mozilla/rust-code-analysis
@@ -94,11 +111,24 @@ except subprocess.CalledProcessError as e:
 
 print("Script completed.")
 
+
 # Specify folder and output CSV paths
 output_csv_path= './app/metrics/output.csv'    # Replace with your desired output CSV file path (replace with yours)
 
 # combine dataframes
 combined_df = pd.concat([_extract_all_json_to_csv(directoryModels), _extract_all_json_to_csv(directoryController)], ignore_index=True)
+
+# Loop through each file in the models folder
+for filename in os.listdir(directoryModels):
+    _convert_rb(directoryModels)
+    
+
+# Loop through each file in the controller folder
+for filename in os.listdir(directoryController):
+    _convert_rb(directoryController)
+
+_remove_json(directoryController)
+_remove_json(directoryModels)
 
 # Save the combined data to CSV
 combined_df.to_csv(output_csv_path, index=False)

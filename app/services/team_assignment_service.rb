@@ -56,7 +56,7 @@ class TeamAssignmentService
         bid_priorities << (bid_record.try(:priority) || 0)
       end
 
-      unless bid_priorities.uniq == 0
+      unless bid_priorities.uniq.zero?
         team.users.each do |user|
           users_bidding_info << { pid: user.id, ranks: bid_priorities }
         end
@@ -85,7 +85,7 @@ class TeamAssignmentService
         new_team = MentoredTeam.create_team_with_users(assignment.id, user_ids)
       else
         new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
-      end      # Select data from `users_bidding_info` variable that only related to team members in current team
+      end
       current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
       Bid.merge_bids_from_different_users(new_team.id, @assignment.sign_up_topics, current_team_members_info)
     end
@@ -132,17 +132,17 @@ class TeamAssignmentService
   # Constructs bidding information for teams including their bids on available topics
   def construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     teams_bidding_info = []
-    bids = fetch_bids(unassigned_teams, sign_up_topics)    
+    bids = fetch_bids(unassigned_teams, sign_up_topics)
 
     unassigned_teams.each do |team|
-        team_bids = construct_team_bids(team, bids)
-        sorted_bids = sort_bids_by_priority(bids)
-        teams_bidding_info << { team_id: team.id, bids: sorted_bids }
+      team_bids = construct_team_bids(team, bids)
+      sorted_bids = sort_bids_by_priority(team_bids)
+      teams_bidding_info << { team_id: team.id, bids: sorted_bids }
     end
     teams_bidding_info
   end
 
-   # Fetches all bids associated with the specific unassigned teams and sign-up topics
+  # Fetches all bids associated with the specific unassigned teams and sign-up topics
   def fetch_bids(unassigned_teams, sign_up_topics)
     Bid.where(
       team_id: unassigned_teams.map(&:id),
@@ -157,12 +157,12 @@ class TeamAssignmentService
       { topic_id: bid.topic_id, priority: bid.priority }
     end
   end
-  
+
   # Sorts an array of bids in ascending order based on their priority
   def sort_bids_by_priority(bids)
     bids.sort_by { |bid| bid[:priority] }
   end
-  
+
   # Assigns available topic slots to teams based on their bidding information.
   # If a certain topic has available slot(s), the team with biggest size and most bids get its first-priority topic.
   # Then the loop breaks to the next team.

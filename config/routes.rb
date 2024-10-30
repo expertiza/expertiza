@@ -667,7 +667,7 @@ Expertiza::Application.routes.draw do
   post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
-<<<<<<< HEAD
+
   get 'bidding/auto_assign_teams/:id', to: 'bidding#auto_assign_teams ', as: 'auto_assign_teams'
   # updated route and added specific controller action upon accessing this route
 

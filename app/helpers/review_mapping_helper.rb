@@ -42,28 +42,28 @@ module ReviewMappingHelper
   def get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
-      get_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      color.push(get_submission_state(response_map, assignment_created, assignment_due_dates, round))
     end
     color[-1]
   end
 
   # checks the submission state within each round and assigns team colour
-  def get_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def get_submission_state(response_map, assignment_created, assignment_due_dates, round)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
+      'purple'
     else
-      process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
+      process_submission_link(response_map, assignment_created, assignment_due_dates, round)
     end
   end
 
   # checks the submission link to determine if it exists and assigns team colour
-  private def process_submission_link(response_map, assignment_created, assignment_due_dates, round, color)
+  private def process_submission_link(response_map, assignment_created, assignment_due_dates, round)
     link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     if valid_submission_link?(link)
-      color.push 'green'
+      'green'
     else
       link_updated_date = get_link_updated_at(link)
-      color.push updated_since_last_submission?(round, assignment_due_dates, link_updated_date) ? 'purple' : 'green'
+      updated_since_last_submission?(round, assignment_due_dates, link_updated_date) ? 'purple' : 'green'
     end
   end
 
@@ -88,13 +88,13 @@ module ReviewMappingHelper
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
-      subm_created_at = submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date, submission)
+      subm_created_at = submitted_within_round_over_one(round, assignment_due_dates, submission_due_date, submission)
     end
     !subm_created_at.try(:first).try(:created_at).nil?
   end
 
   # checks the last round submission date if there is more than one round
-  private def submitted_within_round_over_one(round, response_map, assignment_created, assignment_due_dates, submission_due_date, submission)
+  private def submitted_within_round_over_one(round, assignment_due_dates, submission_due_date, submission)
     submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     submission.where(created_at: submission_due_last_round..submission_due_date)
   end
@@ -168,30 +168,43 @@ module ReviewMappingHelper
 
   # Sorts the reviewers by the average volume of reviews in each round, in descending order
   def sort_reviewers_by_review_volume_desc
-    get_reviewers_comment_volume
+    collect_reviewers_comment_volume
     # get the number of review rounds for the assignment
     @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_volume_per_round = []
-    @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_review_rounds.times do |round|
-      @all_reviewers_avg_volume_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
-    end
+    average_comment_volume_overall
+    average_comment_volume_round
     @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   # Get the volume of the reviewers comments
-  private def get_reviewers_comment_volume
+  private def collect_reviewers_comment_volume
     @reviewers.each do |reviewer|
-      # get the volume of review comments
+      # Get the volume of review comments for the given assignment and reviewer
       review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
       reviewer.avg_vol_per_round = []
+
+      # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
       review_volumes.each_index do |i|
         if i.zero?
           reviewer.overall_avg_vol = review_volumes[0]
         else
+          # Store the review volumes for the remaining rounds
           reviewer.avg_vol_per_round.push(review_volumes[i])
         end
       end
+    end
+  end
+
+  # Calculate the overall average review volume across all reviewers
+  private def average_comment_volume_overall
+    @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+  end
+
+  # Get average comment volume across all reviewers per round
+  private def average_comment_volume_round
+    @all_reviewers_avg_volume_per_round = []
+    @num_review_rounds.times do |round|
+      @all_reviewers_avg_volume_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end
   end
 
@@ -226,76 +239,6 @@ module ReviewMappingHelper
     data = chart_data(labels, reviewer_data, all_reviewers_data)
     options = chart_options
     bar_chart data, options
-  end
-
-  # Prepares the chart data, including labels and datasets for reviewer volume metrics
-  def chart_data(labels, reviewer_data, all_reviewers_data)
-    {
-      labels: labels,
-      datasets: [
-        {
-          # Individual reviewer's volume
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          # Average volume for all reviewers
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-  end
-
-  # Configures chart display options, including axes, legends, and grid lines
-  def chart_options
-    {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [
-          {
-            stacked: true,
-            id: 'bar-y-axis1',
-            barThickness: 10
-          },
-          {
-            display: false,
-            stacked: true,
-            id: 'bar-y-axis2',
-            barThickness: 15,
-            type: 'category',
-            categoryPercentage: 0.8,
-            barPercentage: 0.9,
-            gridLines: {
-              offsetGridLines: true
-            }
-          }
-        ],
-        xAxes: [
-          {
-            stacked: false,
-            ticks: {
-              beginAtZero: true,
-              stepSize: 50,
-              max: 400
-            }
-          }
-        ]
-      }
-    }
   end
 
   # Generates a line chart displaying time intervals for review tagging

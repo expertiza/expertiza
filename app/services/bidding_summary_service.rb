@@ -27,7 +27,7 @@ class BiddingSummaryService
       # Calculate the percentage of first priority bids.
       percentage_first = if total_bids > 0
                            # If there are any bids, calculate the percentage.
-                           (first_bids.to_f / total_bids * 100).round(2)
+                           (first_choice_bids.to_f / total_bids * 100).round(2)
                          else
                            # If there are no bids, the percentage is 0.
                            0

@@ -1,0 +1,85 @@
+<!-- Display the assignment name in the bidding summary header -->
+<h3>Assignment Bidding Summary by Priority: <%= @assignment.name %></h3>
+
+<!-- Define the structure of the bidding summary table -->
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <!-- Define the table headers with specified widths for better alignment -->
+      <th>
+        Topic id
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Unique identifier for each topic"></i>
+      </th>
+      <th>
+        Topic name
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="The name of the topic available for bidding"></i>
+      </th>
+      <th style="width: 80px;">
+        #1 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of first-priority bids"></i>
+      </th>
+      <th style="width: 80px;">
+        #2 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of second-priority bids"></i>
+      </th>
+      <th style="width: 80px;">
+        #3 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of third-priority bids"></i>
+      </th>
+      <th style="width: 100px;">
+        Total bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Total number of bids across all priorities"></i>
+      </th>
+      <th style="width: 150px;">
+        Percentage of #1 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Calculated as (#1 Bids / Total Bids) * 100"></i>
+      </th>
+      <th style="width: 150px;">
+        Bidding teams
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="List of teams that have bid on this topic"></i>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Iterate over each topic to display its bidding information -->
+    <% @topic_data.each do |topic| %>
+      <tr>
+        <!-- Display topic id, name, bid counts, total bids, and bidding teams -->
+        <td><%= topic[:id] %></td>
+        <td><%= topic[:name] %></td>
+        <td><%= topic[:first_bids] %></td>
+        <td><%= topic[:second_bids] %></td>
+        <td><%= topic[:third_bids] %></td>
+        <td><%= topic[:total_bids] %></td>
+        <!-- Calculate and display the percentage of first bids with tooltip and custom background -->
+        <td title="Calculated as (#1 Bids / Total Bids) * 100">
+          <span class="team-bids <%= 
+            if topic[:percentage_first] < 33
+              'low-bids'
+            elsif topic[:percentage_first] < 66
+              'medium-bids'
+            else
+              'high-bids'
+            end %>">
+            <%= topic[:percentage_first] %> %
+          </span>
+        </td>
+        <!-- List all the bidding teams for the topic -->
+        <td>
+          <% topic[:bidding_teams].each do |team| %>
+            <%= team %><br>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<!-- Link to navigate back to the previous page -->
+<%= link_to 'Back', :back %>
+
+<script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+  });
+</script>

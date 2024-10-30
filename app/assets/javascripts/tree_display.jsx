@@ -78,8 +78,8 @@ const node_attributes = {
       (props) =>
         props.is_intelligent
           ? {
-              title: 'Intelligent Assignment',
-              href: '/lottery/run_intelligent_assignment/' + `${parseInt(props.id) / 2}`,
+              title: 'Auto Team Assignment',
+              href: '/bidding/auto_assign_teams/' + `${parseInt(props.id) / 2}`,
               src: '/assets/tree_view/run-lottery.png'
             }
           : null,

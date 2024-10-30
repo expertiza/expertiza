@@ -1,5 +1,6 @@
 class StudentTaskController < ApplicationController
   include AuthorizationHelper
+  include StudentTaskHelper
 
   helper :submitted_content
 
@@ -28,7 +29,7 @@ class StudentTaskController < ApplicationController
       redirect_to(controller: 'eula', action: 'display')
     end
     session[:user] = User.find_by(id: current_user.id)
-    @student_tasks = StudentTask.from_user current_user
+    @student_tasks = retrieve_tasks_for_user current_user
     if session[:impersonate] && !impersonating_as_admin?
 
       if impersonating_as_ta?
@@ -45,12 +46,12 @@ class StudentTaskController < ApplicationController
     @taskrevisions = @student_tasks.select(&:revision?)
 
     ######## Students Teamed With###################
-    @students_teamed_with = StudentTask.teamed_students(current_user, session[:ip])
+    @students_teamed_with = group_teammates_by_course_for_user(current_user, session[:ip])
   end
 
   def view
-    StudentTask.from_participant_id params[:id]
     @participant = AssignmentParticipant.find(params[:id])
+    create_student_task_for_participant(@participant)
     @can_submit = @participant.can_submit
     @can_review = @participant.can_review
     @can_take_quiz = @participant.can_take_quiz
@@ -63,7 +64,7 @@ class StudentTaskController < ApplicationController
     @topics = SignUpTopic.where(assignment_id: @assignment.id)
     @use_bookmark = @assignment.use_bookmark
     # Timeline feature
-    @timeline_list = StudentTask.get_timeline_data(@assignment, @participant, @team)
+    @timeline_list = generate_timeline(@assignment, @participant)
     # To get the current active reviewers of a team assignment.
     # Used in the view to disable or enable the link for sending email to reviewers.
     @review_mappings = review_mappings(@assignment, @team.id) if @team

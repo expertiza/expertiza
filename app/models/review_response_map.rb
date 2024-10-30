@@ -57,7 +57,7 @@ class ReviewResponseMap < ResponseMap
                                             parent_id: assignment_id, type: 'AssignmentTeam')
       t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
-      TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
+      TeamParticipantNode.create(parent_id: team_node.id, node_object_id: t_user.id)
     end
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s

@@ -302,11 +302,11 @@ describe 'AssignmentTeam' do
   describe '.team' do
     context 'when there is a participant' do
       it 'provides the team for participant' do
-        teamuser = build(:team_user, id: 1, team_id: team.id, user_id: user1.id)
+        teamparticipant = build(:team_participant, id: 1, team_id: team.id, user_id: user1.id)
         allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        allow(TeamsUser).to receive(:where).with(user_id: participant1.user_id).and_return([teamuser])
-        allow(Team).to receive(:find).with(teamuser.team_id).and_return(team)
+        allow(TeamsParticipant).to receive(:where).with(user_id: participant1.user_id).and_return([teamparticipant])
+        allow(Team).to receive(:find).with(teamparticipant.team_id).and_return(team)
         expect(AssignmentTeam.team(participant1)).to eq(team)
       end
     end
@@ -369,7 +369,7 @@ describe 'AssignmentTeam' do
       @assignment = create(:assignment)
       @student = create(:student)
       @team = create(:assignment_team, parent_id: @assignment.id)
-      @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
+      @team_participant = create(:team_participant, team_id: @team.id, user_id: @student.id)
     end
     it 'should create a team with users' do
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])

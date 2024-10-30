@@ -121,13 +121,13 @@ class TeamsController < ApplicationController
 
   # Deleting a specific team associated with a given parent object
   def delete
-    # delete records in team, teams_users, signed_up_teams table
+    # delete records in team, teams_participants, signed_up_teams table
     @team = Team.find_by(id: params[:id])
     unless @team.nil?
       # Find all SignedUpTeam records associated with the found team.
       @signed_up_team = SignedUpTeam.where(team_id: @team.id)
-      # Find all TeamsUser records associated with the found team.
-      @teams_users = TeamsUser.where(team_id: @team.id)
+      # Find all TeamsParticipant records associated with the found team.
+      @teams_participants = TeamsParticipant.where(team_id: @team.id)
       # Check if there are SignedUpTeam records associated with the found team.
       unless @signed_up_team.nil?
         # If a topic is assigned to this team and there is only one signed up team record, and it's not waitlisted.
@@ -144,7 +144,7 @@ class TeamsController < ApplicationController
         end
       end
      # @sign_up_team.destroy_all if @sign_up_team
-      @teams_users.destroy_all if @teams_users
+      @teams_participants.destroy_all if @teams_participants
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
     end

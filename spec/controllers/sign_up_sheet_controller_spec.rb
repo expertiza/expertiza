@@ -566,7 +566,7 @@ describe SignUpSheetController do
             allow(User).to receive(:find).with(8).and_return(student)
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
             allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
-            allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
+            allow(TeamParticipantNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamParticipantNode', id: 1))
             request_params = {
               username: 'no name',
               assignment_id: 1

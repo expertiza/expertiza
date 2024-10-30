@@ -1,7 +1,7 @@
 describe Participant do
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
   let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
-  let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
+  let(:team_participant) { build(:team_participant, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
   let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
   let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
@@ -24,7 +24,7 @@ describe Participant do
   describe '#team' do
     it 'returns the team of the participant' do
       allow(participant4).to receive(:user).and_return(user)
-      allow(TeamsUser).to receive(:find_by).with(user: user).and_return(team_user)
+      allow(TeamsParticipant).to receive(:find_by).with(user: user).and_return(team_participant)
       expect(participant4.team).to eq(team)
     end
   end
@@ -62,11 +62,11 @@ describe Participant do
     it 'deletes a participant if no associations exist and force is true' do
       expect(participant.delete(true)).to eq(participant)
     end
-    it 'delete a participant with associations and force is true and multiple team_users' do
+    it 'delete a participant with associations and force is true and multiple team_participants' do
       allow(participant).to receive(:team).and_return(team)
       expect(participant.delete(true)).to eq(participant)
     end
-    it 'delete participant with associations and force is true and single team_user' do
+    it 'delete participant with associations and force is true and single team_participant' do
       allow(participant).to receive(:team).and_return(team)
       allow(team).to receive(:teams_users).and_return(length: 1)
       expect(participant.delete(true)).to eq(participant)
@@ -157,7 +157,7 @@ describe Participant do
   describe 'check if email is being sent or not' do
     it 'participants assignment reviewers are sent email for a new submission' do
       allow(AssignmentTeam).to receive(:team).and_return(team)
-      allow(TeamsUser).to receive(:find_by).and_return(team_user)
+      allow(TeamsParticipant).to receive(:find_by).and_return(team_participant)
       allow(ResponseMap).to receive(:where).and_return([review_response_map])
       expect { participant5.mail_assigned_reviewers }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end

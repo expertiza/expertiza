@@ -5,6 +5,8 @@ class Participant < ApplicationRecord
   belongs_to :user
   belongs_to :topic, class_name: 'SignUpTopic', inverse_of: false
   belongs_to :assignment, foreign_key: 'parent_id', inverse_of: false
+  has_many :teams_participants, dependent: :destroy
+  has_many :teams, through: :teams_participants
   has_many   :join_team_requests, dependent: :destroy
   has_many   :reviews, class_name: 'ResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
   has_many   :team_reviews, class_name: 'ReviewResponseMap', foreign_key: 'reviewer_id', dependent: :destroy, inverse_of: false
@@ -28,7 +30,7 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsUser.find_by(user: user).try(:team)
+    TeamsParticipant.find_by(user: user).try(:team)
   end
 
   def responses
@@ -57,10 +59,10 @@ class Participant < ApplicationRecord
 
   def force_delete(maps)
     maps && maps.each(&:destroy)
-    if team && (team.teams_users.length == 1)
+    if team && (team.teams_participants.length == 1)
       team.delete
     elsif team
-      team.teams_users.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
+      team.teams_participants.each { |teams_participant| teams_participant.destroy if teams_participant.user_id == id }
     end
     destroy
   end

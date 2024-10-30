@@ -1,3 +1,9 @@
+# BiddingController handles the bidding process for team assignments within an assignment.
+# It allows users with the appropriate privileges to automatically assign teams based on
+# bidding data and to calculate summaries of the bidding information.
+#
+# This controller includes authorization checks to ensure that only users with
+# teaching assistant privileges can perform certain actions.
 class BiddingController < ApplicationController
   include AuthorizationHelper
 
@@ -12,28 +18,25 @@ class BiddingController < ApplicationController
   # allowed by the assignment by potentially combining existing smaller teams
   # that have similar bidding info/priorities associated with the assignment's sign-up topics.
   #
-  # rubocop:disable Metrics/AbcSize
-  
+  # rubocop:disable Metrics/AbcSize  
   # GET /bidding/:id/auto_assign_teams
-  def auto_assign_teams    
-
-    @assignment = Assignment.find(params[:id]) 
-
+  def auto_assign_teams
+    @assignment = Assignment.find(params[:id])
     service = TeamAssignmentService.new(params[:id])
 
     begin
       service.assign_teams_to_topics
-      infoMessage = "Team assignments for '#{@assignment.name}' were completed successfully."
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, infoMessage)
-      flash[:success] = infoMessage
+      info_message = "Team assignments for '#{@assignment.name}' were completed successfully."
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, info_message)
+      flash[:success] = info_message
     rescue ActiveRecord::RecordNotFound => e
-      errorMessage = "Assignment with ID #{params[:id]} not found: #{e.message}"
-      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, errorMessage)
-      flash[:error] = errorMessage 
+      error_message = "Assignment with ID #{params[:id]} not found: #{e.message}"
+      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, error_message)
+      flash[:error] = error_message
     rescue StandardError => e
-      errorMessage = "Team assignments failed for assignment ID #{@assignment_id}: #{e.message}"
-      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, errorMessage)
-      flash[:error] = errorMessage 
+      error_message = "Team assignments failed for assignment ID #{@assignment_id}: #{e.message}"
+      ExpertizaLogger.error.LoggerMessage.new(controller_name, session[:user].name, error_message)
+      flash[:error] = error_message
     end
 
     redirect_to controller: 'tree_display', action: 'list'
@@ -41,7 +44,7 @@ class BiddingController < ApplicationController
 
   # GET /bidding/:id/calculate_bidding_summary
   def calculate_bidding_summary
-    service = BiddingSummaryService.new()
+    service = BiddingSummaryService.new
     result = service.bidding_summary(params[:id])
 
     @assignment = result[:assignment]

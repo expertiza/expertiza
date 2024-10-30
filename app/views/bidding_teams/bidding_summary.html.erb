@@ -47,9 +47,9 @@
         <!-- Display topic id, name, bid counts, total bids, and bidding teams -->
         <td><%= topic[:id] %></td>
         <td><%= topic[:name] %></td>
-        <td><%= topic[:first_bids] %></td>
-        <td><%= topic[:second_bids] %></td>
-        <td><%= topic[:third_bids] %></td>
+        <td><%= topic[:first_choice_bids] %></td>
+        <td><%= topic[:second_choice_bids] %></td>
+        <td><%= topic[:third_choice_bids] %></td>
         <td><%= topic[:total_bids] %></td>
         <!-- Calculate and display the percentage of first bids with tooltip and custom background -->
         <td title="Calculated as (#1 Bids / Total Bids) * 100">

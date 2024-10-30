@@ -6,23 +6,45 @@
   <thead>
     <tr>
       <!-- Define the table headers with specified widths for better alignment -->
-      <th>Topic id</th>
-      <th>Topic name</th>
-      <th>#1 bids</th>
-      <th>#2 bids</th>
-      <th>#3 bids</th>
-      <th>Total bids</th>
-      <!-- Set fixed width for the 'Percentage of #1 bids' column -->
-      <th style="width: 200px;">Percentage of #1 bids</th>
-      <!-- Set fixed width for the 'Bidding teams' column -->
-      <th style="width: 200px;">Bidding teams</th>
+      <th>
+        Topic id
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Unique identifier for each topic"></i>
+      </th>
+      <th>
+        Topic name
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="The name of the topic available for bidding"></i>
+      </th>
+      <th style="width: 80px;">
+        #1 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of first-priority bids"></i>
+      </th>
+      <th style="width: 80px;">
+        #2 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of second-priority bids"></i>
+      </th>
+      <th style="width: 80px;">
+        #3 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Number of third-priority bids"></i>
+      </th>
+      <th style="width: 100px;">
+        Total bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Total number of bids across all priorities"></i>
+      </th>
+      <th style="width: 150px;">
+        Percentage of #1 bids
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="Calculated as (#1 Bids / Total Bids) * 100"></i>
+      </th>
+      <th style="width: 150px;">
+        Bidding teams
+        <i class="fa fa-info-circle" data-toggle="tooltip" title="List of teams that have bid on this topic"></i>
+      </th>
     </tr>
   </thead>
   <tbody>
     <!-- Iterate over each topic to display its bidding information -->
     <% @topic_data.each do |topic| %>
       <tr>
-        <!-- Display topic id, name, bid counts, total bids and bidding teams -->
+        <!-- Display topic id, name, bid counts, total bids, and bidding teams -->
         <td><%= topic[:id] %></td>
         <td><%= topic[:name] %></td>
         <td><%= topic[:first_bids] %></td>
@@ -55,3 +77,9 @@
 
 <!-- Link to navigate back to the previous page -->
 <%= link_to 'Back', :back %>
+
+<script>
+  $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip(); 
+  });
+</script>

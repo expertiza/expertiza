@@ -66,4 +66,24 @@ describe TeamAssignmentService do
             expect(teams_bidding_info.size).to eq(2)
         end
     end
+
+    # Validates that the method returns an empty array when no teams are provided
+    it 'returns an empty array if no unassigned teams are provided' do
+        service = TeamAssignmentService.new(assignment.id)
+        sign_up_topics = [topic1, topic2]
+        teams_bidding_info = service.send(:construct_teams_bidding_info, [], sign_up_topics)
+        expect(teams_bidding_info).to eq([])
+    end
+    
+    # Confirms that fetch_bids and construct_team_bids are called within the method
+    it 'calls the fetch_bids and construct_team_bids methods' do
+        service = TeamAssignmentService.new(assignment.id)
+        unassigned_teams = [assignment_team1, assignment_team2]
+        sign_up_topics = [topic1, topic2]
+        # Expect fetch_bids and construct_team_bids to be called as part of construct_teams_bidding_info
+        expect(service).to receive(:fetch_bids).with(unassigned_teams, sign_up_topics).and_call_original
+        expect(service).to receive(:construct_team_bids).at_least(:once).and_call_original
+
+        service.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
+    end
 end

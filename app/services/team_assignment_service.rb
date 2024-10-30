@@ -81,8 +81,11 @@ class TeamAssignmentService
   # Creates new teams based on the response from the web service and the users' bidding data.
   def create_new_teams(teams_response, users_bidding_info)
     teams_response.each do |user_ids|
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, user_ids)
-      # Select data from `users_bidding_info` variable that's only related to team members in current team
+      if assignment.auto_assign_mentor
+        new_team = MentoredTeam.create_team_with_users(assignment.id, user_ids)
+      else
+        new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
+      end      # Select data from `users_bidding_info` variable that only related to team members in current team
       current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
       Bid.merge_bids_from_different_users(new_team.id, @assignment.sign_up_topics, current_team_members_info)
     end
@@ -92,27 +95,38 @@ class TeamAssignmentService
   # This method is called for assignments which have their is_intelligent property set to 1.
   # It runs a stable match algorithm and assigns topics to strongest contenders (team strength, priority of bids).
   def assign_topics_to_new_teams(assignment)
-    unless @assignment.is_intelligent
-      raise StandardError, "This action is not allowed. The assignment #{@assignment.name} does not enable intelligent assignments."
-    end
-
-    sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', @assignment.id)
-    unassigned_teams = @assignment.teams.reload.select do |t|
-      SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? && Bid.where(team_id: t.id).any?
-    end
+    validate_assignment(assignment)
+    sign_up_topics = SignUpTopic.where('assignment_id = ? AND max_choosers > 0', assignment.id)
+    unassigned_teams = find_unassigned_teams(assignment)
     # Sorting unassigned_teams by team size desc, number of bids in current team asc
     # again, we need to find a way to to merge bids that came from different previous teams
     # then sorting unassigned_teams by number of bids in current team (less is better)
     # and we also need to think about, how to sort teams when they have the same team size and number of bids
     # maybe we can use timestamps in this case
-    unassigned_teams.sort! do |t1, t2|
-      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
-        [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
-    end
+    sorted_teams = sort_teams_by_size_and_bids(unassigned_teams)
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
     # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
     @assignment.update(is_intelligent: false)
+  end
+
+  def validate_assignment(assignment)
+    unless assignment.is_intelligent
+      raise StandardError, "This action is not allowed. The assignment #{assignment.name} does not enable intelligent assignments."
+    end
+  end
+
+  def find_unassigned_teams(assignment)
+    assignment.teams.reload.select do |t|
+      SignedUpTeam.where(team_id: t.id, is_waitlisted: 0).blank? && Bid.where(team_id: t.id).any?
+    end
+  end
+
+  def sort_teams_by_size_and_bids(teams)
+    teams.sort! do |t1, t2|
+      [TeamsUser.where(team_id: t2.id).size, Bid.where(team_id: t1.id).size] <=>
+        [TeamsUser.where(team_id: t1.id).size, Bid.where(team_id: t2.id).size]
+    end
   end
 
   # Constructs bidding information for teams including their bids on available topics

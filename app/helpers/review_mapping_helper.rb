@@ -182,7 +182,6 @@ module ReviewMappingHelper
       # Get the volume of review comments for the given assignment and reviewer
       review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
       reviewer.avg_vol_per_round = []
-
       # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
       review_volumes.each_index do |i|
         if i.zero?

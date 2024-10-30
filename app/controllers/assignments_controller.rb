@@ -27,26 +27,25 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
       # E2138 issue #3
-      find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      assignment_by_name = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
       dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
+      if !assignment_by_name && !find_existing_directory && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        assignment_created = Assignment.find(@assignment_form.assignment.id)
+        assignment_form_params[:assignment][:id] = assignment_created.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
-        ques_array = assignment_form_params[:assignment_questionnaire]
-        due_array = assignment_form_params[:due_date]
-        ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+
+        assignment_form_params[:assignment_questionnaire].each do |cur_questionnaire|
+          cur_questionnaire[:assignment_id] = assignment_created.id.to_s
         end
-        due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+
+        assignment_form_params[:due_date].each do |cur_due|
+          cur_due[:parent_id] = assignment_created.id.to_s
         end
-        assignment_form_params[:assignment_questionnaire] = ques_array
-        assignment_form_params[:due_date] = due_array
+
         @assignment_form.update(assignment_form_params, current_user)
         aid = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
@@ -55,7 +54,7 @@ class AssignmentsController < ApplicationController
         return
       else
         flash[:error] = 'Failed to create assignment.'
-        if find_existing_assignment
+        if assignment_by_name
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
         if find_existing_directory
@@ -75,7 +74,7 @@ class AssignmentsController < ApplicationController
     edit_params_setting
     assignment_staggered_deadline?
     update_due_date
-    check_questionnaires_usage
+    validate_questionnaires_usage
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
@@ -97,7 +96,7 @@ class AssignmentsController < ApplicationController
     assignment_staggered_deadline?
     nil_timezone_update
     update_feedback_attributes
-    query_participants_and_alert
+    query_participants
 
     if params['button'].nil?
       render partial: 'assignments/edit/topics'
@@ -112,23 +111,13 @@ class AssignmentsController < ApplicationController
     @assignment = Assignment.find(params[:id])
   end
 
-  # gets an assignment's path/url
-  def path
-    begin
-      file_path = @assignment.path
-    rescue StandardError
-      file_path = nil
-    end
-    file_path
-  end
-
   # makes a copy of an assignment
   def copy
     update_copy_session
     # check new assignment submission directory and old assignment submission directory
     new_assign_id = AssignmentForm.copy(params[:id], @user)
     if new_assign_id
-      if check_same_directory?(params[:id], new_assign_id)
+      if validate_same_directory?(params[:id], new_assign_id)
         flash[:note] = 'Warning: The submission directory for the copy of this assignment will be the same as the submission directory '\
           'for the existing assignment. This will allow student submissions to one assignment to overwrite submissions to the other assignment. '\
           'If you do not want this to happen, change the submission directory in the new copy of the assignment.'
@@ -148,7 +137,7 @@ class AssignmentsController < ApplicationController
       # Issue 1017 - allow instructor to delete assignment created by TA.
       # FixA : TA can only delete assignment created by itself.
       # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
-      if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
+      if current_user_has_instructor_privileges? || (current_user_has_ta_privileges? && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
         ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
         flash[:success] = 'The assignment was successfully deleted.'
@@ -216,8 +205,8 @@ class AssignmentsController < ApplicationController
     rubrics_list = %w[ReviewQuestionnaire
                       MetareviewQuestionnaire AuthorFeedbackQuestionnaire
                       TeammateReviewQuestionnaire BookmarkRatingQuestionnaire]
-    @assignment_questionnaires.each do |aq|
-      remove_existing_questionnaire(rubrics_list, aq)
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
     end
 
     remove_invalid_questionnaires(rubrics_list)
@@ -225,11 +214,11 @@ class AssignmentsController < ApplicationController
   end
 
   # Removes questionnaire types from the rubric list that are already on the assignment
-  def remove_existing_questionnaire(rubrics_list, aq)
-    return if aq.questionnaire_id.nil?
+  def remove_existing_questionnaire(rubrics_list, assignment_questionnaire)
+    return if assignment_questionnaire.questionnaire_id.nil?
 
     rubrics_list.reject! do |rubric|
-      rubric == Questionnaire.where(id: aq.questionnaire_id).first.type.to_s
+      rubric == Questionnaire.where(id: assignment_questionnaire.questionnaire_id).first.type.to_s
     end
   end
 
@@ -318,15 +307,15 @@ class AssignmentsController < ApplicationController
     questionnaire_array = assignment_form_params[:assignment_questionnaire]
     questionnaire_array.each { |cur_questionnaire| cur_questionnaire[:assignment_id] = exist_assignment.id.to_s }
     assignment_form_params[:assignment_questionnaire]
-    due_array = assignment_form_params[:due_date]
-    due_array.each { |cur_due| cur_due[:parent_id] = exist_assignment.id.to_s }
-    assignment_form_params[:due_date]
+    assignment_form_params[:due_date].each do |cur_due|
+      cur_due[:parent_id] = exist_assignment.id.to_s
+    end
     @assignment_form.update(assignment_form_params, current_user)
   end
 
   # helper methods for copy
   # checks if two assignments are in the same directory
-  def check_same_directory?(old_id, new_id)
+  def validate_same_directory?(old_id, new_id)
     Assignment.find(old_id).directory_path == Assignment.find(new_id).directory_path
   end
 
@@ -397,9 +386,9 @@ class AssignmentsController < ApplicationController
   end
 
   # checks if each questionnaire in an assignment is used
-  def check_questionnaires_usage
-    @assignment_questionnaires.each do |aq|
-      unless aq.used_in_round.nil?
+  def validate_questionnaires_usage
+    @assignment_questionnaires.each do |assignment_questionnaire|
+      unless assignment_questionnaire.used_in_round.nil?
         @reviewvarycheck = 1
         break
       end
@@ -504,11 +493,17 @@ class AssignmentsController < ApplicationController
     ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
-  def query_participants_and_alert
+  # This method checks whether an assignment is missing participants.
+  def query_participants
     assignment = Assignment.find(params[:id])
-    if assignment.participants.empty?
-      flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{assignment.id}&model=Assignment">here</a>)
+    if assignment.missing_participants?
+      alert_missing_participants(assignment.id)
     end
+  end
+
+  # This methods send out an alert to add participants to an assignment.
+  def alert_missing_participants(id)
+    flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
   end
 
   # sets values allowed for the assignment form

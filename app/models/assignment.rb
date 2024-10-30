@@ -170,7 +170,7 @@ class Assignment < ApplicationRecord
     review_assignment_strategy == RS_AUTO_SELECTED
   end
   alias is_using_dynamic_reviewer_assignment? dynamic_reviewer_assignment?
-
+  
   def path
     if course_id.nil? && instructor_id.nil?
       raise 'The path cannot be created. The assignment must be associated with either a course or an instructor.'
@@ -627,6 +627,10 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  def missing_participants?
+    participants.empty?
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil
@@ -667,6 +671,5 @@ class Assignment < ApplicationRecord
       signed_up_teams.destroy_all
     end
   end
-
 end
 

@@ -29,9 +29,9 @@ class TeamAssignmentService
 
   # Preparing the bidding data from users
   def prepare_bidding_data
-    teams = assignment.teams
-    users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
-    @bidding_data = { users: users_bidding_info, max_team_size: assignment.max_team_size }
+    teams = @assignment.teams
+    users_bidding_info = construct_users_bidding_info(@assignment.sign_up_topics, teams)
+    @bidding_data = { users: users_bidding_info, max_team_size: @assignment.max_team_size }
   end
 
   # Generate user bidding information hash based on students who haven't signed up yet
@@ -58,7 +58,7 @@ class TeamAssignmentService
 
       unless bid_priorities.uniq == 0
         team.users.each do |user|
-          users_bidding_info << { pid: user.id, ranks: bids }
+          users_bidding_info << { pid: user.id, ranks: bid_priorities }
         end
       end
     end
@@ -70,7 +70,7 @@ class TeamAssignmentService
   # with similar bidding priorities for the assignment's sign-up topics.
   def teams_from_bidding_service
     url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
-    response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
+    response = RestClient.post url, @bidding_data.to_json, content_type: :json, accept: :json
 
     # Structure of teams variable: [[user_id1, user_id2], [user_id3, user_id4]]
     @teams_response = JSON.parse(response)['teams']
@@ -87,7 +87,7 @@ class TeamAssignmentService
         new_team = AssignmentTeam.create_team_with_users(assignment.id, user_ids)
       end      # Select data from `users_bidding_info` variable that only related to team members in current team
       current_team_members_info = users_bidding_info.select { |info| user_ids.include? info[:pid] }.map { |info| info[:ranks] }
-      Bid.merge_bids_from_different_users(new_team.id, assignment.sign_up_topics, current_team_members_info)
+      Bid.merge_bids_from_different_users(new_team.id, @assignment.sign_up_topics, current_team_members_info)
     end
   end
 
@@ -107,7 +107,7 @@ class TeamAssignmentService
     teams_bidding_info = construct_teams_bidding_info(unassigned_teams, sign_up_topics)
     assign_available_slots(teams_bidding_info)
     # Remove is_intelligent property from assignment so that it can revert to the default sign-up state
-    assignment.update(is_intelligent: false)
+    @assignment.update(is_intelligent: false)
   end
 
   def validate_assignment(assignment)
@@ -136,7 +136,7 @@ class TeamAssignmentService
 
     unassigned_teams.each do |team|
         team_bids = construct_team_bids(team, bids)
-        sorted_bids = sort_bids_by_priority(team, bids)
+        sorted_bids = sort_bids_by_priority(bids)
         teams_bidding_info << { team_id: team.id, bids: sorted_bids }
     end
     teams_bidding_info

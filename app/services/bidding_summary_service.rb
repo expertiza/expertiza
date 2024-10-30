@@ -13,13 +13,16 @@
     @assignment = Assignment.find(assignment_id)
     @topics = @assignment.sign_up_topics.includes(:bids)
     @topic_data = @topics.map do |topic|
+
     # Count the total number of bids for the topic.
     total_bids = topic.bids.count
+    
     # Count the number of first, second, and third priority bids.
     first_choice_bids = topic.bids.where(priority: 1).count # TODO: First, second, third Choice Bids etc...
     second_choice_bids = topic.bids.where(priority: 2).count
     third_choice_bids = topic.bids.where(priority: 3).count
-    # Extract the team names for the bids.
+
+      # Extract the team names for the bids.
     bidding_teams = topic.bids.includes(:team).map { |bid| bid.team.try(:name) }
 
     # Calculate the percentage of first priority bids.
@@ -34,9 +37,9 @@
     {
       id: topic.id,
       name: topic.topic_name,
-      first_bids: first_choice_bids,
-      second_bids: second_choice_bids,
-      third_bids: third_choice_bids,
+      first_choice_bids: first_choice_bids,
+      second_choice_bids: second_choice_bids,
+      third_choice_bids: third_choice_bids,
       total_bids: total_bids,
       percentage_first: percentage_first,
       bidding_teams: bidding_teams

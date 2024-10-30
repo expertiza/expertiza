@@ -180,7 +180,7 @@ module ReviewMappingHelper
   end
 
   # Get the volume of the reviewers comments
-  def get_reviewers_comment_volume
+  private def get_reviewers_comment_volume
     @reviewers.each do |reviewer|
       # get the volume of review comments
       review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)

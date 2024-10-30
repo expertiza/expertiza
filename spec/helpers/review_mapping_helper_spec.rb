@@ -671,8 +671,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
       expect(resp_color).to eq(['green'])
     end
 
@@ -687,8 +686,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
       expect(resp_color).to eq(['green'])
     end
 
@@ -704,8 +702,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
       expect(resp_color).to eq(['green'])
     end
 
@@ -721,8 +718,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
       expect(resp_color).to eq(['purple'])
     end
   end

@@ -65,5 +65,14 @@ describe BiddingTeamsAssignmentService do
             teams_bidding_info = service.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
             expect(teams_bidding_info.size).to eq(2)
         end
+
+        it 'should return an empty array if there are no bids' do
+            service = BiddingTeamsAssignmentService.new(assignment.id)
+            unassigned_teams = [assignment_team1, assignment_team2]
+            sign_up_topics = [topic1, topic2]
+            teams_bidding_info = service.send(:construct_teams_bidding_info, unassigned_teams, sign_up_topics)
+            expect(teams_bidding_info).to be_empty
+        end
+
     end
 end

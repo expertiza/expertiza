@@ -672,7 +672,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
       resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
-      expect(resp_color).to eq(['green'])
+      expect(resp_color).to eq("green")
     end
 
     it 'should return green color if the submission link is not present' do
@@ -687,7 +687,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
       resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
-      expect(resp_color).to eq(['green'])
+      expect(resp_color).to eq("green")
     end
 
     it 'should return green color if the assignment was not submitted within the round' do
@@ -703,7 +703,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
       resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
-      expect(resp_color).to eq(['green'])
+      expect(resp_color).to eq("green")
     end
 
     xit 'should return purple color if the assignment was submitted within the round' do

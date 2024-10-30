@@ -32,11 +32,8 @@ class SubmittedContentController < ApplicationController
     # hence use team count for the check
     SignUpSheet.signup_team(@assignment.id, @participant.user_id, nil) if @participant.team.nil?
     # @can_submit is the flag indicating if the user can submit or not in current stage
-    @can_submit = false
+    @can_submit = !params.key?(:view)
     @stage = @assignment.current_stage(SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id))
-    if @stage == "submission"
-      @can_submit = true
-    end
   end
 
   # view is called when @assignment.submission_allowed(topic_id) is false

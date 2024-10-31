@@ -38,7 +38,7 @@
   <img src="/assets/info.png" title="If checked, it is possible to bid for reviews"/>
   <br>
   <% if @assignment_form.assignment.bidding_for_reviews_enabled %>
-    <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bidding', :assignment_id => @assignment_form.assignment.id %>
+    <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bid_review', :assignment_id => @assignment_form.assignment.id %>
   <% end %>
 <% end %>
 

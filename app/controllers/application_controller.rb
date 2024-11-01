@@ -111,6 +111,10 @@ class ApplicationController < ActionController::Base
     !authorizations.include?(authorization)
   end
 
+  def map_team_reviewing_enabled?(map_team_reviewing_enabled)
+    map_team_reviewing_enabled == true
+  end
+
   private
 
   def current_user

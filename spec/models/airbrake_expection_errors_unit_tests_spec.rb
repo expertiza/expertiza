@@ -58,8 +58,8 @@ describe 'Aribrake-1805332790232222219' do
     allow(@assignment).to receive(:try).with('id'.to_sym).and_return(1)
     allow(@questionnaire).to receive(:try).with('id'.to_sym).and_return(1)
     create(:assignment_questionnaire)
-    expect { rc.send(:set_dropdown_or_scale) }.not_to raise_error(NoMethodError)
-    expect(rc.send(:set_dropdown_or_scale)).to eq('dropdown')
+    expect { rc.send(:get_dropdown_or_scale) }.not_to raise_error(NoMethodError)
+    expect(rc.send(:get_dropdown_or_scale)).to eq('dropdown')
   end
 
   it 'will not raise error even if instance variables are nil' do
@@ -69,7 +69,7 @@ describe 'Aribrake-1805332790232222219' do
     allow(@questionnaire).to receive(:try) {}
     allow(@assignment).to receive(:try).with('id'.to_sym).and_return(nil)
     allow(@questionnaire).to receive(:try).with('id'.to_sym).and_return(nil)
-    expect { rc.send(:set_dropdown_or_scale) }.not_to raise_error(NoMethodError)
-    expect(rc.send(:set_dropdown_or_scale)).to eq('scale')
+    expect { rc.send(:get_dropdown_or_scale) }.not_to raise_error(NoMethodError)
+    expect(rc.send(:get_dropdown_or_scale)).to eq('scale')
   end
 end

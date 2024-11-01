@@ -19,6 +19,13 @@ class Response < ApplicationRecord
     id
   end
 
+  def show_feedback
+    return unless self.response.any?
+
+    map = FeedbackResponseMap.find_by(reviewed_object_id: id)
+    map.response.last.display_as_html if map && map.response.any?
+  end
+
   def display_as_html(prefix = nil, count = nil, _file_url = nil, show_tags = nil, current_user = nil)
     identifier = ''
     # The following three lines print out the type of rubric before displaying

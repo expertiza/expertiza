@@ -1,12 +1,13 @@
-# This is a new model create by E1577 (heat map)
-# represents each table in the view_team view.
-# the important piece to note is that the @listofrows is a  list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
+# This is a new model created by E1577 (heat map)
+# Represents each table in the view_team view.
+# The important piece to note is that @list_of_rows is a list of type VmQuestionResponse_Row, which represents a row of the heatgrid table.
 class VmQuestionResponse
   attr_reader :name, :rounds, :round, :questionnaire_type, :questionnaire_display_type, :list_of_reviews, :list_of_rows, :list_of_reviewers, :max_score
 
   @questionnaire = nil
   @assignment = nil
 
+  # Initializes a new instance of VmQuestionResponse, setting basic properties based on the questionnaire and assignment.
   def initialize(questionnaire, assignment = nil, round = nil)
     @assignment = assignment
     @questionnaire = questionnaire
@@ -29,6 +30,7 @@ class VmQuestionResponse
     @name  = questionnaire.name
   end
 
+  # Adds questions to the list of rows, excluding header questions.
   def add_questions(questions)
     questions.each do |question|
       # Get the maximum score for this question. For some unknown, godforsaken reason, the max
@@ -43,6 +45,7 @@ class VmQuestionResponse
     end
   end
 
+  # Adds reviews to the list based on the type of questionnaire.
   def add_reviews(participant, team, vary)
     if @questionnaire_type == 'ReviewQuestionnaire'
       reviews = if vary
@@ -101,27 +104,25 @@ class VmQuestionResponse
     end
   end
 
+  # Displays team members if the questionnaire type is Metareview or Review.
   def display_team_members(ip_address = nil)
-    @output = ''
-    if @questionnaire_type == 'MetareviewQuestionnaire' || @questionnaire_type == 'ReviewQuestionnaire'
-      @output = 'Team members:'
-      @list_of_team_participants.each do |participant|
-        @output = @output + ' (' + participant.fullname(ip_address) + ') '
-      end
+    return '' unless %w[MetareviewQuestionnaire ReviewQuestionnaire].include?(@questionnaire_type)
 
-    end
-
-    @output
+    team_members = @list_of_team_participants.map { |participant| participant.fullname(ip_address) }
+    "Team members: #{team_members.join(' ')}"
   end
 
+  # Adds team members to the list of participants for the given team.
   def add_team_members(team)
     @list_of_team_participants = team.participants
   end
 
+  # Calculates the maximum score for the questionnaire based on question count.
   def max_score_for_questionnaire
     @max_score * @list_of_rows.length
   end
 
+  # Adds an answer to the corresponding question row and assigns a color code.
   def add_answer(answer)
     # We want to add each response score from this review (answer) to its corresponding
     # question row.
@@ -162,13 +163,12 @@ class VmQuestionResponse
     end
   end
 
-  # This method calls all the methods that are responsible for calculating different metrics.If any new metric is introduced, please call the method that calculates the metric values from this method.
+  # Calculates various metrics related to reviews and answers.
   def calculate_metrics
     number_of_comments_greater_than_10_words
-    number_of_comments_greater_than_20_words
   end
 
-  # This method is responsible for checking whether a review comment contains more than 10 words.
+  # Counts comments that contain more than 10 words for each question row.
   def number_of_comments_greater_than_10_words
     @list_of_reviews.each do |review|
       answers = Answer.where(response_id: review.response_id)
@@ -176,19 +176,6 @@ class VmQuestionResponse
         @list_of_rows.each do |row|
           row.metric_hash["> 10 Word Comments"] = 0 if row.metric_hash["> 10 Word Comments"].nil?
           row.metric_hash["> 10 Word Comments"] = row.metric_hash["> 10 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 10
-        end
-      end
-    end
-  end
-
-  # In case if new metirc is added. This is a dummy metric added for manual testing and will be removed.
-  def number_of_comments_greater_than_20_words
-    @list_of_reviews.each do |review|
-      answers = Answer.where(response_id: review.response_id)
-      answers.each do |answer|
-        @list_of_rows.each do |row|
-          row.metric_hash["> 20 Word Comments"] = 0 if row.metric_hash["> 20 Word Comments"].nil?
-          row.metric_hash["> 20 Word Comments"] = row.metric_hash["> 20 Word Comments"] + 1 if row.question_id == answer.question_id && answer.comments && answer.comments.split.size > 20
         end
       end
     end

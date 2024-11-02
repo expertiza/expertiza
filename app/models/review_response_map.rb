@@ -75,7 +75,22 @@ class ReviewResponseMap < ResponseMap
     end
   end
 
+  def show_feedback(response)
+    return unless self.response.any? && response
 
+    map = FeedbackResponseMap.find_by(reviewed_object_id: response.id)
+    map.response.last.display_as_html if map && map.response.any?
+  end
+
+  def metareview_response_maps
+    responses = Response.where(map_id: id)
+    metareview_list = []
+    responses.each do |response|
+      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
+      metareview_response_maps.each { |metareview_response_map| metareview_list << metareview_response_map }
+    end
+    metareview_list
+  end
 
   # return the responses for specified round, for varying rubric feature -Yang
   def self.get_responses_for_team_round(team, round)
@@ -92,6 +107,21 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
+  # E-1973 - returns the reviewer of the response, either a participant or a team
+  def get_reviewer
+    ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
+  end
+
+  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
+  # the assignment is used to determine if the reviewer is a participant or a team
+  def self.get_reviewer_with_id(assignment_id, reviewer_id)
+    assignment = Assignment.find(assignment_id)
+    if assignment.team_reviewing_enabled
+      return AssignmentTeam.find(reviewer_id)
+    else
+      return AssignmentParticipant.find(reviewer_id)
+    end
+  end
 
   # wrap latest version of responses in each response map, together with the questionnaire_id
   # will be used to display the reviewer summary

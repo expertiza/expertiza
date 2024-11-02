@@ -90,32 +90,6 @@ class ResponseMap < ApplicationRecord
     false
   end
 
-  # E-1973 - returns the reviewer of the response, either a participant or a team
-  def get_reviewer
-    ResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)
-  end
-
-  # E-1973 - gets the reviewer of the response, given the assignment and the reviewer id
-  # the assignment is used to determine if the reviewer is a participant or a team
-  def self.get_reviewer_with_id(assignment_id, reviewer_id)
-    assignment = Assignment.find(assignment_id)
-    if assignment.team_reviewing_enabled
-      return AssignmentTeam.find(reviewer_id)
-    else
-      return AssignmentParticipant.find(reviewer_id)
-    end
-  end
-
-  def metareview_response_maps
-    responses = Response.where(map_id: id)
-    metareview_list = []
-    responses.each do |response|
-      metareview_response_maps = MetareviewResponseMap.where(reviewed_object_id: response.id)
-      metareview_response_maps.each { |metareview_response_map| metareview_list << metareview_response_map }
-    end
-    metareview_list
-  end
-
   def find_team_member
     # ACS Have metareviews done for all teams
     if type.to_s == 'MetareviewResponseMap'

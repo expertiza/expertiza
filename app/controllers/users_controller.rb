@@ -63,6 +63,8 @@ class UsersController < ApplicationController
   def list
     letter = params[:letter]
     search_by = params[:search_by]
+    @pagination_options = pagination_options
+    @per_page = @pagination_options[params[:per_page]]
     # If search parameters present
     if letter.present? && search_by.present?
       case search_by.to_i
@@ -259,7 +261,6 @@ class UsersController < ApplicationController
   # For filtering the users list with proper search and pagination.
   def paginate_list
     paginate_options = pagination_options
-
     # If the above hash does not have a value for the key,
     # it means that we need to show all the users on the page
     #
@@ -270,15 +271,15 @@ class UsersController < ApplicationController
     @search_by = params[:search_by]
 
     # Sets the number of users to display per page based on the 'per_page' parameter from the request.
-    # If no 'per_page' parameter is provided, it defaults to '4', which corresponds to displaying all users on one page.
-    @per_page = params[:per_page] || '4'
+    # If no 'per_page' parameter is provided, it defaults to '2', which corresponds to displaying 50 users on one page.
+    @per_page = params[:per_page]
 
     # search for corresponding users
     # users = User.search_users(role, user_id, letter, @search_by)
 
     # paginate
     users = if paginate_options[@per_page.to_s].nil? # displaying all - no pagination
-              User.paginate(page: params[:page], per_page: User.count)
+              User.paginate(page: params[:page], per_page: paginate_options['1'])
             else # some pagination is active - use the per_page
               User.paginate(page: params[:page], per_page: paginate_options[@per_page.to_s])
             end

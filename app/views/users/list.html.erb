@@ -49,7 +49,7 @@
 </div>
 
 <div style="float: left; display: inline-block;">
-  <%= will_paginate @paginated_users, :inner_window => 1, :outer_window => 1, :params => {:num_versions => @per_page}%>
+  <%= will_paginate @paginated_users, inner_window: 1, outer_window: 1, params: { per_page: params[:per_page] } %>
 </div>
 
 <div style="clear: both;"></div>

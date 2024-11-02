@@ -1,20 +1,13 @@
 class AuthorFeedbackQuestionnaire < Questionnaire
-  after_initialize :post_initialization
   @print_name = 'Author Feedback Rubric'
 
-  class << self
-    attr_reader :print_name
-  end
-
-  def post_initialization
-    self.display_type = 'Author Feedback'
-  end
+  after_initialize { post_initialization('Author Feedback') }
 
   def symbol
-    'feedback'.to_sym
+    super('feedback')
   end
 
   def get_assessments_for(participant)
-    participant.feedback
+    super(participant, :feedback)
   end
 end

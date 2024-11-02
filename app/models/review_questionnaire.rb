@@ -1,22 +1,9 @@
 class ReviewQuestionnaire < Questionnaire
-  after_initialize :post_initialization
   @print_name = 'Review Rubric'
 
-  class << self
-    attr_reader :print_name
-  end
-
-  def post_initialization
-    self.display_type = 'Review'
-  end
-
-  def symbol
-    'review'.to_sym
-  end
-
-  def get_assessments_for(participant)
-    participant.reviews
-  end
+  after_initialize { post_initialization('Review') }
+  def symbol; super('review'); end
+  def get_assessments_for(participant); super(participant, :reviews); end
 
   # return  the responses for specified round, for varying rubric feature -Yang
   def get_assessments_round_for(participant, round)

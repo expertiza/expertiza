@@ -40,7 +40,7 @@ class TeammateReviewResponseMap < ResponseMap
     participant = AssignmentParticipant.find(reviewee_id)
     defn[:body][:obj_name] = assignment.name
     user = User.find(participant.user_id)
-    defn[:body][:first_name] = user.fullname
+    defn[:body][:first_name] = user.name
     defn[:to] = user.email
     Mailer.sync_message(defn).deliver
   end

@@ -22,14 +22,14 @@ class LotteryController < ApplicationController
 
     users_bidding_info = construct_users_bidding_info(assignment.sign_up_topics, teams)
     bidding_data = { users: users_bidding_info, max_team_size: assignment.max_team_size }
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, "Bidding data for assignment #{assignment.name}: #{bidding_data}", request)
 
     begin
       url = WEBSERVICE_CONFIG['topic_bidding_webservice_url']
       response = RestClient.post url, bidding_data.to_json, content_type: :json, accept: :json
       # Structure of teams variable: [[user_id1, user_id2], [user_id3, user_id4]]
       teams = JSON.parse(response)['teams']
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Team formation info for assignment #{assignment.name}: #{teams}", request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, "Team formation info for assignment #{assignment.name}: #{teams}", request)
       create_new_teams_for_bidding_response(teams, assignment, users_bidding_info)
       assignment.remove_empty_teams
       match_new_teams_to_topics(assignment)

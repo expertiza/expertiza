@@ -356,7 +356,7 @@ describe MentorManagement do
         # Test case for when mentor_ids is not empty
         a = FactoryBot.create(:assignment, id: 997, directory_path: 'A2', auto_assign_mentor: true)
         # Create mentors for this assignment
-        ta1 = FactoryBot.create(:teaching_assistant, name: 'ta1', id: 1002)
+        ta1 = FactoryBot.create(:teaching_assistant, username: 'ta1', id: 1002)
         FactoryBot.create(:participant, id: 1001, user_id: 1002, parent_id: a.id, duty: Participant::DUTY_MENTOR)
         # Assign a mentor to a team
         allow(Team).to receive(:find).with(team.id).and_return(team)

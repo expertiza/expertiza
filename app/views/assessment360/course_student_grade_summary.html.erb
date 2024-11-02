@@ -49,7 +49,7 @@
 
   <% @course_participants.each do |cp|%>
       <tr>
-          <td align="center"><%= "#{cp.name(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
+          <td align="center"><%= "#{cp.username(session[:ip])} (#{cp.fullname(session[:ip])})" %> </td>
           <% @assignments.each do |assignment|%>
               <% topic = format_topic(@topics[cp.id][assignment.id]) %>
               <td title="<%= topic %>" class="topic topic-tooltip">

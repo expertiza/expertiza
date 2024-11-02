@@ -1,6 +1,6 @@
 describe AssignmentQuestionnaireController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
-  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, username: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
 
@@ -51,7 +51,7 @@ describe AssignmentQuestionnaireController do
         course2 = create(:course)
         assignment2 = create(:assignment, course_id: course2.id, instructor_id: instructor1)
         ta1 = create(:teaching_assistant, id: 20)
-        ta2 = create(:teaching_assistant, id:40, name: 'test_ta_2')
+        ta2 = create(:teaching_assistant, id:40, username: 'test_ta_2')
         TaMapping.create(ta_id: ta1.id, course_id: course2.id)
         
         stub_current_user(ta2, ta2.role.name, ta2.role)

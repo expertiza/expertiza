@@ -5,12 +5,12 @@
   <table width="100%">
     <tr>
       <th align = "right" width="15%"> Full name:</th>
-      <td width="35%"> <%= @user.fullname(session[:ip]) %></td>
+      <td width="35%"> <%= @user.name(session[:ip]) %></td>
       <td rowspan=4 width="50%" align="center"><%= image_tag "blank_profile_pic.jpg", :width=>"100px", :height=>"100px", :border=>1%></td>
     </tr>
     <tr>
       <th align = "right"> User id:</th>
-      <td> <%= @user.name(session[:ip]) %></td>
+      <td> <%= @user.username(session[:ip]) %></td>
     </tr>
     <tr>
       <th align = "right"> email:</th>

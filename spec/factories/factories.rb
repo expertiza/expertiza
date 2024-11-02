@@ -49,11 +49,11 @@ FactoryBot.define do
   end
 
   factory :admin, class: User do
-    sequence(:name) { |n| "admin#{n}" }
+    sequence(:username) { |n| "admin#{n}" }
     role { Role.where(name: 'Administrator').first || association(:role_of_administrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| "#{n}, administrator" }
+    sequence(:name) { |n| "#{n}, administrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -71,11 +71,11 @@ FactoryBot.define do
   end
 
   factory :superadmin, class: User do
-    sequence(:name) { |n| "superadmin#{n}" }
+    sequence(:username) { |n| "superadmin#{n}" }
     role { Role.where(name: 'Super-Administrator').first || association(:role_of_superadministrator) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| "#{n}, superadministrator" }
+    sequence(:name) { |n| "#{n}, superadministrator" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -101,7 +101,7 @@ FactoryBot.define do
   end
 
   factory :mentor, class: AssignmentParticipant do
-    sequence(:name) { |n| n = n % 3; "mentor206#{n + 4}" }
+    sequence(:username) { |n| n = n % 3; "mentor206#{n + 4}" }
     can_submit true
     can_review true
     assignment { Assignment.first || association(:assignment) }
@@ -121,11 +121,11 @@ FactoryBot.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
-    sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    sequence(:username) { |n| n = n % 3; "student206#{n + 4}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| n = n % 3; "206#{n + 4}, student" }
+    sequence(:name) { |n| n = n % 3; "206#{n + 4}, student" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -143,11 +143,11 @@ FactoryBot.define do
   end
 
   factory :instructor, class: Instructor do
-    name 'instructor6'
+    username 'instructor6'
     role { Role.where(name: 'Instructor').first || association(:role_of_instructor) }
     password 'password'
     password_confirmation 'password'
-    fullname '6, instructor'
+    name '6, instructor'
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -165,11 +165,11 @@ FactoryBot.define do
   end
 
   factory :teaching_assistant, class: Ta do
-    name 'teaching_assistant5888'
+    username 'teaching_assistant5888'
     role { Role.where(name: 'Teaching Assistant').first || association(:role_of_teaching_assistant) }
     password 'password'
     password_confirmation 'password'
-    fullname '5888, teaching assistant'
+    name '5888, teaching assistant'
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -572,9 +572,9 @@ FactoryBot.define do
   end
 
   factory :requested_user, class: AccountRequest do
-    name 'requester1'
+    username 'requester1'
     role_id 2
-    fullname 'requester, requester'
+    name 'requester, requester'
     institution_id 1
     email 'requester1@test.com'
     status 'Under Review'
@@ -640,9 +640,9 @@ FactoryBot.define do
   end
 
   factory :test_user, class: User do
-    name 'username'
-    fullname 'full name'
-    email 'abc@mailinator.com'
+    sequence(:username) { |n| "username#{n}" }
+    name 'full name'
+    sequence(:email) { |n| "user#{n}@mailinator.com" }
   end
 
   factory :survey_deployment, class: SurveyDeployment do

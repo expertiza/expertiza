@@ -42,7 +42,7 @@ module AnswerHelper
       user = Participant.find(reviewer_id).user
       answers_per_user = Answer.find_by(response_id: response_id).comments
       # For each response_id, add its info to the dictionary
-      user_id_to_answers[response_id] = { email: user.email, answers: answers_per_user, name: user.name, assignment_name: assignment_name } unless user.nil?
+      user_id_to_answers[response_id] = { email: user.email, answers: answers_per_user, username: user.username, assignment_name: assignment_name } unless user.nil?
     end
     user_id_to_answers
   end

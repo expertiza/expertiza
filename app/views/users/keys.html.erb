@@ -1,9 +1,9 @@
-<h1>User: <%=h @user.name(session[:ip]) %></h1>
+<h1>User: <%=h @user.username(session[:ip]) %></h1>
 
 <table>
 
   <tr><th>Full Name:</th>
-    <td><%= @user.fullname(session[:ip]) %></td>
+    <td><%= @user.name(session[:ip]) %></td>
   </tr>
 
   <tr><th>Email Address:</th>

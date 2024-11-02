@@ -13,7 +13,7 @@ describe 'create team by importing file' do
     # to test create new teams by importing a txt file
     it 'is able to create team by importing a file' do
       login_as('instructor6')
-      instructor = User.where(name: 'instructor6').first
+      instructor = User.where(username: 'instructor6').first
       assignment = Assignment.where(instructor_id: instructor.id).first
       visit "/teams/list?id=#{assignment.id}&type=Assignment"
       click_link 'Import Teams'

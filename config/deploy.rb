@@ -58,7 +58,7 @@ set :default_env,
     'JAVA_HOME' => '/usr/jdk-11'
 
 # Default value for local_user is ENV['USER']
-# set :local_user, -> { `git config user.name`.chomp }
+# set :local_user, -> { `git config user.username`.chomp }
 
 # Default value for keep_releases is 5
 set :keep_releases, 10

@@ -61,8 +61,8 @@
 
     <% @student.team.participants.each do |member| %> <!--start team member content-->
         <tr>
+        <td><%= member.user.username(session[:ip]) %></td>
         <td><%= member.user.name(session[:ip]) %></td>
-        <td><%= member.user.fullname(session[:ip]) %></td>
         <%if @student.assignment.duty_based_assignment? %>
             <% team_user = member.team_user %>
               <!-- Gets duty of member if the assignment is duty based and member has a duty -->
@@ -141,8 +141,8 @@
           </tr>
           <% @student.team.participants.each do |member| %> <!--start Pair Programming content-->
             <tr>
+              <td><%= member.user.username(session[:ip]) %></td>
               <td><%= member.user.name(session[:ip]) %></td>
-              <td><%= member.user.fullname(session[:ip]) %></td>
               <td><%= member.user.email(session[:ip]) %></td>
               <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
               <% if (status == "W" || status.nil?) and current_user.id != member.user.id %>
@@ -189,7 +189,7 @@
         </tr>
           <% @send_invs.each do |inv| %>
             <tr>
-              <td><%= inv.to_user.name(session[:ip]) %></td>
+              <td><%= inv.to_user.username(session[:ip]) %></td>
               <td><%= inv.to_user.fullname(session[:ip]) %></td>
               <td><%= inv.to_user.email(session[:ip]) %></td>
                 <% if inv.reply_status == 'A' %>
@@ -226,7 +226,7 @@
          <table style="width:80%" align="center" >
            <tr>
             <td>
-              <%=t ".enter_user"%><%= text_field_with_auto_complete :user, :name, {:size => 41} %>
+              <%=t ".enter_user"%><%= text_field_with_auto_complete :user, :username, {:size => 41} %>
               <input type='submit' value='Invite'/>
             </td>
            </tr>
@@ -245,8 +245,8 @@
         </tr>
         <% @users_on_waiting_list.each do |user|%>
           <tr>
+            <td> &nbsp; <%=user.username(session[:ip])%> &nbsp; </td>
             <td> &nbsp; <%=user.name(session[:ip])%> &nbsp; </td>
-            <td> &nbsp; <%=user.fullname(session[:ip])%> &nbsp; </td>
             <td> &nbsp; <%=user.email(session[:ip])%> &nbsp; </td>
           </tr>
         <% end%>
@@ -266,7 +266,7 @@
       <% @received_invs.each do |inv| %>
           <% if inv.reply_status == 'W' %>
               <tr>
-                <td><%= inv.from_user.name(session[:ip]) %></td>
+                <td><%= inv.from_user.username(session[:ip]) %></td>
                 <td>
                   <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
                   <% teams_users.each do |teams_user| %>

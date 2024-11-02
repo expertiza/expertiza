@@ -12,8 +12,8 @@ class TeamsUsersController < ApplicationController
 
   def auto_complete_for_user_name
     team = Team.find(session[:team_id])
-    @users = team.get_possible_team_members(params[:user][:name])
-    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    @users = team.get_possible_team_members(params[:user][:username])
+    render inline: "<%= auto_complete_result @users, 'username' %>", layout: false
   end
 
   # Example of duties: manager, designer, programmer, tester. Finds TeamsUser and save preferred Duty
@@ -34,10 +34,10 @@ class TeamsUsersController < ApplicationController
   end
 
   def create
-    user = User.find_by(name: params[:user][:name].strip)
+    user = User.find_by(username: params[:user][:username].strip)
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+      flash[:error] = "\"#{params[:user][:username].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
     end
 
     team = Team.find(params[:id])
@@ -51,12 +51,12 @@ class TeamsUsersController < ApplicationController
         end
         if AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id).nil?
           urlAssignmentParticipantList = url_for controller: 'participants', action: 'list', id: assignment.id, model: 'Assignment', authorization: 'participant'
-          flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
+          flash[:error] = "\"#{user.username}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
             add_member_return = team.add_member(user, team.parent_id)
           rescue
-            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
+            flash[:error] = "The user #{user.username} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
             return
           end
@@ -71,19 +71,19 @@ class TeamsUsersController < ApplicationController
         end
         if CourseParticipant.find_by(user_id: user.id, parent_id: course.id).nil?
           urlCourseParticipantList = url_for controller: 'participants', action: 'list', id: course.id, model: 'Course', authorization: 'participant'
-          flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
+          flash[:error] = "\"#{user.username}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           begin
             add_member_return = team.add_member(user, team.parent_id)
           rescue
-            flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
+            flash[:error] = "The user #{user.username} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
             return
           end
           flash[:error] = 'This team already has the maximum number of members.' if add_member_return == false
           if add_member_return
             @teams_user = TeamsUser.last
-            undo_link("The team user \"#{user.name}\" has been successfully added to \"#{team.name}\".")
+            undo_link("The team user \"#{user.username}\" has been successfully added to \"#{team.name}\".")
           end
         end
       end
@@ -97,7 +97,7 @@ class TeamsUsersController < ApplicationController
     parent_id = Team.find(@teams_user.team_id).parent_id
     @user = User.find(@teams_user.user_id)
     @teams_user.destroy
-    undo_link("The team user \"#{@user.name}\" has been successfully removed. ")
+    undo_link("The team user \"#{@user.username}\" has been successfully removed. ")
     redirect_to controller: 'teams', action: 'list', id: parent_id
   end
 

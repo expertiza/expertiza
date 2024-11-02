@@ -13,7 +13,7 @@ class SuggestionController < ApplicationController
   def add_comment
     @suggestion_comment = SuggestionComment.new(vote: params[:suggestion_comment][:vote], comments: params[:suggestion_comment][:comments])
     @suggestion_comment.suggestion_id = params[:id]
-    @suggestion_comment.commenter = session[:user].name
+    @suggestion_comment.commenter = session[:user].username
     if @suggestion_comment.save
       flash[:notice] = 'Your comment has been successfully added.'
     else
@@ -57,7 +57,7 @@ class SuggestionController < ApplicationController
   def new
     @suggestion = Suggestion.new
     session[:assignment_id] = params[:id]
-    @suggestions = Suggestion.where(unityID: session[:user].name, assignment_id: params[:id])
+    @suggestions = Suggestion.where(unityID: session[:user].username, assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 
@@ -67,7 +67,7 @@ class SuggestionController < ApplicationController
     @assignment = Assignment.find(session[:assignment_id])
     @suggestion.status = 'Initiated'
     @suggestion.unityID = if params[:suggestion_anonymous].nil?
-                            session[:user].name
+                            session[:user].username
                           else
                             ''
                           end
@@ -105,7 +105,7 @@ class SuggestionController < ApplicationController
         subject: "Suggested topic '#{@suggestion.title}' has been approved",
         body: {
           approved_topic_name: @suggestion.title,
-          proposer: proposer.name
+          proposer: proposer.username
         }
       ).deliver_now!
     end
@@ -160,7 +160,7 @@ class SuggestionController < ApplicationController
 
   def approve
     @suggestion = Suggestion.find(params[:id])
-    @user_id = User.find_by(name: @suggestion.unityID).try(:id)
+    @user_id = User.find_by(username: @suggestion.unityID).try(:id)
     if @user_id
       @team_id = TeamsUser.team_id(@suggestion.assignment_id, @user_id)
       @topic_id = SignedUpTeam.topic_id(@suggestion.assignment_id, @user_id)

@@ -10,8 +10,8 @@ class ScrubDatabase
         fake_lastname = FakeNameGenerator.last_name
         num = rand(1..9)
         role = user.role.name.downcase.gsub(/[- ]/, '_')
-        user.name = role == 'student' ? "#{fake_name}_#{fake_lastname[0..3]}#{num}" : "#{role}_#{fake_name}__#{fake_lastname[0..3]}"
-        user.fullname = role == 'student' ? "#{fake_lastname}, #{fake_name}" : "#{fake_name}, #{role}"
+        user.username = role == 'student' ? "#{fake_name}_#{fake_lastname[0..3]}#{num}" : "#{role}_#{fake_name}__#{fake_lastname[0..3]}"
+        user.name = role == 'student' ? "#{fake_lastname}, #{fake_name}" : "#{fake_name}, #{role}"
         user.email = 'expertiza@mailinator.com'
         user.handle = 'handle'
         user.password = 'password'

@@ -14,9 +14,9 @@
 		<% for review in reviews %>
        <td align="center">
        <% unless controller.action_name == "view_my_scores"%>
-         &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
+         &nbsp;<%= review.map.reviewer.name(session[:ip]) %></a>&nbsp;<%=link_to image_tag("/assets/delete_icon.png", :border => 0), {:controller => 'response', :action => 'delete', :id => review.id, :return => 'instructor'} %>
 		   <% else %>
-         &nbsp;<%= review.map.reviewer.fullname(session[:ip]) %>&nbsp;
+         &nbsp;<%= review.map.reviewer.name(session[:ip]) %>&nbsp;
 		   <% end %>
 		   </td>	    
     <% end %>
@@ -31,7 +31,7 @@
              <% symbol = "review" + review.round.to_s %>
              <% score = Response.score(:response => [review], :questions => @questions[symbol.to_sym]) %>
              <% unless controller.action_name == "view_my_scores" %>
-               <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.fullname(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.fullname(session[:ip]) %>_grade]" value="<%= score %>">
+               <input type="hidden" class="form-control" id="mailer_<%= review.map.reviewer.name(session[:ip]) %>_grade" name="mailer[<%= review.map.reviewer.name(session[:ip]) %>_grade]" value="<%= score %>">
              <% end %>
              <%if score==-1%>
                <%= sprintf("--") %>% &nbsp;

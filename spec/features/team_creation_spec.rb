@@ -19,7 +19,7 @@ xdescribe 'Team Creation' do
 
   describe 'one student who signup for a topic should send an inviatation to the other student who has no topic' do
     before(:each) do
-      user = User.find_by(name: 'student2064')
+      user = User.find_by(username: 'student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       # Assignment name
@@ -45,7 +45,7 @@ xdescribe 'Team Creation' do
       click_button 'Invite'
       expect(page).to have_content('student2065')
 
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -69,7 +69,7 @@ xdescribe 'Team Creation' do
 
   describe 'one student who has a topic sends an invitation to other student who also has a topic' do
     before(:each) do
-      user = User.find_by(name: 'student2064')
+      user = User.find_by(username: 'student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -83,7 +83,7 @@ xdescribe 'Team Creation' do
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=1'
       # expect(page).to have_content('Your topic(s)')
       # signup for topic for user1 finish
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -97,7 +97,7 @@ xdescribe 'Team Creation' do
       visit '/sign_up_sheet/sign_up?assignment_id=1&id=2'
       # expect(page).to have_content('Your topic(s)')
       # signup for topic for user2 finish
-      user = User.find_by(name: 'student2064')
+      user = User.find_by(username: 'student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -112,7 +112,7 @@ xdescribe 'Team Creation' do
       click_button 'Invite'
       expect(page).to have_content('Waiting for reply')
 
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       click_link 'final2'
@@ -134,7 +134,7 @@ xdescribe 'Team Creation' do
 
   describe 'one student should send an invitation to other student and both does not have topics' do
     before(:each) do
-      user = User.find_by(name: 'student2066')
+      user = User.find_by(username: 'student2066')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -149,7 +149,7 @@ xdescribe 'Team Creation' do
       visit "/sign_up_sheet/sign_up?id=#{assignment_id}&topic_id=1"
       expect(page).to have_content('Your topic(s)')
 
-      user = User.find_by(name: 'student2064')
+      user = User.find_by(username: 'student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -168,7 +168,7 @@ xdescribe 'Team Creation' do
       click_button 'Invite'
       expect(page).to have_content('Waiting for reply')
 
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -193,7 +193,7 @@ xdescribe 'Team Creation' do
 
   describe 'one student should send an invitation to other student who has a topic signed up for' do
     before(:each) do
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -209,7 +209,7 @@ xdescribe 'Team Creation' do
       expect(page).to have_content('Your topic(s)')
 
       # choose a topic for student5710
-      user = User.find_by(name: 'student2064')
+      user = User.find_by(username: 'student2064')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')
@@ -226,7 +226,7 @@ xdescribe 'Team Creation' do
       click_button 'Invite'
       expect(page).to have_content('Waiting for reply')
 
-      user = User.find_by(name: 'student2065')
+      user = User.find_by(username: 'student2065')
       stub_current_user(user, user.role.name, user.role)
       visit '/student_task/list'
       expect(page).to have_content('final2')

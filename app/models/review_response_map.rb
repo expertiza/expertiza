@@ -45,7 +45,7 @@ class ReviewResponseMap < ResponseMap
 
   def self.import(row_hash, _session, assignment_id)
     reviewee_user_name = row_hash[:reviewee].to_s
-    reviewee_user = User.find_by(name: reviewee_user_name)
+    reviewee_user = User.find_by(username: reviewee_user_name)
     raise ArgumentError, 'Cannot find reviewee user.' unless reviewee_user
 
     reviewee_participant = AssignmentParticipant.find_by(user_id: reviewee_user.id, parent_id: assignment_id)
@@ -61,7 +61,7 @@ class ReviewResponseMap < ResponseMap
     end
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s
-      reviewer_user = User.find_by(name: reviewer_user_name)
+      reviewer_user = User.find_by(username: reviewer_user_name)
       raise ArgumentError, 'Cannot find reviewer user.' unless reviewer_user
       next if reviewer_user_name.empty?
 
@@ -102,7 +102,7 @@ class ReviewResponseMap < ResponseMap
           responses << map.response.reject { |r| (r.round != round || !r.is_submitted) }.last
         end
       end
-      responses.sort! { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+      responses.sort! { |a, b| a.map.reviewer.name <=> b.map.reviewer.name }
     end
     responses
   end
@@ -149,7 +149,7 @@ class ReviewResponseMap < ResponseMap
                    end
     else
       # This is a search, so find reviewers by user's full name
-      user_ids = User.select('DISTINCT id').where('fullname LIKE ?', '%' + review_user[:fullname] + '%')
+      user_ids = User.select('DISTINCT id').where('name LIKE ?', '%' + review_user[:name] + '%')
       # E1973 - we use a separate query depending on if the reviewer is a team or participant
       if assignment.team_reviewing_enabled
         reviewer_participants = AssignmentTeam.where('id IN (?) and parent_id = ?', team_ids, assignment.id)
@@ -171,7 +171,7 @@ class ReviewResponseMap < ResponseMap
     defn[:body][:type] = 'Peer Review'
     AssignmentTeam.find(reviewee_id).users.each do |user|
       defn[:body][:obj_name] = assignment.name
-      defn[:body][:first_name] = User.find(user.id).fullname
+      defn[:body][:first_name] = User.find(user.id).name
       defn[:to] = User.find(user.id).email
       Mailer.sync_message(defn).deliver_now
     end

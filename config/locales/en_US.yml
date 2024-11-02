@@ -265,7 +265,7 @@ en_US:
       team_name_up: "Team Name:"
       team_members: "Team members"
       username: "Username"
-      fullname: "Full name"
+      name: "Full name"
       email_address: "Email address"
       review_action: "Review action"
       send_invite: "Send invitations"

@@ -215,7 +215,7 @@ describe GradesController do
         }
         allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params: request_params
-        expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
+        expect(flash[:note]).to eq("The computed score will be used for #{participant.user.username}.")
         expect(response).to redirect_to('/grades/1/edit')
       end
     end
@@ -231,7 +231,7 @@ describe GradesController do
         }
         allow(participant).to receive(:update_attribute).with(any_args).and_return(participant)
         post :update, params: request_params
-        expect(flash[:note]).to eq("The computed score will be used for #{participant.user.name}.")
+        expect(flash[:note]).to eq("The computed score will be used for #{participant.user.username}.")
         expect(response).to redirect_to('/grades/1/edit')
       end
     end

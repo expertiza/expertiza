@@ -1,7 +1,7 @@
 describe CourseNode do
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:course_node) { build(:course_node, id: 1) }
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) { User.new username: 'abc', name: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
   let(:assignment) { build(:assignment, id: 1) }
   before(:each) do
     course_node.node_object_id = 1

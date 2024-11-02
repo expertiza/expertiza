@@ -2,7 +2,7 @@
 
 <%= form_tag :action => 'create' do %>
   <p><label for="role_id">Role</label><br/>
-    <%= collection_select 'user', 'role_id', @all_roles, :id, :name, {:selected => @rolename.id} %></p>
+    <%= collection_select 'user', 'role_id', @all_roles, :id, :username, {:selected => @rolename.id} %></p>
 
   <%= render :partial => 'user', :locals => { :new_user => true , :request_user =>false , :edit => false} %>
   <%= submit_tag "Create" %>

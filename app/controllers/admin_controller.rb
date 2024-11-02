@@ -22,7 +22,7 @@ class AdminController < ApplicationController
   end
 
   def list_administrators
-    @users = User.admins.order(:name).where('parent_id = ?', current_user.id).paginate(page: params[:page], per_page: 50)
+    @users = User.admins.order(:username).where('parent_id = ?', current_user.id).paginate(page: params[:page], per_page: 50)
   end
 
   def show_administrator
@@ -31,7 +31,7 @@ class AdminController < ApplicationController
   end
 
   def list_instructors
-    @users = User.instructors.order(:name).where('parent_id = ?', current_user.id).paginate(page: params[:page], per_page: 50)
+    @users = User.instructors.order(:username).where('parent_id = ?', current_user.id).paginate(page: params[:page], per_page: 50)
   end
 
   def show_instructor

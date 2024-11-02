@@ -1,9 +1,9 @@
 describe AdminController do
-  let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 1, name: 'Administrator1') }
-  let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 1, name: 'Administrator2') }
+  let(:admin1) { build(:admin, id: 3, role_id: 4, parent_id: 1, username: 'Administrator1') }
+  let(:admin2) { build(:admin, id: 4, role_id: 4, parent_id: 1, username: 'Administrator2') }
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
-  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
-  let(:instructor2) { build(:instructor, id: 11, role_id: 3, parent_id: 4, name: 'Instructor2') }
+  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, username: 'Instructor1') }
+  let(:instructor2) { build(:instructor, id: 11, role_id: 3, parent_id: 4, username: 'Instructor2') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
 
   # create fake lists
@@ -20,12 +20,12 @@ describe AdminController do
     allow(User).to receive(:where).with(['role_id = ?', super_admin.role_id]).and_return([super_admin])
 
     allow(User).to receive(:where).with(role_id: admin1.role).and_return(admin_list)
-    allow(admin_list).to receive(:order).with(:name).and_return(admin_list)
+    allow(admin_list).to receive(:order).with(:username).and_return(admin_list)
     allow(admin_list).to receive(:where).with('parent_id = ?', super_admin.id).and_return(admin_list)
     allow(admin_list).to receive(:paginate).with(page: '1', per_page: 50).and_return(admin_list)
 
     allow(User).to receive(:where).with(role_id: instructor1.role).and_return(instructor_list)
-    allow(instructor_list).to receive(:order).with(:name).and_return(instructor_list)
+    allow(instructor_list).to receive(:order).with(:username).and_return(instructor_list)
     allow(instructor_list).to receive(:where).with('parent_id = ?', admin1.id).and_return(instructor_list_pid3)
     allow(instructor_list_pid3).to receive(:paginate).with(page: '1', per_page: 50).and_return(instructor_list_pid3)
   end

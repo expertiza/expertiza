@@ -1,11 +1,11 @@
 describe Participant do
   let(:team) { build(:assignment_team, id: 1, name: 'myTeam') }
-  let(:user) { build(:student, id: 4, name: 'no name', fullname: 'no two') }
+  let(:user) { build(:student, id: 4, username: 'no name', name: 'no two') }
   let(:team_user) { build(:team_user, id: 1, user: user, team: team) }
   let(:topic) { build(:topic) }
-  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
-  let(:participant3) { build(:participant, can_review: false, user: build(:student, name: 'King', fullname: 'Titan, King', id: 3)) }
+  let(:participant) { build(:participant, user: build(:student, username: 'Jane', name: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, username: 'John', name: 'Doe, John', id: 2)) }
+  let(:participant3) { build(:participant, can_review: false, user: build(:student, username: 'King', name: 'Titan, King', id: 3)) }
   let(:participant4) { Participant.new }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:participant5) { build(:participant, user: user, assignment: assignment) }
@@ -38,7 +38,7 @@ describe Participant do
   end
 
   describe '#name' do
-    it 'returns the name of the user' do
+    it 'returns the username of the user' do
       expect(participant.name).to eq('Jane')
     end
   end

@@ -24,9 +24,9 @@ describe MetareviewResponseMap do
   let(:response2) { build(:response, id: 3, map_id: 1, round: nil, response_map: review_response_map, is_submitted: true) }
   let(:response3) { build(:response) }
   let(:metareview_response_map) { build(:meta_review_response_map, review_mapping: review_response_map) }
-  let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student2) { build(:student, id: 3, name: 'name2', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student) { build(:student, id: 1, username: 'name', name: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, username: 'name1', name: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student2) { build(:student, id: 3, username: 'name2', name: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment_questionnaire1) { build(:assignment_questionnaire, id: 1, assignment_id: 1, questionnaire_id: 1) }
   let(:assignment_questionnaire2) { build(:assignment_questionnaire, id: 2, assignment_id: 1, questionnaire_id: 2) }
   let(:questionnaire1) { build(:questionnaire, type: 'ReviewQuestionnaire') }
@@ -104,18 +104,18 @@ describe MetareviewResponseMap do
         expect { MetareviewResponseMap.import(row_hash, session, 1) }.to raise_error(ArgumentError, 'Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>')
         # when reviewee user doesn't exist
         row_hash = { reviewee: 'name', metareviewers: ['name1'], reviewer: 'name1' }
-        allow(User).to receive(:find_by).with(name: 'name1').and_return(student)
+        allow(User).to receive(:find_by).with(username: 'name1').and_return(student)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
         expect { MetareviewResponseMap.import(row_hash, session, 1) }.to raise_error(ImportError, 'Contributor, ' + row_hash[:reviewee].to_s + ', was not found.')
         # when a metareview response map is created
-        allow(User).to receive(:find_by).with(name: 'name2').and_return(student2)
+        allow(User).to receive(:find_by).with(username: 'name2').and_return(student2)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 3, parent_id: 1).and_return([participant])
         allow(AssignmentTeam).to receive(:where).with(name: 'name', parent_id: 1).and_return([team])
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1).and_return([student])
         row_hash = { reviewee: 'name', metareviewers: ['name1'], reviewer: 'name2' }
         expect { MetareviewResponseMap.import(row_hash, session, 1).to eq(metareview_response_map) }
         ## when reviewer user doesn't exist
-        allow(User).to receive(:find_by).with(name: 'name2').and_return(student2)
+        allow(User).to receive(:find_by).with(username: 'name2').and_return(student2)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 3, parent_id: 1).and_return([participant])
         allow(AssignmentTeam).to receive(:where).with(name: 'name', parent_id: 1).and_return([team])
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1).and_return(nil)

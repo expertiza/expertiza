@@ -1,6 +1,6 @@
 describe 'CourseTeam' do
   let(:course_team1) { build(:course_team, id: 1, name: 'no team') }
-  let(:user2) { build(:student, id: 2, name: 'no name') }
+  let(:user2) { build(:student, id: 2, username: 'no name') }
   let(:participant) { build(:participant, user: user2) }
   let(:course) { build(:course, id: 1, name: 'ECE517') }
   let(:team_user) { build(:team_user, id: 1, user: user2) }

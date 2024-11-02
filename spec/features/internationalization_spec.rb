@@ -1,6 +1,6 @@
 describe 'internationalization', js: true do
   before(:each) do
-    instructor = create(:instructor, name: 'hindi_instructor')
+    instructor = create(:instructor, username: 'hindi_instructor')
     student = create(:student)
 
     course = create(:course, name: 'Hindi Course Intl', instructor: instructor, locale: Course.locales['hi_IN'])
@@ -36,7 +36,7 @@ describe 'internationalization', js: true do
 
   describe "changing the user's locale preference" do
     it "should display the profile page in the user's configured language" do
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
 
       # Default locale preference is 'No Preference'
@@ -55,7 +55,7 @@ describe 'internationalization', js: true do
     end
 
     it 'should be able to persist user locale preference across sessions' do
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'No Preference')
 
@@ -63,18 +63,18 @@ describe 'internationalization', js: true do
       click_button 'Save', match: :first
       Capybara.reset_sessions!
 
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'Hindi')
     end
   end
 
   describe "changing the course's locale preference" do
-    let(:instructor) { Instructor.find_by(name: 'hindi_instructor') }
+    let(:instructor) { Instructor.find_by(username: 'hindi_instructor') }
     let(:course) { Course.find_by(name: 'English Course') }
 
     it "should display the course page in the course's configured language" do
-      login_as(instructor.name)
+      login_as(instructor.username)
       visit "/course/#{course.id}/edit"
 
       # English Course locale is 'English'
@@ -91,7 +91,7 @@ describe 'internationalization', js: true do
     end
 
     it 'should be able to persist course locale preference across sessions' do
-      login_as(instructor.name)
+      login_as(instructor.username)
       visit "/course/#{course.id}/edit"
       expect(page).to have_select('course_locale', selected: 'English')
 
@@ -99,7 +99,7 @@ describe 'internationalization', js: true do
       click_button 'Update', match: :first
       Capybara.reset_sessions!
 
-      login_as(instructor.name)
+      login_as(instructor.username)
       visit "/course/#{course.id}/edit"
       expect(page).to have_select('course_locale', selected: 'Hindi')
     end
@@ -107,7 +107,7 @@ describe 'internationalization', js: true do
 
   describe 'a user with no language preference' do
     it 'views the profile page (and other pages without a locale affinity) in English' do
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'No Preference')
 
@@ -115,7 +115,7 @@ describe 'internationalization', js: true do
       expect(page).to have_content('Assignments')
     end
     it 'views the course page in the course language (and also for other pages with a locale affinity)' do
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
       expect(page).to have_select('user_locale', selected: 'No Preference')
 
@@ -127,7 +127,7 @@ describe 'internationalization', js: true do
 
   describe "a user with a language preference of 'Hindi'" do
     before(:each) do
-      login_as(hindi_course_student.name)
+      login_as(hindi_course_student.username)
       visit '/profile/update/edit'
       select 'Hindi', from: 'user_locale'
       click_button 'Save', match: :first

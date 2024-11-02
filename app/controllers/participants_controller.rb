@@ -39,17 +39,17 @@ class ParticipantsController < ApplicationController
       #E2351 - add corresponding duty fill from permissions
       can_mentor = permissions[:can_mentor]
       if curr_object.is_a?(Assignment)
-        curr_object.add_participant(params[:user][:name], can_submit, can_review, can_take_quiz, can_mentor)
+        curr_object.add_participant(params[:user][:username], can_submit, can_review, can_take_quiz, can_mentor)
       elsif curr_object.is_a?(Course)
-        curr_object.add_participant(params[:user][:name])
+        curr_object.add_participant(params[:user][:username])
       end
-      user = User.find_by(name: params[:user][:name])
+      user = User.find_by(username: params[:user][:username])
       @model = params[:model]
       @participant = curr_object.participants.find_by(user_id: user.id)
-      flash.now[:note] = "The user <b>#{params[:user][:name]}</b> has successfully been added."
+      flash.now[:note] = "The user <b>#{params[:user][:username]}</b> has successfully been added."
     rescue StandardError
       url_for controller: 'users', action: 'new'
-      flash.now[:error] = "The user <b>#{params[:user][:name]}</b> does not exist or has already been added."
+      flash.now[:error] = "The user <b>#{params[:user][:username]}</b> does not exist or has already been added."
     end
     render action: 'add.js.erb', layout: false
   end
@@ -79,7 +79,7 @@ class ParticipantsController < ApplicationController
     parent_id = participant.parent_id
     begin
       participant.destroy
-      flash[:note] = undo_link("The user \"#{participant.user.name}\" has been successfully removed as a participant.")
+      flash[:note] = undo_link("The user \"#{participant.user.username}\" has been successfully removed as a participant.")
     rescue StandardError
       flash[:error] = 'This participant is on a team, or is assigned as a reviewer for someone’s work.'
     end
@@ -158,13 +158,13 @@ class ParticipantsController < ApplicationController
   # Deletes participants from an assignment
   def delete
     contributor = AssignmentParticipant.find(params[:id])
-    name = contributor.name
+    username = contributor.name
     assignment_id = contributor.assignment
     begin
         contributor.destroy
-        flash[:note] = "\"#{name}\" is no longer a participant in this assignment."
+        flash[:note] = "\"#{username}\" is no longer a participant in this assignment."
     rescue StandardError
-      flash[:error] = "\"#{name}\" was not removed from this assignment. Please ensure that \"#{name}\" is not a reviewer or metareviewer and try again."
+      flash[:error] = "\"#{username}\" was not removed from this assignment. Please ensure that \"#{username}\" is not a reviewer or metareviewer and try again."
       end
     redirect_to controller: 'review_mapping', action: 'list_mappings', id: assignment_id
   end
@@ -204,8 +204,8 @@ class ParticipantsController < ApplicationController
   # Get the user info from the team user
   def get_user_info(team_user, assignment)
     user = {}
+    user[:username] = team_user.username
     user[:name] = team_user.name
-    user[:fullname] = team_user.fullname
     # set by default
     permission_granted = false
     assignment.participants.each do |participant|

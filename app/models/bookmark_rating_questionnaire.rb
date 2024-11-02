@@ -9,4 +9,8 @@ class BookmarkRatingQuestionnaire < Questionnaire
   def get_assessments_for(participant)
     super(participant, :bookmark_reviews)
   end
+
+  class << self
+    attr_reader :print_name
+  end
 end

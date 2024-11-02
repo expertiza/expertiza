@@ -5,6 +5,10 @@ class ReviewQuestionnaire < Questionnaire
   def symbol; super('review'); end
   def get_assessments_for(participant); super(participant, :reviews); end
 
+  class << self
+    attr_reader :print_name
+  end
+
   # return  the responses for specified round, for varying rubric feature -Yang
   def get_assessments_round_for(participant, round)
     team = AssignmentTeam.team(participant)

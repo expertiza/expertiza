@@ -10,4 +10,8 @@ class AuthorFeedbackQuestionnaire < Questionnaire
   def get_assessments_for(participant)
     super(participant, :feedback)
   end
+
+  class << self
+    attr_reader :print_name
+  end
 end

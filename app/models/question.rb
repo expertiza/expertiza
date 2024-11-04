@@ -37,6 +37,23 @@ class Question < ApplicationRecord
     end
   end
 
+  # Placeholder methods, override in derived classes if required.
+  # this method decide what to display if an instructor (etc.) is creating or editing a questionnaire
+  def edit
+  end
+  # this method decide what to display if an instructor (etc.) is viewing a questionnaire
+  def view_question_text
+  end
+  # this method decide what to display if a student is filling out a questionnaire
+  def view_completed_question
+  end
+  # this method decide what to display if a student is viewing a filled-out questionnaire
+  def complete
+  end
+  def self.compute_question_score
+  end
+
+
   # This method returns questions (question_ids) in one assignment where the comments field is meaningful (ScoredQuestion and TextArea types)
   def self.get_all_questions_with_comments_available(assignment_id)
     question_ids = []

@@ -7,9 +7,6 @@ class CourseSurveyResponseMap < SurveyResponseMap
     Questionnaire.find_by(id: survey_deployment.questionnaire_id)
   end
 
-  def contributor
-    nil
-  end
 
   def survey_parent
     course

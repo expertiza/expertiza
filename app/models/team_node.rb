@@ -13,7 +13,8 @@ class TeamNode < Node
   end
 
   def get_name(_ip_address = nil)
-    Team.find(node_object_id).name
+    t = Team.find(node_object_id)
+    t.name + ' ' + t.class.name.demodulize
   end
 
   def get_children(_sortvar = nil, _sortorder = nil, _user_id = nil, _parent_id = nil, _search = nil)

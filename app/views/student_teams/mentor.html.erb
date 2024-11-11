@@ -1,0 +1,88 @@
+<!-- E2351 New view for mentors so they can see all the teams they are mentoring for the assignment -->
+<h1><%=t ".team_info"%> <%= @student.assignment.name %></h1>
+<% if @student.team.nil? %>
+  <%=t ".no_team"%>
+  <h3><%=t ".name_team"%></h3>
+  <%= form_tag :controller => 'student_teams', :action => 'create' do %>
+    <%= hidden_field_tag 'student_id', @student.id %>
+    <label for="team_name"><%=t ".team_name"%></label>&nbsp;
+    <%= text_field 'team', 'name' %>
+    <%= submit_tag t(".name_team") %>
+  <% end %>
+<% else %> 
+  <% @student.assignment.teams.each do |team| %>
+    <% if team.includes?(@student) %>
+      <br/><br/>
+      <b><%=t team.name %></b>
+      <br/><br/>
+      <!--start team member table-->
+      <table style="width:80%" align="center" >
+        <tr style="border: 1px outset #000000; padding: 10px 20px" >
+          <th class="head">Username</th>
+          <th class="head">Full name</th>
+          <% if @student.assignment.duty_based_assignment? %>
+              <th class="head">Role</th>
+          <% end %>
+          <th class="head">Email address</th>
+          <% if @teammate_review_allowed %>
+            <th class="head"><%=t ".review_action"%></th>
+          <% end %>
+        </tr>
+      <% team.participants.each do |member| %>
+        <% unless MentorManagement.user_a_mentor?(member.user) %>
+              <tr>
+              <td><%= member.user.name(session[:ip]) %></td>
+              <td><%= member.user.fullname(session[:ip]) %></td>
+              <%if @student.assignment.duty_based_assignment? %>
+                  <% team_user = member.team_user %>
+                    <!-- Gets duty of member if the assignment is duty based and member has a duty -->
+                  <%unless team_user.duty_id.nil?%>
+                    <td><%= Duty.find(team_user.duty_id).name %></td>
+                  <%else%>
+                      <td>
+                        <%if  member.user.id == session[:user].id%>
+                            <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
+                        <%else%>
+                            Not Selected
+                        <%end%>
+                      </td>
+                  <%end%>
+              <%end%>
+              <td><%= member.user.email(session[:ip]) %></td>
+              <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
+              <% if @teammate_review_allowed &&
+                ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
+                <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
+                  <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
+                  if map.nil?
+                    map = TeammateReviewResponseMap.create(:reviewer_id => @student.id, :reviewee_id => member.id, :reviewed_object_id => @student.assignment.id)
+                  end
+                  review = map.response.last
+                  if review.nil? %>
+                  <td>
+                    <%= link_to "Review", {:controller => 'response', :action => 'new', :id => map.map_id, :return => "teammate"} %>
+                  </td>
+                <% else %>
+                  <td>
+                    <%= link_to t(".view"), {:controller => 'response', :action => 'view', :id => review.id} %>
+                    &nbsp;&nbsp;
+                    <%= link_to t(".edit"), {:controller => 'response', :action => 'edit', :id => review.id, :return => "teammate"} %>
+                  </td>
+                <% end %>
+              <% end %>
+            <% end %>
+          </tr>
+
+        <%end %>
+      <%end %>
+      <%# <% if @teammate_review_allowed %>
+        <%# <tr style="border: 1px outset #000000; padding: 10px 20px" >
+          <th class="head">Teammate review question</th>
+          <th class="head">Self contribution percentage</th>
+        </tr> %>
+      <%# <% end %> <!--end self contribution for Cake questions-->
+    </table>
+    <%end %>
+  <%end %>
+<% end %>
+<%= link_to 'Back', :controller => 'student_task', :action => 'list' %>

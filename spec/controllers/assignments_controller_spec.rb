@@ -267,6 +267,7 @@ describe AssignmentsController do
         new_assignment_questionnaire = AssignmentQuestionnaire.new
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: '1').and_return([assignment_questionnaire])
         allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2).and_return([])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 2, used_in_round: anything).and_return([])
         allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
         allow(AssignmentQuestionnaire).to receive(:new).and_return(new_assignment_questionnaire)
         allow(Questionnaire).to receive(:find).with('666').and_return(questionnaire)

@@ -26,6 +26,16 @@ function onMetricToggle(clicked_metric) {
     }
 }
 
+function toggleQuestionnaire(elementId) {
+    const element = document.getElementById(elementId);
+    
+    if (element.style.display === "none" || element.style.display === "") {
+      element.style.display = "block";
+    } else {
+      element.style.display = "none";
+    }
+}
+
 var lesser = false;
 // Function to sort the columns based on the total review score
 function col_sort(m) {
@@ -280,35 +290,6 @@ function drawTagGrid(rowData) {
         // Generate a table row for this review containing tag status cells
         drawReviewRow(tRow, questionNum, reviewNum, gridWidth, rowData, rIndex, tooltipText);
     }
-}
-
-// Generates the header rows and cells for the tag heatgrid with "Tags Completed # out of #"
-function drawHeader(table, headerTooltipText, gridWidth) {
-    let tHead = table.createTHead();
-    let row = tHead.insertRow();
-    row.setAttribute("class", "hide-scrollbar tablesorter-headerRow");
-
-    // Create "Tags Completed:" Cell
-    let th = document.createElement("th");
-    let text = document.createTextNode("\u2195 Tags Completed");
-    th.setAttribute("text-align", "center");
-    th.setAttribute("id", "tagsSuperLabel");
-    th.colSpan = gridWidth;
-    addToolTip(th, "Click to collapse/expand");
-    th.appendChild(text);
-    row.appendChild(th);
-    row.setAttribute("onClick", "toggleHeatGridRows()");
-
-    // create "# out of #" Cell to show number of completed tags
-    row = tHead.insertRow();
-    th = document.createElement("th");
-    text = document.createTextNode("0 out of 0");
-    th.setAttribute("id", "tagsSuperNumber");
-    th.colSpan = gridWidth;
-    addToolTip(th, headerTooltipText);
-    th.appendChild(text);
-    row.appendChild(th);
-    row.setAttribute("onClick", "toggleHeatGridRows()");
 }
 
 // Generate a sub-heading heatgrid row, once per question, format: "Round 2 -- Question 3"

@@ -12,11 +12,11 @@
     <td align="center" width="120px" style="font-size: xx-large"><%= link_to 'NO', list_tree_display_index_url %></td>
     <td align="center" width="120px" style="font-size: xx-large">
         <% if @node_type == 'course' %>
-            <%= link_to 'YES', :controller => :courses, :action => :delete, :id => @id %>
+            <%= link_to 'YES', {controller: :courses, action: :delete, id: @id}, method: :post %>
         <% elsif @node_type == 'questionnaires'%>
             <%= link_to 'YES', :controller => :questionnaires, :action => :delete, :id => @id %>
         <% else %>
-            <%= link_to 'YES', :controller => :assignments, :action => :delete, :id => @id %>
+            <%= link_to 'YES', {controller: :assignments, action: :delete, id: @id}, method: :post %>
         <% end %>
     </td>
   </tr>

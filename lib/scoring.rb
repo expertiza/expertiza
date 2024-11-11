@@ -47,16 +47,15 @@ module Scoring
     return -1.0 if @response.nil?
 
     if @response
-      @questions = params[:questions]
-      return -1.0 if @questions.nil?
+      questions = params[:questions]
+      return -1.0 if questions.nil?
 
       weighted_score = 0
       sum_of_weights = 0
-
-      @questionnaire = Questionnaire.find(@questions.first.questionnaire_id)
+      @questionnaire = Questionnaire.find(questions.first.questionnaire_id)
 
       # Retrieve data for questionnaire (max score, sum of scores, weighted scores, etc.)
-      questionnaire_data = ScoreView.questionnaire_data(@questions[0].questionnaire_id, @response.id)
+      questionnaire_data = ScoreView.questionnaire_data(questions[0].questionnaire_id, @response.id)
       weighted_score = questionnaire_data.weighted_score.to_f unless questionnaire_data.weighted_score.nil?
       sum_of_weights = questionnaire_data.sum_of_weights.to_f
       answers = Answer.where(response_id: @response.id)
@@ -112,7 +111,7 @@ module Scoring
     end
     assignment.teams.each_with_index do |team, index|
       scores[:teams][index.to_s.to_sym] = { team: team, scores: {} }
-      if assignment.vary_by_round?
+      if assignment.varying_rubrics_by_round?
         grades_by_rounds, total_num_of_assessments, total_score = compute_grades_by_rounds(assignment, questions, team)
         # merge the grades from multiple rounds
         scores[:teams][index.to_s.to_sym][:scores] = merge_grades_by_rounds(assignment, grades_by_rounds, total_num_of_assessments, total_score)
@@ -153,7 +152,7 @@ module Scoring
     scores[:total_score] = compute_total_score(assignment, scores)
 
     # merge scores[review#] (for each round) to score[review]
-    merge_scores(participant, scores) if assignment.vary_by_round?
+    merge_scores(participant, scores) if assignment.varying_rubrics_by_round?
     # In the event that this is a microtask, we need to scale the score accordingly and record the total possible points
     if assignment.microtask?
       topic = SignUpTopic.find_by(assignment_id: assignment.id)
@@ -254,7 +253,7 @@ module Scoring
     review_scores = {}
     response_type = 'ReviewResponseMap'
     response_maps = ResponseMap.where(reviewed_object_id: assignment.id, type: response_type)
-    if assignment.vary_by_round?
+    if assignment.varying_rubrics_by_round?
       review_scores = scores_varying_rubrics(assignment, review_scores, response_maps)
     else
       review_scores = scores_non_varying_rubrics(assignment, review_scores, response_maps)
@@ -267,7 +266,7 @@ module Scoring
   def compute_avg_and_ranges_hash(assignment)
     scores = {}
     contributors = assignment.contributors # assignment_teams
-    if assignment.vary_by_round?
+    if assignment.varying_rubrics_by_round?
       rounds = assignment.rounds_of_reviews
       (1..rounds).each do |round|
         contributors.each do |contributor|
@@ -325,7 +324,9 @@ def scores_varying_rubrics(assignment, review_scores, response_maps)
       respective_scores = {}
       respective_scores = reviewer[round] unless reviewer.nil? || reviewer[round].nil?
       this_review_score = calc_review_score(corresponding_response, questions)
+      review_scores[response_map.reviewer_id] = {} unless review_scores[response_map.reviewer_id]
       respective_scores[response_map.reviewee_id] = this_review_score
+      review_scores[response_map.reviewer_id][round] = respective_scores
       reviewer = {} if reviewer.nil?
       reviewer[round] = {} if reviewer[round].nil?
       reviewer[round] = respective_scores

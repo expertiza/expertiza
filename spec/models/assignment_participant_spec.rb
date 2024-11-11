@@ -135,7 +135,7 @@ describe AssignmentParticipant do
     context 'when no user is found by offered username' do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
-          row = { name: 'no one', fullname: 'no one', email: 'no_one@email.com' }
+          row = { username: 'no one', fullname: 'no one', email: 'no_one@email.com' }
           expect(ImportFileHelper).not_to receive(:create_new_user)
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
@@ -143,7 +143,7 @@ describe AssignmentParticipant do
 
       context 'when new user needs to be created' do
         let(:row) do
-          { name: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
+          { username: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
           { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
@@ -177,7 +177,7 @@ describe AssignmentParticipant do
 
       context 'when the record has more than 4 items' do
         let(:row) do
-          { name: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
+          { username: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
           { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',

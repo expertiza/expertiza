@@ -98,15 +98,23 @@
         <%= label_tag('num_reviews_per_student', 'Set number of reviews done by each student') %>
         <span id='num_reviews_per_student_threshold' class="form-inline">
             <%= text_field_tag('num_reviews_per_student', 0, {:class => 'form-control width-50'}) %>
-          <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag', :class => "btn btn-default" %>
-          </span><br/>
+            <br/>
+            <%= check_box_tag('exclude_teams_without_submission', 'true', false, {:style => 'margin-left: 30px;'}) %>
+            <%= label_tag('exclude_teams_without_submission_label', 'Exclude teams that have not submitted?') %>
+            <br/>
+            <%= submit_tag 'Assign reviewers', :id => 'first_submit_tag', :class => "btn btn-default", :style => 'margin-left: 30px;' %>
+        </span><br/>
 
         <%= radio_button_tag 'num_reviews', 'submission', false %>
         <%= label_tag('num_reviews_per_submission', 'Set minimum number of reviews done for each submission') %>
         <span id='num_reviews_per_submission_threshold' hidden='hidden'>
             <%= text_field_tag('num_reviews_per_submission', 0, {:style => 'width:20px'}) %>
-          <%= submit_tag 'Assign reviewers', :id => 'second_submit_tag' %>
-          </span><br/>
+            <br/>
+            <%= check_box_tag('exclude_teams_without_submission', 'true', false, {:style => 'margin-left: 30px;'}) %>
+            <%= label_tag('exclude_teams_without_submission_second_label', 'Exclude teams that have not submitted?') %>
+            <br/>
+            <%= submit_tag 'Assign reviewers', :id => 'second_submit_tag', :class => "btn btn-default", :style => 'margin-left: 30px;' %>
+        </span><br/>
 
         <%= radio_button_tag 'num_reviews', 'calibrated_and_uncalibrated', false %>
         <%= label_tag('assign_both_calibrated_and_uncalibrated_artifacts', 'Set both calibrated and uncalibrated artifacts') %>

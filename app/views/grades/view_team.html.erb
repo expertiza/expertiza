@@ -39,8 +39,19 @@
   [:assessments].any? && @pscore[:review2][:assessments].any? %>
   <% rscore_review1 = Rscore.new(@pscore,:review1) %>
   <% rscore_review2 = Rscore.new(@pscore,:review2) %>
-  <% average = rscore_review1.my_avg + rscore_review2.my_avg %>
-  <% average /= 2 %>
+<!--Bugfix 2570 -- Added condition to check if my_avg is "N/A" for any review. The reviews with a valid average is considered.
+-->
+  <% average = 0 %>
+  <% number_of_reviews = 0 %>
+  <% if rscore_review1.my_avg != "N/A" %>
+    <% average += rscore_review1.my_avg %>
+    <% number_of_reviews += 1 %>
+  <% end %>
+  <% if rscore_review2.my_avg != "N/A" %>
+    <% average += rscore_review2.my_avg %>
+    <% number_of_reviews += 1 %>
+  <% end %>
+  <% average /= number_of_reviews unless number_of_reviews.zero? %>
   <h4><%=t ".average_peer_review"%> <span class = "c5"><%= average.is_a?(Float)? sprintf("%.2f",average): average %></span></h4>
 <% elsif @pscore[:review]  %>
 <% rscore_review = Rscore.new(@pscore,:review)%>
@@ -64,7 +75,7 @@
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
-          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body collapse" style="max-width: 80%">
+          <div id="hid<%= vm.questionnaire_type + vm.round.to_s %>" class="accordion-body" style="max-width: 80%; display: none;">
             <table class="table table-striped">
               <thead>
               <th>#</th>
@@ -88,7 +99,7 @@
                     (<%=t ".round"%>: <%= vm.round.to_s  %> <%=t ".of"%> <%= vm.rounds.to_s  %>)
                 <%end %>
               </h4>
-              <span class="spn_qsttog" data-toggle="collapse" class="accordion-toggle" data-target="#hid<%= vm.questionnaire_type + vm.round.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
+              <span class="spn_qsttog" onclick="toggleQuestionnaire('hid<%= vm.questionnaire_type + vm.round.to_s %>')" data-toggle="tooltip" data-placement="right" title="Click to display/hide questions"><%=t ".toggle_question_list"%></span>
             <% if @assignment.is_answer_tagging_allowed %>
             <span class="spn_qsttog" id="tag_prompt_toggler" title=""><%=t ".hide_tags"%></span>
             <% end %>
@@ -160,7 +171,7 @@
                   <!-- actual cells with scores and colored background. -->
                   <% row.score_row.each do |score| %>
                       <% score_comment = score.comment.nil? ? '' : score.comment %> 
-                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score.comment).html_safe%>">
+                      <td class="<%= score.color_code %>" align="center" data-toggle="tooltip" title="<%= strip_tags(score_comment).html_safe%>">
                         <span class="<%=  underlined?(score) %>"><%= score.score_value.to_s %></span>
                       </td>
                   <% end %>
@@ -296,21 +307,22 @@
    @course_id = Assignment.find_by(id: @participant.parent_id).course_id
    @ta_id = @participant.user_id
 %>
-
+<% if @assignment.current_stage(topic_id) == "Finished" %>
   <h4 style="font-weight:bold;display:inline-block;"><%=t ".grade_and_comment"%></h4><br/>
   <% if ['Student', 'Teaching Assistant'].include? current_user.role.name %>
     <%=t ".grade"%>: <%= label_tag 'grade_for_submission', @team.try(:grade_for_submission) %><br/>
     <%=t ".Comment"%>: <%= label_tag 'comment_for_submission', @team.try(:comment_for_submission) %><br>
     <%=t ".late_penalty"%>: <%= label_tag 'late_penalty', @penalties[:submission] %><br/>
   <% end %>
-<% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || @current_role_name == 'Instructor' %>
-  <h4 style="font-weight:bold;display:inline-block;">TA Grade-Comment:</h4><br/>
+  <% if TaMapping.where(ta_id: @ta_id, course_id: @course_id).exists? || current_user == @assignment.instructor%>
+  <h4 style="font-weight:bold;display:inline-block;">Grade</h4><br/>
     <%= form_tag 'save_grade_and_comment_for_submission' do %>
       <%= hidden_field_tag :participant_id, params[:id] %>
       <%= number_field_tag 'grade_for_submission', @team.try(:grade_for_submission) ,min: 0, max: 100, maxlength: 3, size: 3, class: "form-control width-150", placeholder: t(".grade") %><br/>
+      <h4 style="font-weight:bold;display:inline-block;">Comments</h4><br/>
       <%= text_area_tag 'comment_for_submission', @team.try(:comment_for_submission), size: '75x10', placeholder: t(".Comment"), class: "form-control width-500" %><br>
       <%= submit_tag t(".save") ,class: "btn btn-default" %>
     <% end %>
   <% end %>
-
+<% end %>
 <%= link_to 'Back', :back %>

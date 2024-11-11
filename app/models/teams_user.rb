@@ -62,6 +62,9 @@ class TeamsUser < ApplicationRecord
     team_id = nil
     teams_users = TeamsUser.where(user_id: user_id)
     teams_users.each do |teams_user|
+      if teams_user.team_id == nil
+        next
+      end
       team = Team.find(teams_user.team_id)
       if team.parent_id == assignment_id
         team_id = teams_user.team_id

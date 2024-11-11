@@ -160,6 +160,7 @@ class SignUpSheetController < ApplicationController
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
+
   def set_values_for_new_topic
     @sign_up_topic = SignUpTopic.new
     @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
@@ -218,7 +219,7 @@ class SignUpSheetController < ApplicationController
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
       # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = SignedUpTeam.find_team_users(@assignment.id, session[:user].id)
+      users_team = Team.find_team_users(@assignment.id, session[:user].id)
       @selected_topics = if users_team.empty?
                            nil
                          else
@@ -238,7 +239,7 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  # routes to new page to specficy student
+  # routes to new page to specify student
   def signup_as_instructor; end
 
   def signup_as_instructor_action
@@ -278,7 +279,8 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], session[:user].id)
+      users_team = Team.find_team_users(assignment.id, session[:user].id)
+      delete_signup_for_topic(params[:topic_id], users_team[0].t_id)
       flash[:success] = 'You have successfully dropped your topic!'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
     end
@@ -299,7 +301,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop a student after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
-      delete_signup_for_topic(assignment.id, params[:topic_id], participant.user_id)
+      delete_signup_for_topic(params[:topic_id], team.id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
     end
@@ -511,7 +513,17 @@ class SignUpSheetController < ApplicationController
     @ad_information
   end
 
-  def delete_signup_for_topic(assignment_id, topic_id, user_id)
-    SignUpTopic.reassign_topic(user_id, assignment_id, topic_id)
+  def delete_signup_for_topic(topic_id, team_id)
+    # Delete a signup record for a specific topic and team.
+
+    # Find the SignUpTopic record with the specified topic_id using the `find_by` method.
+    @sign_up_topic = SignUpTopic.find_by(id: topic_id)
+    # Check if the @sign_up_topic record exists (is not nil).
+    unless @sign_up_topic.nil?
+       # If the @sign_up_topic record exists, reassign the topic for the specified team by calling the `reassign_topic` 
+       # instance method of SignUpTopic.
+      @sign_up_topic.reassign_topic(team_id)
+    end 
   end
+  
 end

@@ -43,13 +43,17 @@ class StudentTask
   end
 
   def content_submitted_in_current_stage?
-    current_stage == 'submission' && hyperlinks.present?
+    current_stage == 'submission' && (hyperlinks.present? || recent_submission.present?) 
   end
 
   delegate :course, to: :assignment
 
   def hyperlinks
     @hyperlinks ||= participant.team.nil? ? [] : participant.team.hyperlinks
+  end
+
+  def recent_submission
+    participant.team&.most_recent_submission
   end
 
   def incomplete?

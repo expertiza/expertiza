@@ -2,4 +2,3 @@ GOOGLE_CONFIG = YAML.load_file("#{Rails.root}/config/google_auth.yml")[Rails.env
 GITHUB_CONFIG = YAML.load_file("#{Rails.root}/config/github_auth.yml")[Rails.env]
 WEBSERVICE_CONFIG = YAML.load_file("#{Rails.root}/config/webservices.yml")[Rails.env]
 PLAGIARISM_CHECKER_CONFIG = YAML.load_file("#{Rails.root}/config/plagiarism_checker.yml")[Rails.env]
-LOCAL_ENV = YAML.load_file("#{Rails.root}/config/local_env.yml")[Rails.env]

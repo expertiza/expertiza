@@ -314,6 +314,12 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.index ["assignment_id"], name: "index_duties_on_assignment_id"
   end
 
+  create_table "github_metric_uses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "assignment_id"
+    t.index ["assignment_id"], name: "fk_rails_3bd405b603"
+    t.index ["id"], name: "index_github_metric_uses_on_id", unique: true
+  end
+
   create_table "goldberg_content_pages", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string "title"
     t.string "name", default: "", null: false
@@ -491,6 +497,23 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.index ["content_page_id"], name: "fk_menu_item_content_page_id"
     t.index ["controller_action_id"], name: "fk_menu_item_controller_action_id"
     t.index ["parent_id"], name: "fk_menu_item_parent_id"
+  end
+
+  create_table "metric_sources", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "metrics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "metric_source_id"
+    t.integer "team_id"
+    t.string "github_id"
+    t.integer "participant_id"
+    t.integer "total_commits"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "nodes", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -996,6 +1019,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "institution_id"
     t.boolean "etc_icons_on_homepage", default: true
     t.integer "locale", default: 0
+    t.string "github_id"
     t.index ["role_id"], name: "fk_user_role_id"
   end
 
@@ -1039,6 +1063,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
   add_foreign_key "duties", "assignments"
+  add_foreign_key "github_metric_uses", "assignments"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"

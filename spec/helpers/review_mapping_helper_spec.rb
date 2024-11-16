@@ -437,7 +437,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return (Adam) if max_team_size = 1' do
       max_team_size = 1
       student = create(:student, fullname: 'Adam')
-      create(:team_user, user: student, team: @reviewee)
+      create(:team_participant, user: student, team: @reviewee)
 
       @response = create(:response, response_map: @response_map)
       ip_address = '0.0.0.0'
@@ -541,7 +541,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewee = create(:assignment_team, assignment: @assignment)
       @reviewer = create(:participant, assignment: @assignment, user: student)
 
-      create(:team_user, user: student, team: @reviewee)
+      create(:team_participant, user: student, team: @reviewee)
 
       @response_map_1 = create(:review_response_map, reviewer: @reviewer)
       @response_map_2 = create(:review_response_map, reviewer: @reviewer)
@@ -743,7 +743,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewee = create(:assignment_team, assignment: @assignment)
       @reviewer = create(:participant, assignment: @assignment, user: student)
 
-      create(:team_user, user: student, team: @reviewee)
+      create(:team_participant, user: student, team: @reviewee)
 
       @review_scores = { @reviewer.id => { 1 => { @reviewee.id => 10 }, 2 => { @reviewee.id => 20 }, 3 => { @reviewee.id => 30 } } }
 
@@ -937,7 +937,7 @@ describe ReviewMappingHelper, type: :helper do
             }
       }
 
-      create(:team_user, user: student, team: @reviewee)
+      create(:team_participant, user: student, team: @reviewee)
     end
 
     # assert the value for metrics in round 1 for given team_id

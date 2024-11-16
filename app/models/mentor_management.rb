@@ -115,7 +115,7 @@ class MentorManagement
     team_counts = {}
     mentor_ids.each { |id| team_counts[id] = 0 }
     #E2351 removed (:team_id) after .count to fix balancing algorithm
-    team_counts.update(TeamsUser.where(user_id: mentor_ids).group(:user_id).count)
+    team_counts.update(TeamsParticipant.where(user_id: mentor_ids).group(:user_id).count)
 
     team_counts.sort_by { |_, v| v }
   end

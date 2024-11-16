@@ -73,7 +73,7 @@ describe MentorManagement do
       allow(Team).to receive(:find).with(team.id).and_return(team)
 
       # add 2 students to our team
-      [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
+      [student1, student2].each { |student| FactoryBot.create(:team_participant, team_id: team.id, user_id: student.id) }
 
       allow(assignment).to receive(:topics?).and_return(false)
       allow(team).to receive(:topics).and_return(nil)
@@ -116,7 +116,7 @@ describe MentorManagement do
         FactoryBot.create(:team, id: random_id)
         random_id
       end
-      team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: ta.id) }
+      team_ids.each { |team_id| FactoryBot.create(:team_participant, team_id: team_id, user_id: ta.id) }
       expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq [[mentor.user_id, team_count]]
     end
   end
@@ -203,7 +203,7 @@ describe MentorManagement do
         allow(Team).to receive(:find).with(team.id).and_return(team)
 
         # Add a student to a team (less than half)
-        FactoryBot.create(:team_user, team_id: team.id, user_id: student1.id)
+        FactoryBot.create(:team_participant, team_id: team.id, user_id: student1.id)
 
         # Make sure assignment and team has no topic assigned
         allow(assignment).to receive(:topics?).and_return(false)
@@ -225,7 +225,7 @@ describe MentorManagement do
         allow(Team).to receive(:find).with(team.id).and_return(team)
 
         # add 2 students to our team
-        [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
+        [student1, student2].each { |student| FactoryBot.create(:team_participant, team_id: team.id, user_id: student.id) }
 
         allow(assignment).to receive(:topics?).and_return(false)
         allow(team).to receive(:topics).and_return(nil)
@@ -248,7 +248,7 @@ describe MentorManagement do
         allow(Team).to receive(:find).with(team.id).and_return(team)
 
         # add 2 students to a team
-        [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
+        [student1, student2].each { |student| FactoryBot.create(:team_participant, team_id: team.id, user_id: student.id) }
         allow(assignment).to receive(:topics?).and_return(false)
         allow(team).to receive(:topics).and_return(nil)
 
@@ -360,7 +360,7 @@ describe MentorManagement do
         FactoryBot.create(:participant, id: 1001, user_id: 1002, parent_id: a.id, duty: Participant::DUTY_MENTOR)
         # Assign a mentor to a team
         allow(Team).to receive(:find).with(team.id).and_return(team)
-        [student1, student2].each { |student| FactoryBot.create(:team_user, team_id: team.id, user_id: student.id) }
+        [student1, student2].each { |student| FactoryBot.create(:team_participant, team_id: team.id, user_id: student.id) }
         MentorManagement.assign_mentor(a.id, team.id)
       
         mentors = MentorManagement.zip_mentors_with_team_count(assignment.id)

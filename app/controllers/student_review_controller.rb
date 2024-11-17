@@ -15,12 +15,16 @@ class StudentReviewController < ApplicationController
   def list
     # we can assume the id is of the current user and for the participant
     # if the assignment has team reviewers, other controllers take care of getting the team from this object
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+    participant_service = ParticipantService.new(params[:id], current_user.id)
 
-    @assignment = @participant.assignment
-    # Find the current phase that the assignment is in.
-    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    unless participant_service.valid_participant?
+      head :forbidden
+      return
+    end
+
+    @assignment = @participant_service.assignment
+    @topic_id = participant_service.topic_id
+  
     @review_phase = @assignment.current_stage(@topic_id)
     # E-1973 calling get_reviewer on a participant will return either that participant
     # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
@@ -58,6 +62,11 @@ class StudentReviewController < ApplicationController
     @response_ids = []
     @all_assignments.each do |assignment|
       @response_ids << assignment.response_id
+    end
+
+    # Redirect review bidding to the review bid controller if bidding enabled
+    if @assignment.review_choosing_algorithm == "Bidding"
+      redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
     end
 
     # Redirect review bidding to the review bid controller if bidding enabled

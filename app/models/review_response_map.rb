@@ -55,9 +55,9 @@ class ReviewResponseMap < ResponseMap
     if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
       reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
                                             parent_id: assignment_id, type: 'AssignmentTeam')
-      t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
+      t_participant = TeamsParticipant.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
-      TeamParticipantNode.create(parent_id: team_node.id, node_object_id: t_user.id)
+      TeamParticipantNode.create(parent_id: team_node.id, node_object_id: t_participant.id)
     end
     row_hash[:reviewers].each do |reviewer|
       reviewer_user_name = reviewer.to_s

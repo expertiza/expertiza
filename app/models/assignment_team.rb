@@ -213,14 +213,14 @@ class AssignmentTeam < Team
     return nil if participant.nil?
 
     team = nil
-    teams_users = TeamsParticipant.where(user_id: participant.user_id)
-    return nil unless teams_users
+    teams_participants = TeamsParticipant.where(user_id: participant.user_id)
+    return nil unless teams_participants
 
-    teams_users.each do |teams_user|
-      if teams_user.team_id == nil
+    teams_participants.each do |teams_participant|
+      if teams_participant.find_team_id == nil
         next
       end
-      team = Team.find(teams_user.team_id)
+      team = Team.find(teams_participant.find_team_id)
       return team if team.parent_id == participant.parent_id
     end
     nil

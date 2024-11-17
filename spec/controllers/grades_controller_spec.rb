@@ -94,7 +94,7 @@ describe GradesController do
 
     context 'when view_my_scores page is allow to access' do
       it 'renders grades#view_my_scores page' do
-        allow(TeamsUser).to receive(:where).with(any_args).and_return([double('TeamsUser', team_id: 1)])
+        allow(TeamsParticipant).to receive(:where).with(any_args).and_return([double('TeamsParticipant', team_id: 1)])
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
@@ -302,7 +302,7 @@ describe GradesController do
         session
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-        allow(TeamsUser).to receive(:team_id).and_return(1)
+        allow(TeamsParticipant).to receive(:find_team_id).and_return(1)
         get :view_my_scores, params: request_params
         expect(response).to redirect_to('/')
       end

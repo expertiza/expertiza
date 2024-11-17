@@ -7,9 +7,9 @@ class MentoredTeam < AssignmentTeam
         can_add_member = false
         unless full?
           can_add_member = true
-          t_user = TeamsUser.create(user_id: user.id, team_id: id)
+          t_participant = TeamsParticipant.create(user_id: user.id, team_id: id)
           parent = TeamNode.find_by(node_object_id: id)
-          TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
+          TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_participant.id)
           add_participant(parent_id, user)
           ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
         end

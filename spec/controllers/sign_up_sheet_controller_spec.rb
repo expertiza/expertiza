@@ -545,7 +545,7 @@ describe SignUpSheetController do
             allow(Team).to receive(:find_team_users).with('1', 8).and_return([team])
             allow(Team).to receive(:find).and_return(team)
             allow(team).to receive(:t_id).and_return(1)
-            allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
+            allow(TeamsParticipant).to receive(:find_team_id).with('1', 8).and_return(1)
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
             allow(SignUpSheet).to receive(:signup_team).and_return(true)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
@@ -565,7 +565,7 @@ describe SignUpSheetController do
             allow(Team).to receive(:find_team_users).with('1', 8).and_return([])
             allow(User).to receive(:find).with(8).and_return(student)
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
+            allow(TeamsParticipant).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsParticipant', id: 1))
             allow(TeamParticipantNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamParticipantNode', id: 1))
             request_params = {
               username: 'no name',
@@ -642,7 +642,7 @@ describe SignUpSheetController do
   describe '#delete_signup_as_instructor' do
     before(:each) do
       allow(Team).to receive(:find).with('1').and_return(team)
-      allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(double('TeamsUser', user: student))
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1).and_return(double('TeamsParticipant', user: student))
       allow(AssignmentParticipant).to receive(:find_by).with(user_id: 8, parent_id: 1).and_return(participant)
       allow(participant).to receive(:team).and_return(team)
     end
@@ -761,7 +761,7 @@ describe SignUpSheetController do
   describe '#show_team' do
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with(topic_id: 1).and_return([signed_up_team])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([double('TeamsParticipant', user_id: 1)])
       allow(User).to receive(:find).with(1).and_return(student)
       request_params = { assignment_id: 1, id: 1 }
       get :show_team, params: request_params
@@ -771,8 +771,8 @@ describe SignUpSheetController do
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page' do
-      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
+      allow(TeamsParticipant).to receive(:where).with(user_id: 6).and_return([double('TeamsParticipant', team_id: 1)])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([double('TeamsParticipant', team_id: 1, user_id: 8)])
       allow(Team).to receive(:find).with(1).and_return(team)
       team.parent_id = 1
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])

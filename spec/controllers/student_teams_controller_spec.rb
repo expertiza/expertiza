@@ -48,7 +48,7 @@ describe StudentTeamsController do
         allow(AssignmentTeam).to receive(:new).with(name: 'test', parent_id: 1).and_return(team7)
         allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
         allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(User).to receive(:find).with(1).and_return(team_user1)
+        allow(User).to receive(:find).with(1).and_return(team_participant1)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
         allow(student1).to receive(:user_id).with(any_args).and_return(1)
         allow(team7).to receive(:save).and_return(true)
@@ -172,9 +172,9 @@ describe StudentTeamsController do
   #  context 'remove team user' do
   #    it 'remove user' do
   #   allow(AssignmentParticipant).to receive(:find).and_return(participant)
-  #   allow(TeamsUser).to receive(:where).and_return(team_user1)
-  #   allow(team_user1).to receive(:destroy_all)
-  #   allow(team_user1).to receive_message_chain(:where,:empty?).and_return(false)
+  #   allow(TeamsParticipant).to receive(:where).and_return(team_participant1)
+  #   allow(team_participant1).to receive(:destroy_all)
+  #   allow(team_participant1).to receive_message_chain(:where,:empty?).and_return(false)
   #   allow_any_instance_of(AssignmentParticipant).to receive(:save).and_return(false)
   #   user_session = {user:student1}
   #   request_params = {

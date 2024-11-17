@@ -773,6 +773,7 @@ describe SignUpSheetController do
     it 'redirects to sign_up_sheet#list page' do
       allow(TeamsParticipant).to receive(:where).with(user_id: 6).and_return([double('TeamsParticipant', team_id: 1)])
       allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([double('TeamsParticipant', team_id: 1, user_id: 8)])
+      allow(TeamsParticipant).to receive(:find_team_id).with(1, 6).and_return(1)
       allow(Team).to receive(:find).with(1).and_return(team)
       team.parent_id = 1
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])

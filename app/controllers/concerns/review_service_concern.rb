@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# This concern provides the `review_service` method, which initializes the `ReviewService`
-# with the current participant. It can be included in any controller that requires review-related logic.
+# This concern provides the `review_service` method for the current participant.
 module ReviewServiceConcern
   extend ActiveSupport::Concern
 

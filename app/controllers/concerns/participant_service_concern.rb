@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# This concern provides the `participant_service` method and related participant-specific logic,
-# such as authorization checks. It can be included in any controller that requires access to
-# a participant's service logic.
+# This concern provides the `participant_service` method and related participant-specific logic.
 module ParticipantServiceConcern
   extend ActiveSupport::Concern
 

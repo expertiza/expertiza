@@ -1,6 +1,20 @@
+# frozen_string_literal: true
+
+# The `StudentReviewController` manages the review processes for students within an assignment.
+# It handles actions related to listing reviews, managing review phases, and redirecting users
+# based on the assignment's review bidding configurations. This controller ensures that students
+# have the necessary permissions to access review-related functionalities and facilitates the
+# seamless flow of review assignments and bidding.
 class StudentReviewController < ApplicationController
   include AuthorizationHelper
+  include ParticipantServiceConcern
+  include ReviewServiceConcern
 
+  before_action :authorize_participant, only: [list]
+
+  BIDDING_ALGORITHM = 'Bidding'
+
+  # Checks authorization of current user
   def action_allowed?
     (current_user_has_student_privileges? &&
         (%w[list].include? action_name) &&
@@ -8,61 +22,59 @@ class StudentReviewController < ApplicationController
       current_user_has_student_privileges?
   end
 
+  # Determines participant locale
   def controller_locale
     locale_for_student
   end
 
+  # Retrieves review and metareview for the student, and if bidding is required, 
+  # redirects to review bidding page
   def list
-    # we can assume the id is of the current user and for the participant
-    # if the assignment has team reviewers, other controllers take care of getting the team from this object
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+    setup_assignment_and_phase(participant_service)
+    review_data(participant_service)
+    metareview_data(participant_service)
 
-    @assignment = @participant.assignment
-    # Find the current phase that the assignment is in.
-    @topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    redirect_if_bidding_required
+  end
+
+  private
+
+  # Gets the assignment and topic ID using the participant service.
+  # Gets current review phase based on assignment and topic.
+  def setup_assignment_and_phase(participant_service)
+    @assignment = participant_service.assignment
+    @topic_id = participant_service.topic_id
     @review_phase = @assignment.current_stage(@topic_id)
-    # E-1973 calling get_reviewer on a participant will return either that participant
-    # or there team, depending on if reviewers are teams. If the reviewer is not yet on a team, just set review_mappings
-    # to an empty list to prevent errors
-    if @participant.get_reviewer
-      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.get_reviewer.id, team_reviewing_enabled: @assignment.team_reviewing_enabled)
-    else
-      @review_mappings = []
-    end
-    # if it is an calibrated assignment, change the response_map order in a certain way
-    @review_mappings = @review_mappings.sort_by { |mapping| mapping.id % 5 } if @assignment.is_calibrated
-    @metareview_mappings = MetareviewResponseMap.where(reviewer_id: @participant.id)
-    # Calculate the number of reviews that the user has completed so far.
+  end
 
-    @num_reviews_total = @review_mappings.size
-    # Add the reviews which are requested and not began.
-    @num_reviews_completed = 0
-    @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-    end
+  # Gets and assigns review data for the current participant
+  def review_data
+    @review_mappings = review_service.sorted_review_mappings
+    @num_reviews_total = review_service.review_counts[:total]
+    @num_reviews_completed = review_service.review_counts[:completed]
+    @num_reviews_in_progress = review_service.review_counts[:in_progress]
+    @response_ids = review_service.response_ids
+  end
 
-    @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-    # Calculate the number of metareviews that the user has completed so far.
-    @num_metareviews_total = @metareview_mappings.size
-    @num_metareviews_completed = 0
-    @metareview_mappings.each do |map|
-      @num_metareviews_completed += 1 unless map.response.empty?
-    end
-    @num_metareviews_in_progress = @num_metareviews_total - @num_metareviews_completed
-    @topic_id = SignedUpTeam.topic_id(@assignment.id, @participant.user_id)
+  # Gets and assigns metareview data for the current participant
+  def metareview_data(participant_service)
+    metareview_service = MetareviewService.new(participant_service)
 
-    @all_assignments = SampleReview.where(assignment_id: @assignment.id)
-    @response_ids = []
-    @all_assignments.each do |assignment|
-      @response_ids << assignment.response_id
-    end
+    @review_mappings = metareview_service.sorted_metareview_mappings
+    @num_reviews_total = metareview_service.metareview_counts[:total]
+    @num_reviews_completed = metareview_service.metareview_counts[:completed]
+    @num_reviews_in_progress = metareview_service.metareview_counts[:in_progress]
+  end
 
-    # Redirect review bidding to the review bid controller if bidding enabled
-    if @assignment.bidding_for_reviews_enabled
-      redirect_to controller: 'review_bids', action: 'index', assignment_id: params[:assignment_id], id: params[:id]
-    end
+  # Checks if review bidding is required for the assignment
+  def bidding_required?
+    @assignment.review_choosing_algorithm == BIDDING_ALGORITHM || @assignment.bidding_for_reviews_enabled
+  end
+
+  # Redirects the participant to the review bidding page if bidding is required
+  def redirect_if_bidding_required
+    return unless bidding_required
+
+    redirect_to review_bids_path(assignment_id: params[:assignment_id], id: params[:id]) if bidding_required?
   end
 end

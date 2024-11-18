@@ -188,6 +188,8 @@ module AuthorizationHelper
       participant.can_review
     when 'take_quiz'
       participant.can_take_quiz
+    when 'reader'
+      participant.given_user_can_read
     else
       raise "Did not recognize user action '" + action + "'"
     end

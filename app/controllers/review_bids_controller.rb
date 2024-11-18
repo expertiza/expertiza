@@ -14,9 +14,10 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      required_role_for_show_actions? && list_action_authorized?(params[:id])
+      (current_user_has_student_privileges? && list_action_authorized?) ||
+        current_user_has_student_privileges?
     else
-      required_role_for_other_actions?
+      current_user_has_ta_privileges?
     end
   end
 
@@ -127,7 +128,7 @@ class ReviewBidsController < ApplicationController
   end
 
   def list_action_authorized?(assignment_id)
-    action_name != 'list' || are_needed_authorizations_present?(assignment_id, required_roles_for_list)
+    (%w[list].include? action_name) && are_needed_authorizations_present?(assignment_id, required_roles_for_list)
   end
 
   def required_roles_for_list

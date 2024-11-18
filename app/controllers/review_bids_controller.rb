@@ -1,42 +1,33 @@
+# frozen_string_literal: true
+
+# The `ReviewBidsController` is responsible for managing the review bidding process
+# for assignments. It handles actions related to displaying review options, setting
+# review priorities, and managing reviews after the bidding process is complete.
 class ReviewBidsController < ApplicationController
-  require 'json'
-  require 'uri'
-  require 'net/http'
-  require 'rest_client'
+  include AuthorizationHelper
+  include ParticipantServiceConcern
+  include ReviewServiceConcern
+
+  before_action :authorize_participant, only: [:index]
 
   # action allowed function checks the action allowed based on the user working
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include?(current_role_name) &&
-        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+      required_role_for_show_actions? && list_action_authorized?(params[:id])
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      required_role_for_other_actions?
     end
   end
 
   # provides variables for reviewing page located at views/review_bids/others_work.html.erb
   def index
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
+    @assignment = participant_service.assignment
+    @review_mappings = review_service.review_mappings
 
-    @assignment = @participant.assignment
-    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
+    # Get the number of reviews that have been completed
+    @num_reviews_completed = review_service.review_counts[:completed]
 
-    # Finding how many reviews have been completed
-    @num_reviews_completed = 0
-    @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-    end
-
-    # render view for completing reviews after review bidding has been completed
     render 'sign_up_sheet/review_bids_others_work'
   end
 
@@ -117,5 +108,30 @@ class ReviewBidsController < ApplicationController
   rescue StandardError
     false
     # end
+  end
+
+  private
+
+  def required_role_for_show_actions?
+    current_user_has_instructor_privileges? ||
+      current_user_has_ta_privileges? ||
+      current_user_has_admin_privileges? ||
+      current_user_has_super_admin_privileges? ||
+      current_user_has_student_privileges?
+  end
+
+  def required_role_for_other_actions?
+    current_user_has_instructor_privileges? ||
+      current_user_has_ta_privileges? ||
+      current_user_has_admin_privileges? ||
+      current_user_has_super_admin_privileges?
+  end
+
+  def list_action_authorized?(assignment_id)
+    action_name != 'list' || are_needed_authorizations_present?(assignment_id, required_roles_for_list)
+  end
+
+  def required_roles_for_list
+    %w[participant reader submitter reviewer]
   end
 end

@@ -7,6 +7,9 @@
 # seamless flow of review assignments and bidding.
 class StudentReviewController < ApplicationController
   include AuthorizationHelper
+  include ParticipantServiceConcern
+  include ReviewServiceConcern
+
   before_action :authorize_participant, only: [list]
 
   BIDDING_ALGORITHM = 'Bidding' # Constant to prevent hardcoding values
@@ -24,22 +27,13 @@ class StudentReviewController < ApplicationController
 
   def list
     setup_assignment_and_phase(participant_service)
-    get_review_data(participant_service)
-    get_metareview_data(participant_service)
+    review_data(participant_service)
+    metareview_data(participant_service)
 
     redirect_if_bidding_required
   end
 
   private
-
-  def participant_service
-    @participant_service ||= ParticipantService.new(params[:id], current_user.id)
-  end
-
-  # should this be moved to AuthorizationHelper class?
-  def authorize_participant
-    return head :forbidden unless participant_service.valid_participant?
-  end
 
   def setup_assignment_and_phase(participant_service)
     @assignment = participant_service.assignment
@@ -47,9 +41,7 @@ class StudentReviewController < ApplicationController
     @review_phase = @assignment.current_stage(@topic_id)
   end
 
-  def get_review_data(participant_service)
-    review_service = ReviewService.new(participant_service.reviewer)
-
+  def review_data
     @review_mappings = review_service.sorted_review_mappings
     @num_reviews_total = review_service.review_counts[:total]
     @num_reviews_completed = review_service.review_counts[:completed]
@@ -57,7 +49,7 @@ class StudentReviewController < ApplicationController
     @response_ids = review_service.response_ids
   end
 
-  def get_metareview_data(participant_service)
+  def metareview_data(participant_service)
     metareview_service = MetareviewService.new(participant_service)
 
     @review_mappings = metareview_service.sorted_metareview_mappings

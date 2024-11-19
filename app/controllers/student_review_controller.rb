@@ -6,6 +6,7 @@
 # have the necessary permissions to access review-related functionalities and facilitates the
 # seamless flow of review assignments and bidding.
 class StudentReviewController < ApplicationController
+  include ActionAuthorizationConcern
   include AuthorizationHelper
   include ParticipantServiceConcern
   include ReviewServiceConcern
@@ -16,9 +17,10 @@ class StudentReviewController < ApplicationController
 
   # Checks authorization of current user
   def action_allowed?
-    (current_user_has_student_privileges? &&
-        (%w[list].include? action_name) &&
-        are_needed_authorizations_present?(params[:id], 'submitter')) ||
+    assignment_id = participant_service.assignment&.id
+    return false if assignment_id.nil?
+
+    (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
       current_user_has_student_privileges?
   end
 
@@ -64,6 +66,11 @@ class StudentReviewController < ApplicationController
     @num_reviews_total = metareview_service.metareview_counts[:total]
     @num_reviews_completed = metareview_service.metareview_counts[:completed]
     @num_reviews_in_progress = metareview_service.metareview_counts[:in_progress]
+  end
+
+  # Authorizations required for actions
+  def required_authorizations_for_actions
+    %w[submitter]
   end
 
   # Checks if review bidding is required for the assignment

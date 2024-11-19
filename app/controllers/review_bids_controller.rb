@@ -4,6 +4,7 @@
 # for assignments. It handles actions related to displaying review options, setting
 # review priorities, and managing reviews after the bidding process is complete.
 class ReviewBidsController < ApplicationController
+  include ActionAuthorizationConcern
   include AuthorizationHelper
   include ParticipantServiceConcern
   include ReviewServiceConcern
@@ -13,8 +14,12 @@ class ReviewBidsController < ApplicationController
   # Checks authorization of current user
   def action_allowed?
     case params[:action]
-    when 'show', 'set_priority', 'index'
-      (current_user_has_student_privileges? && list_action_authorized?) ||
+    when *allowed_actions_for_roles
+      assignment = participant_service.assignment
+      return false if assignment.nil?
+
+      assignment_id = assignment.id
+      (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
         current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
@@ -112,26 +117,13 @@ class ReviewBidsController < ApplicationController
 
   private
 
-  def required_role_for_show_actions?
-    current_user_has_instructor_privileges? ||
-      current_user_has_ta_privileges? ||
-      current_user_has_admin_privileges? ||
-      current_user_has_super_admin_privileges? ||
-      current_user_has_student_privileges?
+  # Actions that require role-based access
+  def allowed_actions_for_roles
+    %w[show set_priority index]
   end
 
-  def required_role_for_other_actions?
-    current_user_has_instructor_privileges? ||
-      current_user_has_ta_privileges? ||
-      current_user_has_admin_privileges? ||
-      current_user_has_super_admin_privileges?
-  end
-
-  def list_action_authorized?(assignment_id)
-    (%w[list].include? action_name) && are_needed_authorizations_present?(assignment_id, required_roles_for_list)
-  end
-
-  def required_roles_for_list
+  # Authorizations required for actions
+  def required_authorizations_for_actions
     %w[participant reader submitter reviewer]
   end
 end

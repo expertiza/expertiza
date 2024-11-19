@@ -17,10 +17,10 @@
 
     <% teams.each do |team| %>
         <tr>
-          <% teams_users = TeamsUser.where(team_id: team.id) %>
+          <% teams_participants = TeamsParticipant.where(team_id: team.id) %>
           <% users_for_curr_team = "" %>
-          <% teams_users.each do |teams_user| %>
-              <% user = User.find(teams_user.user_id) %>
+          <% teams_participants.each do |teams_participant| %>
+              <% user = User.find(teams_participant.user_id) %>
               <% users_for_curr_team += user.name(session[:ip]) + ' (' + user.fullname(session[:ip]) + ')' + '<br/>' %>
               <% participants = Array.new %>
               <% participants << Participant.where(["parent_id = ? AND user_id = ?", assignment.id, user.id]).first %>

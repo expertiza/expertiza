@@ -12,8 +12,8 @@ describe TagPromptDeployment do
   let(:answers_one) { Answer.new(id: [1], question_id: [1], answer: [3], comments: ['comment'], response_id: [241]) }
   let(:user1) { User.new(id: 1) }
   let(:user2) { User.new(id: 2) }
-  let(:team_user1) { TeamsUser.new(user_id: user1.id, team_id: team.id) }
-  let(:team_user2) { TeamsUser.new(user_id: user2.id, team_id: team.id) }
+  let(:team_user1) { TeamsParticipant.new(user_id: user1.id, team_id: team.id) }
+  let(:team_user2) { TeamsParticipant.new(user_id: user2.id, team_id: team.id) }
   let(:tagA) { AnswerTag.new(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer: answer, updated_at: Date.new.to_s) }
   let(:tagB) { AnswerTag.new(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer: answer, updated_at: Date.new.to_s) }
 
@@ -121,7 +121,7 @@ describe TagPromptDeployment do
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
       allow(ResponseMap).to receive(:assessments_for).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
-      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(TeamsParticipant).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
       allow(User).to receive(:find).with(user1.id).and_return(user1)
       allow(User).to receive(:find).with(user2.id).and_return(user2)
       allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
@@ -150,7 +150,7 @@ describe TagPromptDeployment do
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
-      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(TeamsParticipant).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
       allow(User).to receive(:find).with(user1.id).and_return(user1)
       allow(User).to receive(:find).with(user2.id).and_return(user2)
       allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([tagA, tagB])
@@ -179,7 +179,7 @@ describe TagPromptDeployment do
       allow(assignment).to receive(:varying_rubrics_by_round?).and_return(true)
       allow(ReviewResponseMap).to receive(:get_responses_for_team_round).and_return([response])
       allow(Answer).to receive(:where).and_return(answersObjectArray)
-      allow(TeamsUser).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
+      allow(TeamsParticipant).to receive(:where).with(team_id: team.id).and_return([team_user1, team_user2])
       allow(User).to receive(:find).with(user1.id).and_return(user1)
       allow(User).to receive(:find).with(user2.id).and_return(user2)
       allow(AnswerTag).to receive(:where).with(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer_id: [2, 3]).and_return([])

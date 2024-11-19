@@ -3,6 +3,8 @@
 # The `ReviewService` class encapsulates the business logic related to managing
 # review mappings for a given participant and their associated assignment.
 class ReviewService
+  attr_reader :participant, :assignment, :reviewer
+
   def initialize(participant)
     @participant = participant
     @assignment = participant.assignment

@@ -5,6 +5,8 @@
 # retrieve associated assignment details, determine the current topic ID, and fetch
 # the reviewer associated with the participant.
 class ParticipantService
+  attr_reader :participant, :assignment
+
   def initialize(participant_id, current_user_id)
     @participant = AssignmentParticipant.find(participant_id)
     @current_user_id = current_user_id

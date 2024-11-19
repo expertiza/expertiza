@@ -9,6 +9,7 @@
 # to
 
 class SignUpSheetController < ApplicationController
+  include ActionAuthorizationConcern
   include AuthorizationHelper
 
   require 'rgl/adjacency'
@@ -17,10 +18,12 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      (current_user_has_student_privileges? &&
-          (%w[list].include? action_name) &&
-          are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
+    when *allowed_actions_for_roles
+      assignment = participant_service.assignment
+      return false if assignment.nil?
+
+      assignment_id = assignment.id
+      (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
         current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
@@ -524,6 +527,24 @@ class SignUpSheetController < ApplicationController
        # instance method of SignUpTopic.
       @sign_up_topic.reassign_topic(team_id)
     end 
+  end
+
+  # Actions that require role-based access
+  def allowed_actions_for_roles
+    %w[
+      set_priority
+      sign_up
+      delete_signup
+      list
+      show_team
+      switch_original_topic_to_approved_suggested_topic
+      publish_approved_suggested_topic
+    ]
+  end
+
+  # Authorizations required for actions
+  def required_authorizations_for_actions
+    %w[participant reader submitter reviewer]
   end
   
 end

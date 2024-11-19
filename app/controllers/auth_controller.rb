@@ -47,7 +47,7 @@ class AuthController < ApplicationController
 
   # handles Github login attempts using the omniAuth2 gem.
   def github_login
-    session["github_access_token"] = env['omniauth.auth']["credentials"]["token"]
+    session["github_access_token"] = request.env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"
       redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
     elsif session["github_view_type"] == "view_scores"
@@ -123,7 +123,7 @@ class AuthController < ApplicationController
   end
 
   def google_login
-    g_email = env['omniauth.auth'].info.email
+    g_email = request.env['omniauth.auth'].info.email
   end
 
   # clears user identification info from session variables and sets the assignment ID.

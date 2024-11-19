@@ -502,7 +502,6 @@ ActiveRecord::Schema.define(version: 20241116230751) do
   end
 
   create_table "metrics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "metric_source_id"
     t.integer "team_id"
     t.string "github_id"
     t.integer "participant_id"
@@ -1014,7 +1013,6 @@ ActiveRecord::Schema.define(version: 20241116230751) do
     t.integer "institution_id"
     t.boolean "etc_icons_on_homepage", default: true
     t.integer "locale", default: 0
-    t.string "github_id"
     t.index ["role_id"], name: "fk_user_role_id"
   end
 

@@ -20,6 +20,12 @@ class MetricsController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id
   end
 
+  def callback
+    auth = request.env['omniauth.auth']
+    session["github_access_token"] = auth.credientials.token
+    github_metrics_for_submission(session["participant_id"], session["assignment_id"])
+  end
+
   # render the view_github_metrics page, which displays detailed metrics for a single team of participants.
   # Shows two charts, a barchart timeline, and a piechart of total contributions by team member, as well as pull request
   # statistics if available
@@ -27,11 +33,11 @@ class MetricsController < ApplicationController
     github_metrics_for_submission(params[:id], params[:assignment_id])
   end
 
-  # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
-  # An unauthorized user only has 60 requests per hour limit, which is not sufficient.
-  def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
-  end
+  # # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
+  # # An unauthorized user only has 60 requests per hour limit, which is not sufficient.
+  # def authorize_github
+  #   redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  # end
 
   # Master query method that runs a query based on links contained within a single team's submission. Sets up instance
   # variables, then passes control to retrieve_github_data to handle the logic for the individual links. Finally, store
@@ -43,7 +49,7 @@ class MetricsController < ApplicationController
       session["participant_id"] = id 
       session["assignment_id"] = assignment_id
       session["github_view_type"] = "view_submissions"
-      redirect_to :controller => 'metrics', :action => 'authorize_github'
+      redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
       return
     end
 
@@ -145,7 +151,7 @@ class MetricsController < ApplicationController
     while has_next_page
       # Make the query message and execute the HTTP request with the query
       # response_data is a Ruby Hash class
-      response_data = query_commit_statistics(Metric.pull_query(hyperlink_data, end_cursor))
+      response_data = query_commit_statistics(Metric.pull_query(hyperlink_data))
 
       # Extract all commits in this pull request and the page info
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
@@ -215,7 +221,7 @@ class MetricsController < ApplicationController
       # iterate across pages of 100 commits until no more pages are found
       while has_next_page
         # generate query for Github API call using hyperlink_data and other parameters
-        query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)
+        query_text = Metric.repo_query(hyperlink_data, @assignment.created_at)
         github_data = query_commit_statistics(query_text)
         # parse repository data only if API did not return an error; otherwise, drop API return hash
         unless github_data.nil? || github_data["errors"] || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
@@ -305,45 +311,4 @@ class MetricsController < ApplicationController
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
 
-  # Handle the create action for a github metric, which stores a datapoint mapping a team id, and a github email address
-  # to an expertiza User, with a datapoint for their total contributions to the project. Users are asked to create the
-  # mapping from their Github email within their user profile, but we also try to intelligently determine that mapping if
-  # the user has not provided an email, and their profile contains enough clues.
-  def create_github_metric(team_id, github_id, total_commits)
-    metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
-    # Attempt to find user by their github email -- Mapping already exists
-    user = User.find_by_github_id(github_id) || find_user_by_github_email(github_id)
-
-    participant_id = user&.id
-
-    unless metric.nil?
-      metric.total_commits = total_commits
-      metric.participant_id = participant_id
-      metric.save
-    else
-      Metric.create(
-        metric_source_id: MetricSource.find_by_name("Github").id,
-        team_id: team_id,
-        github_id: github_id,
-        participant_id: participant_id,
-        total_commits: total_commits
-      )
-    end
-  end
-
-  def find_user_by_github_email(email)
-  email_parts = email.split('@')
-
-  if email_parts[1] == 'ncsu.edu'
-    user = User.find_by_email(email)
-    user.github_id = email unless user.nil?
-    user&.save
-  else
-    user = User.find_by_email("#{email_parts[0]}@ncsu.edu")
-    user.github_id = email unless user.nil?
-    user&.save
-  end
-
-  user
-  end
 end

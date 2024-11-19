@@ -478,6 +478,12 @@ Expertiza::Application.routes.draw do
     end
   end
 
+  resources :metrics do
+    collection do
+      get '/auth/:provider/callback', to: 'metrics#callback'
+    end
+  end
+
   resources :student_teams, only: %i[create edit update] do
     collection do
       get :view

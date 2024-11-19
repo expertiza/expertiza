@@ -2,11 +2,11 @@
 
 development:
   client_key: 'Ov23lidOdTA6RxJkFZx9'
-  client_secret: '99c08a66fab04474b0559b0f38316f77fa96a85e'
+  client_secret: '90f511872cb13f68c130912e926b6e8a87fab221'
 
 test:
   client_key: 'Ov23lidOdTA6RxJkFZx9'
-  client_secret: '99c08a66fab04474b0559b0f38316f77fa96a85e'
+  client_secret: '90f511872cb13f68c130912e926b6e8a87fab221'
 
 # Set these to appropriate values when deploying to production
 production:

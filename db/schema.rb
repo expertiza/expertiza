@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20241116220354) do
+ActiveRecord::Schema.define(version: 20241116230751) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -313,12 +313,6 @@ ActiveRecord::Schema.define(version: 20241116220354) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assignment_id"], name: "index_duties_on_assignment_id"
-  end
-
-  create_table "github_metric_uses", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "assignment_id"
-    t.index ["assignment_id"], name: "fk_rails_3bd405b603"
-    t.index ["id"], name: "index_github_metric_uses_on_id", unique: true
   end
 
   create_table "goldberg_content_pages", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
@@ -1064,7 +1058,6 @@ ActiveRecord::Schema.define(version: 20241116220354) do
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
   add_foreign_key "duties", "assignments"
-  add_foreign_key "github_metric_uses", "assignments"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"

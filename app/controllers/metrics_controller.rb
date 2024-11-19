@@ -24,7 +24,7 @@ class MetricsController < ApplicationController
   # Shows two charts, a barchart timeline, and a piechart of total contributions by team member, as well as pull request
   # statistics if available
   def show
-    github_metrics_for_submission(params[:id])
+    github_metrics_for_submission(params[:id], params[:assignment_id])
   end
 
   # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
@@ -37,11 +37,11 @@ class MetricsController < ApplicationController
   # variables, then passes control to retrieve_github_data to handle the logic for the individual links. Finally, store
   # a small subset of data as Metrics in the metrics table containing participants, their total contribution,
   # (in number of commits), their github email, and a reference to their User account (if mapping exists or can be determined)
-  def github_metrics_for_submission(id)
+  def github_metrics_for_submission(id, assignment_id)
     # redirect_to authorize_github if github_access_token is not present.
     if session["github_access_token"].nil?
       session["participant_id"] = id 
-      session["assignment_id"] = AssignmentParticipant.find(id).assignment.id
+      session["assignment_id"] = assignment_id
       session["github_view_type"] = "view_submissions"
       redirect_to :controller => 'metrics', :action => 'authorize_github'
       return

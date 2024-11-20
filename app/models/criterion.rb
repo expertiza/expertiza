@@ -55,10 +55,15 @@ class Criterion < ScoredQuestion
     end
     # show advice given for different questions
     html += advices_criterion_question(count, question_advices) if !question_advices.empty? && (advice_total_length > 0)
-    # dropdown options to rate a project based on the question
-    html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'dropdown'
-    # scale options to rate a project based on the question
-    html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'scale'
+    # Force scale criterion when minimum score is 0
+    if questionnaire_min == 0
+      html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max)
+    else
+      # dropdown options to rate a project based on the question
+      html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'dropdown'
+      # scale options to rate a project based on the question
+      html += scale_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'scale'
+    end
     safe_join([''.html_safe, ''.html_safe], html.html_safe)
   end
 

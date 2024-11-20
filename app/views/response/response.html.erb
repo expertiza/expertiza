@@ -370,9 +370,9 @@
         <td>
             <% answer = Answer.where(question_id: question.id, response_id: @response.id).first unless @response.nil? %>
             <% if question.instance_of? Criterion %>
-              <%= question.complete(i, answer, 1, @questionnaire.max_question_score, @dropdown_or_scale) %>
+                <%= question.complete(i, answer, @questionnaire.min_question_score, @questionnaire.max_question_score, @dropdown_or_scale) %>
             <% elsif question.instance_of? Scale %>
-              <%= question.complete(i, 1, @questionnaire.max_question_score, answer) %>
+              <%= question.complete(i, @questionnaire.min_question_score, @questionnaire.max_question_score, answer) %>
             <% elsif question.instance_of? Cake %>
               <%= question.complete(i, answer, @total_score[question.id].to_s) %>
             <% else %>

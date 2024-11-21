@@ -5,7 +5,7 @@
 # retrieve associated assignment details, determine the current topic ID, and fetch
 # the reviewer associated with the participant.
 class ParticipantService
-  attr_reader :participant, :assignment
+  attr_reader :participant
 
   def initialize(participant_id, current_user_id)
     @participant = AssignmentParticipant.find(participant_id)
@@ -13,18 +13,24 @@ class ParticipantService
   end
 
   def valid_participant?
+    return false unless @participant
+
     @participant.user_id == @current_user_id
   end
 
   def assignment
-    @participant.assignment
+    @assignment ||= @participant&.assignment
   end
 
   def topic_id
-    SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
+    SignedUpTeam.topic_id(@participant&.parent_id, @participant&.user_id)
   end
 
   def reviewer
-    @participant.get_reviewer
+    @participant&.get_reviewer
+  end
+
+  def participant_authorization
+    @participant&.authorization
   end
 end

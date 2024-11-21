@@ -10,19 +10,49 @@
 module ActionAuthorizationConcern
   extend ActiveSupport::Concern
 
-  # Determines if the current action is authorized for the given assignment
-  def action_authorized?(assignment_id)
-    allowed_actions_for_roles.include?(action_name) &&
-      are_needed_authorizations_present?(assignment_id, required_authorizations_for_actions)
+  private
+
+  def authorize_action
+    return unless action_allowed?
+
+    render plain: 'Access Denied', status: :forbidden
   end
 
-  # List of actions allowed for specific roles
-  def allowed_actions_for_authorizations
-    %w[list]
+  def authorize_participant
+    head :forbidden unless participant_service.valid_participant?
   end
 
-  # Authorizations required for specific actions
-  def required_authorizations_for_actions
-    raise NotImplementedError, 'You must implement `required_authorizations_for_action` in the including controller'
+  def action_allowed?
+    return false unless current_user
+
+    action = params[:action].to_s.downcase
+    assignment = participant_service.assignment
+
+    return verify_authorizations(assignment) if actions_requiring_authorization.include?(action)
+    return verify_action_access(assignment) if actions_allowed_for_students_and_above.include?(action)
+    return current_user_has_ta_privileges? if actions_restricted_to_tas_and_above.include?(action)
+
+    false
+  end
+
+  def verify_authorizations
+    raise NotImplementedError, "#{self.class.name} must define #verify_authorization"
+  end
+
+  def verify_action_access(assignment)
+    return false if assignment.nil?
+    return false unless current_user_has_student_privileges?
+  end
+
+  def actions_requiring_authorizations?
+    []
+  end
+
+  def actions_allowed_for_students_and_above
+    []
+  end
+
+  def actions_restricted_to_tas_and_above
+    []
   end
 end

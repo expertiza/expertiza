@@ -9,22 +9,8 @@ class ReviewBidsController < ApplicationController
   include ParticipantServiceConcern
   include ReviewServiceConcern
 
+  before_action :authorize_action
   before_action :authorize_participant, only: [:index]
-
-  # Checks authorization of current user
-  def action_allowed?
-    case params[:action]
-    when *allowed_actions_for_roles
-      assignment = participant_service.assignment
-      return false if assignment.nil?
-
-      assignment_id = assignment.id
-      (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
-        current_user_has_student_privileges?
-    else
-      current_user_has_ta_privileges?
-    end
-  end
 
   # Displays the review bid others work page for the current participant
   def index
@@ -117,13 +103,26 @@ class ReviewBidsController < ApplicationController
 
   private
 
-  # Actions that require role-based access
-  def allowed_actions_for_roles
+  def actions_requiring_authorization
+    %w[list]
+  end
+
+  def actions_allowed_for_students_and_above
     %w[show set_priority index]
   end
 
-  # Authorizations required for actions
-  def required_authorizations_for_actions
+  def actions_restricted_to_tas_and_above
+    %w[assign_bidding run_bidding_algorithm]
+  end
+
+  def required_authorizations_for_allowed_actions
     %w[participant reader submitter reviewer]
+  end
+
+  def verify_authorizations
+    return false unless current_user_has_student_privileges?
+    return false unless are_needed_authorizations_present?(params[:id], *required_authorizations_for_allowed_actions)
+
+    true
   end
 end

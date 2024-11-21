@@ -11,18 +11,10 @@ class StudentReviewController < ApplicationController
   include ParticipantServiceConcern
   include ReviewServiceConcern
 
+  before_action :authorize_action
   before_action :authorize_participant, only: [list]
 
   BIDDING_ALGORITHM = 'Bidding'
-
-  # Checks authorization of current user
-  def action_allowed?
-    assignment_id = participant_service.assignment&.id
-    return false if assignment_id.nil?
-
-    (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
-      current_user_has_student_privileges?
-  end
 
   # Determines participant locale
   def controller_locale
@@ -68,11 +60,6 @@ class StudentReviewController < ApplicationController
     @num_reviews_in_progress = metareview_service.metareview_counts[:in_progress]
   end
 
-  # Authorizations required for actions
-  def required_authorizations_for_actions
-    %w[submitter]
-  end
-
   # Checks if review bidding is required for the assignment
   def bidding_required?
     @assignment.review_choosing_algorithm == BIDDING_ALGORITHM || @assignment.bidding_for_reviews_enabled
@@ -80,8 +67,31 @@ class StudentReviewController < ApplicationController
 
   # Redirects the participant to the review bidding page if bidding is required
   def redirect_if_bidding_required
-    return unless bidding_required
+    return unless bidding_required?
 
     redirect_to review_bids_path(assignment_id: params[:assignment_id], id: params[:id]) if bidding_required?
   end
+
+  def actions_requiring_authorization
+    %w[list]
+  end
+
+  def actions_allowed_for_students_and_above
+    %w[controller_locale list]
+  end
+
+  def actions_restricted_to_tas_and_above
+    []
+  end
+
+  def required_authorizations_for_allowed_actions
+    %w[submitter]
+  end
+
+  def verify_authorizations
+    return false unless current_user_has_student_privileges?
+    return false unless are_needed_authorizations_present?(params[:id], *required_authorizations_for_allowed_actions)
+
+    true
+  end  
 end

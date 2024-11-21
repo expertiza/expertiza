@@ -1,6 +1,7 @@
 describe ReviewBidsController do
   # let(:assignment) { double('Assignment', id: 1) }
   # let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
+  let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
@@ -9,31 +10,71 @@ describe ReviewBidsController do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     allow(Participant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
+    allow(participant).to receive(:assignment).and_return(assignment)
   end
 
   describe '#action_allowed?' do
-    context 'when different roles call the controller' do
-      it 'does not allow Students to run review bidding algorithm' do
+    describe 'when different roles call the controller' do
+      describe 'as a Student' do
+        it 'does not allow running the review bidding algorithm' do
+          session[:user] = build(:student)
+          controller.params = { id: '1', action: 'assign_bidding' }
+          expect(controller.action_allowed?).to be false
+        end
+
+        it 'allows access to show, index, and set_priority' do
+          session[:user] = build(:student)
+          %w[show index set_priority].each do |action|
+            controller.params = { id: '1', action: action }
+            expect(controller.action_allowed?).to be true
+          end
+        end
+      end
+
+      describe 'as other roles (Instructor, Teaching Assistant, Administrator)' do
+        it 'allows running the review bidding algorithm' do
+          controller.params = { id: '1', action: 'assign_bidding' }
+          %i[instructor teaching_assistant admin].each do |role|
+            session[:user] = build(role)
+            expect(controller.action_allowed?).to be true
+          end
+        end
+      end
+    end
+
+    describe 'when no user is present in the session' do
+      it 'does not allow users that are not logged in to perform any action' do
+        session[:user] = nil
+        %w[assign_bidding show index set_priority].each do |action|
+          controller.params = { id: '1', action: action }
+          expect(controller.action_allowed?).to be false
+        end
+      end
+    end
+
+    describe 'when the action is empty, nil, or invalid' do
+      it 'does not allow access to invalid actions' do
         session[:user] = build(:student)
-        controller.params = { action: 'assign_bidding' }
+        [nil, '', 'bad_action'].each do |action|
+          controller.params = { id: '1', action: action }
+          expect(controller.action_allowed?).to be false
+        end
+      end
+    end
+
+    describe 'when the action is not in lowercase' do
+      it 'allows access for case-insensitive actions' do
+        session[:user] = build(:student)
+        controller.params = { id: '1', action: 'Assign_Bidding' }
         expect(controller.action_allowed?).to be false
-      end
-      it 'does allow Instructors, Teaching Assistants, Administrators to run review bidding algorithm' do
-        controller.params = { action: 'assign_bidding' }
-        session[:user] = build(:instructor)
+
+        controller.params = { id: '1', action: 'SHOW' }
         expect(controller.action_allowed?).to be true
-        session[:user] = build(:teaching_assistant)
+
+        controller.params = { id: '1', action: 'indeX' }
         expect(controller.action_allowed?).to be true
-        session[:user] = build(:admin)
-        expect(controller.action_allowed?).to be true
-      end
-      it 'does allow Students to access show, index, set_priority' do
-        session[:user] = build(:student)
-        controller.params = { action: 'show' }
-        expect(controller.action_allowed?).to be true
-        controller.params = { action: 'index' }
-        expect(controller.action_allowed?).to be true
-        controller.params = { action: 'set_priority' }
+
+        controller.params = { id: '1', action: 'Set_Priority' }
         expect(controller.action_allowed?).to be true
       end
     end

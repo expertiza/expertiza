@@ -20,30 +20,36 @@ class MetricsController < ApplicationController
     redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id
   end
 
+  def callback
+    auth = request.env['omniauth.auth']
+    session["github_access_token"] = auth.credientials.token
+    github_metrics_for_submission(session["participant_id"], session["assignment_id"])
+  end
+
   # render the view_github_metrics page, which displays detailed metrics for a single team of participants.
   # Shows two charts, a barchart timeline, and a piechart of total contributions by team member, as well as pull request
   # statistics if available
   def show
-    github_metrics_for_submission(params[:id])
+    github_metrics_for_submission(params[:id], params[:assignment_id])
   end
 
-  # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
-  # An unauthorized user only has 60 requests per hour limit, which is not sufficient.
-  def authorize_github
-    redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
-  end
+  # # Authorize with token to use Github API with a higher rate limit of 5000 requests per hour. 
+  # # An unauthorized user only has 60 requests per hour limit, which is not sufficient.
+  # def authorize_github
+  #   redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
+  # end
 
   # Master query method that runs a query based on links contained within a single team's submission. Sets up instance
   # variables, then passes control to retrieve_github_data to handle the logic for the individual links. Finally, store
   # a small subset of data as Metrics in the metrics table containing participants, their total contribution,
   # (in number of commits), their github email, and a reference to their User account (if mapping exists or can be determined)
-  def github_metrics_for_submission(id)
+  def github_metrics_for_submission(id, assignment_id)
     # redirect_to authorize_github if github_access_token is not present.
     if session["github_access_token"].nil?
       session["participant_id"] = id 
-      session["assignment_id"] = AssignmentParticipant.find(id).assignment.id
+      session["assignment_id"] = assignment_id
       session["github_view_type"] = "view_submissions"
-      redirect_to :controller => 'metrics', :action => 'authorize_github'
+      redirect_to "https://github.com/login/oauth/authorize?client_id=#{GITHUB_CONFIG['client_key']}"
       return
     end
 
@@ -76,20 +82,6 @@ class MetricsController < ApplicationController
 
     @participants = get_data_for_list_submissions(@team)
 
-    # Create database entry for basic statistics. These data are queried later by view_team in grades (the heatgrid)
-    @authors.each do |author|
-      # Check to see if this author is a member of the expertiza dev team. This COULD be done with a query,
-      # But will only work if the authenticated user running the query has push access to the github repository
-      # (Per Github API security rules)
-      unless LOCAL_ENV["COLLABORATORS"].include? author[1]
-        # If author is a student, keep the commit data and store the total as a Metric
-        data_object = {}
-        data_object[:author] = author[0] # Github Name
-        data_object[:email] = author[1] # Github Email
-        data_object[:commits] = @parsed_data[author[0]].values.inject(0) {|sum, value| sum += value} #Sum of commits
-        create_github_metric(@team_id, author[1], data_object[:commits])
-      end
-    end
   end
 
 
@@ -102,14 +94,12 @@ class MetricsController < ApplicationController
     pull_links = team_links.select do |link|
       link.match(/pull/) && link.match(/github.com/) # all links that contain both pull and github.com
     end
-    if !pull_links.empty? # have pull links, retrieve pull request info
-      query_all_pull_requests(pull_links)
-    else # retrieve repo info if no PR is submitted
-    repo_links = team_links.select do |link|
-      link.match(/github.com/)
+    if pull_links.empty? # No PR links found
+      flash[:error] = 'No pull request links have been submitted by this team.'
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id and return
     end
-    retrieve_repository_data(repo_links)
-    end
+    # If pull links are present, retrieve pull request info
+    query_all_pull_requests(pull_links)
   end
 
 
@@ -145,7 +135,7 @@ class MetricsController < ApplicationController
     while has_next_page
       # Make the query message and execute the HTTP request with the query
       # response_data is a Ruby Hash class
-      response_data = query_commit_statistics(Metric.pull_query(hyperlink_data, end_cursor))
+      response_data = query_commit_statistics(Metric.pull_query(hyperlink_data))
 
       # Extract all commits in this pull request and the page info
       current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
@@ -196,55 +186,6 @@ class MetricsController < ApplicationController
   end
 
 
-  ####################### Handling of Repository Links #########################
-  # Iterate through repository links, and for each link, iterate across pages of 100 commits (API Limit), calling corresponding
-  # methods to query the github API  for data on each page, then parse and process the data accordingly.
-  def retrieve_repository_data(repo_links)
-    has_next_page = true # flag indicating if there are more pages of commits to retrieve
-    end_cursor = nil # parameter needed for Github API call
-  
-    # iterate through each repository link provided
-    repo_links.each do |hyperlink|
-      # parse the link into its constituent parts
-      submission_hyperlink_tokens = hyperlink.split('/')
-      hyperlink_data = {}
-      # extract repository and owner names from the parsed link and add to the hyperlink_data hash
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4].gsub('.git', '')
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
-  
-      # iterate across pages of 100 commits until no more pages are found
-      while has_next_page
-        # generate query for Github API call using hyperlink_data and other parameters
-        query_text = Metric.repo_query(hyperlink_data, @assignment.created_at, end_cursor)
-        github_data = query_commit_statistics(query_text)
-        # parse repository data only if API did not return an error; otherwise, drop API return hash
-        unless github_data.nil? || github_data["errors"] || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
-          parse_repository_data(github_data)
-        end
-        # only run iteration across an additional page if no API errors and presence of additional pages of commits are detected
-        has_next_page = false if github_data.nil? || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil? || github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
-      end
-    end
-  end
-
-  # Process data returned by a respository query, stripping unecessary layers off of data hash, and organizing data for use
-  # elsewhere in the app. Also calls accounting method for each commit, and sorting method to sort the data upon completion.
-  # Finally,  calls team_statistics to parse the organized datasets and assemble key instance variables for the views.
-  def parse_repository_data(github_data)
-    commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
-    commit_objects.each do |commit_object|
-      # extract commit author name, email, and date from the commit object and count them using the accounting method
-      commit_author = commit_object["node"]["author"]
-      author_name = commit_author["name"]
-      author_email = commit_author["email"]
-      commit_date = commit_author["date"].to_s
-      count_github_authors_and_dates(author_name, author_email, commit_date[0, 10])
-    end
-    # sort commit dates and call team_statistics to process the organized data and assemble instance variables for the views
-    sort_commit_dates
-    team_statistics(github_data, :repo)
-  end
-
   ####################### Shared Math/Stats and Sorting Methods ################
 
   # Traverse organized datasets and assemble key instance variables for the views. Handles differences in dataset between
@@ -275,8 +216,7 @@ class MetricsController < ApplicationController
 
   # do accounting, aggregate each authors' number of commits on each date
   def count_github_authors_and_dates(author_name, author_email, commit_date)
-    return if LOCAL_ENV["COLLABORATORS"].include?(author_name)
-  
+
     @authors[author_name] ||= author_email
     @dates[commit_date] ||= 1
     @parsed_data[author_name] ||= Hash.new(0)
@@ -289,13 +229,27 @@ class MetricsController < ApplicationController
   # data: the query message made in get_query method. Documented in detail in get_query method
   def query_commit_statistics(data)
     uri = URI.parse("https://api.github.com/graphql")
-    http = Net::HTTP.new(uri.host, uri.port) # host: api.github.com, port: 443
+    http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"]) # set up authorization
-    request.body = data.to_json # convert query message to json and pass as request body
-    response = http.request(request) # make the actual request
-    ActiveSupport::JSON.decode(response.body.to_s) # convert the response body to string, decoded then return
+  
+    # Create the POST request with appropriate headers
+    request = Net::HTTP::Post.new(
+      uri.path,
+      {
+        'Authorization' => "Bearer #{session['github_access_token']}",
+        'Content-Type' => 'application/json'
+      }
+    )
+  
+    # Wrap the query string in a hash with a query key
+    request.body = { query: data }.to_json
+  
+    # Make the request
+    response = http.request(request)
+
+    # Parse and return the JSON response
+    ActiveSupport::JSON.decode(response.body.to_s)
   end
 
   # pr_object contains head commit reference num, author name, and repo name
@@ -305,45 +259,4 @@ class MetricsController < ApplicationController
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
 
-  # Handle the create action for a github metric, which stores a datapoint mapping a team id, and a github email address
-  # to an expertiza User, with a datapoint for their total contributions to the project. Users are asked to create the
-  # mapping from their Github email within their user profile, but we also try to intelligently determine that mapping if
-  # the user has not provided an email, and their profile contains enough clues.
-  def create_github_metric(team_id, github_id, total_commits)
-    metric = Metric.where("team_id = ? AND github_id = ?", team_id, github_id).first
-    # Attempt to find user by their github email -- Mapping already exists
-    user = User.find_by_github_id(github_id) || find_user_by_github_email(github_id)
-
-    participant_id = user&.id
-
-    unless metric.nil?
-      metric.total_commits = total_commits
-      metric.participant_id = participant_id
-      metric.save
-    else
-      Metric.create(
-        metric_source_id: MetricSource.find_by_name("Github").id,
-        team_id: team_id,
-        github_id: github_id,
-        participant_id: participant_id,
-        total_commits: total_commits
-      )
-    end
-  end
-
-  def find_user_by_github_email(email)
-  email_parts = email.split('@')
-
-  if email_parts[1] == 'ncsu.edu'
-    user = User.find_by_email(email)
-    user.github_id = email unless user.nil?
-    user&.save
-  else
-    user = User.find_by_email("#{email_parts[0]}@ncsu.edu")
-    user.github_id = email unless user.nil?
-    user&.save
-  end
-
-  user
-  end
 end

@@ -59,12 +59,12 @@ class Metric < ActiveRecord::Base
   # after - a pointer provided by the Github API to where the last query left off.
   #
   # Returns a hash containing the query text.
-  def self.pull_query(hyperlink_data, after: nil)
+  def self.pull_query(hyperlink_data)
     format(PULL_REQUEST_QUERY, {
       owner_name: hyperlink_data["owner_name"],
       repository_name: hyperlink_data["repository_name"],
       pull_request_number: hyperlink_data["pull_request_number"],
-      after_clause: after ? "after: \"#{after}\"" : ""
+      after_clause: nil
     })
   end
 
@@ -75,12 +75,12 @@ class Metric < ActiveRecord::Base
   # after - a pointer provided by the Github API to where the last query left off.
   #
   # Returns a hash containing the query text.
-  def self.repo_query(hyperlink_data, date, after: nil)
+  def self.repo_query(hyperlink_data, date)
     format(REPO_QUERY, {
       owner_name: hyperlink_data["owner_name"],
       repository_name: hyperlink_data["repository_name"],
-      start_date: DateTime.parse(date).to_time.iso8601(3),
-      after_clause: after ? "after: \"#{after}\"" : ""
+      start_date: date.iso8601(3),
+      after_clause: nil
     })
   end
 end

@@ -1,12 +1,12 @@
 module MetricsHelper
   include Chartjs::ChartHelpers::Implicit
-  # Creates the bar graph for the github metrics data.
-  # Links the authors with their github data and assigns
-  # them a color. Currently supports up to 6 different colors and will
-  # loop if it goes over.
+
+  # Creates the bar graph for the GitHub metrics data.
+  # Links the authors with their GitHub data and assigns
+  # them a color. Supports up to 6 different colors and will loop if it goes over.
   def display_github_metrics(parsed_data, authors, dates)
     data_array = []
-    color = %w[red yellow blue gray green magenta]
+    color = %w[#4e79a7 #f28e2b #e15759 #76b7b2 #59a14f #edc948 #af7aa1 #ff9da7]
     i = 0
     authors.each do |author|
       data_object = {}
@@ -23,73 +23,73 @@ module MetricsHelper
       labels: dates,
       datasets: data_array
     }
-    horizontal_bar_chart data, chart_options
+    bar_chart data, chart_options
   end
 
+  # Creates a pie chart for the total commits by authors.
   def display_totals_piechart(parsed_data, authors, dates)
-    data_array = []
-    color = %w[ff0000 ffff00 0000ff aaaaaa 00ff00 ff00ff]
-    i = 0
-    authors.each do |author|
-      data_object = {}
-      data_object[:author] = author[0]
-      data_object[:commits] = parsed_data[author[0]].values.inject(0) {|sum, value| sum += value}
-      data_object[:color] = color[i]
-      data_array.push(data_object)
-      i += 1
-      i = 0 if i > 4
+    data = {
+      labels: [],
+      datasets: [
+        {
+          data: [],
+          backgroundColor: [],
+          borderWidth: 1
+        }
+      ]
+    }
+  
+    colors = %w[#4e79a7 #f28e2b #e15759 #76b7b2 #59a14f #edc948 #af7aa1 #ff9da7]
+    authors.each_with_index do |author, index|
+      data[:labels] << author[0]
+      data[:datasets][0][:data] << parsed_data[author[0]].values.sum
+      data[:datasets][0][:backgroundColor] << colors[index % colors.length]
     end
-
-     link = nil
-    GoogleChart::PieChart.new('600x300', '# Commits By Author', false) do |pc|
-      data_array.each do |datapoint|
-        label = datapoint[:author] + " (" + datapoint[:commits].to_s + ")"
-        pc.data label, datapoint[:commits], datapoint[:color]
-      end
-      link = pc.to_url
-    end
-      link
+  
+    data.to_json
   end
 
-  # Defines the general settings of the github metrics chart
+  # Defines the general settings of the GitHub metrics chart.
   def chart_options
     {
       responsive: true,
       maintainAspectRatio: false,
       width: 100,
       height: 100,
-      scales: graph_scales
+      scales: graph_scales,
+      indexAxis: 'y' # Set the index axis to make the bars horizontal
     }
   end
 
-  # Defines the labels and display of the data on the github metrics chart
+  # Defines the labels and display of the data on the GitHub metrics chart.
   def graph_scales
     {
-      yAxes: [{
-                stacked: true,
-                ticks: {
-                  beginAtZero: true
-                },
-                barThickness: 30,
-                scaleLabel: {
-                  display: true,
-                  labelString: 'Submission timeline'
-                }
-              }],
-      xAxes: [{
-                stacked: true,
-                ticks: {
-                  beginAtZero: true
-                },
-                barThickness: 30,
-                scaleLabel: {
-                  display: true,
-                  labelString: '# of Commits'
-                }
-              }]
+      x: {
+        stacked: true,
+        ticks: {
+          beginAtZero: true
+        },
+        title: {
+          display: true,
+          text: '# of Commits'
+        },
+        barThickness: 30
+      },
+      y: {
+        stacked: true,
+        ticks: {
+          beginAtZero: true
+        },
+        title: {
+          display: true,
+          text: 'Submission timeline'
+        },
+        barThickness: 30
+      }
     }
   end
 
+  # Parses hyperlink data into components for pull request number, repository, and owner.
   def parse_hyperlink_data(hyperlink)
     tokens = hyperlink.split('/')
     {
@@ -99,7 +99,7 @@ module MetricsHelper
     }
   end
 
-  # sort each author's commits based on date
+  # Sorts each author's commits based on date.
   def sort_commit_dates
     @dates.each_key do |date|
       @parsed_data.each_value do |commits|
@@ -107,8 +107,8 @@ module MetricsHelper
       end
     end
     @parsed_data.each do |author, commits|
-      @parsed_data[author] = Hash[commits.sort_by {|date, _commit_count| date }]
-      @total_commits += commits.inject (0) {|sum,value| sum + value[1] }
+      @parsed_data[author] = Hash[commits.sort_by { |date, _commit_count| date }]
+      @total_commits += commits.values.sum
     end
   end
 end

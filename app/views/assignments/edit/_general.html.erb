@@ -134,9 +134,10 @@
     </tr>
       <!--Github-->
   <tr>
-    <td style='padding:5px' id='assignment_use_github' colspan="2">
-      <input type="checkbox" name = "use_github" id="use_github" <%= "checked" if GithubMetricUsesController.record_exists?(@assignment_form.assignment.id) %>></input>
-      <%= label_tag('use_github', 'Use github metrics?') %>
+    <td style='padding:5px' id='assignment_use_github_metrics'>
+      <input name="assignment_form[assignment][use_github_metrics]" type="hidden" value="false" id="use_github_metrics" </input>
+      <%= check_box_tag('assignment_form[assignment][use_github_metrics]', 'true', @assignment_form.assignment.use_github_metrics) %>
+      <%= label_tag('assignment_form[assignment][use_github_metrics]', 'Use github metrics?') %>
     </td>
   </tr>
     <!--Conference-->
@@ -256,27 +257,6 @@
             jQuery("#topics_tab_header").hide();
         }
         
-        $('#use_github').change(function () {
-            if (jQuery('#use_github').is(':checked')) {
-                jQuery.ajax({
-                    url: '/github_metric_uses/' + <%= @assignment.id %>,
-                    method: 'POST',
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    dataType: 'json'
-                })
-            } else{
-                jQuery.ajax({
-                    url: '/github_metric_uses/' + <%= @assignment.id %>,
-                    method: 'DELETE',
-                    xhrFields: {
-                        withCredentials: true
-                    },
-                    dataType: 'json'
-                })
-            }
-        })
     });
     
     function topicsChanged() {

@@ -22,21 +22,39 @@
 <% if @parsed_data && @authors.present? && @dates %>
 
   <table>
-    <tr>
-      <td align="center"><h3>Code Frequency</h3></td>
-      <td align="center"><h3>Total contributions by author</h3></td>
-    </tr>
-    <tr>
-      <td>
-        <div class="chart-container" style="width: 600px; height:450px;display: block;alignment: left">
-          <%= display_github_metrics(@parsed_data, @authors, @dates) %>
-        </div>
-      </td>
-      <td>
-        <img src="<%= display_totals_piechart(@parsed_data, @authors, @dates) %>" style="display: block; alignment: right  ">
-      </td>
-    </tr>
-  </table>
+  <tr>
+    <td align="center"><h3>Code Frequency</h3></td>
+    <td align="center"><h3>Total Contributions by Author</h3></td>
+  </tr>
+  <tr>
+    <td>
+      <div class="chart-container" style="width: 600px; height:450px; display: block; alignment: left;">
+        <%= display_github_metrics(@parsed_data, @authors, @dates) %>
+      </div>
+    </td>
+    <td>
+      <div class="chart-container" style="width: 600px; height:450px; display: block; alignment: right;">
+        <canvas id="totalsPieChart"></canvas>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('totalsPieChart').getContext('2d');
+    const pieChartData = <%= raw display_totals_piechart(@parsed_data, @authors, @dates) %>;
+
+    new Chart(ctx, {
+      type: 'pie',
+      data: pieChartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
   <h3>Team Statistics</h3>
   <ul>
     <li>Total number of commits:<%= @total_commits %></li>

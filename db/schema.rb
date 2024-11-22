@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20241116230751) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -133,6 +133,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
     t.boolean "enable_pair_programming", default: false
+    t.boolean "use_github_metrics", default: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -491,6 +492,22 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.index ["content_page_id"], name: "fk_menu_item_content_page_id"
     t.index ["controller_action_id"], name: "fk_menu_item_controller_action_id"
     t.index ["parent_id"], name: "fk_menu_item_parent_id"
+  end
+
+  create_table "metric_sources", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "metrics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id"
+    t.string "github_id"
+    t.integer "participant_id"
+    t.integer "total_commits"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "nodes", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|

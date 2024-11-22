@@ -2,6 +2,7 @@ class MetricsController < ApplicationController
   include AuthorizationHelper
   include AssignmentHelper
   include MetricsHelper
+  require 'json'
 
   def action_allowed?
     current_user_has_instructor_privileges?
@@ -82,20 +83,6 @@ class MetricsController < ApplicationController
 
     @participants = get_data_for_list_submissions(@team)
 
-    # Create database entry for basic statistics. These data are queried later by view_team in grades (the heatgrid)
-    @authors.each do |author|
-      # Check to see if this author is a member of the expertiza dev team. This COULD be done with a query,
-      # But will only work if the authenticated user running the query has push access to the github repository
-      # (Per Github API security rules)
-      unless LOCAL_ENV["COLLABORATORS"].include? author[1]
-        # If author is a student, keep the commit data and store the total as a Metric
-        data_object = {}
-        data_object[:author] = author[0] # Github Name
-        data_object[:email] = author[1] # Github Email
-        data_object[:commits] = @parsed_data[author[0]].values.inject(0) {|sum, value| sum += value} #Sum of commits
-        create_github_metric(@team_id, author[1], data_object[:commits])
-      end
-    end
   end
 
 
@@ -281,8 +268,7 @@ class MetricsController < ApplicationController
 
   # do accounting, aggregate each authors' number of commits on each date
   def count_github_authors_and_dates(author_name, author_email, commit_date)
-    return if LOCAL_ENV["COLLABORATORS"].include?(author_name)
-  
+
     @authors[author_name] ||= author_email
     @dates[commit_date] ||= 1
     @parsed_data[author_name] ||= Hash.new(0)
@@ -295,13 +281,27 @@ class MetricsController < ApplicationController
   # data: the query message made in get_query method. Documented in detail in get_query method
   def query_commit_statistics(data)
     uri = URI.parse("https://api.github.com/graphql")
-    http = Net::HTTP.new(uri.host, uri.port) # host: api.github.com, port: 443
+    http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-    request = Net::HTTP::Post.new(uri.path, 'Authorization' => 'Bearer' + ' ' + session["github_access_token"]) # set up authorization
-    request.body = data.to_json # convert query message to json and pass as request body
-    response = http.request(request) # make the actual request
-    ActiveSupport::JSON.decode(response.body.to_s) # convert the response body to string, decoded then return
+  
+    # Create the POST request with appropriate headers
+    request = Net::HTTP::Post.new(
+      uri.path,
+      {
+        'Authorization' => "Bearer #{session['github_access_token']}",
+        'Content-Type' => 'application/json'
+      }
+    )
+  
+    # Wrap the query string in a hash with a query key
+    request.body = { query: data }.to_json
+  
+    # Make the request
+    response = http.request(request)
+
+    # Parse and return the JSON response
+    ActiveSupport::JSON.decode(response.body.to_s)
   end
 
   # pr_object contains head commit reference num, author name, and repo name

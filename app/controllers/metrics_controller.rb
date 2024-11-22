@@ -95,9 +95,12 @@ class MetricsController < ApplicationController
     pull_links = team_links.select do |link|
       link.match(/pull/) && link.match(/github.com/) # all links that contain both pull and github.com
     end
-    if !pull_links.empty? # have pull links, retrieve pull request info
-      query_all_pull_requests(pull_links)
+    if pull_links.empty? # No PR links found
+      flash[:error] = 'No pull request links have been submitted by this team.'
+      redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id and return
     end
+    # If pull links are present, retrieve pull request info
+    query_all_pull_requests(pull_links)
   end
 
 

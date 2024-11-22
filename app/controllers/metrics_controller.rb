@@ -97,11 +97,6 @@ class MetricsController < ApplicationController
     end
     if !pull_links.empty? # have pull links, retrieve pull request info
       query_all_pull_requests(pull_links)
-    else # retrieve repo info if no PR is submitted
-    repo_links = team_links.select do |link|
-      link.match(/github.com/)
-    end
-    retrieve_repository_data(repo_links)
     end
   end
 
@@ -188,55 +183,6 @@ class MetricsController < ApplicationController
     end
   end
 
-
-  ####################### Handling of Repository Links #########################
-  # Iterate through repository links, and for each link, iterate across pages of 100 commits (API Limit), calling corresponding
-  # methods to query the github API  for data on each page, then parse and process the data accordingly.
-  def retrieve_repository_data(repo_links)
-    has_next_page = true # flag indicating if there are more pages of commits to retrieve
-    end_cursor = nil # parameter needed for Github API call
-  
-    # iterate through each repository link provided
-    repo_links.each do |hyperlink|
-      # parse the link into its constituent parts
-      submission_hyperlink_tokens = hyperlink.split('/')
-      hyperlink_data = {}
-      # extract repository and owner names from the parsed link and add to the hyperlink_data hash
-      hyperlink_data["repository_name"] = submission_hyperlink_tokens[4].gsub('.git', '')
-      hyperlink_data["owner_name"] = submission_hyperlink_tokens[3]
-  
-      # iterate across pages of 100 commits until no more pages are found
-      while has_next_page
-        # generate query for Github API call using hyperlink_data and other parameters
-        query_text = Metric.repo_query(hyperlink_data, @assignment.created_at)
-        github_data = query_commit_statistics(query_text)
-        # parse repository data only if API did not return an error; otherwise, drop API return hash
-        unless github_data.nil? || github_data["errors"] || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil?
-          parse_repository_data(github_data)
-        end
-        # only run iteration across an additional page if no API errors and presence of additional pages of commits are detected
-        has_next_page = false if github_data.nil? || github_data["data"].nil? || github_data["data"]["repository"].nil? || github_data["data"]["repository"]["ref"].nil? || github_data["errors"] || github_data["data"]["repository"]["ref"]["target"]["history"]["pageInfo"]["hasNextPage"] != "true"
-      end
-    end
-  end
-
-  # Process data returned by a respository query, stripping unecessary layers off of data hash, and organizing data for use
-  # elsewhere in the app. Also calls accounting method for each commit, and sorting method to sort the data upon completion.
-  # Finally,  calls team_statistics to parse the organized datasets and assemble key instance variables for the views.
-  def parse_repository_data(github_data)
-    commit_objects = github_data["data"]["repository"]["ref"]["target"]["history"]["edges"]
-    commit_objects.each do |commit_object|
-      # extract commit author name, email, and date from the commit object and count them using the accounting method
-      commit_author = commit_object["node"]["author"]
-      author_name = commit_author["name"]
-      author_email = commit_author["email"]
-      commit_date = commit_author["date"].to_s
-      count_github_authors_and_dates(author_name, author_email, commit_date[0, 10])
-    end
-    # sort commit dates and call team_statistics to process the organized data and assemble instance variables for the views
-    sort_commit_dates
-    team_statistics(github_data, :repo)
-  end
 
   ####################### Shared Math/Stats and Sorting Methods ################
 

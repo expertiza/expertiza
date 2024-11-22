@@ -2,7 +2,6 @@ class MetricsController < ApplicationController
   include AuthorizationHelper
   include AssignmentHelper
   include MetricsHelper
-  require 'json'
 
   def action_allowed?
     current_user_has_instructor_privileges?

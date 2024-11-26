@@ -15,6 +15,9 @@ describe MetricsController do
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
 
+  # Tests the function query_pull_request_status which
+  # queries the Github API for the given pull request link
+  # and sees what the status is.
   describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
@@ -41,6 +44,10 @@ describe MetricsController do
       allow(controller).to receive(:parse_pull_request_data)
     end
 
+    # The test verifies that the pull_request_data method is called with
+    # the correct parameters for two different pull request links.
+    # These PR links are passed to the 'query_all_pull_requests' method, which triggers
+    # the expected calls to pull_request_data with the correct arguments.
     it 'gets pull request details for each PR link submitted' do
       expect(controller).to receive(:pull_request_data).with("pull_request_number" => "1261",
                                                              "repository_name" => "expertiza",
@@ -52,6 +59,9 @@ describe MetricsController do
                                           "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
 
+    # The test ensures that for each of these PR links, the 'parse_pull_request_data'
+    # method is triggered with the appropriate data, verifying that the method processes
+    # multiple PR links correctly.
     it 'calls parse_github_data_pull on each of the PR details' do
       expect(controller).to receive(:parse_pull_request_data).with({ "data" => {
         "repository" => {
@@ -79,6 +89,7 @@ describe MetricsController do
         controller.instance_variable_set(:@team, teams_mock)
       end
 
+      # Test that given multiple github links, only the PR link is parsed.
       it 'retrieves PR data only' do
         expect(controller).to receive(:query_all_pull_requests).with(["https://github.com/Shantanu/website/pull/1123"])
         controller.retrieve_github_data
@@ -103,6 +114,8 @@ describe MetricsController do
       controller.instance_variable_set(:@check_statuses, {})
     end
 
+    # Test that for multiple PR links that the merge status is correctly
+    # retrieved with query_pull_request_status method
     it 'gets and stores the statuses associated with head commits of PRs' do
       expect(controller).to receive(:query_pull_request_status).with("qwerty")
       expect(controller).to receive(:query_pull_request_status).with("asdfg")
@@ -121,6 +134,8 @@ describe MetricsController do
         session["github_access_token"] = nil
       end
 
+      # Test that given the correct parameters, the show view
+      # redirects the user to the github metrics show view
       it 'redirects user to GitHub authorization page' do
         params = {id: 900, assignment_id: assignment.id}
         get :show, params: params
@@ -149,6 +164,7 @@ describe MetricsController do
       )
     end
 
+    # Test that given a PR link, the github metrics are correctly retrieved
     it 'gets pull request data for link passed' do
       hyperlink_data = {};
       hyperlink_data["pull_request_number"] = "1917";
@@ -179,6 +195,9 @@ describe MetricsController do
       controller.instance_variable_set(:@dates, {})
       controller.instance_variable_set(:@parsed_data, {})
     end
+
+    # Test that the controller instance variables are being properly
+    # set for authors and dates
     it 'sets authors and data for GitHub data' do
       controller.count_github_authors_and_dates("author", "email@ncsu.edu", "date")
       expect(controller.instance_variable_get(:@authors)).to eq("author" => "email@ncsu.edu")
@@ -241,6 +260,7 @@ describe MetricsController do
       session['github_access_token'] = "qwerty"
     end
 
+    # Test that bad credentials are rejected?
     it 'gets data from GitHub api v4(graphql)' do
       response = controller.query_commit_statistics("{\"team\":\"rails\",\"players\":\"36\"}")
       expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql", "status"=>"401")
@@ -259,6 +279,8 @@ describe MetricsController do
       controller.instance_variable_set(:@merge_status, [])
     end
 
+    # Given github metrics, ensure that the team_statistics method properly
+    # parses the data and assigns the metrics to the proper instance variables 
     it 'parses team data from github data for merged pull Request' do
       github_data = {
         "data" => {
@@ -325,6 +347,8 @@ describe MetricsController do
       controller.instance_variable_set(:@total_commits, 0)
     end
 
+    # Test that instance variables are being populated correctly
+    # with parsed github metrics
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.sort_commit_dates
       expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,

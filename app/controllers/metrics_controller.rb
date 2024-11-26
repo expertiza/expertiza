@@ -1,7 +1,7 @@
 class MetricsController < ApplicationController
   include AuthorizationHelper
   include AssignmentHelper
-  include MetricsHelper
+  include GithubMetricsHelper
 
   def action_allowed?
     current_user_has_instructor_privileges?

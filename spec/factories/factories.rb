@@ -650,14 +650,6 @@ FactoryBot.define do
     type 'AssignmentSurveyDeployment'
   end
 
-  factory :metric, class: Metric do
-    id 1
-    metric_source_id 1
-    team_id 1
-    github_id "student@ncsu.edu"
-    total_commits 20
-  end
-  
   factory :multiple_choice_checkbox, class: MultipleChoiceCheckbox do
     txt 'Test question:'
     weight 1

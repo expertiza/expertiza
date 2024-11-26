@@ -22,9 +22,6 @@ describe GradesHelper, type: :helper do
   let(:vmQ1) { VmQuestionResponse.new(questionnaire1, assignment, 1) }
   let(:vmQ2) { VmQuestionResponse.new(questionnaire2, assignment, 2) }
   let(:helper) { Class.new { extend GradesHelper } }
-  let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
-  let(:team) { build(:assignment_team, id: 1, name: 'no team') }
-  let(:metric) { build(:metric, id: 1, metric_source_id: 1, participant_id: participant.id, github_id:"student@ncsu.edu") }
 
   describe 'accordion_title' do
     it 'should render is_first:true if last_topic is nil' do

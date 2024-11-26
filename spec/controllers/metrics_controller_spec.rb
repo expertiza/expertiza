@@ -115,7 +115,6 @@ describe MetricsController do
   describe '#show' do
     context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
-        params = {id: 900}
         allow(controller).to receive(:authorize_github)
         allow(controller).to receive(:github_metrics_for_submission)
         allow(controller).to receive(:show)
@@ -123,8 +122,8 @@ describe MetricsController do
       end
 
       it 'redirects user to GitHub authorization page' do
-        params = {id: 900}
-        get :show, params
+        params = {id: 900, assignment_id: assignment.id}
+        get :show, params: params
         expect(response.status).to eq(302) #redirected
       end
     end
@@ -244,7 +243,7 @@ describe MetricsController do
 
     it 'gets data from GitHub api v4(graphql)' do
       response = controller.query_commit_statistics("{\"team\":\"rails\",\"players\":\"36\"}")
-      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql")
+      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql", "status"=>"401")
     end
   end
 

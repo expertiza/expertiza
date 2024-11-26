@@ -65,36 +65,10 @@ describe MetricsController do
     end
   end
 
-  # This test is XDESCRIBED because Github will invalidate and ban any secret token that gets pushed in a commit.
-  # To run this test, using your own valid token, update the github access token on line 75 below with a valid token,
-  # and run the test locally. Do not push with a valid token unless you are happy with the token being banned, and needing
-  # to obtain a new token from the Github omniauth API.
-  xdescribe '#retrieve_repository_data' do
-    before(:each) do
-      assignment_mock = double
-      allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
-      allow(controller).to receive(:parse_repository_data)
-      controller.instance_variable_set(:@assignment, assignment_mock)
-      session["github_access_token"]="47a9e77a0b7067aa22d5aac868dc69a73482ff0b"
-    end
-
-    it 'gets details for each repo link submitted, excluding those for expertiza and servo' do
-      expect(controller).to receive(:parse_repository_data).with({"data"=>{"repository"=>{"ref"=>{"target"=>
-                                                                                                    {"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjFkZjcxZDEzMTBlMTc5YmU4OTM4ZjhjOTY4ODI1NTQwYmM3ZGFjNmE=", "history"=>
-                                                                                                      {"edges"=>[{"node"=>{"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjFkZjcxZDEzMTBlMTc5YmU4OTM4ZjhjOTY4ODI1NTQwYmM3ZGFjNmE=", "author"=>
-                                                                                                        {"name"=>"Stevan Michael Dupor", "email"=>"70522325+smdupor@users.noreply.github.com", "date"=>"2021-04-29T11:36:38-04:00"}}},
-                                                                                                                 {"node"=>{"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjMzZmMzZjA2YTU5ODZhNzFmNWVkNmQ3MTJlMWMzMTgyYTliYjQ4YzA=", "author"=>
-                                                                                                                   {"name"=>"Stevan Michael Dupor", "email"=>"70522325+smdupor@users.noreply.github.com", "date"=>"2021-04-29T11:30:18-04:00"}}}],
-                                                                                                       "pageInfo"=>{"endCursor"=>"1df71d1310e179be8938f8c968825540bc7dac6a 1", "hasNextPage"=>false}}}}}}}
-      )
-      controller.retrieve_repository_data(["https://github.com/smdupor/GITHUB_LANDING_TEST", "https://github.com/smdupor/GITHUB_LANDING_TEST.git"])
-    end
-  end
-
   describe '#retrieve_github_data' do
     before(:each) do
       allow(controller).to receive(:query_all_pull_requests)
-      allow(controller).to receive(:retrieve_repository_data)
+      controller.instance_variable_set(:@assignment, assignment)
     end
 
     context 'when pull request links have been submitted' do
@@ -119,11 +93,6 @@ describe MetricsController do
         controller.instance_variable_set(:@team, teams_mock)
       end
 
-      it 'retrieves repo details ' do
-        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website",
-                                                                       "https://github.com/expertiza/expertiza"])
-        controller.retrieve_github_data
-      end
     end
   end
 
@@ -158,55 +127,6 @@ describe MetricsController do
         get :show, params
         expect(response.status).to eq(302) #redirected
       end
-    end
-  end
-
-  ###### Are we not testing an outgoing command message here to the METRICS model? Do we need to do that here or elsewhere?
-  # X-describing for now
-  describe '#get_github_repository_details' do
-    before(:each) do
-      assignment_mock = double
-      allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
-      allow(controller).to receive(:parse_repository_data)
-      controller.instance_variable_set(:@assignment, assignment_mock)
-      allow(controller).to receive(:query_commit_statistics).and_return("github": "github")
-    end
-
-    it 'gets  make_github_graphql_request with query for repository' do
-      hyperlink_data = {
-        "owner_name" => "Shantanu",
-        "repository_name" => "expertiza"
-      }
-
-      expect(controller).to receive(:query_commit_statistics).with(
-        query:       "query {
-        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
-          ref(qualifiedName: \"master\") {
-            target {
-              ... on Commit {
-                id
-                  history( since:\"2021-01-01T00:00:00\") {
-                    edges {
-                      node {
-                        id author {
-                          name email date
-                        }
-                      }
-                    }
-                  pageInfo {
-                    endCursor
-                    hasNextPage
-                  }
-                }
-              }
-            }
-          }
-        }
-      }"
-      )
-
-      details = controller.retrieve_repository_data(["https://github.com/Shantanu/expertiza/"])
-      expect(details).to eq(["https://github.com/Shantanu/expertiza/"])
     end
   end
 
@@ -314,47 +234,6 @@ describe MetricsController do
     it 'calls organize_commit_dates' do
       expect(controller).to receive(:sort_commit_dates)
       controller.parse_pull_request_data(@github_data)
-    end
-  end
-
-  describe '#parse_github_repository_data' do
-    before(:each) do
-      allow(controller).to receive(:count_github_authors_and_dates)
-      allow(controller).to receive(:sort_commit_dates)
-      controller.instance_variable_set(:@merge_status, {})
-      @github_data = {
-        "data" => {
-          "repository" => {
-            "ref" => {
-              "target" => {
-                "history" => {
-                  "edges" => [
-                    {
-                      "node" => {
-                        "author" => {
-                          "name" => "Shantanu",
-                          "email" => "shantanu@ncsu.edu",
-                          "date" => "2018-12-1013:45"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    end
-
-    it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
-      expect(controller).to receive(:count_github_authors_and_dates).with("Shantanu", "shantanu@ncsu.edu", "2018-12-10")
-      controller.parse_repository_data(@github_data)
-    end
-
-    it 'calls organize_commit_dates' do
-      expect(controller).to receive(:sort_commit_dates)
-      controller.parse_repository_data(@github_data)
     end
   end
 

@@ -494,13 +494,6 @@ ActiveRecord::Schema.define(version: 20241116230751) do
     t.index ["parent_id"], name: "fk_menu_item_parent_id"
   end
 
-  create_table "metric_sources", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.string "name"
-    t.string "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "metrics", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "team_id"
     t.string "github_id"

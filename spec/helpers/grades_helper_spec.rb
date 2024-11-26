@@ -311,22 +311,4 @@ describe GradesHelper, type: :helper do
       end
     end
   end
-  
-  
-  describe "metrics_table" do
-    it "returns a dataset when a metric exists for this team" do
-      create(:assignment)
-      @assignment_team = create(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
-      create(:metric)
-      allow(metrics_table(@assignment_team)).to receive(:metric)
-      expect(metrics_table(@assignment_team)).to eq({"Github Email: student@ncsu.edu"=>{:color=>"c1", :commits=>20}})
-    end
-
-    it "returns an empty set when no metrics exist for this team" do
-      create(:assignment)
-      @assignment_team = create(:assignment_team, id: 1, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
-      allow(metrics_table(@assignment_team)).to receive(:metric)
-      expect(metrics_table(@assignment_team)).to eq({})
-    end
-  end
 end

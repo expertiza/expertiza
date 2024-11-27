@@ -239,8 +239,10 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  # routes to new page to specify student
-  def signup_as_instructor; end
+  # This method routes the instructor to a new page where it requests a student to sign up
+  # This student id along with assignment and topic id is then used in the signup_as_instructor function
+  # renamed from signup_as_instructor to select_student_for_signup for better clarity
+  def select_student_for_signup; end
 
 
   def signup_as_instructor_action

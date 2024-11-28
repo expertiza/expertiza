@@ -27,39 +27,18 @@ class AssignmentsController < ApplicationController
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
       # E2138 issue #3
-      assignment_by_name = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      name = @assignment_form.assignment.name
       dir_path = assignment_form_params[:assignment][:directory_path]
-      find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !assignment_by_name && !find_existing_directory && @assignment_form.save # No existing names/directories
+      course_id = @assignment_form.assignment.course_id
+
+      is_conflict = Assignment.record_exists?(name: name, directory_path: dir_path, course_id: course_id)
+
+      if !is_conflict[:by_name] && !is_conflict[:by_directory] && @assignment_form.save
         @assignment_form.create_assignment_node
-        assignment_created = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = assignment_created.id.to_s
-        if assignment_form_params[:assignment][:directory_path].blank?
-          assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
-        end
-
-        assignment_form_params[:assignment_questionnaire].each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = assignment_created.id.to_s
-        end
-
-        assignment_form_params[:due_date].each do |cur_due|
-          cur_due[:parent_id] = assignment_created.id.to_s
-        end
-
-        @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find(@assignment_form.assignment.id).id
-        ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-        redirect_to edit_assignment_path aid
-        undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
-        return
       else
         flash[:error] = 'Failed to create assignment.'
-        if assignment_by_name
-          flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
-        end
-        if find_existing_directory
-          flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
-        end
+        flash[:error] << "<br> #{name} already exists as an assignment name" if is_conflict[:by_name]
+        flash[:error] << "<br> #{dir_path} already exists as a submission directory name" if is_conflict[:by_directory]
         redirect_to '/assignments/new?private=1'
       end
     else

@@ -369,36 +369,20 @@ end
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic and per round basis
   def save_topic_deadlines
+    assignment = Assignment.find(params[:assignment_id])
+    topics = SignUpTopic.where(assignment_id: params[:assignment_id])
+    due_dates = params[:due_date]
+    review_rounds = assignment.num_review_rounds
 
-  assignment = Assignment.find(params[:assignment_id])
+    @assignment_submission_due_dates, @assignment_review_due_dates = fetch_assignment_due_dates(assignment)
 
-  topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-
-  due_dates = params[:due_date]
-
-  review_rounds = assignment.num_review_rounds
-
-
-
-  @assignment_submission_due_dates, @assignment_review_due_dates = fetch_assignment_due_dates(assignment)
-
-
-
-  topics.each do |topic|
-
-    (1..review_rounds).each do |round|
-
-      process_due_dates_for_topic_and_round(topic, round, due_dates)
-
+    topics.each do |topic|
+     (1..review_rounds).each do |round|
+       process_due_dates_for_topic_and_round(topic, round, due_dates)
     end
-
-  end
-
-
-
-  redirect_to_assignment_edit(params[:assignment_id])
-
-end       
+   end
+   redirect_to_assignment_edit(params[:assignment_id])
+ end       
 
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team

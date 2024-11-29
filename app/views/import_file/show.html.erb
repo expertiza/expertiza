@@ -13,6 +13,8 @@
     <%= render 'import_file/metareviewer' %>
 <% elsif @model == 'AssignmentParticipant' || @model == 'CourseParticipant' %>
     <%=  render 'import_file/participant' %>
+<% elsif @model == 'GithubAssociation' %>
+    <%=  render 'import_file/github_association' %>
 <% elsif @model == 'SignUpTopic' %>
   <%= render 'import_file/sign_up_topic' %>
 <% else %>

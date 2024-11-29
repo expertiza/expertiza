@@ -9,8 +9,10 @@ module GithubMetricsHelper
     color = %w[#4e79a7 #f28e2b #e15759 #76b7b2 #59a14f #edc948 #af7aa1 #ff9da7]
     i = 0
     authors.each do |author|
+      github_association = GithubAssociation.find_by_github_user(author[1])
+      expertiza_username = GithubAssociation.find_by_github_user(author[1]) ? GithubAssociation.find_by_github_user(author[1]).expertiza_username : author[0]
       data_object = {}
-      data_object['label'] = author[0]
+      data_object['label'] = expertiza_username
       data_object['data'] = parsed_data[author[0]].values
       data_object['backgroundColor'] = color[i]
       data_object['borderWidth'] = 1
@@ -41,7 +43,9 @@ module GithubMetricsHelper
   
     colors = %w[#4e79a7 #f28e2b #e15759 #76b7b2 #59a14f #edc948 #af7aa1 #ff9da7]
     authors.each_with_index do |author, index|
-      data[:labels] << author[0]
+      github_association = GithubAssociation.find_by_github_user(author[1])
+      expertiza_username = GithubAssociation.find_by_github_user(author[1]) ? GithubAssociation.find_by_github_user(author[1]).expertiza_username : author[0]
+      data[:labels] << expertiza_username
       data[:datasets][0][:data] << parsed_data[author[0]].values.sum
       data[:datasets][0][:backgroundColor] << colors[index % colors.length]
     end

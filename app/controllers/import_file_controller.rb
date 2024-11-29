@@ -103,6 +103,22 @@ class ImportFileController < ApplicationController
       rescue StandardError
         errors << $ERROR_INFO
       end
+    elsif params[:model] == 'GithubAssociation'
+      contents_hash = eval(params[:contents_hash])
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+      else
+        new_header = ['expertiza_username', 'github_user']
+        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+      end
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          GithubAssociation.import(row_hash, session, params[:id])
+        end
+      rescue StandardError => e
+        errors << e.message
+      end
     elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'
@@ -202,6 +218,11 @@ class ImportFileController < ApplicationController
           h[header[0]] = row
         end
         new_body << h
+      end
+    elsif params[:model] == 'GithubAssociation'
+      header.map! { |str| str.strip.downcase.gsub(/\s+/, "").to_sym }
+      body.each do |row|
+        new_body << header.zip(row).to_h
       end
     elsif params[:model] == 'ReviewResponseMap'
       header.map!(&:to_sym)

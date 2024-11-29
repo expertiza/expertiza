@@ -45,6 +45,20 @@ function checkForParticipantColumnDuplicate() {
     }
 }
 
+function checkForGithubAssociationDuplicate() {
+    var sel1 = document.getElementById("select1");
+    var sel2 = document.getElementById("select2");
+
+    var val1 = sel1.options[sel1.selectedIndex].value;
+    var val2 = sel2.options[sel2.selectedIndex].value;
+
+    if (val1 === val2) {
+        alert("No two columns can have the same value.");
+    } else {
+        github_column_form.submit();
+    }
+}
+
 function checkTopicForDuplicatesAndRequiredColumns(optional_count) {
 
     var sel1 = document.getElementById("select1");

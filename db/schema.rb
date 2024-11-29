@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20241116230751) do
+ActiveRecord::Schema.define(version: 20241129161638) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -313,6 +313,11 @@ ActiveRecord::Schema.define(version: 20241116230751) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assignment_id"], name: "index_duties_on_assignment_id"
+  end
+
+  create_table "github_associations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.string "expertiza_username"
+    t.string "github_user"
   end
 
   create_table "goldberg_content_pages", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|

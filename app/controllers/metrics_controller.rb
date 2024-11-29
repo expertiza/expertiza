@@ -168,9 +168,9 @@ class MetricsController < ApplicationController
       commit = commit_object.dig("node", "commit")
       author_name = commit.dig("author", "name")
       author_email = commit.dig("author", "email")
+      author_login = commit.dig("author", "user")["login"]
       commit_date = commit.dig("committedDate").to_s[0, 10] # Convert datetime object to string in format 2019-04-30
-
-      count_github_authors_and_dates(author_name, author_email, commit_date)
+      count_github_authors_and_dates(author_name, author_email, author_login, commit_date)
     end
 
     # Sort author's commits based on dates
@@ -215,9 +215,8 @@ class MetricsController < ApplicationController
   end  
 
   # do accounting, aggregate each authors' number of commits on each date
-  def count_github_authors_and_dates(author_name, author_email, commit_date)
-
-    @authors[author_name] ||= author_email
+  def count_github_authors_and_dates(author_name, author_email, author_login, commit_date)
+    @authors[author_name] ||= author_login
     @dates[commit_date] ||= 1
     @parsed_data[author_name] ||= Hash.new(0)
     @parsed_data[author_name][commit_date] += 1
@@ -244,10 +243,8 @@ class MetricsController < ApplicationController
   
     # Wrap the query string in a hash with a query key
     request.body = { query: data }.to_json
-  
     # Make the request
     response = http.request(request)
-
     # Parse and return the JSON response
     ActiveSupport::JSON.decode(response.body.to_s)
   end

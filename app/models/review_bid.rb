@@ -17,7 +17,7 @@ class ReviewBid < ApplicationRecord
     }
   end
 
-  # bid obect to limit db touches for similar data acquisitions
+  # bid object to limit db touches for similar data acquisitions
   def bids
     @bids ||= ReviewBid.where(participant_id: participant_id)
   end
@@ -46,7 +46,7 @@ class ReviewBid < ApplicationRecord
 
     # Clear existing response maps for this assignment
     ReviewResponseMap.where(reviewed_object_id: topic.assignment_id).destroy_all
-    
+
     # Assign topics for each reviewer
     matched_topics.each do |reviewer_id, topics|
       Array(topics).each do |topic_id|

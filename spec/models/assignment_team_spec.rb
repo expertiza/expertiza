@@ -13,7 +13,7 @@ describe 'AssignmentTeam' do
   describe '#hyperlinks' do
     context 'when current teams submitted hyperlinks' do
       it 'returns the hyperlinks submitted by the team' do
-        expect(team.hyperlinks).to eq(['https://www.expertiza.ncsu.edu'])
+        expect(team.hyperlinks).to eq(['https://www.expertiza.ncsu.edu', 'https://github.com/expertiza/expertiza/pull/1261'])
       end
     end
 

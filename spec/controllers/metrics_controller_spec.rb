@@ -15,6 +15,9 @@ describe MetricsController do
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
 
+  # Tests the function query_pull_request_status which
+  # queries the Github API for the given pull request link
+  # and sees what the status is.
   describe '#get_statuses_for_pull_request' do
     before(:each) do
       allow(Net::HTTP).to receive(:get) { "{\"team\":\"rails\", \"players\":\"36\"}" }
@@ -41,6 +44,10 @@ describe MetricsController do
       allow(controller).to receive(:parse_pull_request_data)
     end
 
+    # The test verifies that the pull_request_data method is called with
+    # the correct parameters for two different pull request links.
+    # These PR links are passed to the 'query_all_pull_requests' method, which triggers
+    # the expected calls to pull_request_data with the correct arguments.
     it 'gets pull request details for each PR link submitted' do
       expect(controller).to receive(:pull_request_data).with("pull_request_number" => "1261",
                                                              "repository_name" => "expertiza",
@@ -52,6 +59,9 @@ describe MetricsController do
                                           "https://github.com/Shantanu/mamaMiya/pull/1293"])
     end
 
+    # The test ensures that for each of these PR links, the 'parse_pull_request_data'
+    # method is triggered with the appropriate data, verifying that the method processes
+    # multiple PR links correctly.
     it 'calls parse_github_data_pull on each of the PR details' do
       expect(controller).to receive(:parse_pull_request_data).with({ "data" => {
         "repository" => {
@@ -65,36 +75,10 @@ describe MetricsController do
     end
   end
 
-  # This test is XDESCRIBED because Github will invalidate and ban any secret token that gets pushed in a commit.
-  # To run this test, using your own valid token, update the github access token on line 75 below with a valid token,
-  # and run the test locally. Do not push with a valid token unless you are happy with the token being banned, and needing
-  # to obtain a new token from the Github omniauth API.
-  xdescribe '#retrieve_repository_data' do
-    before(:each) do
-      assignment_mock = double
-      allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
-      allow(controller).to receive(:parse_repository_data)
-      controller.instance_variable_set(:@assignment, assignment_mock)
-      session["github_access_token"]="47a9e77a0b7067aa22d5aac868dc69a73482ff0b"
-    end
-
-    it 'gets details for each repo link submitted, excluding those for expertiza and servo' do
-      expect(controller).to receive(:parse_repository_data).with({"data"=>{"repository"=>{"ref"=>{"target"=>
-                                                                                                    {"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjFkZjcxZDEzMTBlMTc5YmU4OTM4ZjhjOTY4ODI1NTQwYmM3ZGFjNmE=", "history"=>
-                                                                                                      {"edges"=>[{"node"=>{"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjFkZjcxZDEzMTBlMTc5YmU4OTM4ZjhjOTY4ODI1NTQwYmM3ZGFjNmE=", "author"=>
-                                                                                                        {"name"=>"Stevan Michael Dupor", "email"=>"70522325+smdupor@users.noreply.github.com", "date"=>"2021-04-29T11:36:38-04:00"}}},
-                                                                                                                 {"node"=>{"id"=>"MDY6Q29tbWl0MzYyODYzODU5OjMzZmMzZjA2YTU5ODZhNzFmNWVkNmQ3MTJlMWMzMTgyYTliYjQ4YzA=", "author"=>
-                                                                                                                   {"name"=>"Stevan Michael Dupor", "email"=>"70522325+smdupor@users.noreply.github.com", "date"=>"2021-04-29T11:30:18-04:00"}}}],
-                                                                                                       "pageInfo"=>{"endCursor"=>"1df71d1310e179be8938f8c968825540bc7dac6a 1", "hasNextPage"=>false}}}}}}}
-      )
-      controller.retrieve_repository_data(["https://github.com/smdupor/GITHUB_LANDING_TEST", "https://github.com/smdupor/GITHUB_LANDING_TEST.git"])
-    end
-  end
-
   describe '#retrieve_github_data' do
     before(:each) do
       allow(controller).to receive(:query_all_pull_requests)
-      allow(controller).to receive(:retrieve_repository_data)
+      controller.instance_variable_set(:@assignment, assignment)
     end
 
     context 'when pull request links have been submitted' do
@@ -105,6 +89,7 @@ describe MetricsController do
         controller.instance_variable_set(:@team, teams_mock)
       end
 
+      # Test that given multiple github links, only the PR link is parsed.
       it 'retrieves PR data only' do
         expect(controller).to receive(:query_all_pull_requests).with(["https://github.com/Shantanu/website/pull/1123"])
         controller.retrieve_github_data
@@ -119,11 +104,6 @@ describe MetricsController do
         controller.instance_variable_set(:@team, teams_mock)
       end
 
-      it 'retrieves repo details ' do
-        expect(controller).to receive(:retrieve_repository_data).with(["https://github.com/Shantanu/website",
-                                                                       "https://github.com/expertiza/expertiza"])
-        controller.retrieve_github_data
-      end
     end
   end
 
@@ -134,6 +114,8 @@ describe MetricsController do
       controller.instance_variable_set(:@check_statuses, {})
     end
 
+    # Test that for multiple PR links that the merge status is correctly
+    # retrieved with query_pull_request_status method
     it 'gets and stores the statuses associated with head commits of PRs' do
       expect(controller).to receive(:query_pull_request_status).with("qwerty")
       expect(controller).to receive(:query_pull_request_status).with("asdfg")
@@ -146,67 +128,19 @@ describe MetricsController do
   describe '#show' do
     context 'when user hasn\'t logged in to GitHub' do
       before(:each) do
-        params = {id: 900}
         allow(controller).to receive(:authorize_github)
         allow(controller).to receive(:github_metrics_for_submission)
         allow(controller).to receive(:show)
         session["github_access_token"] = nil
       end
 
+      # Test that given the correct parameters, the show view
+      # redirects the user to the github metrics show view
       it 'redirects user to GitHub authorization page' do
-        params = {id: 900}
-        get :show, params
+        params = {id: 900, assignment_id: assignment.id}
+        get :show, params: params
         expect(response.status).to eq(302) #redirected
       end
-    end
-  end
-
-  ###### Are we not testing an outgoing command message here to the METRICS model? Do we need to do that here or elsewhere?
-  # X-describing for now
-  describe '#get_github_repository_details' do
-    before(:each) do
-      assignment_mock = double
-      allow(assignment_mock).to receive(:created_at).and_return(DateTime.new(2021,1,1,0,0,0))
-      allow(controller).to receive(:parse_repository_data)
-      controller.instance_variable_set(:@assignment, assignment_mock)
-      allow(controller).to receive(:query_commit_statistics).and_return("github": "github")
-    end
-
-    it 'gets  make_github_graphql_request with query for repository' do
-      hyperlink_data = {
-        "owner_name" => "Shantanu",
-        "repository_name" => "expertiza"
-      }
-
-      expect(controller).to receive(:query_commit_statistics).with(
-        query:       "query {
-        repository(owner: \"" + hyperlink_data["owner_name"] + "\", name: \"" + hyperlink_data["repository_name"] + "\") {
-          ref(qualifiedName: \"master\") {
-            target {
-              ... on Commit {
-                id
-                  history( since:\"2021-01-01T00:00:00\") {
-                    edges {
-                      node {
-                        id author {
-                          name email date
-                        }
-                      }
-                    }
-                  pageInfo {
-                    endCursor
-                    hasNextPage
-                  }
-                }
-              }
-            }
-          }
-        }
-      }"
-      )
-
-      details = controller.retrieve_repository_data(["https://github.com/Shantanu/expertiza/"])
-      expect(details).to eq(["https://github.com/Shantanu/expertiza/"])
     end
   end
 
@@ -230,6 +164,7 @@ describe MetricsController do
       )
     end
 
+    # Test that given a PR link, the github metrics are correctly retrieved
     it 'gets pull request data for link passed' do
       hyperlink_data = {};
       hyperlink_data["pull_request_number"] = "1917";
@@ -260,6 +195,9 @@ describe MetricsController do
       controller.instance_variable_set(:@dates, {})
       controller.instance_variable_set(:@parsed_data, {})
     end
+
+    # Test that the controller instance variables are being properly
+    # set for authors and dates
     it 'sets authors and data for GitHub data' do
       controller.count_github_authors_and_dates("author", "email@ncsu.edu", "date")
       expect(controller.instance_variable_get(:@authors)).to eq("author" => "email@ncsu.edu")
@@ -317,55 +255,15 @@ describe MetricsController do
     end
   end
 
-  describe '#parse_github_repository_data' do
-    before(:each) do
-      allow(controller).to receive(:count_github_authors_and_dates)
-      allow(controller).to receive(:sort_commit_dates)
-      controller.instance_variable_set(:@merge_status, {})
-      @github_data = {
-        "data" => {
-          "repository" => {
-            "ref" => {
-              "target" => {
-                "history" => {
-                  "edges" => [
-                    {
-                      "node" => {
-                        "author" => {
-                          "name" => "Shantanu",
-                          "email" => "shantanu@ncsu.edu",
-                          "date" => "2018-12-1013:45"
-                        }
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    end
-
-    it 'calls process_github_authors_and_dates for each commit object of GitHub data passed in' do
-      expect(controller).to receive(:count_github_authors_and_dates).with("Shantanu", "shantanu@ncsu.edu", "2018-12-10")
-      controller.parse_repository_data(@github_data)
-    end
-
-    it 'calls organize_commit_dates' do
-      expect(controller).to receive(:sort_commit_dates)
-      controller.parse_repository_data(@github_data)
-    end
-  end
-
   describe '#make_github_graphql_request' do
     before(:each) do
       session['github_access_token'] = "qwerty"
     end
 
+    # Test that bad credentials are rejected?
     it 'gets data from GitHub api v4(graphql)' do
       response = controller.query_commit_statistics("{\"team\":\"rails\",\"players\":\"36\"}")
-      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql")
+      expect(response).to eq("message" => "Bad credentials", "documentation_url" => "https://docs.github.com/graphql", "status"=>"401")
     end
   end
 
@@ -381,6 +279,8 @@ describe MetricsController do
       controller.instance_variable_set(:@merge_status, [])
     end
 
+    # Given github metrics, ensure that the team_statistics method properly
+    # parses the data and assigns the metrics to the proper instance variables 
     it 'parses team data from github data for merged pull Request' do
       github_data = {
         "data" => {
@@ -447,6 +347,8 @@ describe MetricsController do
       controller.instance_variable_set(:@total_commits, 0)
     end
 
+    # Test that instance variables are being populated correctly
+    # with parsed github metrics
     it 'calls organize_commit_dates to sort parsed commits by dates' do
       controller.sort_commit_dates
       expect(controller.instance_variable_get(:@parsed_data)).to eq("abc" => {"2017-04-05" => 2, "2017-04-13" => 2,

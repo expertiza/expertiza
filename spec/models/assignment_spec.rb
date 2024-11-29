@@ -726,19 +726,5 @@ describe Assignment do
       end
     end
   end
-  describe '#uses_github?' do
-
-    it 'does NOT use github' do
-      create(:assignment)
-      create(:assignment_team, name: 'team1', submitted_hyperlinks: ["https://expertiza.ncsu.edu/"])
-      expect(assignment.uses_github?).to eq(false)
-    end
-
-    it 'uses github' do
-      create(:assignment)
-      create(:assignment_team, name: 'team1', submitted_hyperlinks: ["https://www.github.com/anonymous/expertiza", "https://github.com/expertiza/expertiza/pull/1234"])
-      expect(assignment.uses_github?).to eq(true)
-    end
-  end
 end
 

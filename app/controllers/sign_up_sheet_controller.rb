@@ -173,7 +173,7 @@ class SignUpSheetController < ApplicationController
 
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
   # staggered means that different topics can have different deadlines.
-  def redirect_to_sign_up(assignment_id)
+  def redirect_to_signup(assignment_id)
     assignment = Assignment.find(assignment_id)
     assignment.staggered_deadline == true ? (redirect_to action: 'add_signup_topics_staggered', id: assignment_id) : (redirect_to action: 'add_signup_topics', id: assignment_id)
   end
@@ -247,10 +247,10 @@ class SignUpSheetController < ApplicationController
   end
 
   # routes to new page to specify student
-  def signup_as_instructor; end
+  def sign_up_as_instructor; end
 
 
-  def signup_as_instructor_action
+  def sign_up_as_instructor_action
   user = User.find_by(name: params[:username])
 
   # Check if the user is nil (i.e., user not found in the database)
@@ -519,7 +519,7 @@ end
     topic.category = params[:topic][:category]
     # topic.assignment_id = params[:id]
     topic.save
-    redirect_to_sign_up(params[:id])
+    redirect_to_signup(params[:id])
   end
 
   def update_max_choosers(topic)

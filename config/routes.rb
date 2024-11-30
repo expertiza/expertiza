@@ -424,7 +424,7 @@ Expertiza::Application.routes.draw do
       get :select_student_for_signup
       get :delete_signup_as_instructor
       post :delete_all_topics_for_assignment
-      post :signup_as_instructor_action
+      post :sign_up_as_instructor_action
       post :set_priority
       post :save_topic_deadlines
       post :delete_all_selected_topics

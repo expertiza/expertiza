@@ -1,4 +1,4 @@
-<%= form_tag(:controller => "sign_up_sheet", :action => "signup_as_instructor_action",:topic_id => params[:topic_id], :assignment_id => params[:assignment_id]) do %>
+<%= form_tag(:controller => "sign_up_sheet", :action => "sign_up_as_instructor_action",:topic_id => params[:topic_id], :assignment_id => params[:assignment_id]) do %>
     <%= label_tag(:username, "Sign up this user’s team:") %>
     <%= text_field_tag(:username) %>
     <%= hidden_field_tag "topic_id", params[:topic_id] %>

@@ -478,9 +478,9 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :metrics do
+  resources :github_metrics do
     collection do
-      get '/auth/:provider/callback', to: 'metrics#callback'
+      get '/auth/:provider/callback', to: 'github_metrics#callback'
     end
   end
 

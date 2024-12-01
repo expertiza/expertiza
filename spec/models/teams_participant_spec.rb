@@ -101,13 +101,6 @@ describe TeamsParticipant do
     end
   end
 
-  describe '.first_participant_for_team' do
-    it 'returns the first team participant for a given team id' do
-      allow(TeamsParticipant).to receive(:find_by).with(team_id: team.id).and_return(team_participant)
-      expect(TeamsParticipant.first_participant_for_team(team.id)).to eq(team_participant)
-    end
-  end
-
   describe '.team_empty?' do
     it 'returns true when the team has no participants' do
       allow(TeamsParticipant).to receive(:where).with(team_id: team.id).and_return([])

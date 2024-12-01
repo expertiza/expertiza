@@ -44,11 +44,6 @@ class TeamsParticipant < ApplicationRecord
     team_participant&.destroy
   end
 
-  # Returns the first TeamsParticipant entry for the given team ID
-  def self.first_participant_for_team(team_id)
-    TeamsParticipant.find_by(team_id: team_id)
-  end
-
   # Determines whether a team is empty by checking if it has any members
   def self.team_empty?(team_id)
     team_members = TeamsParticipant.where(team_id: team_id)
@@ -56,6 +51,10 @@ class TeamsParticipant < ApplicationRecord
   end
 
   # Adds a member to the team they were invited to and accepted the invite for
+  # [E2456]: Method name renamed for better clarity:
+  # The original method name `add_member_to_invited_team` was ambiguous.
+  # The new name `add_accepted_invitee_to_team` explicitly communicates
+  # that the method is about adding an invited user who has accepted the invitation.
   def self.add_accepted_invitee_to_team(inviter_user_id, invited_user_id, assignment_id)
     can_add_member = false
     participants_teams = TeamsParticipant.where(user_id: inviter_user_id) # Fetches all teams the inviter is a participant of
@@ -67,6 +66,9 @@ class TeamsParticipant < ApplicationRecord
   end
 
   # Finds the team ID for a given assignment and participant
+  # [E2456]: Method name renamed to `find_team_id` for better alignment with its purpose:
+  # The original name `team_id` was too generic and lacked clear intent. 
+  # `find_team_id` indicates that this method retrieves the team ID for a specific assignment and user.
   def self.find_team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this participant in this assignment
     TeamsParticipant.where(user_id: user_id).find do |participant|

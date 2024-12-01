@@ -22,7 +22,7 @@ class Invitation < ApplicationRecord
     invites.each(&:destroy)
   end
 
-  # After a users accepts an invite, the teams_users table needs to be updated.
+  # After a users accepts an invite, the teams_participants table needs to be updated.
   def self.update_users_topic_after_invite_accept(invitee_user_id, invited_user_id, assignment_id)
     new_team_id = TeamsParticipant.find_team_id(assignment_id, invitee_user_id)
     # check the invited_user_id have ever join other team in this assignment before

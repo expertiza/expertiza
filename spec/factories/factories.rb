@@ -243,6 +243,11 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
+  factory :github_metrics do
+    participant { create(:participant) }
+    assignment { participant.assignment }
+  end
+
   factory :late_policy, class: LatePolicy do
     # Help multiple factory-created assignments get unique names
     # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests

@@ -1,4 +1,4 @@
-class GithubMetrics
+class GithubMetric
   attr_reader :participant, :assignment, :team, :token
   attr_accessor :head_refs, :parsed_data, :authors, :dates, :total_additions,
                 :total_deletions, :total_commits, :total_files_changed,
@@ -17,6 +17,15 @@ class GithubMetrics
     retrieve_github_metrics
     query_all_merge_statuses
     self
+  end
+
+  def pull_query(hyperlink_data)
+    format(PULL_REQUEST_QUERY, {
+      owner_name: hyperlink_data["owner_name"],
+      repository_name: hyperlink_data["repository_name"],
+      pull_request_number: hyperlink_data["pull_request_number"],
+      after_clause: nil
+    })
   end
 
   private
@@ -188,15 +197,6 @@ class GithubMetrics
       }
     }
   QUERY
-
-  def pull_query(hyperlink_data)
-    format(PULL_REQUEST_QUERY, {
-      owner_name: hyperlink_data["owner_name"],
-      repository_name: hyperlink_data["repository_name"],
-      pull_request_number: hyperlink_data["pull_request_number"],
-      after_clause: nil
-    })
-  end
 
   def sort_commit_dates
     @dates = @dates.keys.sort

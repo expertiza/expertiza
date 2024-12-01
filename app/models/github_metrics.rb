@@ -56,7 +56,7 @@ class GithubMetrics
           owner: hyperlink_data["owner_name"],
           repository: hyperlink_data["repository_name"]
         }
-        parse_pull_request_metrics(github_data)
+        parse_pull_request_data(github_data)
       end
     end
   
@@ -67,7 +67,7 @@ class GithubMetrics
       response_data = {}
   
       while has_next_page
-        response_data = query_commit_statistics(Metric.pull_query(hyperlink_data))
+        response_data = query_commit_statistics(pull_query(hyperlink_data))
         current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
         current_page_info = current_commits["pageInfo"]
         
@@ -170,5 +170,40 @@ class GithubMetrics
   
     def process_dates
       @dates = @dates.keys.sort
+    end
+  
+    PULL_REQUEST_QUERY = <<~QUERY
+      query {
+        repository(owner: "%<owner_name>s", name: "%<repository_name>s") {
+          pullRequest(number: %<pull_request_number>s) {
+            number additions deletions changedFiles mergeable merged headRefOid
+            commits(first: 100 %<after_clause>s) {
+              totalCount
+              pageInfo {
+                hasNextPage startCursor endCursor
+              }
+              edges {
+                node {
+                  id commit {
+                    author {
+                      name email
+                    }
+                    additions deletions changedFiles committedDate
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    QUERY
+  
+    def pull_query(hyperlink_data)
+      format(PULL_REQUEST_QUERY, {
+        owner_name: hyperlink_data["owner_name"],
+        repository_name: hyperlink_data["repository_name"],
+        pull_request_number: hyperlink_data["pull_request_number"],
+        after_clause: nil
+      })
     end
   end

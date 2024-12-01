@@ -166,10 +166,6 @@ class GithubMetrics
       raise StandardError, "GitHub access token is required"
     end
   
-    def process_dates
-      @dates = @dates.keys.sort
-    end
-  
     PULL_REQUEST_QUERY = <<~QUERY
       query {
         repository(owner: "%<owner_name>s", name: "%<repository_name>s") {

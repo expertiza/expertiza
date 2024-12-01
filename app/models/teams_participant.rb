@@ -13,25 +13,28 @@ class TeamsParticipant < ApplicationRecord
     name
   end
 
-  # Deletes the associated team user node, removes the team if empty, 
-  # and then destroys this TeamsParticipant instance
-  def delete
-    remove_team_participant_node
-    remove_team_if_participants_empty
-    remove_teams_participant_instance
+  # Deletes the associated team participant node, removes the team if it's empty,
+  # and then destroys this TeamsParticipant instance.
+  def delete_teams_participant_with_dependencies
+    delete_associated_team_participant_node
+    delete_team_if_no_participants
+    destroy_teams_participant_instance
   end
 
-  def remove_team_participant_node
+  # Deletes the associated TeamParticipantNode for this TeamsParticipant
+  def delete_associated_team_participant_node
     team_participant_node = TeamParticipantNode.find_by(node_object_id: id)
     team_participant_node&.destroy
   end
 
-  def remove_team_if_participants_empty
+  # Deletes the associated Team if no participants remain
+  def delete_team_if_no_participants
     team = self.team
     team.delete if team.teams_participants.empty?
   end
 
-  def remove_teams_participant_instance
+  # Destroys the TeamsParticipant instance itself
+  def destroy_teams_participant_instance
     destroy
   end
 

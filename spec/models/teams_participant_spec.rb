@@ -41,38 +41,38 @@ describe TeamsParticipant do
     end
   end
 
-  describe '#delete' do
-    it 'calls remove_team_participant_node' do
-        expect(team_participant).to receive(:remove_team_participant_node)
-        team_participant.delete
+  describe '#delete_teams_participant_with_dependencies' do
+    it 'calls delete_associated_team_participant_node' do
+        expect(team_participant).to receive(:delete_associated_team_participant_node)
+        team_participant.delete_teams_participant_with_dependencies
     end
 
-    it 'calls remove_team_if_participants_empty' do
-        expect(team_participant).to receive(:remove_team_if_participants_empty)
-        team_participant.delete
+    it 'calls delete_team_if_no_participants' do
+        expect(team_participant).to receive(:delete_team_if_no_participants)
+        team_participant.delete_teams_participant_with_dependencies
     end
 
-    it 'calls remove_teams_participant_instance' do
-        expect(team_participant).to receive(:remove_teams_participant_instance)
-        team_participant.delete
+    it 'calls destroy_teams_participant_instance' do
+        expect(team_participant).to receive(:destroy_teams_participant_instance)
+        team_participant.delete_teams_participant_with_dependencies
     end
 
     it 'destroys the associated TeamParticipantNode' do
       expect(TeamParticipantNode).to receive(:find_by).with(node_object_id: team_participant.id).and_return(team_participant_node)
       expect(team_participant_node).to receive(:destroy)
-      team_participant.remove_team_participant_node
+      team_participant.delete_associated_team_participant_node
     end
 
     it 'destroys itself' do
       expect(team_participant).to receive(:destroy)
-      team_participant.remove_teams_participant_instance
+      team_participant.destroy_teams_participant_instance
     end
 
     context 'when it is the last participant in the team' do
       it 'deletes the team' do
         allow(team).to receive(:teams_participants).and_return([double]) # Simulate a non-empty participants array
-        expect(team).not_to receive(:delete)
-        team_participant.remove_team_if_participants_empty
+        expect(team).not_to receive(:delete_teams_participant_with_dependencies)
+        team_participant.delete_team_if_no_participants
       end
     end
   end

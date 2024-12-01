@@ -15,7 +15,7 @@
 <% unless topic.description.nil? %>
     <br/>
     <p style="font-size: 12px"><%= truncate(topic.description.to_s, length: 90, omission: '...') %>
-    <% unless topic.link.nil? %>
+    <% unless topic.link.nil? || topic.link.empty? %>
         <%= link_to image_tag('external-link-16.png', :border => 0, :align => 'middle'), topic.link, :target=>'_blank' %>
     <% end%>
     </p>

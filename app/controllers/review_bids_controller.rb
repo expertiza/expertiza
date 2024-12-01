@@ -6,8 +6,6 @@
 class ReviewBidsController < ApplicationController
   include ActionAuthorizationConcern
   include AuthorizationHelper
-  include ParticipantServiceConcern
-  include ReviewServiceConcern
 
   before_action :authorize_action
   before_action :authorize_participant, only: [:index]
@@ -124,5 +122,15 @@ class ReviewBidsController < ApplicationController
     return false unless are_needed_authorizations_present?(params[:id], *required_authorizations_for_allowed_actions)
 
     true
+  end
+
+  # Initialize participant service
+  def participant_service
+    @participant_service ||= ParticipantService.new(params[:id], current_user.id)
+  end
+
+  # Initialize review service
+  def review_service
+    @review_service ||= ReviewService.new(participant_service.participant)
   end
 end

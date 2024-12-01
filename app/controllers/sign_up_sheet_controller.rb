@@ -511,8 +511,7 @@ end
 
   # get info related to the ad for partners so that it can be displayed when an assignment_participant
   # clicks to see ads related to a topic
-  def fetch_advertisement_info_for_topic
-    (_assignment_id, topic_id)
+  def fetch_advertisement_info_for_topic(_assignment_id, topic_id)
     @ad_information = []
     @signed_up_teams = SignedUpTeam.where(topic_id: topic_id)
     # Iterate through the results of the query and get the required attributes

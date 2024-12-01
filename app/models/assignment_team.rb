@@ -217,10 +217,10 @@ class AssignmentTeam < Team
     return nil unless teams_participants
 
     teams_participants.each do |teams_participant|
-      if teams_participant.find_team_id == nil
+      if teams_participant.team_id == nil
         next
       end
-      team = Team.find(teams_participant.find_team_id)
+      team = Team.find(teams_participant.team_id)
       return team if team.parent_id == participant.parent_id
     end
     nil

@@ -18,9 +18,9 @@
 <% if @assignment.use_github_metrics %>
   <% if session["github_access_token"].nil? %>
     <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
-    <%= link_to 'Login to Query Github data', { controller: 'metrics', action: 'show', id: participants.first.id } %>
+    <%= link_to 'Login to Query Github data', { controller: 'github_metrics', action: 'show', id: participants.first.id } %>
   <% else %>
-    <%= link_to 'Refresh Github data', { controller: 'metrics', action: 'query_assignment_statistics', id: @assignment.id}, :onclick => "showLoadIcon()"%>
+    <%= link_to 'Refresh Github data', { controller: 'github_metrics', action: 'query_assignment_statistics', id: @assignment.id}, :onclick => "showLoadIcon()"%>
     <img id="load_icon" src="<%= image_url('ajax-loader.gif') %>" style="display:none">
   <% end %>
 <% end %>
@@ -72,7 +72,7 @@
               <%= link_to 'Assign Grade', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %>
               <%#check if use github? %>
               <% if @assignment.use_github_metrics %>
-                <%= link_to 'GitHub metrics', { controller: 'metrics', action: 'show', id: participants.first.id, assignment_id: @assignment.id }, target: '_blank' %></td>
+                <%= link_to 'GitHub metrics', { controller: 'github_metrics', action: 'show', id: participants.first.id, assignment_id: @assignment.id }, target: '_blank' %></td>
               <% end %></td>
             <%elsif ["submission", "review"].include?(@assignment.current_stage(topic_identifier)) %>
               <%= link_to 'View Reviews', { controller: 'grades', action: 'view_team', id: participants.first.id}, target: '_blank' %></td>

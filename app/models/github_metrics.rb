@@ -154,8 +154,6 @@ class GithubMetrics
       end
     end
   
-    private
-  
     def set_unavailable_statistics
       @total_additions = "Not Available"
       @total_deletions = "Not Available"
@@ -210,4 +208,5 @@ class GithubMetrics
     def sort_commit_dates
       @dates = @dates.keys.sort
     end
+  
   end

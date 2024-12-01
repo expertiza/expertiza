@@ -421,7 +421,7 @@ Expertiza::Application.routes.draw do
       get :team_details
       get :intelligent_sign_up
       get :intelligent_save
-      get :sign_up_as_instructor
+      get :select_student_for_signup
       get :delete_signup_as_instructor
       post :delete_all_topics_for_assignment
       post :sign_up_as_instructor_action

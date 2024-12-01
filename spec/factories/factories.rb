@@ -243,9 +243,12 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
-  factory :github_metrics do
-    participant { create(:participant) }
-    assignment { participant.assignment }
+  factory :github_metric do
+    participant_id { 1 }
+    assignment_id { 1 }
+    token { "valid-github-token" }
+
+    initialize_with { new(participant_id, assignment_id, token) }
   end
 
   factory :late_policy, class: LatePolicy do

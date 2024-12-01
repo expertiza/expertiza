@@ -423,7 +423,7 @@ end
     assignment = Assignment.find(params[:assignment_id])
     topic = SignUpTopic.find(params[:id])
     if assignment && topic
-      @results = ad_info(assignment.id, topic.id)
+      @results = fetch_advertisement_info_for_topic(assignment.id, topic.id)
       @results.each do |result|
         result.keys.each do |key|
           @current_team_name = result[key] if key.equal? :name

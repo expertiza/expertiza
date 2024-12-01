@@ -56,7 +56,7 @@ class GithubMetrics
           owner: hyperlink_data["owner_name"],
           repository: hyperlink_data["repository_name"]
         }
-        parse_pull_request_data(github_data)
+        parse_pull_request_metrics(github_data)
       end
     end
   
@@ -205,5 +205,9 @@ class GithubMetrics
         pull_request_number: hyperlink_data["pull_request_number"],
         after_clause: nil
       })
+    end
+  
+    def sort_commit_dates
+      @dates = @dates.keys.sort
     end
   end

@@ -4,11 +4,17 @@
 # for assignments. It handles actions related to displaying review options, setting
 # review priorities, and managing reviews after the bidding process is complete.
 class ReviewBidsController < ApplicationController
-  include ActionAuthorizationConcern
   include AuthorizationHelper
 
-  before_action :authorize_action
-  before_action :authorize_participant, only: [:index]
+  # Checks the action allowed based on the authenticated user and authorizations
+  def action_allowed?
+    case params[:action]
+    when 'show', 'set_priority', 'index'
+      current_user_has_student_privileges? && list_authorization_check
+    else
+      current_user_has_instructor_privileges?
+    end
+  end
 
   # Displays the review bid others work page for the current participant
   def index
@@ -101,29 +107,6 @@ class ReviewBidsController < ApplicationController
 
   private
 
-  def actions_requiring_authorization
-    %w[list]
-  end
-
-  def actions_allowed_for_students_and_above
-    %w[show set_priority index]
-  end
-
-  def actions_restricted_to_tas_and_above
-    %w[assign_bidding run_bidding_algorithm]
-  end
-
-  def required_authorizations_for_allowed_actions
-    %w[participant reader submitter reviewer]
-  end
-
-  def verify_authorizations
-    return false unless current_user_has_student_privileges?
-    return false unless are_needed_authorizations_present?(params[:id], *required_authorizations_for_allowed_actions)
-
-    true
-  end
-
   # Initialize participant service
   def participant_service
     @participant_service ||= ParticipantService.new(params[:id], current_user.id)
@@ -132,5 +115,12 @@ class ReviewBidsController < ApplicationController
   # Initialize review service
   def review_service
     @review_service ||= ReviewService.new(participant_service.participant)
+  end
+
+  # Check for necessary authorizations for list action
+  def list_authorization_check
+    return true unless %w[list].include?(action_name)
+
+    are_needed_authorizations_present?(params[:id], 'participant', 'reviewer')
   end
 end

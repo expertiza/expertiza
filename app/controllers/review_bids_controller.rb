@@ -9,10 +9,10 @@ class ReviewBidsController < ApplicationController
   # Checks the action allowed based on the authenticated user and authorizations
   def action_allowed?
     case params[:action]
-    when 'show', 'set_priority', 'index'
+    when 'show', 'set_priority', 'index', 'list'
       current_user_has_student_privileges? && list_authorization_check
     else
-      current_user_has_instructor_privileges?
+      current_user_has_ta_privileges?
     end
   end
 

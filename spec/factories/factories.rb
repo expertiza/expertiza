@@ -101,9 +101,9 @@ FactoryBot.define do
   end
 
   factory :mentor, class: AssignmentParticipant do
-    sequence(:name) { |n| n = n % 3; "mentor206#{n + 4}" }
-    can_submit true
-    can_review true
+    # sequence(:name) { |n| n = n % 3; "mentor206#{n + 4}" }
+    can_submit false
+    can_review false
     assignment { Assignment.first || association(:assignment) }
     association :user, factory: :student
     submitted_at nil
@@ -115,7 +115,7 @@ FactoryBot.define do
     time_stamp nil
     digital_signature nil
     can_mentor true
-    can_take_quiz true
+    can_take_quiz false
   end
 
 
@@ -323,7 +323,7 @@ FactoryBot.define do
   end
 
   factory :participant, class: AssignmentParticipant do
-    can_submit true
+    can_submit false
     can_review true
     assignment { Assignment.first || association(:assignment) }
     association :user, factory: :student
@@ -336,7 +336,7 @@ FactoryBot.define do
     time_stamp nil
     digital_signature nil
     can_mentor false
-    can_take_quiz true
+    can_take_quiz false
   end
 
   factory :course_participant, class: CourseParticipant do

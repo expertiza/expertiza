@@ -2,15 +2,20 @@ describe ReviewBidsController do
   # let(:assignment) { double('Assignment', id: 1) }
   # let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
   let(:instructor) { build(:instructor, id: 6) }
+  let(:teaching_assistant) { build(:teaching_assistant, id: 999) }
+  let(:admin) { build(:admin) }
+  let(:superadmin) { build(:superadmin) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
-  let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
+  let(:participant_authorized) { build(:participant, can_review: true) }
+  let(:participant_unauthorized) { build(:participant, can_review: false, can_mentor: true) }
 
   before :each do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
-    allow(Participant).to receive(:find).with('1').and_return(participant)
-    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
-    allow(participant).to receive(:assignment).and_return(assignment)
+    allow(Participant).to receive(:find).with('1').and_return(participant_authorized)
+    allow(Participant).to receive(:find_by).with(id: '1').and_return(participant_authorized)
+    allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant_authorized)
+    allow(participant_authorized).to receive(:assignment).and_return(assignment)
   end
 
   describe 'action_allowed as a Student' do
@@ -24,7 +29,8 @@ describe ReviewBidsController do
 
     it 'allows show, index, set_priority, and list with participant or reviewer authorizations' do
       session[:user] = build(:student)
-      allow(controller).to receive(:are_needed_authorizations_present?).and_return(true)
+
+      allow(Participant).to receive(:find_by).with(id: '1').and_return(participant_authorized)
       %w[show index set_priority list].each do |action|
         controller.params = { id: '1', action: action }
         expect(controller.action_allowed?).to be true
@@ -33,7 +39,8 @@ describe ReviewBidsController do
 
     it 'does not allow list if not authorized as a participant or reviewer' do
       session[:user] = build(:student)
-      allow(controller).to receive(:are_needed_authorizations_present?).and_return(false)
+
+      allow(Participant).to receive(:find_by).with(id: '1').and_return(participant_unauthorized)
       controller.params = { id: '1', action: 'list' }
       expect(controller.action_allowed?).to be false
     end
@@ -41,7 +48,7 @@ describe ReviewBidsController do
 
   describe 'action_allowed as an Instructor, Teaching Assistant, Administrator, or Super-Administrator' do
     it 'allows assign_bidding and run_bidding_algorithm actions' do
-      %i[instructor teaching_assistant administrator super-administrator].each do |role|
+      %i[instructor teaching_assistant admin superadmin].each do |role|
         session[:user] = build(role)
         %w[assign_bidding run_bidding_algorithm].each do |action|
           controller.params = { id: '1', action: action }
@@ -51,7 +58,7 @@ describe ReviewBidsController do
     end
 
     it 'allows access to show, index, set_priority, and list without additional authorization' do
-      %i[instructor teaching_assistant administrator super-administrator].each do |role|
+      %i[instructor teaching_assistant admin superadmin].each do |role|
         session[:user] = build(role)
         %w[show index set_priority list].each do |action|
           controller.params = { id: '1', action: action }

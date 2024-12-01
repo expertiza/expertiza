@@ -4,7 +4,7 @@ class GithubMetric
                 :total_deletions, :total_commits, :total_files_changed,
                 :merge_status, :check_statuses
 
-  def initialize(participant_id, assignment_id = nil, token = nil)
+  def initialize(participant_id = nil, assignment_id = nil, token = nil)
     @participant = AssignmentParticipant.find(participant_id)
     @assignment = assignment_id ? Assignment.find(assignment_id) : @participant.assignment
     @team = @participant.team

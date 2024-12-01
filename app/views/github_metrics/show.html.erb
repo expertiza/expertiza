@@ -1,0 +1,103 @@
+<% status_classes = {"failure" => "failed", "success" => "passed"} %>
+<h2>GitHub Metrics for assignment: <%= @assignment.name %></h2>
+<h4>Team: <%= @metrics.team.name %></h4>
+
+<!--Obtain topic name from assignment helper-->
+<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@metrics.team) %>
+<% if @assignment.topics? %>
+  <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
+<% end %>
+
+<!--Toggle submission-->
+<button onclick="toggleFunction('<%= @metrics.participant.id.to_s%>')" class="btn btn-default">Show Submission</button>
+<div id="<%= @metrics.participant.id.to_s %>" style="display:none;">
+  <% if @metrics.participant.team.hyperlinks.try(:length) %>
+    <%= render :partial => 'submitted_content/hyperlink', :locals => {participant: @metrics.participant, stage: @stage} %>
+  <% else %>
+    <b>No Submission</b>
+  <% end %>
+</div><br><br>
+
+
+<% if @metrics.parsed_data && @metrics.authors.present? && @metrics.dates %>
+
+  <table>
+  <tr>
+    <td align="center"><h3>Code Frequency</h3></td>
+    <td align="center"><h3>Total Contributions by Author</h3></td>
+  </tr>
+  <tr>
+    <td>
+      <div class="chart-container" style="width: 600px; height:450px; display: block; alignment: left;">
+        <%= display_github_metrics(@metrics.parsed_data, @metrics.authors, @metrics.dates) %>
+      </div>
+    </td>
+    <td>
+      <div class="chart-container" style="width: 600px; height:450px; display: block; alignment: right;">
+        <canvas id="totalsPieChart"></canvas>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('totalsPieChart').getContext('2d');
+    const pieChartData = <%= raw display_totals_piechart(@metrics.parsed_data, @metrics.authors, @metrics.dates) %>;
+
+    new Chart(ctx, {
+      type: 'pie',
+      data: pieChartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  });
+</script>
+  <h3>Team Statistics</h3>
+  <ul>
+    <li>Total number of commits:<%= @metrics.total_commits %></li>
+    <li>Total number of lines added: <%= @metrics.total_additions %></li>
+    <li>Total number of lines removed: <%= @metrics.total_deletions %></li>
+    <li>Total number of files changed: <%= @metrics.total_files_changed %></li>
+    <% unless @metrics.merge_status[-1]%>
+      <li>
+        <div>Merge statuses:</div>
+        <ul>
+          <% @metrics.merge_status.each do |k, v| %>
+            <li>Pull Request Number <%= k %> has status: <%= v %> </li>
+          <% end %>
+        </ul>
+      </li>
+      <li>
+        <span>Check Statuses:</span>
+        <% if @metrics.check_statuses.empty? %>
+          <span>NA</span>
+        <% else %>
+          <ul>
+            <% @metrics.check_statuses.each do |pull_number, check_status| %>
+              <li>
+                <div>Pull request: <%= pull_number %></div>
+                <div>Overall Status: <span class=<%= status_classes[check_status["state"]] %>><%= check_status["state"] %></span></div>
+                <% if check_status["statuses"].present? %>
+                  <div>Results:</div>
+                  <ul>
+                    <% check_status["statuses"].each do |status| %>
+                      <li><strong><%= status["context"] %></strong>
+                        <div>Check status: <span class=<%= status_classes[status["state"]] %>><%= status["state"] %></span></div>
+                        <div>Check description: <%= status["description"] || "NA" %></div>
+                      </li>
+                    <% end %>
+                  </ul>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+    <% end %>
+    </li>
+  </ul>
+<% else %>
+  <h4 style="font-weight:bold;display:inline-block;">No github data to show</h4>
+<% end %>

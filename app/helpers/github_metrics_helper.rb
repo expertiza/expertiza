@@ -93,16 +93,6 @@ module GithubMetricsHelper
     }
   end
 
-  # Parses hyperlink data into components for pull request number, repository, and owner.
-  def parse_hyperlink_data(hyperlink)
-    tokens = hyperlink.split('/')
-    {
-      "pull_request_number" => tokens[6],
-      "repository_name" => tokens[4],
-      "owner_name" => tokens[3]
-    }
-  end
-
   # Sorts each author's commits based on date.
   def sort_commit_dates
     @dates.each_key do |date|

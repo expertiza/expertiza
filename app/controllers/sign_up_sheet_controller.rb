@@ -404,67 +404,33 @@ end
 
 
 def save_topic_deadlines
-
   assignment = Assignment.find(params[:assignment_id])
-
   @assignment_submission_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 1 }
-
   @assignment_review_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 2 }
-
   due_dates = params[:due_date]
-
   topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-
   review_rounds = assignment.num_review_rounds
 
-
-
   topics.each_with_index do |topic, index|
-
     (1..review_rounds).each do |i|
-
       @topic_submission_due_date = due_dates[topics[index].id.to_s + '_submission_' + i.to_s + '_due_date']
-
       @topic_review_due_date = due_dates[topics[index].id.to_s + '_review_' + i.to_s + '_due_date']
-
       @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime('%Y-%m-%d %H:%M')
-
       @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime('%Y-%m-%d %H:%M')
 
-
-
       %w[submission review].each do |deadline_type|
-
         deadline_type_id = DeadlineType.find_by_name(deadline_type).id
-
         next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
-
-
-
         topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
-
-
-
         if topic_due_date.nil?
-
           create_topic_due_date(topic, deadline_type, deadline_type_id, i)
-
         else
-
           update_topic_due_date(topic_due_date, deadline_type, i)
-
         end
-
       end
-
     end
-
   end
-
-
-
   redirect_to_assignment_edit(params[:assignment_id])
-
 end
 
 

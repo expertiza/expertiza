@@ -21,27 +21,22 @@
 <%= label_tag('assignment_form[assignment][can_choose_topic_to_review]', 'Allow reviewer to choose which topic to review?') %>
 
 <br>
-<input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
-<%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
-<%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
-
-<br>
 <% if @assignment_form.assignment.can_choose_topic_to_review? == true %>
-  <input name="assignment_form[assignment][bidding_for_reviews_enabled]" type="hidden" value="false"/>
-  <%= check_box_tag(
-    'assignment_form[assignment][bidding_for_reviews_enabled]',
-    'true',
-    @assignment_form.assignment.bidding_for_reviews_enabled,
-    {:id => "bidding_for_reviews_enabled_checkbox"})
-  %>
-  <%= label_tag('assignment_form[assignment][bidding_for_reviews_enabled]', 'Allow bidding for reviewers?') %>
-  <img src="/assets/info.png" title="If checked, it is possible to bid for reviews"/>
-  <br>
-  <% if @assignment_form.assignment.bidding_for_reviews_enabled %>
+  <input name="assignment_form[assignment][review_choosing_algorithm]" type="hidden" value="Simple Choose"/>
+  <%= label_tag('assignment_form[assignment][review_choosing_algorithm]', 'Method for reviewer to choose which topic to review:') %>
+  <%= select('assignment_form[assignment]', 'review_choosing_algorithm',[['Simple Choose', 'Simple Choose'],['Bidding','Bidding']], {:selected => @assignment_form.assignment.review_choosing_algorithm})%>
+  <img src="/assets/info.png" title="This will dictact how reviewers will be able to choose topics to review:
+            Simple Choose allows reviews to choose topics on a first come first serve basis
+            Bidding allows reviewers to bid on topics to review"/>
+  <% if @assignment_form.assignment.review_choosing_algorithm == "Bidding" %>
     <%= button_to 'Run Review Algorithm', :controller=>'review_bids', :action=>'assign_bidding', :assignment_id => @assignment_form.assignment.id %>
   <% end %>
 <% end %>
 
+<br>
+<input name="assignment_form[assignment][use_bookmark]" type="hidden" value="false"/>
+<%= check_box_tag('assignment_form[assignment][use_bookmark]', 'true', @assignment_form.assignment.use_bookmark, {:onChange => 'useBookmarkChanged()'})%>
+<%= label_tag('assignment_form[assignment][use_bookmark]', 'Allow participants to create bookmarks?') %>
 <br><br>
 <% if @assignment_form.assignment.staggered_deadline == true %>
     <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>

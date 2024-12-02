@@ -81,8 +81,6 @@ class AssignmentsController < ApplicationController
     path_warning_and_answer_tag
     update_assignment_badges
     @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
-    @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
 

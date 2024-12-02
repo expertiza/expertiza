@@ -172,7 +172,11 @@ class AssignmentsController < ApplicationController
 
   # remove an assignment from a course. Doesn't delete assignment
   def remove_assignment_from_course
-    Assignment.remove_assignment_from_course(params[:id])
+    begin
+      Assignment.remove_assignment_from_course(params[:id])
+    rescue StandardError
+      flash[:error] = $ERROR_INFO
+    end
     redirect_to list_tree_display_index_path
   end
 

@@ -27,8 +27,8 @@ module FileHelper
     elsif newpath # nil oldpath
       create_directory_from_path(newpath)
     end
-  rescue StandardError
-    flash[:warn] = 'StandardError in self.update_file_location'
+  rescue StandardError => e
+    raise 'An error occurred while updating file location' + e.message
   end
 
   # replace invalid characters with underscore

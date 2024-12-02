@@ -86,28 +86,18 @@ class ReviewBidsController < ApplicationController
 
   # Assigns bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
-    redirect_back fallback_location: root_path
-  end
+    matched_topics = BiddingAlgorithmService.new(bidding_data).run
 
-  # Calls web service to run the bid assignment algorithm
-  # Sends student IDs, topic IDs, student preferences, and timestamps to the web service
-  # The web service returns the matched assignments in the JSON response body
-  def run_bidding_algorithm(bidding_data)
-    # begin
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
+    unless matched_topics
+      return redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+    end
+
+    ReviewBid.assign_review_topics(matched_topics)
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
+    redirect_back fallback_location: root_path, notice: 'Reviewers were successfully assigned to topics.'
   end
 
   private

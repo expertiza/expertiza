@@ -9,7 +9,6 @@
 # to
 
 class SignUpSheetController < ApplicationController
-  include ActionAuthorizationConcern
   include AuthorizationHelper
 
   require 'rgl/adjacency'
@@ -19,12 +18,7 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when *allowed_actions_for_roles
-      assignment = participant_service.assignment
-      return false if assignment.nil?
-
-      assignment_id = assignment.id
-      (current_user_has_student_privileges? && action_authorized?(assignment_id)) ||
-        current_user_has_student_privileges?
+      current_user_has_student_privileges? && list_authorization_check
     else
       current_user_has_ta_privileges?
     end
@@ -542,9 +536,10 @@ class SignUpSheetController < ApplicationController
     ]
   end
 
-  # Authorizations required for actions
-  def required_authorizations_for_actions
-    %w[participant reader submitter reviewer]
+  # Check for necessary authorizations for list action
+  def list_authorization_check
+    return true unless %w[list].include?(action_name)
+
+    are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')
   end
-  
 end

@@ -8,12 +8,12 @@ class ParticipantService
   attr_reader :participant
 
   def initialize(participant_id, current_user_id)
-    @participant = AssignmentParticipant.find(participant_id)
+    @participant = AssignmentParticipant.find_by(id: participant_id)
     @current_user_id = current_user_id
   end
 
   def valid_participant?
-    return false unless @participant
+    return false if @participant.nil?
 
     @participant.user_id == @current_user_id
   end

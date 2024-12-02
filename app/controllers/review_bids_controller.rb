@@ -97,19 +97,13 @@ class ReviewBidsController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
-  # Calls web service to run the bid assignment algorithm
-  # Sends student IDs, topic IDs, student preferences, and timestamps to the web service
-  # The web service returns the matched assignments in the JSON response body
+  # removed url that no longer functioned
+  # added mocked data
+  # Replace when new service becomes available
   def run_bidding_algorithm(bidding_data)
-    # begin
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
+    mocked_data = mock_bidding_data(bidding_data) # Use mocked data
+    process_mocked_bidding_data(mocked_data)
   end
-
   private
 
   # Initialize participant service
@@ -134,5 +128,29 @@ class ReviewBidsController < ApplicationController
 
     flash[:error] = 'Invalid participant access.'
     redirect_back fallback_location: root_path
+  end
+
+  # Replace when new service becomes available
+  def mock_bidding_data(bidding_data)
+  
+    {
+    assignment_id: bidding_data[:assignment_id],
+    reviewer_ids: bidding_data[:reviewer_ids],
+    topics: [
+      { topic_id: 1, preferences: [2, 1, 3] },
+      { topic_id: 2, preferences: [3, 1, 2] },
+      { topic_id: 3, preferences: [1, 2, 3] }
+    ],
+    matched: [
+      { reviewer_id: bidding_data[:reviewer_ids][0], topic_id: 1 },
+      { reviewer_id: bidding_data[:reviewer_ids][1], topic_id: 2 },
+      { reviewer_id: bidding_data[:reviewer_ids][2], topic_id: 3 }
+    ]
+    }
+  end
+
+  # Process mocked bidding data to simulate algorithm behavior
+  def process_mocked_bidding_data(mocked_data)
+    mocked_data[:matched] # Return matched data for downstream processing
   end
 end

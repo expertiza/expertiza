@@ -3,7 +3,7 @@
 <h4>Team: <%= @metrics.team.name %></h4>
 
 <!--Obtain topic name from assignment helper-->
-<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@metrics.team) %>
+<% topic_id, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(@metrics.team) %>
 <% if @assignment.topics? %>
   <h4>Topic: <%= topic_id + '. ' + topic_name %></h4>
 <% end %>
@@ -19,7 +19,7 @@
 </div><br><br>
 
 
-<% if @metrics.parsed_data && @metrics.authors.present? && @metrics.dates %>
+<% if @metrics.parsed_metrics && @metrics.authors.present? && @metrics.dates %>
 
   <table>
   <tr>
@@ -29,7 +29,7 @@
   <tr>
     <td>
       <div class="chart-container" style="width: 600px; height:450px; display: block; alignment: left;">
-        <%= display_github_metrics(@metrics.parsed_data, @metrics.authors, @metrics.dates) %>
+        <%= display_bar_chart(@metrics.parsed_metrics, @metrics.authors, @metrics.dates) %>
       </div>
     </td>
     <td>
@@ -43,7 +43,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const ctx = document.getElementById('totalsPieChart').getContext('2d');
-    const pieChartData = <%= raw display_totals_piechart(@metrics.parsed_data, @metrics.authors, @metrics.dates) %>;
+    const pieChartData = <%= raw display_piechart(@metrics.parsed_metrics, @metrics.authors, @metrics.dates) %>;
 
     new Chart(ctx, {
       type: 'pie',

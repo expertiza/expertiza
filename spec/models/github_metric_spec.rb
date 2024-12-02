@@ -12,6 +12,7 @@ RSpec.describe GithubMetric, type: :model do
     allow(participant).to receive(:team).and_return(team)
   end
 
+  # Test to see that the GithubMetrics object is properly initialized
   describe '#initialize' do
     it 'initializes with correct attributes' do
       expect(github_metric.participant).to eq(participant)
@@ -21,6 +22,7 @@ RSpec.describe GithubMetric, type: :model do
     end
   end
 
+  # Test to see that the appropriate error is given if there is no github access token
   describe '#process_metrics' do
     context 'when token is missing' do
       it 'raises a missing token error' do
@@ -29,6 +31,7 @@ RSpec.describe GithubMetric, type: :model do
       end
     end
 
+    # Test to see that the appropriate error is given if no pull request links have been submitted
     context 'when no pull request links exist' do
       it 'raises an error for missing pull request links' do
         allow(team).to receive(:hyperlinks).and_return([])
@@ -63,6 +66,8 @@ RSpec.describe GithubMetric, type: :model do
         })
       end
 
+      # Test to see that given a valid pull request link exists that the
+      # metrics are properly parsed from a returned graphql query
       it 'retrieves and parses pull request metrics successfully' do
         github_metric.process_metrics
         expect(github_metric.total_additions).to eq(10)
@@ -83,6 +88,7 @@ RSpec.describe GithubMetric, type: :model do
       }
     end
 
+    # Test to see that a proper graphql query is formed when given valid parameters
     it 'formats the pull query correctly' do
       query = github_metric.pull_query(hyperlink_data)
       expect(query).to include("repository(owner: \"owner\", name: \"repo\")")

@@ -149,61 +149,32 @@ end
 
 
  def create_topic_due_date(topic, deadline_type, deadline_type_id, round)
-
   TopicDueDate.create(
-
     due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
-
     deadline_type_id: deadline_type_id,
-
     parent_id: topic.id,
-
     submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].submission_allowed_id,
-
     review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_allowed_id,
-
     review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_of_review_allowed_id,
-
     round: round,
-
     flag: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].flag,
-
     threshold: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].threshold,
-
     delayed_job_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].delayed_job_id,
-
     deadline_name: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].deadline_name,
-
     description_url: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].description_url,
-
     quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].quiz_allowed_id,
-
     teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].teammate_review_allowed_id,
-
     type: 'TopicDueDate'
-
   )
-
 end
 
-
-
 def update_topic_due_date(topic_due_date, deadline_type, round)
-
   topic_due_date.update_attributes(
-
     due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
-
     submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].submission_allowed_id,
-
     review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_allowed_id,
-
     review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_of_review_allowed_id,
-
     quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].quiz_allowed_id,
-
     teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].teammate_review_allowed_id
-
   )
-
 end

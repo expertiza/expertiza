@@ -31,6 +31,7 @@ Before running the script, ensure you have the following installed:
 1. run in terminal:
 ```bash
 python halstead.py
+```
 
 2. exports into output.csv file
 

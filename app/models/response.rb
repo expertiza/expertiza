@@ -6,6 +6,7 @@ class Response < ApplicationRecord
   include Lockable
   include ResponseAnalytic
   include Scoring
+  include ScoreCalculationHelper
   belongs_to :response_map, class_name: 'ResponseMap', foreign_key: 'map_id', inverse_of: false
 
   has_many :scores, class_name: 'Answer', foreign_key: 'response_id', dependent: :destroy, inverse_of: false
@@ -47,7 +48,8 @@ class Response < ApplicationRecord
       # For quiz responses, the weights will be 1 or 0, depending on if correct
       sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
-    sum
+    penalty = LatePolicy.calculate_penalty(submission_time, due_date)
+    apply_penalty(sum, penalty)
   end
 
   def delete

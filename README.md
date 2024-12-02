@@ -28,7 +28,9 @@ Before running the script, ensure you have the following installed:
    pip install pandas
 
 ## Run
-1. run in terminal: python halstead.py
+1. run in terminal:
+```bashpython halstead.py
+
 2. exports into output.csv file
 
 

@@ -29,7 +29,8 @@ Before running the script, ensure you have the following installed:
 
 ## Run
 1. run in terminal:
-```bashpython halstead.py
+```bash
+python halstead.py
 
 2. exports into output.csv file
 

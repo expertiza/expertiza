@@ -33,7 +33,7 @@ Before running the script, ensure you have the following installed:
 python halstead.py
 ```
 
-2. exports into output.csv file
+2. exports into output.csv file with all halstead metrics for complexity
 
 
 #### Peer review system

@@ -79,21 +79,22 @@ class Assignment < ApplicationRecord
 
   # removes an assignment from course
   def self.remove_assignment_from_course(id)
-    assignment = Assignment.find(id)
-    oldpath = begin
-                assignment.path
-              rescue StandardError
-                nil
-              end
-    assignment.course_id = nil
-    assignment.save
-    newpath = begin
-                assignment.path
-              rescue StandardError
-                nil
-              end
-    FileHelper.update_file_location(oldpath, newpath)
+    assignment = find_by(id: id)
+    return { success: false, message: "Assignment not found" } unless assignment
+
+    begin
+      oldpath = assignment.path rescue nil
+      assignment.update(course_id: nil)
+      newpath = assignment.path rescue nil
+
+      FileHelper.update_file_location(oldpath, newpath)
+      { success: true, message: "Assignment removed successfully from course" }
+    rescue StandardError => e
+      Rails.logger.error("Error in Assignment.remove_assignment_from_course: #{e.message}")
+      { success: false, message: "Failed to remove assignment from course: #{e.message}" }
+    end
   end
+
 
   def teams?
     @has_teams ||= teams.any?

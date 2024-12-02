@@ -5,6 +5,33 @@ Expertiza
 [![Coverage Status](https://coveralls.io/repos/github/expertiza/expertiza/badge.svg?branch=main)](https://coveralls.io/github/expertiza/expertiza?branch=main)
 [![Maintainability](https://api.codeclimate.com/v1/badges/23b8a211854207919986/maintainability)](https://codeclimate.com/github/expertiza/expertiza/maintainability)
 
+#### Metrics overview for LLM and how to run
+This script automates the process of converting Ruby files to Python files, analyzing the code using Rust tools, extracting metrics from JSON outputs, and then reverting the changes. Finally, it combines the data into a CSV file.
+
+## Prerequisites
+
+Before running the script, ensure you have the following installed:
+
+1. **Python 3.8+**: For script execution.
+2. **Rust and Cargo**: Required to build and run the `rust-code-analysis` tool.
+3. **Rust Code Analysis Tool**:
+   - Clone the repository from [rust-code-analysis](https://github.com/mozilla/rust-code-analysis).
+   - Build the project by navigating to its directory and running `cargo build`.
+4. **PowerShell**: For running the Rust tool on Windows.
+
+## Installation
+
+1. Clone this repository.
+2. Navigate to the project directory.
+3. Install the required Python packages:
+   ```bash
+   pip install pandas
+
+## Run
+1. run in terminal: python halstead.py
+2. exports into output.csv file
+
+
 #### Peer review system
 
 Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.

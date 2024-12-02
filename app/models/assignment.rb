@@ -92,7 +92,7 @@ class Assignment < ApplicationRecord
               rescue StandardError
                 nil
               end
-    assignment.FileHelper.update_file_location(oldpath, newpath)
+    assignment.update_file_location(oldpath, newpath)
   end
 
   def teams?

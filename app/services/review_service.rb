@@ -11,13 +11,18 @@ class ReviewService
     @reviewer = fetch_reviewer
   end
 
-  def review_mappings
+  def review_mappings(other_filters = {})
     return ReviewResponseMap.none unless @reviewer
 
-    ReviewResponseMap.where(
+    # Initial filter of ReviewResponseMap where team reviewing is enabled
+    filters = {
       reviewer_id: @reviewer.id,
       team_reviewing_enabled: @assignment.team_reviewing_enabled
-    )
+    }
+
+    filters.merge!(other_filters)
+
+    ReviewResponseMap.where(filters)
   end
 
   def sorted_review_mappings

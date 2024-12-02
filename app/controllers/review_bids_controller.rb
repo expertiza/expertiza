@@ -6,6 +6,8 @@
 class ReviewBidsController < ApplicationController
   include AuthorizationHelper
 
+  before_action :authorize_participant, only: [:index]
+
   # Checks the action allowed based on the authenticated user and authorizations
   def action_allowed?
     case params[:action]
@@ -19,9 +21,12 @@ class ReviewBidsController < ApplicationController
   # Displays the review bid others work page for the current participant
   def index
     @assignment = participant_service.assignment
-    @review_mappings = review_service.review_mappings
+    unless @assignment.is_a?(Assignment)
+      flash[:error] = 'Assignment not found.'
+      redirect_back fallback_location: root_path and return
+    end
 
-    # Get the number of reviews that have been completed
+    @review_mappings = review_service.review_mappings
     @num_reviews_completed = review_service.review_counts[:completed]
 
     render 'sign_up_sheet/review_bids_others_work'
@@ -87,7 +92,7 @@ class ReviewBidsController < ApplicationController
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
     matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
+    ReviewBid.assign_review_topics(matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
   end
@@ -122,5 +127,12 @@ class ReviewBidsController < ApplicationController
     return true unless %w[list].include?(action_name)
 
     are_needed_authorizations_present?(params[:id], 'participant', 'reviewer')
+  end
+
+  def authorize_participant
+    return if participant_service.valid_participant?
+
+    flash[:error] = 'Invalid participant access.'
+    redirect_back fallback_location: root_path
   end
 end

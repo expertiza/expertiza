@@ -6,22 +6,22 @@
 # have the necessary permissions to access review-related functionalities and facilitates the
 # seamless flow of review assignments and bidding.
 class StudentReviewController < ApplicationController
-  include ActionAuthorizationConcern
   include AuthorizationHelper
-  include ParticipantServiceConcern
-  include ReviewServiceConcern
 
-  before_action :authorize_action
   before_action :authorize_participant, only: [list]
 
   BIDDING_ALGORITHM = 'Bidding'
+
+  def action_allowed?
+    current_user_has_student_privileges? && list_authorization_check
+  end
 
   # Determines participant locale
   def controller_locale
     locale_for_student
   end
 
-  # Retrieves review and metareview for the student, and if bidding is required, 
+  # Retrieves review and metareview for the student, and if bidding is required,
   # redirects to review bidding page
   def list
     setup_assignment_and_phase(participant_service)
@@ -43,7 +43,7 @@ class StudentReviewController < ApplicationController
 
   # Gets and assigns review data for the current participant
   def review_data
-    @review_mappings = review_service.sorted_review_mappings
+    @review_mappings = @review_service.review_mappings(reviewer_is_team: @assignment.reviewer_is_team)
     @num_reviews_total = review_service.review_counts[:total]
     @num_reviews_completed = review_service.review_counts[:completed]
     @num_reviews_in_progress = review_service.review_counts[:in_progress]
@@ -72,26 +72,27 @@ class StudentReviewController < ApplicationController
     redirect_to review_bids_path(assignment_id: params[:assignment_id], id: params[:id]) if bidding_required?
   end
 
-  def actions_requiring_authorization
-    %w[list]
+  # Initialize participant service
+  def participant_service
+    @participant_service ||= ParticipantService.new(params[:id], current_user.id)
   end
 
-  def actions_allowed_for_students_and_above
-    %w[controller_locale list]
+  # Initialize review service
+  def review_service
+    @review_service ||= ReviewService.new(participant_service.participant)
   end
 
-  def actions_restricted_to_tas_and_above
-    []
+  def authorize_participant
+    return if participant_service.valid_participant?
+
+    flash[:error] = 'Invalid participant access.'
+    redirect_back fallback_location: root_path
   end
 
-  def required_authorizations_for_allowed_actions
-    %w[submitter]
-  end
+  # Check for necessary authorizations for list action
+  def list_authorization_check
+    return true unless %w[list].include?(action_name)
 
-  def verify_authorizations
-    return false unless current_user_has_student_privileges?
-    return false unless are_needed_authorizations_present?(params[:id], *required_authorizations_for_allowed_actions)
-
-    true
+    are_needed_authorizations_present?(params[:id], 'submitter')
   end  
 end

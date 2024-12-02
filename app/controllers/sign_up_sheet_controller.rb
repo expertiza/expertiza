@@ -402,22 +402,72 @@ end
   # 3. Enhanced Readability: Overall structure and variable naming are 
   #    maintained to promote readability and maintainability.
 
-  def save_topic_deadlines
 
-    assignment = Assignment.find(params[:assignment_id])
-    topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    due_dates = params[:due_date]
-    review_rounds = assignment.num_review_rounds
+def save_topic_deadlines
 
-    @assignment_submission_due_dates, @assignment_review_due_dates = fetch_assignment_due_dates(assignment)
+  assignment = Assignment.find(params[:assignment_id])
 
-    topics.each do |topic|
-     (1..review_rounds).each do |round|
-       process_due_dates_for_topic_and_round(topic, round, due_dates)
+  @assignment_submission_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 1 }
+
+  @assignment_review_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 2 }
+
+  due_dates = params[:due_date]
+
+  topics = SignUpTopic.where(assignment_id: params[:assignment_id])
+
+  review_rounds = assignment.num_review_rounds
+
+
+
+  topics.each_with_index do |topic, index|
+
+    (1..review_rounds).each do |i|
+
+      @topic_submission_due_date = due_dates[topics[index].id.to_s + '_submission_' + i.to_s + '_due_date']
+
+      @topic_review_due_date = due_dates[topics[index].id.to_s + '_review_' + i.to_s + '_due_date']
+
+      @assignment_submission_due_date = DateTime.parse(@assignment_submission_due_dates[i - 1].due_at.to_s).strftime('%Y-%m-%d %H:%M')
+
+      @assignment_review_due_date = DateTime.parse(@assignment_review_due_dates[i - 1].due_at.to_s).strftime('%Y-%m-%d %H:%M')
+
+
+
+      %w[submission review].each do |deadline_type|
+
+        deadline_type_id = DeadlineType.find_by_name(deadline_type).id
+
+        next if instance_variable_get('@topic_' + deadline_type + '_due_date') == instance_variable_get('@assignment_' + deadline_type + '_due_date')
+
+
+
+        topic_due_date = TopicDueDate.where(parent_id: topic.id, deadline_type_id: deadline_type_id, round: i).first rescue nil
+
+
+
+        if topic_due_date.nil?
+
+          create_topic_due_date(topic, deadline_type, deadline_type_id, i)
+
+        else
+
+          update_topic_due_date(topic_due_date, deadline_type, i)
+
+        end
+
+      end
+
     end
-   end
-   redirect_to_assignment_edit(params[:assignment_id])
- end       
+
+  end
+
+
+
+  redirect_to_assignment_edit(params[:assignment_id])
+
+end
+
+
   # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
   def show_team
     assignment = Assignment.find(params[:assignment_id])

@@ -14,7 +14,7 @@ class MetricsController < ApplicationController
   #   @assignment = Assignment.find(params[:id])
   #   teams = @assignment.teams
   #   teams.each do |team|
-  #     topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team)
+  #     topic_identifier, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(team)
   #     github_metrics_for_submission(participants.first.id) unless participants.first.nil?
   #   end
   #   redirect_to controller: 'assignments', action: 'list_submissions', id: @assignment.id

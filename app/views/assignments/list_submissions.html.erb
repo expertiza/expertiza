@@ -17,7 +17,7 @@
 <%#check if use github? %>
 <% if @assignment.use_github_metrics %>
   <% if session["github_access_token"].nil? %>
-    <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@teams.first) %>
+    <% topic_identifier, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(@teams.first) %>
     <%= link_to 'Login to Query Github data', { controller: 'github_metrics', action: 'show', id: participants.first.id } %>
   <% else %>
     <%= link_to 'Refresh Github data', { controller: 'github_metrics', action: 'query_assignment_statistics', id: @assignment.id}, :onclick => "showLoadIcon()"%>
@@ -55,7 +55,7 @@
   <% @teams.each do |team| %>
     <% @l = @l+1 %>
     <tr>
-      <% topic_identifier, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(team) %>
+      <% topic_identifier, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(team) %>
 
       <!--Topic name-->
       <% if @assignment.topics? %>

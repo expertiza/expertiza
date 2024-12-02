@@ -1,6 +1,6 @@
 class GithubMetric
   attr_reader :participant, :assignment, :team, :token
-  attr_accessor :head_refs, :parsed_data, :authors, :dates, :total_additions,
+  attr_accessor :head_refs, :parsed_metrics, :authors, :dates, :total_additions,
                 :total_deletions, :total_commits, :total_files_changed,
                 :merge_status, :check_statuses
 
@@ -14,16 +14,16 @@ class GithubMetric
 
   def process_metrics
     return handle_missing_token unless @token
-    retrieve_github_metrics
+    retrieve_metrics
     query_all_merge_statuses
     self
   end
 
-  def pull_query(hyperlink_data)
+  def pull_query(hyperlink_metrics)
     format(PULL_REQUEST_QUERY, {
-      owner_name: hyperlink_data["owner_name"],
-      repository_name: hyperlink_data["repository_name"],
-      pull_request_number: hyperlink_data["pull_request_number"],
+      owner_name: hyperlink_metrics["owner_name"],
+      repository_name: hyperlink_metrics["repository_name"],
+      pull_request_number: hyperlink_metrics["pull_request_number"],
       after_clause: nil
     })
   end
@@ -32,7 +32,7 @@ class GithubMetric
 
   def initialize_metrics
     @head_refs = {}
-    @parsed_data = {}
+    @parsed_metrics = {}
     @authors = {}
     @dates = {}
     @total_additions = 0
@@ -43,7 +43,7 @@ class GithubMetric
     @check_statuses = {}
   end
 
-  def retrieve_github_metrics
+  def retrieve_metrics
     team_links = @team.hyperlinks
     pull_links = team_links.select { |link| link.match(/pull/) && link.match(/github.com/) }
     if pull_links.empty?
@@ -55,27 +55,27 @@ class GithubMetric
 
   def parse_all_pull_requests(pull_links)
     pull_links.each do |hyperlink|
-      hyperlink_data = parse_hyperlink_data(hyperlink)
-      github_data = retrieve_pull_request_metrics(hyperlink_data)
+      hyperlink_metrics = parse_hyperlink_metrics(hyperlink)
+      github_metrics = retrieve_pull_request_metrics(hyperlink_metrics)
   
-      @head_refs[hyperlink_data["pull_request_number"]] = {
-        head_commit: github_data["data"]["repository"]["pullRequest"]["headRefOid"],
-        owner: hyperlink_data["owner_name"],
-        repository: hyperlink_data["repository_name"]
+      @head_refs[hyperlink_metrics["pull_request_number"]] = {
+        head_commit: github_metrics["data"]["repository"]["pullRequest"]["headRefOid"],
+        owner: hyperlink_metrics["owner_name"],
+        repository: hyperlink_metrics["repository_name"]
       }
-      parse_pull_request_metrics(github_data)
+      parse_pull_request_metrics(github_metrics)
     end
   end
 
-  def retrieve_pull_request_metrics(hyperlink_data)
+  def retrieve_pull_request_metrics(hyperlink_metrics)
     has_next_page = true
     end_cursor = nil
     all_edges = []
-    response_data = {}
+    response_metrics = {}
 
     while has_next_page
-      response_data = query_commit_statistics(pull_query(hyperlink_data))
-      current_commits = response_data["data"]["repository"]["pullRequest"]["commits"]
+      response_metrics = query_commit_statistics(pull_query(hyperlink_metrics))
+      current_commits = response_metrics["data"]["repository"]["pullRequest"]["commits"]
       current_page_info = current_commits["pageInfo"]
       
       all_edges.push(*current_commits["edges"])
@@ -84,13 +84,13 @@ class GithubMetric
       end_cursor = current_page_info["endCursor"]
     end
 
-    response_data["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
-    response_data
+    response_metrics["data"]["repository"]["pullRequest"]["commits"]["edges"] = all_edges
+    response_metrics
   end
 
-  def parse_pull_request_metrics(github_data)
-    team_statistics(github_data, :pull)
-    commit_objects = github_data.dig("data", "repository", "pullRequest", "commits", "edges")
+  def parse_pull_request_metrics(github_metrics)
+    team_statistics(github_metrics, :pull)
+    commit_objects = github_metrics.dig("data", "repository", "pullRequest", "commits", "edges")
     commit_objects.each do |commit_object|
       commit = commit_object.dig("node", "commit")
       author_name = commit.dig("author", "name")
@@ -98,7 +98,7 @@ class GithubMetric
       author_email = commit.dig("author", "email")
       commit_date = commit.dig("committedDate").to_s[0, 10]
 
-      count_github_authors_and_dates(author_name, author_email, author_login, commit_date)
+      count_authors_and_dates(author_name, author_email, author_login, commit_date)
     end
     sort_commit_dates
   end
@@ -109,14 +109,14 @@ class GithubMetric
     end
   end
 
-  def count_github_authors_and_dates(author_name, author_email, author_login, commit_date)
+  def count_authors_and_dates(author_name, author_email, author_login, commit_date)
     @authors[author_name] ||= author_login
     @dates[commit_date] ||= 1
-    @parsed_data[author_name] ||= Hash.new(0)
-    @parsed_data[author_name][commit_date] += 1
+    @parsed_metrics[author_name] ||= Hash.new(0)
+    @parsed_metrics[author_name][commit_date] += 1
   end
 
-  def query_commit_statistics(data)
+  def query_commit_statistics(metrics)
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -130,7 +130,7 @@ class GithubMetric
       }
     )
   
-    request.body = { query: data }.to_json
+    request.body = { query: metrics }.to_json
     response = http.request(request)
     ActiveSupport::JSON.decode(response.body.to_s)
   end
@@ -140,10 +140,10 @@ class GithubMetric
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
 
-  def team_statistics(github_data, data_type)
-    if data_type == :pull
-      if github_data["data"] && github_data["data"]["repository"] && github_data["data"]["repository"]["pullRequest"]
-        pull_request = github_data["data"]["repository"]["pullRequest"]
+  def team_statistics(github_metrics, metrics_type)
+    if metrics_type == :pull
+      if github_metrics["data"] && github_metrics["data"]["repository"] && github_metrics["data"]["repository"]["pullRequest"]
+        pull_request = github_metrics["data"]["repository"]["pullRequest"]
         @total_additions += pull_request["additions"]
         @total_deletions += pull_request["deletions"]
         @total_files_changed += pull_request["changedFiles"]
@@ -202,8 +202,8 @@ class GithubMetric
     @dates = @dates.keys.sort
   end
 
-  # Parses hyperlink data into components for pull request number, repository, and owner.
-  def parse_hyperlink_data(hyperlink)
+  # Parses hyperlink metrics into components for pull request number, repository, and owner.
+  def parse_hyperlink_metrics(hyperlink)
     tokens = hyperlink.split('/')
     {
       "pull_request_number" => tokens[6],

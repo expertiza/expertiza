@@ -26,7 +26,7 @@
 <table id="tag_heat_grid" class="tag_heat_grid"></table>
 <h4><%=t ".team"%> <%= @team.name(session[:ip]) %></h4>
 <!--Obtain topic name from assignment helper-->
-<% topic_id, topic_name, users_for_curr_team, participants = get_data_for_list_submissions(@team) %>
+<% topic_id, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(@team) %>
 <% if @assignment.topics? %>
   <h4><%=t ".topic"%> <%= topic_id + '. ' + topic_name %></h4>
 <% end %>

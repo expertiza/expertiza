@@ -195,56 +195,48 @@ class SignUpSheetController < ApplicationController
   end
 
   def list
-    #fetch the participant and related assignment
+    # Fetch participant and assignment details
     @participant = AssignmentParticipant.find(params[:id].to_i)
-    assignment_details = fetch_assignment_details(@participant)
-    @assignment = assignment_details[:assignment]
-
-    #retrieve slot information
-    @slots_filled = assignment_details[:slots_filled]
-    @slots_waitlisted = assignment_details[:slots_waitlisted]
-
-
-    @show_actions = true
-    @priority = 0
-    @sign_up_topics = assignment_details[:sign_up_topics]
-    @max_team_size = assignment_details[:max_team_size]
+    fetch_assignment_details(@participant)
+  
+    # Fetch deadline information
+    fetch_deadlines(@assignment)
+  
+    # Determine if actions can be shown based on deadlines
+    @show_actions = !set_action_display_status(@assignment)
+  
+    # Determine user's selected topics and team-related information
+    user_sign_up_status(@assignment, session[:user].id)
     team_id = @participant.team.try(:id)
-    @use_bookmark = assignment_details[:use_bookmark]
-
-    #If the assignment is intelligent, get topics based on biding
+  
+    # Handle intelligent assignments
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-      #Collect all sign up topics based on bids
-      signed_up_topics = []
-      @bids.each do |bid|
-        sign_up_topic = SignUpTopic.find_by(id: bid.topic_id)
-        signed_up_topics << sign_up_topic if sign_up_topic
-      end
-      #Filter and update signup topic list
+  
+      # Collect and filter topics based on bids
+      signed_up_topics = @bids.map { |bid| SignUpTopic.find_by(id: bid.topic_id) }.compact
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
       @bids = signed_up_topics
+    else
+      @bids = []
     end
-
-    #Calculating the size of sign up topic list
+  
+    # Calculate the size of the signup topic list
     @num_of_topics = @sign_up_topics.size
-
-    #Storing deadline information
-    deadlines = fetch_deadlines(@assignment)
-    @signup_topic_deadline = deadlines[:signup_topic_deadline]
-    @drop_topic_deadline = deadlines[:drop_topic_deadline]
-
+  
+    # Store bid information
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-
-    #Handle topic sign up restrictions based on dealines
-    @show_actions = false if set_action_display_status(@assignment)
-
-    @selected_topics = user_sign_up_status(@assignment, session[:user].id)
-    
-    render('sign_up_sheet/intelligent_topic_selection') && return if @assignment.is_intelligent
-    
+  
+    # Render the intelligent topic selection view if applicable
+    if @assignment.is_intelligent
+      render('sign_up_sheet/intelligent_topic_selection') && return
+    end
+  
+    # Default rendering
+    render('sign_up_sheet/list')
   end
+  
 
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment

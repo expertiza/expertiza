@@ -78,16 +78,17 @@ class Assignment < ApplicationRecord
   end
 
   # removes an assignment from course
-  def remove_assignment_from_course
+  def self.remove_assignment_from_course(id)
+    assignment = Assignment.find(id)
     oldpath = begin
-                path
+                assignment.path
               rescue StandardError
                 nil
               end
-    self.course_id = nil
-    save
+    assignment.course_id = nil
+    assignment.save
     newpath = begin
-                path
+                assignment.path
               rescue StandardError
                 nil
               end

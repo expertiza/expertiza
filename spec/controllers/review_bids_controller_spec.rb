@@ -15,8 +15,8 @@ describe ReviewBidsController do
   end
 
   describe 'action_allowed as a Student' do
-    it 'does not allow assign_bidding or run_bidding_algorithm actions' do
-      %w[assign_bidding run_bidding_algorithm].each do |action|
+    it 'does not allow assign_bidding or assign_reviewers actions' do
+      %w[assign_bidding assign_reviewers].each do |action|
         controller.params = { id: '1', action: action }
         expect(controller.action_allowed?).to be false
       end
@@ -53,12 +53,12 @@ describe ReviewBidsController do
   end
 
   describe 'action_allowed as an Instructor, Teaching Assistant, Administrator, or Super-Administrator' do
-    it 'allows assign_bidding and run_bidding_algorithm actions' do
+    it 'allows assign_bidding and assign_reviewers actions' do
       %i[instructor teaching_assistant admin superadmin].each do |role|
         user = send(role)
         controller.session[:user] = user
 
-        %w[assign_bidding run_bidding_algorithm].each do |action|
+        %w[assign_bidding assign_reviewers].each do |action|
           controller.params = { id: '1', action: action }
           expect(controller.action_allowed?).to be true
         end
@@ -83,7 +83,7 @@ describe ReviewBidsController do
       controller.session[:user] = nil
       allow(controller).to receive(:current_user).and_return(nil)
 
-      %w[assign_bidding run_bidding_algorithm show index set_priority list].each do |action|
+      %w[assign_bidding assign_reviewers show index set_priority list].each do |action|
         controller.params = { id: '1', action: action }
         expect(controller.action_allowed?).to be false
       end
@@ -252,11 +252,61 @@ describe ReviewBidsController do
     end
   end
 
-  describe '#run_bidding_algorithm' do
+  describe '#assign_reviewers' do
     render_views
     it 'connects to the webservice to run bidding algorithm' do
-      post :run_bidding_algorithm
+      post :assign_reviewers
       expect(response).to have_http_status(302)
     end
+  end
+
+  describe '#mock_bidding_data' do
+  let(:bidding_data) do
+    {
+      assignment_id: 1,
+      reviewer_ids: [1, 2, 3],
+      topics: [
+        { topic_id: 1, preferences: [2, 1, 3] },
+        { topic_id: 2, preferences: [3, 1, 2] },
+        { topic_id: 3, preferences: [1, 2, 3] }
+      ]
+    }
+  end
+
+  it 'creates valid mock bidding data' do
+    controller = ReviewBidsController.new
+    mocked_data = controller.send(:mock_bidding_data, bidding_data)
+    expect(mocked_data).to include(:assignment_id, :reviewer_ids, :topics, :matched)
+    expect(mocked_data[:topics].size).to eq(3)
+    expect(mocked_data[:matched].size).to eq(3)
+  end
+
+  describe '#find_leftover_topics' do
+  let(:assignment_id) { 1 }
+  let(:matched_topics) { [{ reviewer_id: 1, topic_id: 1 }, { reviewer_id: 2, topic_id: 2 }] }
+
+  before do
+    allow(SignUpTopic).to receive(:where).with(assignment_id: assignment_id).and_return(
+      double(pluck: [1, 2, 3])
+    )
+  end
+
+  it 'returns the correct leftover topics' do
+    controller = ReviewBidsController.new
+    leftover_topics = controller.send(:find_leftover_topics, assignment_id, matched_topics)
+    expect(leftover_topics).to eq([3])
+  end
+
+  describe '#assign_leftover_topics' do
+  let(:reviewer_ids) { [1, 2, 3, 4] }
+  let(:matched_topics) { [{ reviewer_id: 1, topic_id: 1 }, { reviewer_id: 2, topic_id: 2 }] }
+  let(:leftover_topics) { [3, 4] }
+
+  it 'assigns leftover topics to non-bidders in a round-robin fashion' do
+    expect(ReviewBid).to receive(:create).with(priority: 1, signuptopic_id: 3, participant_id: 3)
+    expect(ReviewBid).to receive(:create).with(priority: 1, signuptopic_id: 4, participant_id: 4)
+
+    controller = ReviewBidsController.new
+    controller.send(:assign_leftover_topics, reviewer_ids, matched_topics, leftover_topics)
   end
 end

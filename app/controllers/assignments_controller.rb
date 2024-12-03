@@ -152,9 +152,8 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
-  # sets the current assignment and suggestions for the assignment
+  # sets the current assignment for delayed mailer view
   def delayed_mailer
-    @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 

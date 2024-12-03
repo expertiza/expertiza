@@ -708,7 +708,7 @@ describe Assignment do
       assignment = create(:assignment)
       assignment.course_id = 2
       expect(assignment.course_id).to eq(2)
-      Assignment.remove_assignment_from_course(assignment.id)
+      assignment.remove_assignment_from_course
       expect(assignment.course_id).to be_nil
     end
   end

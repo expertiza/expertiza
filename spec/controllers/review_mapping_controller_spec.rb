@@ -10,13 +10,15 @@ describe ReviewMappingController do
     double('MetareviewResponseMap', id: 1, map_id: 1, assignment: assignment,
                                     reviewer: reviewer, reviewee: double('Participant', id: 2, name: 'reviewee'))
   end
-  let(:participant) { double('AssignmentParticipant', id: 1, can_review: false, user: double('User', id: 1)) }
-  let(:participant1) { double('AssignmentParticipant', id: 2, can_review: true, user: double('User', id: 2)) }
-  let(:user) { double('User', id: 3) }
-  let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
+  let(:participant) { double('AssignmentParticipant', id: 1, user_id: 1, can_review: false, user: double('User', id: 1, user_id: 1)) }
+  let(:participant1) { double('AssignmentParticipant', id: 2, user_id: 2, can_review: true, user: double('User', id: 2, user_id: 2)) }
+  let(:user) { double('User', id: 3, user_id: 3) }
+  let(:participant2) { double('AssignmentParticipant', id: 3, user_id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
-
+  let(:metareviewer) { double('AssignmentParticipant', id: 1) }
+  let(:review_strategy) { double('ReviewStrategy', reviews_per_team: 3, reviews_per_student: 2, teams: [team, team1], participants: [participant, participant1]) }
+  let(:participants_hash) { { participant.id => 0, participant1.id => 0 } }
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
     instructor = build(:instructor)
@@ -303,16 +305,29 @@ describe ReviewMappingController do
   end
 
   describe '#assign_metareviewer_dynamically' do
-    it 'redirects to student_review#list page' do
-      metareviewer = double('AssignmentParticipant', id: 1)
-      allow(AssignmentParticipant).to receive(:where).with(user_id: '1', parent_id: 1).and_return([metareviewer])
-      allow(assignment).to receive(:assign_metareviewer_dynamically).with(metareviewer).and_return(true)
-      request_params = {
-        assignment_id: 1,
-        metareviewer_id: 1
-      }
-      post :assign_metareviewer_dynamically, params: request_params
-      expect(response).to redirect_to('/student_review/list?id=1')
+    context "when there are no reviews to Metareview" do
+      it "displays an error message" do
+        allow(Assignment).to receive(:find).with(any_args).and_return(assignment)
+        allow(AssignmentParticipant).to receive(:where).with(any_args).and_return([metareviewer]) 
+        allow(assignment).to receive(:assign_metareviewer_dynamically).and_raise(StandardError, "assign_metareviewer_dynamically error")
+
+        post :assign_metareviewer_dynamically, params: { assignment_id: assignment.id, metareviewer_id: metareviewer.id }
+        expect(response).to redirect_to('/student_review/list?id=1')
+      end
+    end
+
+    context "when there are reviews to Meta review" do
+      it 'redirects to student_review#list page' do
+        metareviewer = double('AssignmentParticipant', id: 1)
+        allow(AssignmentParticipant).to receive(:where).with(user_id: '1', parent_id: 1).and_return([metareviewer])
+        allow(assignment).to receive(:assign_metareviewer_dynamically).with(metareviewer).and_return(true)
+        request_params = {
+          assignment_id: 1,
+          metareviewer_id: 1
+        }
+        post :assign_metareviewer_dynamically, params: request_params
+        expect(response).to redirect_to('/student_review/list?id=1')
+      end
     end
   end
 
@@ -479,13 +494,22 @@ describe ReviewMappingController do
   end
 
   describe '#delete_metareview' do
-    it 'redirects to review_mapping#list_mappings page after deletion' do
-      allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
-      allow(metareview_response_map).to receive(:delete).and_return(true)
-      request_params = { id: 1 }
-      post :delete_metareview, params: request_params
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+    context 'when metareviews can be deleted successfully' do
+      it 'redirects to review_mapping#list_mappings page after deletion' do
+        allow(MetareviewResponseMap).to receive(:find).with('1').and_return(metareview_response_map)
+        allow(metareview_response_map).to receive(:delete).and_return(true)
+        request_params = { id: 1 }
+        post :delete_metareview, params: request_params
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
     end
+
+    context 'when mapping id is invalid' do
+      it 'gives an error and deletion is a failure' do
+        expect {delete :delete_metareview, params: { id: -1 }}.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
   end
 
   describe '#list_mappings' do
@@ -563,7 +587,7 @@ describe ReviewMappingController do
           expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
         end
       end
-
+      
       context 'when student review num is greater than or equal to team size' do
         it 'throws error stating that student review number cannot be greater than or equal to team size' do
           allow(ReviewResponseMap).to receive(:where)
@@ -605,6 +629,29 @@ describe ReviewMappingController do
         }
         post :automatic_review_mapping, params: request_params
         expect(flash[:error]).to eq('Please choose either the number of reviews per student or the number of reviewers per team (student), not both.')
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
+    end
+
+    context 'when exclude_teams_without_submission is enabled' do
+      it 'excludes teams without submissions and redirects to list_mappings' do
+        allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team, team1])
+        allow(team).to receive(:id).and_return(1)
+        allow(team1).to receive(:id).and_return(2)
+        allow(team).to receive(:[]).with(:submitted_hyperlinks).and_return(['http://example.com'])
+        allow(team).to receive(:[]).with(:directory_num).and_return(1)
+        allow(team1).to receive(:[]).with(:submitted_hyperlinks).and_return(nil)
+        allow(team1).to receive(:[]).with(:directory_num).and_return(nil)
+        
+        request_params = { 
+          id: 1, 
+          max_team_size: 1, 
+          num_reviews_per_student: 1, 
+          exclude_teams_without_submission: true 
+        }
+        post :automatic_review_mapping, params: request_params
+    
+        expect(flash[:error]).to be_nil
         expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
       end
     end
@@ -682,4 +729,39 @@ describe ReviewMappingController do
       end
     end
   end
+
+  describe '#select_metareviewer' do
+    let(:response_map) { double('ResponseMap', id: 1) }
+
+    before do
+      allow(ResponseMap).to receive(:find).with('1').and_return(response_map)
+      get :select_metareviewer, params: { id: 1 }
+    end
+
+    it 'finds the correct ResponseMap and assigns it to @mapping' do
+      expect(assigns(:mapping)).to eq(response_map)
+    end
+
+    it 'calls ResponseMap.find with the correct id' do
+      expect(ResponseMap).to have_received(:find).with('1')
+    end
+  end
+
+  describe '#select_reviewer' do
+    before do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+      get :select_reviewer, params: { contributor_id: 1 }
+    end
+
+    it 'finds the correct AssignmentTeam and assigns it to contributor' do
+      expect(assigns(:contributor)).to eq(team)
+    end
+
+    it 'calls AssignmentTeam.find with the correct contributor_id' do
+      expect(AssignmentTeam).to have_received(:find).with('1')
+    end
+  end
+
 end
+review_mapping_controller_spec.rb
+Displaying review_mapping_controller.rb.

@@ -14,7 +14,7 @@ class GithubMetricsController < ApplicationController
     current_user_has_instructor_privileges?
   end
 
-  # initialize the oath information within the session so that mulitple API requests can
+  # initialize the oath information within the session so that multiple API requests can
   # be sent to github
   def initialize_oath
     session["participant_id"] = params[:id]

@@ -2,7 +2,116 @@ module ReviewMappingHelper
   def create_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end
+#ADDED: Get participant details if user is added to the assignment
+  # @param user_id [Integer] The ID of the user.
+  # @param parent_id [Integer] The ID of the assignment.
+  # @return [AssignmentParticipant or nil] The participant record if found, or nil if not found.
+  def get_participant_or_reviewer(user_id, parent_id)
+    AssignmentParticipant.where(user_id: user_id, parent_id: parent_id).first
+  end
 
+  #ADDED: Get review response mapping if the participant is assgined as a reviewer to the team.
+  # @param reviewed_object_id [Integer] The ID of the reviewed object (e.g., assignment ID).
+  # @param participant [AssignmentParticipant] The participant acting as a reviewer.
+  # @param reviewee_id [Integer] The ID of the team being reviewed.
+  # @param calibrate_to [Boolean] Whether the review is a calibration review.
+  # @return [ReviewResponseMap or nil] The review response mapping if found, or nil if not found.
+  def get_review_response_mapping(reviewed_object_id, participant, reviewee_id, calibrate_to)
+    ReviewResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: participant.get_reviewer.id, reviewee_id: reviewee_id, calibrate_to: calibrate_to).first
+  end
+
+  #ADDED: Get assignment details using assignment id.
+  # @param assignment_id [Integer] The ID of the assignment.
+  # @return [Assignment] The assignment record.
+  def get_assignment(assignment_id)
+    Assignment.find(assignment_id)
+  end
+
+  #ADDED: Get team details using contributer id
+  # @param contributor_id [Integer] The ID of the contributor (team).
+  # @return [AssignmentTeam] The team record.
+  def get_assignment_team(contributor_id)
+    AssignmentTeam.find(params[:contributor_id])
+  end
+
+  def check_for_self_review?(team_id, user_id)
+    TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
+  end
+
+  def get_reviewer(user, assignment, reg_url)
+    reviewer = get_participant_or_reviewer(user.id, assignment.id)
+    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
+
+    reviewer.get_reviewer
+  rescue StandardError => e
+    flash[:error] = e.message
+  end
+   #ADDED: Returns the number of team participants, excluding the members that cannot review and submit.
+  # @param [Integer] team_id - The ID of the team.
+  # @param [Integer] assignment_id - The ID of the assignment.
+  # @return [Integer] - The number of team participants who can both review and submit.
+  def get_num_of_team_participants(team_id, assignment_id)
+    num_team_participants = TeamsUser.where(team_id: team.id).size
+    # If there are some submitters or reviewers in this team, they are not treated as normal participants.
+    # They should be removed from 'num_team_participants'
+    TeamsUser.where(team_id: team.id).each do |team_user|
+      temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
+      num_team_participants -= 1 unless temp_participant.can_review && temp_participant.can_submit
+    end
+    num_team_participants
+  end
+
+  def get_random_reviewer_index(participants, participants_hash, team_id, num_participants)
+    min_value = participants_hash.values.min
+    # get the temp array including indices of participants, each participant has minimum review number in hash table.
+    participants_with_min_assigned_reviews = []
+    participants.each do |participant|
+      participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
+    end
+    # if participants_with_min_assigned_reviews is blank
+    no_min_assigned_reviews = participants_with_min_assigned_reviews.empty?
+    # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
+    has_one_participant_with_self_review = ((participants_with_min_assigned_reviews.size == 1) && check_for_self_review?(team_id, participants[participants_with_min_assigned_reviews[0]].user_id))
+    if no_min_assigned_reviews || has_one_participant_with_self_review
+      # use original method to get random number
+      rand(0..num_participants - 1)
+    else
+      # rand_num should be the position of this participant in original array
+      participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
+    end    
+  end
+    # This method checks if the user is allowed to do any more reviews.
+  # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
+  # if number of reviews are less than allowed than a user is allowed to request.
+  def review_allowed?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    assignment.num_reviews_allowed > @review_mappings.size
+  end
+  # This method checks if the user that is requesting a review has any outstanding reviews, if a user has more than 2
+  # outstanding reviews, he is not allowed to ask for more reviews.
+  # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
+  # else we compute total reviews completed by adding each response
+  # we then check of the reviews in progress are less than assignment's policy
+  def check_outstanding_reviews?(assignment, reviewer)
+    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
+    @num_reviews_total = @review_mappings.size
+    if @num_reviews_total.zero?
+      true
+    else
+      @num_reviews_completed = 0
+      @review_mappings.each do |map|
+        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+      end
+      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
+      @num_reviews_in_progress < Assignment.max_outstanding_reviews
+    end
+  end
+    #ADDED: Check if the topic is selected or not.
+  # @param assignment [Assignment] The current assignment
+  # @return [Boolean] True if the topic selection is invalid, false otherwise
+  def check_invalid_topic?(assignment)
+    params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
+  end
   #
   # gets the response map data such as reviewer id, reviewed object id and type for the review report
   #

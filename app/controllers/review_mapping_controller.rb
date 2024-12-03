@@ -1,6 +1,6 @@
 class ReviewMappingController < ApplicationController
-  include AuthorizationHelper
-
+  include ReviewMappingHelper, AuthorizationHelper
+   
   autocomplete :user, :name
   # helper :dynamic_review_assignment
   helper :submitted_content
@@ -37,41 +37,6 @@ class ReviewMappingController < ApplicationController
     redirect_to controller: 'response', action: 'new', id: map.id, assignment_id: params[:id], return: 'assignment_edit'
   end
 
-  #ADDED: Get participant details if user is added to the assignment
-  # @param user_id [Integer] The ID of the user.
-  # @param parent_id [Integer] The ID of the assignment.
-  # @return [AssignmentParticipant or nil] The participant record if found, or nil if not found.
-  def get_participant_or_reviewer(user_id, parent_id)
-    AssignmentParticipant.where(user_id: user_id, parent_id: parent_id).first
-  end
-
-  #ADDED: Get review response mapping if the participant is assgined as a reviewer to the team.
-  # @param reviewed_object_id [Integer] The ID of the reviewed object (e.g., assignment ID).
-  # @param participant [AssignmentParticipant] The participant acting as a reviewer.
-  # @param reviewee_id [Integer] The ID of the team being reviewed.
-  # @param calibrate_to [Boolean] Whether the review is a calibration review.
-  # @return [ReviewResponseMap or nil] The review response mapping if found, or nil if not found.
-  def get_review_response_mapping(reviewed_object_id, participant, reviewee_id, calibrate_to)
-    ReviewResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: participant.get_reviewer.id, reviewee_id: reviewee_id, calibrate_to: calibrate_to).first
-  end
-
-  #ADDED: Get assignment details using assignment id.
-  # @param assignment_id [Integer] The ID of the assignment.
-  # @return [Assignment] The assignment record.
-  def get_assignment(assignment_id)
-    Assignment.find(assignment_id)
-  end
-
-  #ADDED: Get team details using contributer id
-  # @param contributor_id [Integer] The ID of the contributor (team).
-  # @return [AssignmentTeam] The team record.
-  def get_assignment_team(contributor_id)
-    AssignmentTeam.find(params[:contributor_id])
-  end
-
-  def check_for_self_review?(team_id, user_id)
-    TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
-  end
 
   def select_reviewer
     @contributor = AssignmentTeam.find(params[:contributor_id])
@@ -82,32 +47,6 @@ class ReviewMappingController < ApplicationController
     @mapping = ResponseMap.find(params[:id])
   end
 
-  #Added: Assigns a reviewer to a contributor (team or participant) in the context of an assignment
-  # @param user [User] The user being assigned as a reviewer.
-  # @param assignment [Assignment] The assignment to which the review is related.
-  # @param contributor_id [Integer] The ID of the contributor (team or participant) being reviewed.
-  # @param topic_id [Integer] The ID of the topic associated with the review (if applicable).
-  # @raise [RuntimeError] Raises an error if the reviewer is already assigned to the contributor.
-  # @return [ReviewResponseMap] The newly created review response mapping record.
-  def assign_reviewer_to_contributor(user, assignment, contributor_id, topic_id)
-  
-    # Generate registration URL
-    reg_url = url_for id: assignment.id, user_id: user.id, contributor_id: contributor_id
-  
-    # Get the assignment's participant corresponding to the user
-    reviewer = get_reviewer(user, assignment, reg_url)
-  
-    # Check if reviewer is already assigned
-    if ReviewResponseMap.exists?(reviewee_id: contributor_id, reviewer_id: reviewer.id)
-      raise "The reviewer, \"#{reviewer.name}\", is already assigned to this contributor."
-    else
-      ReviewResponseMap.create(
-        reviewee_id: contributor_id,
-        reviewer_id: reviewer.id,
-        reviewed_object_id: assignment.id
-      )
-    end
-  end
   
   #EDITED: If the user is invalid(not present in database), then return with error message.
   #If reviewer is a participant of the assignment, then only move forward with reviewer assignment.
@@ -144,6 +83,26 @@ class ReviewMappingController < ApplicationController
   
     redirect_to action: 'list_mappings', id: assignment.id, msg: msg
   end
+  def add_metareviewer
+    mapping = ResponseMap.find(params[:id])
+    msg = ''
+    begin
+      user = User.from_params(params)
+
+      regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
+      reviewer = get_reviewer(user, mapping.assignment, regurl)
+      unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
+        raise 'The metareviewer "' + reviewer.user.name + '" is already assigned to this reviewer.'
+      end
+
+      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
+                                   reviewer_id: reviewer.id,
+                                   reviewee_id: mapping.reviewer.id)
+    rescue StandardError => e
+      msg = e.message
+    end
+    redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
+  end
 
   #ADDED: Assigns team with a topic to reviewer dynamically
   # @param topic_id [Integer] The ID of the topic to be assigned
@@ -169,6 +128,32 @@ class ReviewMappingController < ApplicationController
       flash[:error] = 'No artifacts are available to review at this time. Please try later.'
     else
       assignment.assign_reviewer_dynamically_no_topic(reviewer, assignment_team)
+    end
+  end
+#Added: Assigns a reviewer to a contributor (team or participant) in the context of an assignment
+  # @param user [User] The user being assigned as a reviewer.
+  # @param assignment [Assignment] The assignment to which the review is related.
+  # @param contributor_id [Integer] The ID of the contributor (team or participant) being reviewed.
+  # @param topic_id [Integer] The ID of the topic associated with the review (if applicable).
+  # @raise [RuntimeError] Raises an error if the reviewer is already assigned to the contributor.
+  # @return [ReviewResponseMap] The newly created review response mapping record.
+  def assign_reviewer_to_contributor(user, assignment, contributor_id, topic_id)
+  
+    # Generate registration URL
+    reg_url = url_for id: assignment.id, user_id: user.id, contributor_id: contributor_id
+  
+    # Get the assignment's participant corresponding to the user
+    reviewer = get_reviewer(user, assignment, reg_url)
+  
+    # Check if reviewer is already assigned
+    if ReviewResponseMap.exists?(reviewee_id: contributor_id, reviewer_id: reviewer.id)
+      raise "The reviewer, \"#{reviewer.name}\", is already assigned to this contributor."
+    else
+      ReviewResponseMap.create(
+        reviewee_id: contributor_id,
+        reviewer_id: reviewer.id,
+        reviewed_object_id: assignment.id
+      )
     end
   end
 
@@ -215,12 +200,6 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  #ADDED: Check if the topic is selected or not.
-  # @param assignment [Assignment] The current assignment
-  # @return [Boolean] True if the topic selection is invalid, false otherwise
-  def check_invalid_topic?(assignment)
-    params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
-  end
 
   # 7/12/2015 -zhewei
   # This method is used for assign submissions to students for peer review.
@@ -251,33 +230,7 @@ class ReviewMappingController < ApplicationController
   end
   
 
-  # This method checks if the user is allowed to do any more reviews.
-  # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
-  # if number of reviews are less than allowed than a user is allowed to request.
-  def review_allowed?(assignment, reviewer)
-    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-    assignment.num_reviews_allowed > @review_mappings.size
-  end
 
-  # This method checks if the user that is requesting a review has any outstanding reviews, if a user has more than 2
-  # outstanding reviews, he is not allowed to ask for more reviews.
-  # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
-  # else we compute total reviews completed by adding each response
-  # we then check of the reviews in progress are less than assignment's policy
-  def check_outstanding_reviews?(assignment, reviewer)
-    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-    @num_reviews_total = @review_mappings.size
-    if @num_reviews_total.zero?
-      true
-    else
-      @num_reviews_completed = 0
-      @review_mappings.each do |map|
-        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-      end
-      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      @num_reviews_in_progress < Assignment.max_outstanding_reviews
-    end
-  end
 
   # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
@@ -298,28 +251,6 @@ class ReviewMappingController < ApplicationController
     end
     redirect_to student_quizzes_path(id: reviewer.id)
   end
-
-  def add_metareviewer
-    mapping = ResponseMap.find(params[:id])
-    msg = ''
-    begin
-      user = User.from_params(params)
-
-      regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
-      reviewer = get_reviewer(user, mapping.assignment, regurl)
-      unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
-        raise 'The metareviewer "' + reviewer.user.name + '" is already assigned to this reviewer.'
-      end
-
-      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
-                                   reviewer_id: reviewer.id,
-                                   reviewee_id: mapping.reviewer.id)
-    rescue StandardError => e
-      msg = e.message
-    end
-    redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
-  end
-
   def assign_metareviewer_dynamically
     assignment = get_assignment(params[:assignment_id])
     metareviewer = get_participant_or_reviewer(params[:metareviewer_id], assignment.id)
@@ -331,15 +262,51 @@ class ReviewMappingController < ApplicationController
     end
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
+  def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+    #Unsure what this line does. 
+    # if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
+    #                     .where('created_at > :time',
+    #                            time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    if check_insufficient_reviews(assignment_id, review_strategy)
+      participants_with_insufficient_review_num = []
+      participants_hash.each do |participant_id, review_num|
+        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
+      end
+      unsorted_teams_hash = {}
 
-  def get_reviewer(user, assignment, reg_url)
-    reviewer = get_participant_or_reviewer(user.id, assignment.id)
-    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
+      ReviewResponseMap.where(reviewed_object_id: assignment_id,
+                              calibrate_to: 0).each do |response_map|
+        if unsorted_teams_hash.key? response_map.reviewee_id
+          unsorted_teams_hash[response_map.reviewee_id] += 1
+        else
+          unsorted_teams_hash[response_map.reviewee_id] = 1
+        end
+      end
+      teams_hash = unsorted_teams_hash.sort_by { |_, v| v }.to_h
 
-    reviewer.get_reviewer
-  rescue StandardError => e
-    flash[:error] = e.message
+      participants_with_insufficient_review_num.each do |participant_id|
+        teams_hash.each_key do |team_id, _num_review_received|
+          next if check_for_self_review?(team_id, Participant.find(participant_id).user_id)
+
+          participant = AssignmentParticipant.find(participant_id)
+          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
+                                  reviewed_object_id: assignment_id).first_or_create
+
+          teams_hash[team_id] += 1
+          teams_hash = teams_hash.sort_by { |_, v| v }.to_h
+          break
+        end
+      end
+    end
+    @@time_create_last_review_mapping_record = ReviewResponseMap
+                                               .where(reviewed_object_id: assignment_id)
+                                               .last.created_at
   end
+
+ 
+  
+
+
 
   def delete_outstanding_reviewers
     assignment = get_assignment(params[:id])
@@ -664,81 +631,7 @@ class ReviewMappingController < ApplicationController
     end
   end
   
-  def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-    #Unsure what this line does. 
-    # if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-    #                     .where('created_at > :time',
-    #                            time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
-    if check_insufficient_reviews(assignment_id, review_strategy)
-      participants_with_insufficient_review_num = []
-      participants_hash.each do |participant_id, review_num|
-        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
-      end
-      unsorted_teams_hash = {}
-
-      ReviewResponseMap.where(reviewed_object_id: assignment_id,
-                              calibrate_to: 0).each do |response_map|
-        if unsorted_teams_hash.key? response_map.reviewee_id
-          unsorted_teams_hash[response_map.reviewee_id] += 1
-        else
-          unsorted_teams_hash[response_map.reviewee_id] = 1
-        end
-      end
-      teams_hash = unsorted_teams_hash.sort_by { |_, v| v }.to_h
-
-      participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each_key do |team_id, _num_review_received|
-          next if check_for_self_review?(team_id, Participant.find(participant_id).user_id)
-
-          participant = AssignmentParticipant.find(participant_id)
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
-                                  reviewed_object_id: assignment_id).first_or_create
-
-          teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by { |_, v| v }.to_h
-          break
-        end
-      end
-    end
-    @@time_create_last_review_mapping_record = ReviewResponseMap
-                                               .where(reviewed_object_id: assignment_id)
-                                               .last.created_at
-  end
-
-  #ADDED: Returns the number of team participants, excluding the members that cannot review and submit.
-  # @param [Integer] team_id - The ID of the team.
-  # @param [Integer] assignment_id - The ID of the assignment.
-  # @return [Integer] - The number of team participants who can both review and submit.
-  def get_num_of_team_participants(team_id, assignment_id)
-    num_team_participants = TeamsUser.where(team_id: team.id).size
-    # If there are some submitters or reviewers in this team, they are not treated as normal participants.
-    # They should be removed from 'num_team_participants'
-    TeamsUser.where(team_id: team.id).each do |team_user|
-      temp_participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
-      num_team_participants -= 1 unless temp_participant.can_review && temp_participant.can_submit
-    end
-    num_team_participants
-  end
-
-  def get_random_reviewer_index(participants, participants_hash, team_id, num_participants)
-    min_value = participants_hash.values.min
-    # get the temp array including indices of participants, each participant has minimum review number in hash table.
-    participants_with_min_assigned_reviews = []
-    participants.each do |participant|
-      participants_with_min_assigned_reviews << participants.index(participant) if participants_hash[participant.id] == min_value
-    end
-    # if participants_with_min_assigned_reviews is blank
-    no_min_assigned_reviews = participants_with_min_assigned_reviews.empty?
-    # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-    has_one_participant_with_self_review = ((participants_with_min_assigned_reviews.size == 1) && check_for_self_review?(team_id, participants[participants_with_min_assigned_reviews[0]].user_id))
-    if no_min_assigned_reviews || has_one_participant_with_self_review
-      # use original method to get random number
-      rand(0..num_participants - 1)
-    else
-      # rand_num should be the position of this participant in original array
-      participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-    end    
-  end
+  
 
   #EDITED: if_condition_1 and if_condition_2 variable names changed to no_min_assigned_reviews, has_one_participant_with_self_review, is_insufficient_reviews_for_participant and has_participant_not_been_selected
   # @param [Integer] assignment_id - The ID of the assignment.

@@ -1,5 +1,6 @@
 require 'rails_helper'
 describe ReviewMappingController do
+  include ReviewMappingHelper
   let(:assignment) { double('Assignment', id: 1) }
   let(:reviewer) { double('Participant', id: 1, name: 'reviewer') }
   let(:review_response_map) do
@@ -763,5 +764,4 @@ describe ReviewMappingController do
   end
 
 end
-review_mapping_controller_spec.rb
-Displaying review_mapping_controller.rb.
+ 

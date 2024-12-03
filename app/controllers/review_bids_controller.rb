@@ -88,10 +88,16 @@ class ReviewBidsController < ApplicationController
   def assign_bidding
     # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
+
+    #bidding data
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
+
+    #topic management
+    matched_topics = assign_reviewers(bidding_data)
+    leftover_topics = find_leftover_topics(assignment_id, matched_topics)
+    assign_leftover_topics(bidding_data[:reviewer_ids], matched_topics, leftover_topics)
+
     ReviewBid.assign_review_topics(matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
@@ -100,10 +106,11 @@ class ReviewBidsController < ApplicationController
   # removed url that no longer functioned
   # added mocked data
   # Replace when new service becomes available
-  def run_bidding_algorithm(bidding_data)
+  def assign_reviewers(bidding_data)
     mocked_data = mock_bidding_data(bidding_data) # Use mocked data
     process_mocked_bidding_data(mocked_data)
   end
+  
   private
 
   # Initialize participant service
@@ -153,4 +160,24 @@ class ReviewBidsController < ApplicationController
   def process_mocked_bidding_data(mocked_data)
     mocked_data[:matched] # Return matched data for downstream processing
   end
+
+  def find_leftover_topics(assignment_id, matched_topics)
+    all_topic_ids = SignUpTopic.where(assignment_id: assignment_id).pluck(:id)
+    assigned_topic_ids = matched_topics.map { |match| match[:topic_id] }
+  
+    # Calculate leftover topics
+    all_topic_ids - assigned_topic_ids
+  end
+  
+  def assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+    # Find non-bidders by excluding already matched reviewers
+    non_bidders = reviewer_ids - matched_topics.map { |match| match[:reviewer_id] }
+  
+    # Assign leftover topics to non-bidders in a round-robin fashion
+    non_bidders.each_with_index do |reviewer_id, index|
+      topic_id = leftover_topics[index % leftover_topics.length]
+      ReviewBid.create(priority: 1, signuptopic_id: topic_id, participant_id: reviewer_id)
+    end
+  end
+  
 end

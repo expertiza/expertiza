@@ -281,27 +281,6 @@
     <% end %>
 <% end %>
 <!-- termination of the main outer loop.-->
-<!--E2300 Github Metrics integration. Only display github metrics heatgrid if Github is being used and metrics exist -->
-<% metrics = metrics_table(@team_id) %>
-<% unless metrics.nil? %>
-  <br />
-  <h4>Github Contributions</h4>
-  <table id="metrics" class="scoresTable tbl_heat">
-    <thead>
-    <th>Student: </th>
-    <th>Total Commits: </th>
-    </thead>
-    <tbody>
-    <% metrics.each do |author, value| %>
-      <tr>
-        <td><%= author %></td>
-        <td class="<%=value[:color] %>" align="center"><%= value[:commits] %></td>
-      </tr>
-    <% end %>
-    </tbody>
-  </table><img src="/assets/info.png" title="Lines of Code contribution unavailable for Repository links. Please check Github or the Github Metrics link in the Assignment Submissions page for details "/>
-  <br />
-<% end %>
 <!-- Get course ID and TA ID to restrict TAs ability to update his grades-->
 <%
    @course_id = Assignment.find_by(id: @participant.parent_id).course_id

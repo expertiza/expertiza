@@ -78,21 +78,12 @@ class Assignment < ApplicationRecord
   end
 
   # removes an assignment from course
-  def self.remove_assignment_from_course(id)
-    assignment = find_by(id: id)
-    return { success: false, message: "Assignment not found" } unless assignment
-
-    begin
-      oldpath = assignment.path rescue nil
-      assignment.update(course_id: nil)
-      newpath = assignment.path rescue nil
-
+  def remove_assignment_from_course
+      oldpath = path rescue nil
+      self.course_id = nil
+      save
+      newpath = path rescue nil
       FileHelper.update_file_location(oldpath, newpath)
-      { success: true, message: "Assignment removed successfully from course" }
-    rescue StandardError => e
-      Rails.logger.error("Error in Assignment.remove_assignment_from_course: #{e.message}")
-      { success: false, message: "Failed to remove assignment from course: #{e.message}" }
-    end
   end
 
 

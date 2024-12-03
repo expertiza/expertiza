@@ -1,4 +1,5 @@
 require 'penalty_helper'
+require 'active_support/all'
 include PenaltyHelper
 describe LatePolicy do
   let(:late_policy) { build(:late_policy) }
@@ -8,6 +9,10 @@ describe LatePolicy do
   let(:meta_review_response_map) { build(:meta_review_response_map) }
   let(:review_response_map) { build(:review_response_map) }
   let (:response) { build(:response) }
+  let(:due_date) { build(:due_date) }
+  let(:penalty_per_unit) { 10 }  # Example penalty per unit
+  let(:max_penalty) { 100 }      # Example max penalty
+  let(:penalty_unit) { 'Hour' }  # Example unit for penalty calculation
 
   describe 'validations' do
     it 'validates presence of policy_name' do
@@ -123,4 +128,62 @@ describe LatePolicy do
       expect(LatePolicy.update_calculated_penalty_objects(late_policy)).to eq(Array(calculated_penalty))
     end
   end
+
+  describe '#calculate_penalty' do
+  it 'returns the max penalty when calculated penalty exceeds max_penalty' do
+    submission_time = Time.now + 10.days
+    due_date = Time.now
+    late_policy = LatePolicy.new(penalty_unit: 'Day', penalty_per_unit: 20, max_penalty: 50)
+
+    # Time difference is 10 days, calculated penalty would be 10 * 20 = 200
+    # But since the max penalty is 50, it should return 50
+    expect(late_policy.calculate_penalty(submission_time, due_date)).to eq(50)
+  end
+end
+
+  describe '#calculate_penalty' do
+  it 'returns 0 penalty if submission is on time' do
+    submission_time = Time.now
+    due_date = submission_time + 1.hour
+    late_policy = LatePolicy.new(penalty_unit: 'Hour', penalty_per_unit: 10, max_penalty: 100)
+    
+    # Expecting the penalty to be 0 if the submission is on time (due date + 1 hour)
+    expect(late_policy.calculate_penalty(submission_time, due_date)).to eq(0)
+  end
+end
+
+describe '#calculate_penalty' do
+it 'calculates penalty in days if submission is late' do
+  due_date = Time.now
+  submission_time = Time.now + 2.days
+  
+  late_policy = LatePolicy.new(penalty_unit: 'Day', penalty_per_unit: 15, max_penalty: 100)
+
+  # Time difference is 2 days, so penalty should be 2 * 15 = 30
+  expect(late_policy.calculate_penalty(submission_time, due_date)).to eq(30)
+end
+end
+
+describe '#calculate_penalty' do
+it 'returns 0 penalty if penalty_per_unit is not provided' do
+  submission_time = Time.now + 2.hours
+  due_date = Time.now
+  late_policy = LatePolicy.new(penalty_unit: 'Hour', penalty_per_unit: nil, max_penalty: 100)
+
+  # Since penalty_per_unit is nil, there should be no penalty
+  expect(late_policy.calculate_penalty(submission_time, due_date)).to raise_error('Penalty per unit is missing')
+end
+end
+
+describe '#calculate_penalty' do
+  it 'raises an error if the penalty unit is invalid' do
+    submission_time = Time.now + 1.hour
+    due_date = Time.now
+    late_policy = LatePolicy.new(penalty_unit: 'InvalidUnit', penalty_per_unit: 10, max_penalty: 100)
+
+    # Expecting an error due to invalid penalty unit
+    expect { late_policy.calculate_penalty(submission_time, due_date) }.to raise_error('Invalid penalty unit')
+  end
+end
+
 end

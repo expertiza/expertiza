@@ -1,6 +1,6 @@
 class Team < ApplicationRecord
-  has_many :teams_users, dependent: :destroy
-  has_many :users, through: :teams_users
+  has_many :teams_participants, dependent: :destroy
+  has_many :users, through: :teams_participants
   has_many :join_team_requests, dependent: :destroy
   has_one :team_node, foreign_key: :node_object_id, dependent: :destroy
   has_many :signed_up_teams, dependent: :destroy
@@ -8,7 +8,7 @@ class Team < ApplicationRecord
   has_paper_trail
 
   scope :find_team_for_assignment_and_user, lambda { |assignment_id, user_id|
-    joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
+    joins(:teams_participants).where('teams.parent_id = ? AND teams_participants.user_id = ?', assignment_id, user_id)
   }
 
   # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
@@ -42,7 +42,7 @@ class Team < ApplicationRecord
 
   # Delete the given team
   def delete
-    TeamsUser.where(team_id: id).find_each(&:destroy)
+    TeamsParticipant.where(team_id: id).find_each(&:destroy)
     node = TeamNode.find_by(node_object_id: id)
     node.destroy if node
     destroy
@@ -83,9 +83,9 @@ class Team < ApplicationRecord
     can_add_member = false
     unless full?
       can_add_member = true
-      t_user = TeamsUser.create(user_id: user.id, team_id: id)
+      t_user = TeamsParticipant.create(user_id: user.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
-      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
     end
@@ -94,9 +94,9 @@ class Team < ApplicationRecord
 
   # Define the size of the team
   def self.size(team_id)
-    #TeamsUser.where(team_id: team_id).count
+    #TeamsParticipant.where(team_id: team_id).count
     count = 0
-    members = TeamsUser.where(team_id: team_id)
+    members = TeamsParticipant.where(team_id: team_id)
     members.each do |member|
       member_name = member.name
       unless member_name.include?(' (Mentor)') 
@@ -108,11 +108,11 @@ class Team < ApplicationRecord
 
   # Copy method to copy this team
   def copy_members(new_team)
-    members = TeamsUser.where(team_id: id)
+    members = TeamsParticipant.where(team_id: id)
     members.each do |member|
-      t_user = TeamsUser.create(team_id: new_team.id, user_id: member.user_id)
+      t_user = TeamsParticipant.create(team_id: new_team.id, user_id: member.user_id)
       parent = Object.const_get(parent_model).find(parent_id)
-      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+      TeamParticipantNode.create(parent_id: parent.id, node_object_id: t_user.id)
     end
   end
 
@@ -132,7 +132,7 @@ class Team < ApplicationRecord
     # find teams still need team members and users who are not in any team
     teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
     teams.each do |team|
-      TeamsUser.where(team_id: team.id).each do |teams_user|
+      TeamsParticipant.where(team_id: team.id).each do |teams_user|
         users.delete(User.find(teams_user.user_id))
       end
     end
@@ -195,7 +195,7 @@ class Team < ApplicationRecord
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
-        add_member(user) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+        add_member(user) if TeamsParticipant.find_by(team_id: id, user_id: user.id).nil?
       end
     end
   end
@@ -258,7 +258,7 @@ class Team < ApplicationRecord
       output = []
       output.push(team.name)
       if options[:team_name] == 'false'
-        team_members = TeamsUser.where(team_id: team.id)
+        team_members = TeamsParticipant.where(team_id: team.id)
         team_members.each do |user|
           output.push(user.name)
         end
@@ -308,7 +308,7 @@ class Team < ApplicationRecord
 
   # Removes the specified user from any team of the specified assignment
   def self.remove_user_from_previous_team(parent_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id }
+    team_user = TeamsParticipant.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id }
     begin
       team_user.destroy
     rescue StandardError
@@ -317,8 +317,8 @@ class Team < ApplicationRecord
   end
 
   def self.find_team_users(assignment_id, user_id)
-    TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
+    TeamsParticipant.joins('INNER JOIN teams ON teams_participants.team_id = teams.id')
              .select('teams.id as t_id')
-             .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
+             .where('teams.parent_id = ? and teams_participants.user_id = ?', assignment_id, user_id)
   end
 end

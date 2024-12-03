@@ -72,7 +72,7 @@ describe ReviewMappingController do
 
     context 'when team_user does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
-        allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
+        allow(TeamsParticipant).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
         post :add_reviewer, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
       end
@@ -80,7 +80,7 @@ describe ReviewMappingController do
 
     context 'when team_user exists and get_reviewer method returns a reviewer' do
       it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page' do
-        allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(false)
+        allow(TeamsParticipant).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(false)
         allow(SignUpSheet).to receive(:signup_team).with(1, 1, '1').and_return(true)
         user = double('User', id: 1)
         allow(User).to receive(:from_params).with(any_args).and_return(user)
@@ -96,7 +96,7 @@ describe ReviewMappingController do
 
     context 'when instructor tries to assign a student their own artifact for reviewing' do
       it 'flashes an error message' do
-        allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
+        allow(TeamsParticipant).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
         post :add_reviewer, params: @params
         expect(flash[:error]).to eq('You cannot assign this student to review his/her own artifact.')
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1'
@@ -591,8 +591,8 @@ describe ReviewMappingController do
       it 'shows an error flash message and redirects to review_mapping#list_mappings page' do
         assignment_double = double('Assignment', auto_assign_mentor: false) 
         allow(Assignment).to receive(:find).and_return(assignment_double)
-        allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
-        allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
+        allow(TeamsParticipant).to receive(:find_team_id).with(1, 2).and_return(true)
+        allow(TeamsParticipant).to receive(:find_team_id).with(1, 3).and_return(false)
         allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(double('AssignmentTeam', id: 1))
         allow(ApplicationController).to receive_message_chain(:helpers, :create_team_users).with(no_args).with(user, 1).and_return(true)
         request_params = {

@@ -29,7 +29,7 @@ shared_context 'object initializations' do
   let(:invalidrequest) { build_stubbed(:join_team_request) }
   let(:participant) { build_stubbed(:participant, id: 1) }
   let(:node1) { build_stubbed(:assignment_node, node_object_id: 1) }
-  let(:team_user1) { build_stubbed(:team_user, team_id: 1, user_id: 1, id: 1) }
+  let(:team_participant1) { build_stubbed(:team_participant, team_id: 1, user_id: 1, id: 1) }
 end
 # Creating a shared context for authorization check to be shared with teams related files
 shared_context 'authorization check', shared_context: :metadata do

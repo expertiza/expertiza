@@ -17,16 +17,16 @@ module SignUpSheetHelper
     topic_due_date.nil? ? topic_due_date : topic_due_date.due_at
   end
 
-  # Retrieve topics suggested by signed in user for
+  # Retrieve topics suggested by signed in participant for
   # the assignment.
   def get_suggested_topics(assignment_id)
-    team_id = TeamsUser.team_id(assignment_id, session[:user].id)
-    teams_users = TeamsUser.where(team_id: team_id)
-    teams_users_array = []
-    teams_users.each do |teams_user|
-      teams_users_array << teams_user.user_id
+    team_id = TeamsParticipant.find_team_id(assignment_id, session[:user].id)
+    teams_participants = TeamsParticipant.where(team_id: team_id)
+    teams_participants_array = []
+    teams_participants.each do |teams_participant|
+      teams_participants_array << teams_participant.user_id
     end
-    @suggested_topics = SignUpTopic.where(assignment_id: assignment_id, private_to: teams_users_array)
+    @suggested_topics = SignUpTopic.where(assignment_id: assignment_id, private_to: teams_participants_array)
   end
 
   # Render topic row for intelligent topic selection.
@@ -62,7 +62,7 @@ module SignUpSheetHelper
       chooser_present = false
       participants.each do |participant|
         next unless topic.id == participant.topic_id
-        if participant.team.teams_users.size == 0
+        if participant.team.teams_participants.size == 0
           participant.team.destroy
           participant.destroy
           next

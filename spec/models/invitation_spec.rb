@@ -31,9 +31,9 @@ describe Invitation do
     context 'a user is not on a team and wishes to join a team with open slots' do
       it 'places the user on a team and returns true' do
         team_id = 0
-        allow(TeamsUser).to receive(:team_empty?).with(team_id).and_return(false)
+        allow(TeamsParticipant).to receive(:team_empty?).with(team_id).and_return(false)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
-        allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(true)
+        allow(TeamsParticipant).to receive(:add_accepted_invitee_to_team).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(MentorManagement).to receive(:assign_mentor)
         expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(true)
@@ -42,13 +42,13 @@ describe Invitation do
     context 'a user is on a team and wishes to join a team with open slots' do
       it 'removes the user from their previous team, places the user on a team, and returns true' do
         team_id = 1
-        allow(TeamsUser).to receive(:team_empty?).with(team_id).and_return(true)
+        allow(TeamsParticipant).to receive(:team_empty?).with(team_id).and_return(true)
         allow(AssignmentTeam).to receive(:find).with(team_id).and_return(team)
         allow(team).to receive(:assignment).and_return(assignment)
         allow(SignedUpTeam).to receive(:release_topics_selected_by_team_for_assignment).with(team_id, assignment.id).and_return(true)
         allow(AssignmentTeam).to receive(:remove_team_by_id).with(team_id).and_return(true)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
-        allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(true)
+        allow(TeamsParticipant).to receive(:add_accepted_invitee_to_team).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(Invitation).to receive(:update_users_topic_after_invite_accept).with(user2.id, user3.id, assignment.id).and_return(true)
         allow(MentorManagement).to receive(:assign_mentor)
         expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(true)
@@ -57,22 +57,22 @@ describe Invitation do
     context 'a user is on a team and wishes to join a team without slots' do
       it 'removes the user from their previous team, and returns false' do
         team_id = 1
-        allow(TeamsUser).to receive(:team_empty?).with(team_id).and_return(true)
+        allow(TeamsParticipant).to receive(:team_empty?).with(team_id).and_return(true)
         allow(AssignmentTeam).to receive(:find).with(team_id).and_return(team)
         allow(team).to receive(:assignment).and_return(assignment)
         allow(SignedUpTeam).to receive(:release_topics_selected_by_team_for_assignment).with(team_id, assignment.id).and_return(true)
         allow(AssignmentTeam).to receive(:remove_team_by_id).with(team_id).and_return(true)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
-        allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(false)
+        allow(TeamsParticipant).to receive(:add_accepted_invitee_to_team).with(user2.id, user3.id, assignment.id).and_return(false)
         expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(false)
       end
     end
     context 'a user is not on a team and wishes to join a team without slots' do
       it 'returns false' do
         team_id = 0
-        allow(TeamsUser).to receive(:team_empty?).with(team_id).and_return(false)
+        allow(TeamsParticipant).to receive(:team_empty?).with(team_id).and_return(false)
         allow(Invitation).to receive(:remove_users_sent_invites_for_assignment).with(user3.id, assignment.id).and_return(true)
-        allow(TeamsUser).to receive(:add_member_to_invited_team).with(user2.id, user3.id, assignment.id).and_return(false)
+        allow(TeamsParticipant).to receive(:add_accepted_invitee_to_team).with(user2.id, user3.id, assignment.id).and_return(false)
         expect(Invitation.accept_invitation(team_id, user2.id, user3.id, assignment.id)).to eq(false)
       end
     end
@@ -88,34 +88,34 @@ describe Invitation do
 
   describe '#update_users_topic_after_invite_accept' do
     context 'the invited user was already in another team before accepting their invitation' do
-      it 'updates their team user mapping' do
-        updated_teams_user = TeamsUser.new
-        updated_teams_user.team_id = team.id
-        updated_teams_user.user_id = user3.id
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
-        allow(created_teams_user).to receive(:id).and_return(1)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
-        allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_user)
-        allow(TeamsUser).to receive(:update).with(1, team_id: team.id).and_return(updated_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+      it 'updates their team participant mapping' do
+        updated_teams_participant = TeamsParticipant.new
+        updated_teams_participant.team_id = team.id
+        updated_teams_participant.user_id = user3.id
+        created_teams_participant = TeamsParticipant.new
+        created_teams_participant.team_id = team.id
+        created_teams_participant.user_id = user3.id
+        allow(created_teams_participant).to receive(:id).and_return(1)
+        allow(TeamsParticipant).to receive(:find_team_id).with(assignment.id, user2.id).and_return(team.id)
+        allow(TeamsParticipant).to receive(:find_team_id).with(assignment.id, user3.id).and_return(team2.id)
+        allow(TeamsParticipant).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_participant)
+        allow(TeamsParticipant).to receive(:update).with(1, team_id: team.id).and_return(updated_teams_participant)
+        teams_participant = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+        expect(teams_participant.team_id).to eq(team.id)
+        expect(teams_participant.user_id).to eq(user3.id)
       end
     end
     context 'the invited user was never in another team before accepting their invitation' do
       it 'creates a team user mapping' do
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(nil)
-        allow(TeamsUser).to receive(:create).with(team_id: team.id, user_id: user3.id).and_return(created_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+        created_teams_participant = TeamsParticipant.new
+        created_teams_participant.team_id = team.id
+        created_teams_participant.user_id = user3.id
+        allow(TeamsParticipant).to receive(:find_team_id).with(assignment.id, user2.id).and_return(team.id)
+        allow(TeamsParticipant).to receive(:find_team_id).with(assignment.id, user3.id).and_return(nil)
+        allow(TeamsParticipant).to receive(:create).with(team_id: team.id, user_id: user3.id).and_return(created_teams_participant)
+        teams_participant = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+        expect(teams_participant.team_id).to eq(team.id)
+        expect(teams_participant.user_id).to eq(user3.id)
       end
     end
   end

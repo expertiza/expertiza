@@ -105,7 +105,7 @@ module GithubMetricsHelper
   end
 
   # There may or may not be an associated username in expertiza related to the github account if
-  # a team member accidentally pushed to their repoistory with the wrong account, in this case
+  # a team member accidentally pushed to their repository with the wrong account, in this case
   # use the github name assosicated with that account instead of the expertiza username
   def expertiza_username(author)
     github_association = GithubAssociation.find_by_github_user(author[1])

@@ -545,7 +545,7 @@ module ReviewMappingHelper
 
   class TeamReviewStrategy < ReviewStrategy
     def reviews_per_team
-      @review_num
+      @review_num 
     end
 
     def reviews_needed

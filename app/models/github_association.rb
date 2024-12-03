@@ -2,6 +2,7 @@ class GithubAssociation < ApplicationRecord
     validates :expertiza_username, presence: true, uniqueness: { scope: :github_user }
     validates :github_user, presence: true
 
+    # Associate a github username with expertiza username and save the association in the database
     def self.import(row_hash, _row_header, session, _id = nil)
         raise ArgumentError, "Only #{row_hash.length} column(s) is(are) found. It must contain at least expertiza_username, github_user." if row_hash.length < 2
     

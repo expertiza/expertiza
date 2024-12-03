@@ -104,12 +104,17 @@ class ImportFileController < ApplicationController
         errors << $ERROR_INFO
       end
     elsif params[:model] == 'GithubAssociation'
-      contents_hash = eval(params[:contents_hash])
+      formatted = params[:contents_hash].gsub(/:(\w+)=>/, '"\1":')
+
+      formatted = formatted.tr("'", '"')
+
+      eval_hash = formatted.match(/^{.*}$/) ? eval(formatted) : {}
+        eval_hash.transform_keys(&:to_sym) # Ensure keys are symbols
       if params[:has_header] == 'true'
-        @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(eval_hash[:header], eval_hash[:body])
       else
         new_header = ['expertiza_username', 'github_user']
-        @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+        @header_integrated_body = hash_rows_with_headers(new_header, eval_hash[:body])
       end
       errors = []
       begin
@@ -199,7 +204,8 @@ class ImportFileController < ApplicationController
   #
   def hash_rows_with_headers(header, body)
     new_body = []
-    if (params[:model] == 'User') || (params[:model] == 'AssignmentParticipant') || (params[:model] == 'CourseParticipant') || (params[:model] == 'SignUpTopic')
+    if (params[:model] == 'User') || (params[:model] == 'AssignmentParticipant') || (params[:model] == 'CourseParticipant') ||
+       (params[:model] == 'SignUpTopic') || (params[:model] == 'GithubAssociation')
       header.map! { |str| str.strip.downcase.gsub(/\s+/, "").to_sym }
       body.each do |row|
         new_body << header.zip(row).to_h
@@ -218,11 +224,6 @@ class ImportFileController < ApplicationController
           h[header[0]] = row
         end
         new_body << h
-      end
-    elsif params[:model] == 'GithubAssociation'
-      header.map! { |str| str.strip.downcase.gsub(/\s+/, "").to_sym }
-      body.each do |row|
-        new_body << header.zip(row).to_h
       end
     elsif params[:model] == 'ReviewResponseMap'
       header.map!(&:to_sym)

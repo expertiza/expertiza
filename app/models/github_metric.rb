@@ -19,11 +19,9 @@ class GithubMetric
 
   # Main method to process all metrics for a team's GitHub submissions
   # @return [GithubMetric] Returns self after processing
-  # @raise [StandardError] if GitHub token is missing
-  def process_metrics
-    return handle_missing_token unless @token
+  def build_metric
     retrieve_metrics
-    query_all_merge_statuses
+    merge_status?
     self
   end
 
@@ -93,7 +91,7 @@ class GithubMetric
     response_metrics = {}
 
     while has_next_page
-      response_metrics = query_commit_statistics(pull_query(hyperlink_metrics))
+      response_metrics = commit_statistics(pull_query(hyperlink_metrics))
       current_commits = response_metrics["data"]["repository"]["pullRequest"]["commits"]
       current_page_info = current_commits["pageInfo"]
       
@@ -128,9 +126,9 @@ class GithubMetric
   end
 
   # Queries status checks for all pull requests
-  def query_all_merge_statuses
+  def merge_status?
     @head_refs.each do |pull_number, pr_object|
-      @check_statuses[pull_number] = query_pull_request_status(pr_object)
+      @check_statuses[pull_number] = pull_request_status(pr_object)
     end
   end
 
@@ -149,7 +147,7 @@ class GithubMetric
   # Executes GraphQL query against GitHub API
   # @param metrics [String] GraphQL query string
   # @return [Hash] Parsed JSON response from GitHub
-  def query_commit_statistics(metrics)
+  def commit_statistics(metrics)
     uri = URI.parse("https://api.github.com/graphql")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
@@ -171,7 +169,7 @@ class GithubMetric
   # Queries GitHub API for pull request status checks
   # @param pr_object [Hash] Pull request identification information
   # @return [Hash] Status check results
-  def query_pull_request_status(pr_object)
+  def pull_request_status(pr_object)
     url = "https://api.github.com/repos/#{pr_object[:owner]}/#{pr_object[:repository]}/commits/#{pr_object[:head_commit]}/status"
     ActiveSupport::JSON.decode(Net::HTTP.get(URI(url)))
   end
@@ -206,12 +204,6 @@ class GithubMetric
     @total_files_changed = "Not Available"
     pull_request_number = -1
     @merge_status[pull_request_number] = "Not A Pull Request"
-  end
-
-  # Handles case when GitHub token is missing
-  # @raise [StandardError] Always raises error about missing token
-  def handle_missing_token
-    raise StandardError, "GitHub access token is required"
   end
 
   # GraphQL query template for pull request data

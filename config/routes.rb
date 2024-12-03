@@ -478,9 +478,10 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :github_metrics do
+  resources :github_metrics, only: [] do
     collection do
       get '/auth/:provider/callback', to: 'github_metrics#callback'
+      get 'github_metrics/initialize_oath', to: 'github_metrics#initialize_oath'
     end
   end
 

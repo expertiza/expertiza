@@ -22,20 +22,13 @@ RSpec.describe GithubMetric, type: :model do
     end
   end
 
-  # Test to see that the appropriate error is given if there is no github access token
-  describe '#process_metrics' do
-    context 'when token is missing' do
-      it 'raises a missing token error' do
-        github_metric.instance_variable_set(:@token, nil)
-        expect { github_metric.process_metrics }.to raise_error(StandardError, 'GitHub access token is required')
-      end
-    end
+  describe '#build_metric' do
 
     # Test to see that the appropriate error is given if no pull request links have been submitted
     context 'when no pull request links exist' do
       it 'raises an error for missing pull request links' do
         allow(team).to receive(:hyperlinks).and_return([])
-        expect { github_metric.process_metrics }.to raise_error(StandardError, 'No pull request links have been submitted by this team.')
+        expect { github_metric.build_metric }.to raise_error(StandardError, 'No pull request links have been submitted by this team.')
       end
     end
 
@@ -69,7 +62,7 @@ RSpec.describe GithubMetric, type: :model do
       # Test to see that given a valid pull request link exists that the
       # metrics are properly parsed from a returned graphql query
       it 'retrieves and parses pull request metrics successfully' do
-        github_metric.process_metrics
+        github_metric.build_metric
         expect(github_metric.total_additions).to eq(10)
         expect(github_metric.total_deletions).to eq(5)
         expect(github_metric.total_files_changed).to eq(2)

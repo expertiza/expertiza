@@ -50,8 +50,8 @@ class AuthController < ApplicationController
     session["github_access_token"] = request.env['omniauth.auth']["credentials"]["token"]
     if session["github_view_type"] == "view_submissions"
       redirect_to controller: 'assignments', action: 'list_submissions', id: session["assignment_id"]
-    elsif session["github_view_type"] == "view_scores"
-      redirect_to view_grades_path(id: session["assignment_id"])
+    else
+      redirect_to root_path
     end
   end
 

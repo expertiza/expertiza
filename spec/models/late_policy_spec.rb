@@ -1,6 +1,6 @@
 require 'penalty_helper'
 require 'active_support/all'
-include PenaltyHelper
+include ScoreCalculationHelper
 describe LatePolicy do
   let(:late_policy) { build(:late_policy) }
   let(:calculated_penalty) { build(:calculated_penalty) }
@@ -86,7 +86,7 @@ describe LatePolicy do
     it 'does not update calculated penalty when deadline type id is nil' do
       calculated_penalty.deadline_type_id = nil
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
-      allow_any_instance_of(PenaltyHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
+      allow_any_instance_of(ScoreCalculationHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       @old_penalty = calculated_penalty[:penalty_ponits]
       expect(LatePolicy.update_calculated_penalty_objects(late_policy)).to eq(Array(calculated_penalty))
@@ -98,7 +98,7 @@ describe LatePolicy do
     it 'updates calculated penalty by submission penalty when deadline type id is 1' do
       calculated_penalty.deadline_type_id = 1
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
-      allow_any_instance_of(PenaltyHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
+      allow_any_instance_of(ScoreCalculationHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       @old_penalty = calculated_penalty[:penalty_ponits]
       expect(LatePolicy.update_calculated_penalty_objects(late_policy)).to eq(Array(calculated_penalty))
@@ -110,7 +110,7 @@ describe LatePolicy do
     it 'updates calculated penalty by review penalty when deadline type id is 2' do
       calculated_penalty.deadline_type_id = 2
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
-      allow_any_instance_of(PenaltyHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
+      allow_any_instance_of(ScoreCalculationHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       @old_penalty = calculated_penalty[:penalty_ponits]
       expect(LatePolicy.update_calculated_penalty_objects(late_policy)).to eq(Array(calculated_penalty))
@@ -122,7 +122,7 @@ describe LatePolicy do
     it 'updates calculated penalty by meta review penalty when deadline type id is 5' do
       calculated_penalty.deadline_type_id = 5
       allow(CalculatedPenalty).to receive(:all).and_return(Array(calculated_penalty))
-      allow_any_instance_of(PenaltyHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
+      allow_any_instance_of(ScoreCalculationHelper).to receive(:calculate_penalty).and_return(submission: 1, review: 2, meta_review: 3)
       allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
       @old_penalty = calculated_penalty[:penalty_ponits]
       expect(LatePolicy.update_calculated_penalty_objects(late_policy)).to eq(Array(calculated_penalty))

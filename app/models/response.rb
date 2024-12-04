@@ -48,7 +48,7 @@ class Response < ApplicationRecord
       # For quiz responses, the weights will be 1 or 0, depending on if correct
       sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
     end
-    penalty = LatePolicy.calculate_penalty(submission_time, due_date)
+    penalty = LatePolicy.calculate_penalty(updated_at, submission_deadline)
     apply_penalty(sum, penalty)
   end
 

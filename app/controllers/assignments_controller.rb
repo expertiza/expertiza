@@ -37,8 +37,8 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
       else
         flash[:error] = 'Failed to create assignment.'
-        flash[:error] << content_tag(:br) + " #{name} already exists as an assignment name" if is_conflict[:by_name]
-        flash[:error] << content_tag(:br) + " #{dir_path} already exists as a submission directory name" if is_conflict[:by_directory]
+        flash[:error] << "<br/> #{name} already exists as an assignment name" if is_conflict[:by_name]
+        flash[:error] << "<br/> #{dir_path} already exists as a submission directory name" if is_conflict[:by_directory]
         redirect_to '/assignments/new?private=1'
       end
     else
@@ -233,7 +233,7 @@ class AssignmentsController < ApplicationController
     end
     needed_rub = needed_rub[0...-2]
     needed_rub += ']'
-    needed_rub = content_tag(:strong, needed_rub)
+    needed_rub = "<b>" + needed_rub + "</b>"
   end
 
   # checks an assignment's due date has a name or description
@@ -387,10 +387,9 @@ class AssignmentsController < ApplicationController
       rubrics_needed = needed_rubrics(list_unassigned_rubrics)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       if flash.now[:error] != 'Failed to save the assignment: ["Total weight of rubrics should add up to either 0 or 100%"]'
-        flash.now[:error] = "You did not specify all the necessary rubrics. You need #{rubrics_needed} of assignment " +
-          content_tag(:strong, @assignment_form.assignment.name).html_safe +
-          " before saving the assignment. You can assign rubrics " +
-          link_to('here', '#', id: 'go_to_tabs2', style: 'color: blue;').html_safe + "."
+        flash.now[:error] = 'You did not specify all the necessary rubrics. You need ' + rubrics_needed +
+          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
       end
     end
   end
@@ -493,10 +492,7 @@ class AssignmentsController < ApplicationController
 
   # This methods send out an alert to add participants to an assignment.
   def alert_missing_participants(id)
-    flash[:error] = %(
-      Saved assignment is missing participants. Add them
-      #{link_to('here', participants_list_path(id: id, model: 'Assignment'))}
-    ).html_safe
+    flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
   end
 
   # sets values allowed for the assignment form

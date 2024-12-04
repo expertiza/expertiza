@@ -34,7 +34,7 @@ class ReviewBid < ApplicationRecord
   end
 
   def self_topic
-    return nil unless topic&.assignment_id
+    return nil unless topic && topic.assignment_id
 
     SignedUpTeam.topic_id(topic.assignment_id, participant.user_id)
   end

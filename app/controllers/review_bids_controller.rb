@@ -23,7 +23,7 @@ class ReviewBidsController < ApplicationController
     @assignment = participant_service.assignment
     unless @assignment.is_a?(Assignment)
       flash[:error] = 'Assignment not found.'
-      redirect_back fallback_location: root_path and return
+      redirect_back fallback_location: root_path && return
     end
 
     @review_mappings = review_service.review_mappings
@@ -86,7 +86,6 @@ class ReviewBidsController < ApplicationController
 
   # Assigns bidding topics to reviewers
   def assign_bidding
-    begin
       assignment = validate_assignment(params[:assignment_id])
 
       reviewers = validate_reviewers(assignment.id)
@@ -96,7 +95,7 @@ class ReviewBidsController < ApplicationController
 
       if matched_topics.blank?
         flash[:alert] = 'Topic or assignment is missing'
-        redirect_back fallback_location: root_path and return
+        redirect_back fallback_location: root_path && return
       end
 
       leftover_topics = find_leftover_topics(assignment.id, matched_topics)
@@ -120,7 +119,6 @@ class ReviewBidsController < ApplicationController
       Rails.logger.error "StandardError: #{e.message}"
       redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
     end
-  end
 
   private
 

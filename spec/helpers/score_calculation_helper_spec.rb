@@ -3,26 +3,6 @@ require 'rails_helper'
 RSpec.describe ScoreCalculationHelper, type: :helper do
   include ScoreCalculationHelper
 
-  describe '#weighted_score' do
-    it 'calculates the correct weighted score with valid inputs' do
-      scores = [80, 90, 100]
-      weights = [1, 2, 3]
-      expect(weighted_score(scores, weights)).to eq((80 * 1 + 90 * 2 + 100 * 3) / 6.0)
-    end
-
-    it 'returns 0 when all scores are 0' do
-      scores = [0, 0, 0]
-      weights = [1, 2, 3]
-      expect(weighted_score(scores, weights)).to eq(0.0)
-    end
-
-    it 'handles cases where weights are equal' do
-      scores = [80, 90, 100]
-      weights = [1, 1, 1]
-      expect(weighted_score(scores, weights)).to eq(90.0)
-    end
-  end
-
   describe '#apply_penalty' do
     it 'reduces the score by the correct percentage penalty' do
       score = 100

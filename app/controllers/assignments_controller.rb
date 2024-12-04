@@ -110,22 +110,24 @@ class AssignmentsController < ApplicationController
 
   # deletes an assignment
   def delete
-    assignment_form = find_assignment_form(params[:id])
-    # Issue 1017 - allow instructor to delete assignment created by TA.
-    # FixA : TA can only delete assignment created by itself.
-    # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
-    if authorized_to_delete?(assignment_form)
-      perform_deletion(assignment_form, params[:force])
-    else
-      log_action(
-        action: :unauthorized_access,
-        message: 'You are not authorized to delete this assignment.'
-      )
-      flash[:error] = 'You are not authorized to delete this assignment.'
+    begin
+      assignment_form = AssignmentForm.create_form_object(params[:id])
+      user = session[:user]
+      # Issue 1017 - allow instructor to delete assignment created by TA.
+      # FixA : TA can only delete assignment created by itself.
+      # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
+      if current_user_has_instructor_privileges? || (current_user_has_ta_privileges? && (user.id == assignment_form.assignment.instructor_id))
+        assignment_form.delete(params[:force])
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
+        flash[:success] = 'The assignment was successfully deleted.'
+      else
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'You are not authorized to delete this assignment.', request)
+        flash[:error] = 'You are not authorized to delete this assignment.'
+      end
+    rescue StandardError => e
+      flash[:error] = e.message
     end
-  rescue StandardError => e
-    handle_deletion_error(e)
-  ensure
+
     redirect_to list_tree_display_index_path
   end
 
@@ -263,11 +265,14 @@ class AssignmentsController < ApplicationController
 
   # handle assignment form saved condition
   def assignment_form_save_handler
-    exist_assignment = find_existing_assignment
-    prepare_assignment_params(exist_assignment)
+    exist_assignment = Assignment.find_by(name: @assignment_form.assignment.name)
+    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
     fix_assignment_missing_path
     update_assignment_form(exist_assignment)
-    log_and_redirect
+    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+    ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
+    redirect_to edit_assignment_path aid
+    undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
   end
 
   # update_assignment_form_params to handle non existent directory path
@@ -483,59 +488,5 @@ class AssignmentsController < ApplicationController
   # sets values allowed for the assignment form
   def assignment_form_params
     params.require(:assignment_form).permit!
-  end
-
-  def find_existing_assignment
-    Assignment.find_by(name: @assignment_form.assignment.name)
-  end
-
-  def prepare_assignment_params(exist_assignment)
-    assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
-  end
-
-  def log_and_redirect
-    assignment_id = find_existing_assignment.id
-    ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-    redirect_to edit_assignment_path(assignment_id)
-    undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully.")
-  end
-
-  def find_assignment_form(id)
-    AssignmentForm.create_form_object(id)
-  end
-
-  def authorized_to_delete?(assignment_form)
-    user = session[:user]
-    user_instructor?(user) || user_ta_authorized?(user, assignment_form)
-  end
-
-  def user_instructor?(user)
-    user.role.name == 'Instructor'
-  end
-
-  def user_ta_authorized?(user, assignment_form)
-    user.role.name == 'Teaching Assistant' && user.id == assignment_form.assignment.instructor_id
-  end
-
-  def perform_deletion(assignment_form, force)
-    assignment_form.delete(force)
-    log_action(
-      action: :deletion,
-      message: "Assignment #{assignment_form.assignment.id} was deleted."
-    )
-    flash[:success] = 'The assignment was successfully deleted.'
-  end
-
-  def log_action(action:, message:)
-    ExpertizaLogger.info LoggerMessage.new(
-      controller_name,
-      session[:user].name,
-      message,
-      request
-    )
-  end
-
-  def handle_deletion_error(error)
-    flash[:error] = error.message
   end
 end

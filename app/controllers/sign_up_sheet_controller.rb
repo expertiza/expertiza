@@ -243,36 +243,26 @@ class SignUpSheetController < ApplicationController
   # renamed from signup_as_instructor to select_student_for_signup for better clarity
   def select_student_for_signup; end
 
-
+  # This action lets an instructor sign up a student for a topic in an assignment.  
+  # It checks if the student exists and is registered for the assignment, logging errors if not.  
+  # If the signup is successful, it logs the action; otherwise, it logs and displays an error.  
+  # Redirects back to the 'edit' page of the assignment in all cases.  
   def sign_up_as_instructor_action
   user = User.find_by(name: params[:username])
 
-  # Check if the user is nil (i.e., user not found in the database)
-  # If user is nil, display an error message to the user indicating the student does not exist
-  # Log the information for debugging or tracking purposes
-  # Redirect the user back to the 'edit' page of the current assignment
   if user.nil?
     flash[:error] = 'That student does not exist!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Student does not exist')
     return redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  # Check if there is an AssignmentParticipant record with the given user ID and assignment ID
-  # If no such record exists, display an error message indicating the student is not registered for the assignment
-  # Log this information for debugging or tracking purposes, including the user ID
-  # Redirect the user back to the 'edit' page of the current assignment
+ 
   unless AssignmentParticipant.exists?(user_id: user.id, parent_id: params[:assignment_id])
     flash[:error] = 'The student is not registered for the assignment!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Student is not registered for the assignment: #{user.id}")
     return redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
-  # Attempt to sign up the student for the specified topic using the signup_team method
-  # If successful, display a success message indicating the student has been signed up for the topic
-  # Log the action for tracking, including the topic ID
-  # If the signup fails (e.g., the student is already signed up for a topic), display an error message
-  # Log this information for tracking purposes
-  # Redirect the user back to the 'edit' page of the current assignment
   if SignUpSheet.signup_team(params[:assignment_id], user.id, params[:topic_id])
     flash[:success] = 'You have successfully signed up the student for the topic!'
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Instructor signed up student for topic: #{params[:topic_id]}")

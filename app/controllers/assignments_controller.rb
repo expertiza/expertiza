@@ -37,8 +37,8 @@ class AssignmentsController < ApplicationController
         @assignment_form.create_assignment_node
       else
         flash[:error] = 'Failed to create assignment.'
-        flash[:error] << "<br> #{name} already exists as an assignment name" if is_conflict[:by_name]
-        flash[:error] << "<br> #{dir_path} already exists as a submission directory name" if is_conflict[:by_directory]
+        flash[:error] << content_tag(:br) + " #{name} already exists as an assignment name" if is_conflict[:by_name]
+        flash[:error] << content_tag(:br) + " #{dir_path} already exists as a submission directory name" if is_conflict[:by_directory]
         redirect_to '/assignments/new?private=1'
       end
     else
@@ -57,11 +57,10 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_deadline_name(@due_date_all)
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
-    path_warning_and_answer_tag
+    flash_path_warning
+    set_tag_prompt_deployments
     update_assignment_badges
     @assigned_badges = @assignment_form.assignment.badges
-    @badges = Badge.all
-    @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
   end
 
@@ -131,9 +130,8 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
-  # sets the current assignment and suggestions for the assignment
+  # sets the current assignment for delayed mailer view
   def delayed_mailer
-    @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 
@@ -156,11 +154,9 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
+  # remove delayed job from mailer queue
   def delete_delayed_mailer
-    queue = Sidekiq::Queue.new('mailers')
-    queue.each do |job|
-      job.delete if job.jid == params[:delayed_job_id]
-    end
+    Mailer.delete_job_from_mailer_queue(params[:delayed_job_id])
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 
@@ -211,12 +207,13 @@ class AssignmentsController < ApplicationController
 
   # lists parts of the assignment that need a rubric assigned
   def needed_rubrics(empty_rubrics_list)
-    needed_rub = '<b>['
+    needed_rub = '['
     empty_rubrics_list.each do |item|
       needed_rub += item[0...-13] + ', '
     end
     needed_rub = needed_rub[0...-2]
-    needed_rub += '] </b>'
+    needed_rub += ']'
+    needed_rub = content_tag(:strong, needed_rub)
   end
 
   # checks an assignment's due date has a name or description
@@ -380,20 +377,27 @@ class AssignmentsController < ApplicationController
       rubrics_needed = needed_rubrics(list_unassigned_rubrics)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       if flash.now[:error] != 'Failed to save the assignment: ["Total weight of rubrics should add up to either 0 or 100%"]'
-        flash.now[:error] = 'You did not specify all the necessary rubrics. You need ' + rubrics_needed +
-                            " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
-                            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
+        flash.now[:error] = "You did not specify all the necessary rubrics. You need #{rubrics_needed} of assignment " +
+          content_tag(:strong, @assignment_form.assignment.name).html_safe +
+          " before saving the assignment. You can assign rubrics " +
+          link_to('here', '#', id: 'go_to_tabs2', style: 'color: blue;').html_safe + "."
       end
     end
   end
 
-  # flashes an error if an assignment has no directory and sets tag prompting
-  def path_warning_and_answer_tag
+  # flashes an error if an assignment has no directory
+  def flash_path_warning
     if @assignment_form.assignment.directory_path.blank?
       flash.now[:error] = 'You did not specify your submission directory.'
       ExpertizaLogger.error LoggerMessage.new(controller_name, '', 'Submission directory not specified', request)
     end
-    @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id]) if @assignment_form.assignment.is_answer_tagging_allowed
+  end
+
+  # sets tag_prompt_deployments in assignment_form if tagging of is allowed by getting the tag prompt deployment
+  def set_tag_prompt_deployments
+    if @assignment_form.assignment.is_answer_tagging_allowed
+      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
+    end
   end
 
   # update values for an assignment's due date when editing
@@ -479,7 +483,10 @@ class AssignmentsController < ApplicationController
 
   # This methods send out an alert to add participants to an assignment.
   def alert_missing_participants(id)
-    flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
+    flash[:error] = %(
+      Saved assignment is missing participants. Add them
+      #{link_to('here', participants_list_path(id: id, model: 'Assignment'))}
+    ).html_safe
   end
 
   # sets values allowed for the assignment form

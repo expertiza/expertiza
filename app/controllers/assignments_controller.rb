@@ -175,6 +175,26 @@ class AssignmentsController < ApplicationController
 
   private
 
+  # initialize checkboxes related data for view
+  def initialize_checkboxes
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
+    @metareview_allowed
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+  end
+
+  # initialize participants and team counts
+  def initialize_participant_team_counts
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+  end
+
   # check whether rubrics are set before save assignment
   def list_unassigned_rubrics
     rubrics_list = %w[ReviewQuestionnaire
@@ -315,18 +335,8 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
+    initialize_checkboxes
+    initialize_participant_team_counts
   end
 
   # populates assignment deadlines in the form if they are staggered

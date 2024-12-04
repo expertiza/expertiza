@@ -14,8 +14,18 @@ FactoryBot.define do
   end 
 
   factory :review_bid, class: ReviewBid do
+    association :topic, factory: :sign_up_topic # Ensures valid topic association
+    association :participant, factory: :participant
     priority 2
-    signuptopic_id 123
+    # signuptopic_id 123
+  end
+
+  factory :sign_up_topic do
+    sequence(:topic_name) { |n| "topic#{n}" }
+    assignment { association(:assignment) }
+    max_choosers { 3 }
+    category { 'Test Category' }
+    sequence(:topic_identifier) { |n| "tid#{n}" }
   end
 
   factory :role_of_administrator, class: Role do
@@ -121,11 +131,13 @@ FactoryBot.define do
 
   factory :student, class: User do
     # Zhewei: In order to keep students the same names (2065, 2066, 2064) before each example.
-    sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    # sequence(:name) { |n| n = n % 3; "student206#{n + 4}" }
+    sequence(:name) { |n| "student#{n}" }
     role { Role.where(name: 'Student').first || association(:role_of_student) }
     password 'password'
     password_confirmation 'password'
-    sequence(:fullname) { |n| n = n % 3; "206#{n + 4}, student" }
+    # sequence(:fullname) { |n| n = n % 3; "206#{n + 4}, student" }
+    sequence(:fullname) { |n| "fullname#{n}" }
     email 'expertiza@mailinator.com'
     parent_id 1
     private_by_default  false
@@ -135,7 +147,7 @@ FactoryBot.define do
     email_on_review_of_review true
     is_new_user false
     master_permission_granted 0
-    handle 'handle'
+    sequence(:handle) { |n| "student_handle_#{n}" }
     digital_certificate nil
     timezonepref 'Eastern Time (US & Canada)'
     public_key nil
@@ -332,7 +344,7 @@ FactoryBot.define do
     penalty_accumulated 0
     grade nil
     type 'AssignmentParticipant'
-    handle 'handle'
+    sequence(:handle) { |n| "handle_#{n}" }
     time_stamp nil
     digital_signature nil
     can_mentor false

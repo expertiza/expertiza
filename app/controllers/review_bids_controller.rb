@@ -86,18 +86,36 @@ class ReviewBidsController < ApplicationController
 
   # Assigns bidding topics to reviewers
   def assign_bidding
-    assignment_id = params[:assignment_id].to_i
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = BiddingAlgorithmService.new(bidding_data).run
+    begin
+      assignment = validate_assignment(params[:assignment_id])
 
-    unless matched_topics
-      return redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+      reviewers = validate_reviewers(assignment.id)
+
+      matched_topics = run_bidding_algorithm
+
+      if matched_topics.blank?
+        flash[:alert] = 'Topic or assignment is missing'
+        redirect_back fallback_location: root_path and return
+      end
+
+      ReviewBid.new.assign_review_topics(matched_topics)
+
+      assignment.update!(can_choose_topic_to_review: false)
+
+      redirect_back fallback_location: root_path, notice: 'Reviewers were successfully assigned to topics.'
+    rescue ArgumentError => e
+      Rails.logger.error "ArgumentError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: e.message
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "ActiveRecord::RecordInvalid: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+    rescue ActiveRecord::ActiveRecordError => e
+      Rails.logger.error "ActiveRecord::ActiveRecordError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+    rescue StandardError => e
+      Rails.logger.error "StandardError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
     end
-
-    ReviewBid.assign_review_topics(matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
-    redirect_back fallback_location: root_path, notice: 'Reviewers were successfully assigned to topics.'
   end
 
   private
@@ -124,5 +142,28 @@ class ReviewBidsController < ApplicationController
 
     flash[:error] = 'Invalid participant access.'
     redirect_back fallback_location: root_path
+  end
+
+  def validate_assignment(assignment_id)
+    assignment = Assignment.find_by(id: assignment_id.to_i)
+    raise ArgumentError, 'Invalid assignment. Please check and try again.' unless assignment
+
+    assignment
+  end
+
+  def validate_reviewers(assignment_id)
+    reviewers = AssignmentParticipant.where(parent_id: assignment_id)
+    raise ArgumentError, 'No reviewers available for the assignment.' if reviewers.empty?
+
+    reviewers
+  end
+
+  def run_bidding_algorithm
+    review_bid = ReviewBid.new
+    bidding_data = review_bid.bidding_data
+    matched_topics = BiddingAlgorithmService.new(bidding_data).run
+    raise ArgumentError, 'Failed to assign reviewers. Please try again later.' unless matched_topics
+
+    matched_topics
   end
 end

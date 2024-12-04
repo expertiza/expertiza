@@ -9,11 +9,11 @@ class BiddingAlgorithmService
   # MOCK_DATA is based on the documentation detailing how the webservice behaves.
   # Reference: https://wiki.expertiza.ncsu.edu/index.php?title=CSC/ECE_517_Fall_2020_-_E2085._Allow_reviewers_to_bid_on_what_to_review#Webservice
   MOCK_DATA = {
-    '36239' => [3970, 3972, 3975],
-    '36240' => [3973, 3974, 3972],
-    '36241' => [3969, 3971, 3972],
-    '36242' => [3969, 3971, 3973],
-    '36243' => [3969, 3970, 3971]
+    36239 => [3970, 3972, 3975],
+    36240 => [3973, 3974, 3972],
+    36241 => [3969, 3971, 3972],
+    36242 => [3969, 3971, 3973],
+    36243 => [3969, 3970, 3971]
   }.freeze
 
   def initialize(bidding_data)
@@ -21,7 +21,7 @@ class BiddingAlgorithmService
   end
 
   def run
-    return MOCK_DATA if Rails.application.configuration.use_mock_bidding_algorithm
+    return MOCK_DATA if Rails.application.config.use_mock_bidding_algorithm
 
     perform_request
   rescue RestClient::ExceptionWithResponse, JSON::ParserError

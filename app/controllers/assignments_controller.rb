@@ -152,9 +152,8 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
-  # sets the current assignment and suggestions for the assignment
+  # sets the current assignment for delayed mailer view
   def delayed_mailer
-    @suggestions = Suggestion.where(assignment_id: params[:id])
     @assignment = Assignment.find(params[:id])
   end
 
@@ -177,11 +176,9 @@ class AssignmentsController < ApplicationController
     redirect_to list_tree_display_index_path
   end
 
+  # remove delayed job from mailer queue
   def delete_delayed_mailer
-    queue = Sidekiq::Queue.new('mailers')
-    queue.each do |job|
-      job.delete if job.jid == params[:delayed_job_id]
-    end
+    Mailer.delete_job_from_mailer_queue(params[:delayed_job_id])
     redirect_to delayed_mailer_assignments_index_path params[:id]
   end
 

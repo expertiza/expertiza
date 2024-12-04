@@ -86,31 +86,42 @@ class ReviewBidsController < ApplicationController
 
   # Assigns bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
-    assignment_id = params[:assignment_id].to_i
+    begin
+      assignment = validate_assignment(params[:assignment_id])
 
-    #bidding data
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+      reviewers = validate_reviewers(assignment.id)
+      reviewer_ids = reviewers.map(&:id)
 
-    #topic management
-    matched_topics = assign_reviewers(bidding_data)
-    leftover_topics = find_leftover_topics(assignment_id, matched_topics)
-    assign_leftover_topics(bidding_data[:reviewer_ids], matched_topics, leftover_topics)
+      matched_topics = run_bidding_algorithm
 
-    ReviewBid.assign_review_topics(matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
-    redirect_back fallback_location: root_path
+      if matched_topics.blank?
+        flash[:alert] = 'Topic or assignment is missing'
+        redirect_back fallback_location: root_path and return
+      end
+
+      leftover_topics = find_leftover_topics(assignment.id, matched_topics)
+      assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+
+      ReviewBid.new.assign_review_topics(matched_topics)
+      assignment.update!(can_choose_topic_to_review: false)
+
+      flash[:notice] = 'Reviewers were successfully assigned to topics.'
+      redirect_back fallback_location: root_path
+    rescue ArgumentError => e
+      Rails.logger.error "ArgumentError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: e.message
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "ActiveRecord::RecordInvalid: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+    rescue ActiveRecord::ActiveRecordError => e
+      Rails.logger.error "ActiveRecord::ActiveRecordError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+    rescue StandardError => e
+      Rails.logger.error "StandardError: #{e.message}"
+      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+    end
   end
 
-  # removed url that no longer functioned
-  # added mocked data
-  # Replace when new service becomes available
-  def assign_reviewers(bidding_data)
-    mocked_data = mock_bidding_data(bidding_data) # Use mocked data
-    process_mocked_bidding_data(mocked_data)
-  end
-  
   private
 
   # Initialize participant service
@@ -137,47 +148,47 @@ class ReviewBidsController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
-  # Replace when new service becomes available
-  def mock_bidding_data(bidding_data)
-  
-    {
-    assignment_id: bidding_data[:assignment_id],
-    reviewer_ids: bidding_data[:reviewer_ids],
-    topics: [
-      { topic_id: 1, preferences: [2, 1, 3] },
-      { topic_id: 2, preferences: [3, 1, 2] },
-      { topic_id: 3, preferences: [1, 2, 3] }
-    ],
-    matched: [
-      { reviewer_id: bidding_data[:reviewer_ids][0], topic_id: 1 },
-      { reviewer_id: bidding_data[:reviewer_ids][1], topic_id: 2 },
-      { reviewer_id: bidding_data[:reviewer_ids][2], topic_id: 3 }
-    ]
-    }
-  end
-
-  # Process mocked bidding data to simulate algorithm behavior
-  def process_mocked_bidding_data(mocked_data)
-    mocked_data[:matched] # Return matched data for downstream processing
-  end
-
   def find_leftover_topics(assignment_id, matched_topics)
     all_topic_ids = SignUpTopic.where(assignment_id: assignment_id).pluck(:id)
     assigned_topic_ids = matched_topics.map { |match| match[:topic_id] }
-  
+
     # Calculate leftover topics
     all_topic_ids - assigned_topic_ids
   end
-  
+
   def assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+    return if leftover_topics.blank?
+
     # Find non-bidders by excluding already matched reviewers
-    non_bidders = reviewer_ids - matched_topics.map { |match| match[:reviewer_id] }
-  
+    non_bidders = reviewer_ids - matched_topics.keys
+
     # Assign leftover topics to non-bidders in a round-robin fashion
     non_bidders.each_with_index do |reviewer_id, index|
       topic_id = leftover_topics[index % leftover_topics.length]
       ReviewBid.create(priority: 1, signuptopic_id: topic_id, participant_id: reviewer_id)
     end
   end
-  
+
+  def validate_assignment(assignment_id)
+    assignment = Assignment.find_by(id: assignment_id.to_i)
+    raise ArgumentError, 'Invalid assignment. Please check and try again.' unless assignment
+
+    assignment
+  end
+
+  def validate_reviewers(assignment_id)
+    reviewers = AssignmentParticipant.where(parent_id: assignment_id)
+    raise ArgumentError, 'No reviewers available for the assignment.' if reviewers.empty?
+
+    reviewers
+  end
+
+  def run_bidding_algorithm
+    review_bid = ReviewBid.new
+    bidding_data = review_bid.bidding_data
+    matched_topics = BiddingAlgorithmService.new(bidding_data).run
+    raise ArgumentError, 'Failed to assign reviewers. Please try again later.' unless matched_topics
+
+    matched_topics
+  end
 end

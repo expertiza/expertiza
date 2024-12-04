@@ -41,17 +41,12 @@ class ReviewBid < ApplicationRecord
 
   # Assign topics to reviews
   def assign_review_topics(matched_topics)
-    # error handling
-    raise ArgumentError, 'Matched topics must be a Hash' unless matched_topics.is_a?(Hash)
+    validate_topics_and_assignment!(matched_topics)
 
-    # Clear existing response maps for this assignment
     ReviewResponseMap.where(reviewed_object_id: topic.assignment_id).destroy_all
 
-    # Assign topics for each reviewer
     matched_topics.each do |reviewer_id, topics|
-      Array(topics).each do |topic_id|
-        assign_topic_to_reviewer(reviewer_id, topic_id)
-      end
+      Array(topics).each { |topic_id| assign_topic_to_reviewer(reviewer_id, topic_id) }
     end
   end
 
@@ -69,5 +64,12 @@ class ReviewBid < ApplicationRecord
     # error handling
   rescue StandardError => e
     Rails.logger.error("Failed to assign topic #{topic_id} to reviewer #{reviewer_id}: #{e.message}")
+  end
+
+  private
+
+  def validate_topics_and_assignment!(matched_topics)
+    raise ArgumentError, 'Topic or assignment is missing' if topic.nil? || topic.assignment_id.nil?
+    raise ArgumentError, 'Matched topics must be a Hash' unless matched_topics.is_a?(Hash)
   end
 end

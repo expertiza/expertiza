@@ -94,5 +94,5 @@ class StudentReviewController < ApplicationController
     return true unless %w[list].include?(action_name)
 
     are_needed_authorizations_present?(params[:id], 'submitter')
-  end  
+  end
 end

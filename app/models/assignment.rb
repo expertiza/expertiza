@@ -677,23 +677,5 @@ class Assignment < ApplicationRecord
       signed_up_teams.destroy_all
     end
   end
-
-  # Initialize the assignment with instructor and clean questionnaire parameters.
-  def self.initialize_form(assignment_form_params, current_user)
-    form = AssignmentForm.create_form_object(assignment_form_params[:id])
-    form.assignment.instructor ||= current_user
-
-    # Reject empty questionnaire IDs
-    assignment_form_params[:assignment_questionnaire].reject! { |q| q[:questionnaire_id].empty? }
-
-    form
-  end
-
-  # Deletes meta-review due dates if meta-review is unchecked.
-  def self.delete_metareview_due_dates(assignment_id, metareview_allowed)
-    return if metareview_allowed != 'false'
-
-    DueDate.where(parent_id: assignment_id, deadline_type_id: 5).destroy_all
-  end
 end
 

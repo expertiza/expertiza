@@ -66,7 +66,7 @@ class LatePolicy < ApplicationRecord
                     when 'Day'
                       time_diff / 86400
                     else
-                      raise 'Invalid penalty unit'
+                      raise 'Invalid. Penalty unit must be Minute, Hour or Day' 
                     end
 
     raise 'Penalty per unit is missing' if penalty_per_unit.nil?

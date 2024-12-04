@@ -194,26 +194,20 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: assignment_id
   end
 
+  # The `list` method prepares and displays the sign-up sheet or intelligent topic selection page for a given assignment participant.
+  # It fetches the necessary data about the participant, assignment, deadlines, and topic selection status, 
+  # and dynamically adjusts the display based on whether the assignment uses intelligent topic selection.
   def list
-    # Fetch participant and assignment details
     @participant = AssignmentParticipant.find(params[:id].to_i)
     fetch_assignment_details(@participant)
-  
-    # Fetch deadline information
     fetch_deadlines(@assignment)
-  
-    # Determine if actions can be shown based on deadlines
     @show_actions = !set_action_display_status(@assignment)
-  
-    # Determine user's selected topics and team-related information
+      
     user_sign_up_status(@assignment, session[:user].id)
     team_id = @participant.team.try(:id)
-  
-    # Handle intelligent assignments
+    
     if @assignment.is_intelligent
       @bids = team_id.nil? ? [] : Bid.where(team_id: team_id).order(:priority)
-  
-      # Collect and filter topics based on bids
       signed_up_topics = @bids.map { |bid| SignUpTopic.find_by(id: bid.topic_id) }.compact
       signed_up_topics &= @sign_up_topics
       @sign_up_topics -= signed_up_topics
@@ -221,23 +215,19 @@ class SignUpSheetController < ApplicationController
     else
       @bids = []
     end
-  
-    # Calculate the size of the signup topic list
+    
     @num_of_topics = @sign_up_topics.size
-  
-    # Store bid information
     @student_bids = team_id.nil? ? [] : Bid.where(team_id: team_id)
-  
-    # Render the intelligent topic selection view if applicable
+    
     if @assignment.is_intelligent
       render('sign_up_sheet/intelligent_topic_selection') && return
     end
-  
-    # Default rendering
     render('sign_up_sheet/list')
   end
   
-
+  # The `sign_up` method allows a user to sign up for a topic in a specific assignment.
+  # It ensures that the user belongs to a team and attempts to assign the team to the selected topic.
+  # If the team is already signed up for a topic, an error message is displayed.
   def sign_up
     @assignment = AssignmentParticipant.find(params[:id]).assignment
     @user_id = session[:user].id
@@ -248,8 +238,6 @@ class SignUpSheetController < ApplicationController
     redirect_to action: 'list', id: params[:id]
   end
 
-  # routes to new page to specify student
-  def sign_up_as_instructor; end
   # This method routes the instructor to a new page where it requests a student to sign up
   # This student id along with assignment and topic id is then used in the signup_as_instructor function
   # renamed from signup_as_instructor to select_student_for_signup for better clarity
@@ -343,6 +331,8 @@ end
     redirect_to controller: 'assignments', action: 'edit', id: assignment.id
   end
 
+  # The `set_priority` method manages the prioritization of topics for a participant's team in an assignment.
+  # It ensures topics are assigned a priority level, removes deselected topics, and updates the priority order in the `Bid` table.
   def set_priority
     participant = AssignmentParticipant.find_by(id: params[:participant_id])
     assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
@@ -380,21 +370,9 @@ end
   # This is true in case of a staggered deadline type assignment. Individual deadlines can
   # be set on a per topic and per round basis
 
-  # This method saves or updates the due dates for submission and review associated
-  # with topics for a specified assignment. The following refactoring changes have
-  # been implemented to improve code quality:
-  #
-  # 1. Use of Local Variables: Local variables are used instead of instance 
-  #    variables to enhance clarity and encapsulate the method's state.
-  #
-  # 2. Safe Navigation Operator: The code utilizes the safe navigation operator
-  #    (`&.`) to avoid potential nil errors when accessing due dates from the assignment's
-  #    due dates, ensuring more robust error handling.
-  #
-  # 3. Enhanced Readability: Overall structure and variable naming are 
-  #    maintained to promote readability and maintainability.
-
-
+# This method saves or updates the due dates for submission and review associated
+# with topics for a specified assignment. The following refactoring changes have
+# been implemented to improve code quality:
 def save_topic_deadlines
   assignment = Assignment.find(params[:assignment_id])
   @assignment_submission_due_dates = assignment.due_dates.select { |due_date| due_date.deadline_type_id == 1 }
@@ -426,7 +404,7 @@ def save_topic_deadlines
 end
 
 
-  # This method is called when a student click on the trumpet icon. So this is a bad method name. --Yang
+  # This method is called when a student click on the trumpet icon.
   def show_team
     assignment = Assignment.find(params[:assignment_id])
     topic = SignUpTopic.find(params[:id])
@@ -447,6 +425,8 @@ end
     end
   end
 
+  # The `switch_original_topic_to_approved_suggested_topic` method handles switching a participant's team from their current topic
+  # to a new suggested topic that has been approved. It also updates the waitlist for the original topic.
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
     team_id = TeamsUser.team_id(assignment.id, session[:user].id)
@@ -475,6 +455,8 @@ end
     redirect_to action: 'list', id: params[:id]
   end
 
+  # The `publish_approved_suggested_topic` method makes an approved suggested topic publicly available for sign-up.
+  # It removes the `private_to` restriction on the topic if it exists, allowing other participants to sign up for it.
   def publish_approved_suggested_topic
     SignUpTopic.find_by(id: params[:topic_id]).update_attribute(:private_to, nil) if SignUpTopic.exists?(id: params[:topic_id])
     redirect_to action: 'list', id: params[:id]
@@ -482,6 +464,8 @@ end
 
   private
 
+  # The `create_and_configure_signup_topic` method handles the creation and configuration of a new sign-up topic for an assignment.
+  # It initializes the topic, applies additional settings (like micropayment for microtasks), and saves the topic to the database.
   def create_and_configure_signup_topic
     initialize_new_sign_up_topic
     @sign_up_topic.micropayment = params[:topic][:micropayment] if @assignment.microtask?
@@ -493,6 +477,10 @@ end
     end
   end
 
+  # The `create_and_configure_signup_topic` method is responsible for creating a new sign-up topic for an assignment and configuring its settings.
+  # It initializes a new sign-up topic, applies any additional configuration (e.g., micropayment if the assignment is a microtask), and attempts to save it.
+  # If the save is successful, it redirects to the assignment edit page with a success message.
+  # If the save fails, it re-renders the 'new' form to allow the user to correct any errors.
   def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
     update_max_choosers(topic)
@@ -502,11 +490,11 @@ end
     redirect_to_signup(params[:id])
   end
 
+  # While saving the max choosers you should be careful; if there are users who have signed up for this particular
+  # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
+  # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
+  # it.
   def update_max_choosers(topic)
-    # While saving the max choosers you should be careful; if there are users who have signed up for this particular
-    # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
-    # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
-    # it.
     if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
       topic.max_choosers = params[:topic][:max_choosers]
     elsif topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
@@ -539,15 +527,12 @@ end
     @ad_information
   end
 
+  # Delete a signup record for a specific topic and team.
+  # If the @sign_up_topic record exists, reassign the topic for the specified team by calling the `reassign_topic` 
+  # instance method of SignUpTopic.
   def delete_signup_for_topic(topic_id, team_id)
-    # Delete a signup record for a specific topic and team.
-
-    # Find the SignUpTopic record with the specified topic_id using the `find_by` method.
-    @sign_up_topic = SignUpTopic.find_by(id: topic_id)
-    # Check if the @sign_up_topic record exists (is not nil).
-    unless @sign_up_topic.nil?
-       # If the @sign_up_topic record exists, reassign the topic for the specified team by calling the `reassign_topic` 
-       # instance method of SignUpTopic.
+    @sign_up_topic = SignUpTopic.find_by(id: topic_id)    
+    unless @sign_up_topic.nil?       
       @sign_up_topic.reassign_topic(team_id)
     end 
   end

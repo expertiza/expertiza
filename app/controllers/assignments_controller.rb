@@ -1,5 +1,6 @@
 class AssignmentsController < ApplicationController
   include AssignmentHelper
+  include ActionView::Helpers::TagHelper
   include AuthorizationHelper
   autocomplete :user, :name
   before_action :authorize

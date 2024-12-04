@@ -436,25 +436,22 @@ class AssignmentsController < ApplicationController
   end
 
   def retrieve_assignment_form
-    @assignment_form = AssignmentForm.create_form_object(params[:id])
-    @assignment_form.assignment.instructor ||= current_user
-    params[:assignment_form][:assignment_questionnaire].reject! do |q|
-      q[:questionnaire_id].empty?
-    end
-    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
+    @assignment_form = Assignment.initialize_form(params[:assignment_form], current_user)
     @due_date_info = DueDate.where(parent_id: params[:id])
-    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
+
+    # Handle meta-review due dates
+    Assignment.delete_metareview_due_dates(params[:id], params[:metareview_allowed])
   end
 
   # sets assignment time zone if not specified and flashes a warning
   def nil_timezone_update
-    if current_user.timezonepref.nil?
-      parent_id = current_user.parent_id
-      parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = 'We strongly suggest that instructors specify their preferred timezone to'\
-          ' guarantee the correct display time. For now we assume you are in ' + parent_timezone
-      current_user.timezonepref = parent_timezone
-    end
+    return unless current_user.timezonepref.nil?
+
+    parent_id = current_user.parent_id
+    parent_timezone = User.find(parent_id).timezonepref
+    flash[:error] = 'We strongly suggest that instructors specify their preferred timezone to '\
+      'guarantee the correct display time. For now, we assume you are in ' + parent_timezone
+    current_user.timezonepref = parent_timezone
   end
 
   # updates an assignment's attributes and flashes a notice on the status of the save

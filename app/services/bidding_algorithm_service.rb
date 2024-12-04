@@ -43,6 +43,6 @@ class BiddingAlgorithmService
   end
 
   def validate_response(response)
-    raise 'Invalid response format' unless response.headers[:content_type]&.include?('application/json')
+    raise 'Invalid response format' unless response.headers[:content_type] && response.headers[:content_type].include?('application/json')
   end
 end

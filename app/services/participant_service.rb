@@ -19,18 +19,21 @@ class ParticipantService
   end
 
   def assignment
-    @assignment ||= @participant&.assignment
+    @assignment ||= @participant && @participant.assignment
   end
 
   def topic_id
-    SignedUpTeam.topic_id(@participant&.parent_id, @participant&.user_id)
+    participant = @participant
+    SignedUpTeam.topic_id(participant && participant.parent_id, participant && participant.user_id)
   end
-
+  
   def reviewer
-    @participant&.get_reviewer
+    participant = @participant
+    participant && participant.get_reviewer
   end
 
   def participant_authorization
-    @participant&.authorization
+    participant = @participant
+    participant && participant.authorization
   end
 end

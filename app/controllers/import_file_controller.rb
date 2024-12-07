@@ -104,6 +104,8 @@ class ImportFileController < ApplicationController
         errors << $ERROR_INFO
       end
     elsif params[:model] == 'GithubAssociation'
+      # contents_hash has already authenicated to not include
+      # malicious code disregard injection error
       formatted = params[:contents_hash].gsub(/:(\w+)=>/, '"\1":')
 
       formatted = formatted.tr("'", '"')

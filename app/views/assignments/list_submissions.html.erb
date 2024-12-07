@@ -14,11 +14,13 @@
 
 </script>
 <h4><%=@assignment.name%> </h4><h6><%="  Created on:  " + @assignment.created_at.to_s[0..10]%></h6>
-<%#check if use github? %>
+<%#check if use Github? %>
 <% if @assignment.use_github_metrics %>
   <% topic_identifier, topic_name, users_for_curr_team, participants = get_metrics_for_list_submissions(@teams.first) %>
   <% if session["github_access_token"].nil? %>
     <%= link_to 'Login to Query Github data', { controller: 'github_metrics', action: 'initialize_oath', id: participants.first.id, assignment_id: @assignment.id } %>
+  <% else %>
+    <div style="display: none;"></div>
   <% end %>
 <% end %>
 <% headers = {} %>

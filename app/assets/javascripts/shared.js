@@ -46,13 +46,13 @@ function checkForParticipantColumnDuplicate() {
 }
 
 function checkForGithubAssociationDuplicate() {
-    var sel1 = document.getElementById("select1");
-    var sel2 = document.getElementById("select2");
+    var expertiza = document.getElementById("select1");
+    var github = document.getElementById("select2");
 
-    var val1 = sel1.options[sel1.selectedIndex].value;
-    var val2 = sel2.options[sel2.selectedIndex].value;
+    var expertiza_username = expertiza.options[expertiza.selectedIndex].value;
+    var github_username = github.options[github.selectedIndex].value;
 
-    if (val1 === val2) {
+    if (expertiza_username === github_username) {
         alert("No two columns can have the same value.");
     } else {
         github_column_form.submit();

@@ -120,7 +120,7 @@ class GithubMetric
       author_email = commit.dig("author", "email")
       commit_date = commit.dig("committedDate").to_s[0, 10]
 
-      count_authors_and_dates(author_name, author_email, author_login, commit_date)
+      count_total_commits(author_name, author_email, author_login, commit_date)
     end
     sort_commit_dates
   end
@@ -137,7 +137,7 @@ class GithubMetric
   # @param author_email [String] Email of commit author
   # @param author_login [String] GitHub username of author
   # @param commit_date [String] Date of commit
-  def count_authors_and_dates(author_name, author_email, author_login, commit_date)
+  def count_total_commits(author_name, author_email, author_login, commit_date)
     @authors[author_name] ||= author_login
     @dates[commit_date] ||= 1
     @parsed_metrics[author_name] ||= Hash.new(0)

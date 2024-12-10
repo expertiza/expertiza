@@ -28,8 +28,10 @@ class AssignmentsController < ApplicationController
     if params[:button]
       # E2138 issue #3
       assignment_by_name = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
+      dir_path = assignment_form_params[:assignment][:directory_path]
       find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
       if !assignment_by_name && !find_existing_directory && @assignment_form.save # No existing names/directories
+        @assignment_form.create_assignment_node
         assignment_created = Assignment.find(@assignment_form.assignment.id)
         assignment_form_params[:assignment][:id] = assignment_created.id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?

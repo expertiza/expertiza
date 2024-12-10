@@ -26,7 +26,7 @@ class ParticipantService
     participant = @participant
     SignedUpTeam.topic_id(participant && participant.parent_id, participant && participant.user_id)
   end
-  
+
   def reviewer
     participant = @participant
     participant && participant.get_reviewer

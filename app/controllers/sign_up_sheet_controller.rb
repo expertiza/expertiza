@@ -18,7 +18,7 @@ class SignUpSheetController < ApplicationController
   def action_allowed?
     case params[:action]
     when *allowed_actions_for_roles
-      current_user_has_student_privileges? && list_authorization_check
+      current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
     end
@@ -534,12 +534,5 @@ class SignUpSheetController < ApplicationController
       switch_original_topic_to_approved_suggested_topic
       publish_approved_suggested_topic
     ]
-  end
-
-  # Check for necessary authorizations for list action
-  def list_authorization_check
-    return true unless %w[list].include?(action_name)
-
-    are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')
   end
 end

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require Rails.root.join('app', 'services', 'participant_service.rb').to_s
+require Rails.root.join('app', 'services', 'review_service.rb').to_s
+
 # The `StudentReviewController` manages the review processes for students within an assignment.
 # It handles actions related to listing reviews, managing review phases, and redirecting users
 # based on the assignment's review bidding configurations. This controller ensures that students
@@ -8,12 +11,10 @@
 class StudentReviewController < ApplicationController
   include AuthorizationHelper
 
-  before_action :authorize_participant, only: [list]
-
   BIDDING_ALGORITHM = 'Bidding'
 
   def action_allowed?
-    current_user_has_student_privileges? && list_authorization_check
+    current_user_has_student_privileges?
   end
 
   # Determines participant locale
@@ -24,8 +25,14 @@ class StudentReviewController < ApplicationController
   # Retrieves review and metareview for the student, and if bidding is required,
   # redirects to review bidding page
   def list
+    unless participant_service.valid_participant?
+      flash[:error] = 'You are not authorized to view this page.'
+      redirect_back fallback_location: root_path
+      return
+    end
+
     setup_assignment_and_phase(participant_service)
-    review_data(participant_service)
+    review_data
     metareview_data(participant_service)
 
     redirect_if_bidding_required
@@ -43,7 +50,7 @@ class StudentReviewController < ApplicationController
 
   # Gets and assigns review data for the current participant
   def review_data
-    @review_mappings = @review_service.review_mappings(reviewer_is_team: @assignment.reviewer_is_team)
+    @review_mappings = review_service.review_mappings(team_reviewing_enabled: @assignment.team_reviewing_enabled)
     @num_reviews_total = review_service.review_counts[:total]
     @num_reviews_completed = review_service.review_counts[:completed]
     @num_reviews_in_progress = review_service.review_counts[:in_progress]
@@ -52,9 +59,8 @@ class StudentReviewController < ApplicationController
 
   # Gets and assigns metareview data for the current participant
   def metareview_data(participant_service)
-    metareview_service = MetareviewService.new(participant_service)
+    metareview_service = MetareviewService.new(participant_service.participant)
 
-    @review_mappings = metareview_service.sorted_metareview_mappings
     @num_reviews_total = metareview_service.metareview_counts[:total]
     @num_reviews_completed = metareview_service.metareview_counts[:completed]
     @num_reviews_in_progress = metareview_service.metareview_counts[:in_progress]
@@ -80,13 +86,6 @@ class StudentReviewController < ApplicationController
   # Initialize review service
   def review_service
     @review_service ||= ReviewService.new(participant_service.participant)
-  end
-
-  def authorize_participant
-    return if participant_service.valid_participant?
-
-    flash[:error] = 'Invalid participant access.'
-    redirect_back fallback_location: root_path
   end
 
   # Check for necessary authorizations for list action

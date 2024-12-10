@@ -9,7 +9,7 @@ class MetareviewService
   end
 
   def metareview_mappings
-    MetareviewResponseMap.where(reviewer_id: @partipant.id)
+    MetareviewResponseMap.where(reviewer_id: @participant.id)
   end
 
   def metareview_counts

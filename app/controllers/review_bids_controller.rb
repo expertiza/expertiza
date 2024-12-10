@@ -62,63 +62,98 @@ class ReviewBidsController < ApplicationController
 
   # Assigns and updates priorities for review bids
   def set_priority
-    if params[:topic].nil?
-      ReviewBid.where(participant_id: params[:id]).destroy_all
-    else
-      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = ReviewBid.where(participant_id: params[:id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
-      signed_up_topics -= params[:topic].map(&:to_i)
-      signed_up_topics.each do |topic|
-        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
+    participant_id = params[:participant_id].to_i
+    selected_topic_ids = params[:topic]&.map(&:to_i) || []
+    assignment_id = params[:assignment_id].to_i
+
+    unless current_user_can_modify_participant?(participant_id)
+      flash[:error] = 'You are not authorized to modify these bids.'
+      respond_to do |format|
+        format.html { redirect_back fallback_location: root_path }
+        format.json { render json: { status: 'unauthorized' }, status: :unauthorized }
       end
-      params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
-        if bid_existence.empty?
-          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
-        else
-          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
+      return
+    end
+
+    if selected_topic_ids.empty?
+      ReviewBid.where(participant_id: participant_id).destroy_all
+    else
+      assignment = Assignment.find_by(id: assignment_id)
+      if assignment.nil?
+        flash[:error] = "Invalid assignment."
+        respond_to do |format|
+          format.html { redirect_back fallback_location: root_path }
+          format.json { render json: { status: 'invalid_assignment' }, status: :unprocessable_entity }
         end
+        return
+      end
+
+      unless SignUpTopic.where(id: selected_topic_ids, assignment_id: assignment_id).count == selected_topic_ids.size
+        flash[:error] = "One or more selected topics are invalid."
+        respond_to do |format|
+          format.html { redirect_back fallback_location: root_path }
+          format.json { render json: { status: 'invalid_topics' }, status: :unprocessable_entity }
+        end
+        return
+      end
+
+      ReviewBid.where(participant_id: participant_id).where.not(signuptopic_id: selected_topic_ids).destroy_all
+
+      selected_topic_ids.each_with_index do |topic_id, index|
+        bid = ReviewBid.find_or_initialize_by(signuptopic_id: topic_id, participant_id: participant_id)
+        bid.priority = index + 1
+        bid.assignment_id = assignment_id
+        bid.save!
       end
     end
-    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
+
+    respond_to do |format|
+      format.html { redirect_to action: 'show', assignment_id: assignment_id, id: participant_id, notice: 'Review bids updated successfully.' }
+      format.json { render json: { status: 'success' }, status: :ok }
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    flash[:error] = "Failed to update priorities: #{e.message}"
+    respond_to do |format|
+      format.html { redirect_back fallback_location: root_path }
+      format.json { render json: { status: 'error', message: e.message }, status: :unprocessable_entity }
+    end
   end
 
   # Assigns bidding topics to reviewers
   def assign_bidding
-      assignment = validate_assignment(params[:assignment_id])
+    assignment = validate_assignment(params[:assignment_id])
 
-      reviewers = validate_reviewers(assignment.id)
-      reviewer_ids = reviewers.map(&:id)
+    reviewers = validate_reviewers(assignment.id)
+    reviewer_ids = reviewers.map(&:id)
 
-      matched_topics = run_bidding_algorithm
+    matched_topics = run_bidding_algorithm
 
-      if matched_topics.blank?
-        flash[:alert] = 'Topic or assignment is missing'
-        redirect_back fallback_location: root_path && return
-      end
-
-      leftover_topics = find_leftover_topics(assignment.id, matched_topics)
-      assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
-
-      ReviewBid.new.assign_review_topics(matched_topics)
-      assignment.update!(can_choose_topic_to_review: false)
-
-      flash[:notice] = 'Reviewers were successfully assigned to topics.'
-      redirect_back fallback_location: root_path
-    rescue ArgumentError => e
-      Rails.logger.error "ArgumentError: #{e.message}"
-      redirect_back fallback_location: root_path, alert: e.message
-    rescue ActiveRecord::RecordInvalid => e
-      Rails.logger.error "ActiveRecord::RecordInvalid: #{e.message}"
-      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
-    rescue ActiveRecord::ActiveRecordError => e
-      Rails.logger.error "ActiveRecord::ActiveRecordError: #{e.message}"
-      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
-    rescue StandardError => e
-      Rails.logger.error "StandardError: #{e.message}"
-      redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+    if matched_topics.blank?
+      flash[:alert] = 'Topic or assignment is missing'
+      redirect_back fallback_location: root_path && return
     end
+
+    leftover_topics = find_leftover_topics(assignment.id, matched_topics)
+    assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+
+    ReviewBid.new.assign_review_topics(matched_topics)
+    assignment.update!(can_choose_topic_to_review: false)
+
+    flash[:notice] = 'Reviewers were successfully assigned to topics.'
+    redirect_back fallback_location: root_path
+  rescue ArgumentError => e
+    Rails.logger.error "ArgumentError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: e.message
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "ActiveRecord::RecordInvalid: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error "ActiveRecord::ActiveRecordError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+  rescue StandardError => e
+    Rails.logger.error "StandardError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+  end
 
   private
 
@@ -144,6 +179,12 @@ class ReviewBidsController < ApplicationController
 
     flash[:error] = 'Invalid participant access.'
     redirect_back fallback_location: root_path
+  end
+
+  def current_user_can_modify_participant?(participant_id)
+    return true if current_user_has_ta_privileges?
+
+    current_user.assignment_participants.exists?(id: participant_id)
   end
 
   def find_leftover_topics(assignment_id, matched_topics)

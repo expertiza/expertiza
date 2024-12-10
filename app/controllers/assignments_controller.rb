@@ -57,10 +57,10 @@ class AssignmentsController < ApplicationController
       else
         flash[:error] = 'Failed to create assignment.'
         if assignment_by_name
-          flash[:error] << content_tag(:br) +'  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
+          flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
         if find_existing_directory
-          flash[:error] << content_tag(:br) + '  ' + dir_path + ' already exists as a submission directory name'
+          flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
         redirect_to '/assignments/new?private=1'
       end
@@ -81,7 +81,7 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
     flash_path_warning
-    set_tag_prompt_deployments
+    set_tag_prompt_deployments(params[:id])
     update_assignment_badges
     @assigned_badges = @assignment_form.assignment.badges
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
@@ -198,6 +198,26 @@ class AssignmentsController < ApplicationController
 
   private
 
+  # initialize checkboxes related data for view
+  def initialize_checkboxes
+    @due_date_nameurl_not_empty = false
+    @due_date_nameurl_not_empty_checkbox = false
+    @metareview_allowed
+    @metareview_allowed_checkbox = false
+    @signup_allowed = false
+    @signup_allowed_checkbox = false
+    @drop_topic_allowed = false
+    @drop_topic_allowed_checkbox = false
+    @team_formation_allowed = false
+    @team_formation_allowed_checkbox = false
+  end
+
+  # initialize participants and team counts
+  def initialize_participant_team_counts
+    @participants_count = @assignment_form.assignment.participants.size
+    @teams_count = @assignment_form.assignment.teams.size
+  end
+
   # check whether rubrics are set before save assignment
   def list_unassigned_rubrics
     rubrics_list = %w[ReviewQuestionnaire
@@ -236,7 +256,7 @@ class AssignmentsController < ApplicationController
     end
     needed_rub = needed_rub[0...-2]
     needed_rub += ']'
-    needed_rub = content_tag(:strong, needed_rub)
+    needed_rub = "<b>" + needed_rub + " </b>"
   end
 
   # checks an assignment's due date has a name or description
@@ -338,18 +358,8 @@ class AssignmentsController < ApplicationController
 
     @assignment_questionnaires = AssignmentQuestionnaire.where(assignment_id: params[:id])
     @due_date_all = AssignmentDueDate.where(parent_id: params[:id])
-    @due_date_nameurl_not_empty = false
-    @due_date_nameurl_not_empty_checkbox = false
-    @metareview_allowed = false
-    @metareview_allowed_checkbox = false
-    @signup_allowed = false
-    @signup_allowed_checkbox = false
-    @drop_topic_allowed = false
-    @drop_topic_allowed_checkbox = false
-    @team_formation_allowed = false
-    @team_formation_allowed_checkbox = false
-    @participants_count = @assignment_form.assignment.participants.size
-    @teams_count = @assignment_form.assignment.teams.size
+    initialize_checkboxes
+    initialize_participant_team_counts
   end
 
   # populates assignment deadlines in the form if they are staggered
@@ -400,10 +410,9 @@ class AssignmentsController < ApplicationController
       rubrics_needed = needed_rubrics(list_unassigned_rubrics)
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       if flash.now[:error] != 'Failed to save the assignment: ["Total weight of rubrics should add up to either 0 or 100%"]'
-        flash.now[:error] = "You did not specify all the necessary rubrics. You need #{rubrics_needed} of assignment " +
-          content_tag(:strong, @assignment_form.assignment.name).html_safe +
-          " before saving the assignment. You can assign rubrics " +
-          link_to('here', '#', id: 'go_to_tabs2', style: 'color: blue;').html_safe + "."
+        flash.now[:error] = 'You did not specify all the necessary rubrics. You need ' + rubrics_needed +
+          " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
+            " <a id='go_to_tabs2' style='color: blue;'>here</a>."
       end
     end
   end
@@ -417,9 +426,9 @@ class AssignmentsController < ApplicationController
   end
 
   # sets tag_prompt_deployments in assignment_form if tagging of is allowed by getting the tag prompt deployment
-  def set_tag_prompt_deployments
+  def set_tag_prompt_deployments(assignment_id)
     if @assignment_form.assignment.is_answer_tagging_allowed
-      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
+      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     end
   end
 
@@ -475,13 +484,13 @@ class AssignmentsController < ApplicationController
 
   # sets assignment time zone if not specified and flashes a warning
   def nil_timezone_update
-    if current_user.timezonepref.nil?
-      parent_id = current_user.parent_id
-      parent_timezone = User.find(parent_id).timezonepref
-      flash[:error] = 'We strongly suggest that instructors specify their preferred timezone to'\
-          ' guarantee the correct display time. For now we assume you are in ' + parent_timezone
-      current_user.timezonepref = parent_timezone
-    end
+    return unless current_user.timezonepref.nil?
+
+    parent_id = current_user.parent_id
+    parent_timezone = User.find(parent_id).timezonepref
+    flash[:error] = 'We strongly suggest that instructors specify their preferred timezone to '\
+      'guarantee the correct display time. For now we assume you are in ' + parent_timezone
+    current_user.timezonepref = parent_timezone
   end
 
   # updates an assignment's attributes and flashes a notice on the status of the save
@@ -509,10 +518,7 @@ class AssignmentsController < ApplicationController
 
   # This methods send out an alert to add participants to an assignment.
   def alert_missing_participants(id)
-    flash[:error] = %(
-      Saved assignment is missing participants. Add them
-      #{link_to('here', participants_list_path(id: id, model: 'Assignment'))}
-    ).html_safe
+    flash[:error] = %(Saved assignment is missing participants. Add them <a href="/participants/list?id=#{id}&model=Assignment">here</a>)
   end
 
   # sets values allowed for the assignment form

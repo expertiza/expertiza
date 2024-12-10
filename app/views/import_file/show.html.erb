@@ -5,7 +5,7 @@
 
 <% if @model == 'User' %>
     <%= render 'import_file/user' %>
-<% elsif @model == 'AssignmentTeam' || @model == 'CourseTeam'%>
+<% elsif @model == 'AssignmentTeam' || @model == 'CourseTeam' || @model == 'MentoredTeam' %>
     <%= render 'import_file/team' %>
 <% elsif @model == 'ReviewResponseMap' %>
     <%= render 'import_file/reviewer' %>

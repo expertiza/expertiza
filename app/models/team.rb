@@ -203,16 +203,15 @@ class Team < ApplicationRecord
   #  changed to hash by E1776
   def self.import(row_hash, id, options, teamtype)
     raise ArgumentError, 'Not enough fields on this line.' if row_hash.empty? || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last')) || (row_hash[:teammembers].empty? && (options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'))
-
     if options[:has_teamname] == 'true_first' || options[:has_teamname] == 'true_last'
       name = row_hash[:teamname].to_s
       team = where(['name =? && parent_id =?', name, id]).first
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
     else
-      if teamtype.is_a?(CourseTeam)
+      if (teamtype == CourseTeam)
         name = generate_team_name(Course.find(id).name)
-      elsif teamtype.is_a?(AssignmentTeam)
+      elsif (teamtype == AssignmentTeam || teamtype == MentoredTeam)
         name = generate_team_name(Assignment.find(id).name)
       end
     end
@@ -221,9 +220,7 @@ class Team < ApplicationRecord
       team.name = name
       team.save
     end
-
     # insert team members into team unless team was pre-existing & we ignore duplicate teams
-
     team.import_team_members(row_hash) unless team_exists && options[:handle_dups] == 'ignore'
   end
 

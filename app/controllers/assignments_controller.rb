@@ -449,11 +449,14 @@ class AssignmentsController < ApplicationController
   end
 
   def retrieve_assignment_form
-    @assignment_form = Assignment.initialize_form(params[:assignment_form], current_user)
+    @assignment_form = AssignmentForm.create_form_object(params[:id])
+    @assignment_form.assignment.instructor ||= current_user
+    params[:assignment_form][:assignment_questionnaire].reject! do |q|
+      q[:questionnaire_id].empty?
+    end
+    # Deleting Due date info from table if meta-review is unchecked. - UNITY ID: ralwan and vsreeni
     @due_date_info = DueDate.where(parent_id: params[:id])
-
-    # Handle meta-review due dates
-    Assignment.delete_metareview_due_dates(params[:id], params[:metareview_allowed])
+    DueDate.where(parent_id: params[:id], deadline_type_id: 5).destroy_all if params[:metareview_allowed] == 'false'
   end
 
   # sets assignment time zone if not specified and flashes a warning

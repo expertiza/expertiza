@@ -56,12 +56,6 @@ class Assignment < ApplicationRecord
     users.flatten.include? user
   end
 
-  def self.record_exists?(name:, directory_path:, course_id:)
-    by_name = exists?(name: name, course_id: course_id)
-    by_directory = exists?(directory_path: directory_path, course_id: course_id)
-    { by_name: by_name, by_directory: by_directory }
-  end
-
   def self.max_outstanding_reviews
     DEFAULT_MAX_OUTSTANDING_REVIEWS
   end

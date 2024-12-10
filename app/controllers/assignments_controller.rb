@@ -58,7 +58,7 @@ class AssignmentsController < ApplicationController
     @due_date_all = update_nil_dd_description_url(@due_date_all)
     unassigned_rubrics_warning
     flash_path_warning
-    set_tag_prompt_deployments
+    set_tag_prompt_deployments(params[:id])
     update_assignment_badges
     @assigned_badges = @assignment_form.assignment.badges
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
@@ -403,9 +403,9 @@ class AssignmentsController < ApplicationController
   end
 
   # sets tag_prompt_deployments in assignment_form if tagging of is allowed by getting the tag prompt deployment
-  def set_tag_prompt_deployments
+  def set_tag_prompt_deployments(assignment_id)
     if @assignment_form.assignment.is_answer_tagging_allowed
-      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: params[:id])
+      @assignment_form.tag_prompt_deployments = TagPromptDeployment.where(assignment_id: assignment_id)
     end
   end
 

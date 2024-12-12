@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
     return false if participant.nil?
 
     authorization = participant.authorization
-    !authorizations.include?(authorization)
+    authorizations.include?(authorization)
   end
 
   private

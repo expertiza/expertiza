@@ -11,7 +11,7 @@ class ImportFileController < ApplicationController
     @options = params[:options]
     @delimiter = get_delimiter(params)
     @has_header = params[:has_header]
-    @has_teamname = if @model == 'AssignmentTeam' || @model == 'CourseTeam'
+    @has_teamname = if @model == 'AssignmentTeam' || @model == 'CourseTeam' || @model == 'MentoredTeam'
                       params[:has_teamname]
                     else
                       'nil'
@@ -63,7 +63,7 @@ class ImportFileController < ApplicationController
   end
 
   def import_from_hash(session, params)
-    if (params[:model] == 'AssignmentTeam') || (params[:model] == 'CourseTeam')
+    if (params[:model] == 'AssignmentTeam') || (params[:model] == 'CourseTeam') || (params[:model] == 'MentoredTeam')
       contents_hash = eval(params[:contents_hash])
       @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       errors = []
@@ -71,6 +71,8 @@ class ImportFileController < ApplicationController
         @header_integrated_body.each do |row_hash|
           teamtype = if params[:model] == 'AssignmentTeam'
                        AssignmentTeam
+                     elsif params[:model] == 'MentoredTeam'
+                       MentoredTeam
                      else
                        CourseTeam
                      end
@@ -188,7 +190,7 @@ class ImportFileController < ApplicationController
       body.each do |row|
         new_body << header.zip(row).to_h
       end
-    elsif (params[:model] == 'AssignmentTeam') || (params[:model] == 'CourseTeam')
+    elsif (params[:model] == 'AssignmentTeam') || (params[:model] == 'CourseTeam') || (params[:model] == 'MentoredTeam')
       header.map!(&:to_sym)
       body.each do |row|
         h = {}

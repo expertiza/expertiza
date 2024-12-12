@@ -12,7 +12,7 @@ class ReviewBidsController < ApplicationController
   def action_allowed?
     case params[:action]
     when 'show', 'set_priority', 'index', 'list'
-      current_user_has_student_privileges? && list_authorization_check
+      current_user_has_student_privileges? && current_user_has_review_permissions?
     else
       current_user_has_ta_privileges?
     end
@@ -66,7 +66,8 @@ class ReviewBidsController < ApplicationController
     selected_topic_ids = params[:topic]&.map(&:to_i) || []
     assignment_id = params[:assignment_id].to_i
 
-    unless current_user_can_modify_participant?(participant_id)
+    # Redirects with an error message if the user is not authorized to modify bids.
+    unless current_user_can_modify_bids?(participant_id)
       flash[:error] = 'You are not authorized to modify these bids.'
       respond_to do |format|
         format.html { redirect_back fallback_location: root_path }
@@ -75,6 +76,9 @@ class ReviewBidsController < ApplicationController
       return
     end
 
+    # Resets existing review bids if we don't have any selected topic ids
+    # If selected topics are available, verifies that assignment is not nil
+    # before updating or creating bids based on selected topics
     if selected_topic_ids.empty?
       ReviewBid.where(participant_id: participant_id).destroy_all
     else
@@ -88,6 +92,7 @@ class ReviewBidsController < ApplicationController
         return
       end
 
+      # Verifies that all selected topic IDs belong to the specified assignment
       unless SignUpTopic.where(id: selected_topic_ids, assignment_id: assignment_id).count == selected_topic_ids.size
         flash[:error] = "One or more selected topics are invalid."
         respond_to do |format|
@@ -97,8 +102,10 @@ class ReviewBidsController < ApplicationController
         return
       end
 
+      # Removes outdated bids for the participant, deleting any bids not in the selected_topic_ids.
       ReviewBid.where(participant_id: participant_id).where.not(signuptopic_id: selected_topic_ids).destroy_all
 
+      # Creates or updates review bids for the selected topics with assigned priorities.
       selected_topic_ids.each_with_index do |topic_id, index|
         bid = ReviewBid.find_or_initialize_by(signuptopic_id: topic_id, participant_id: participant_id)
         bid.priority = index + 1
@@ -129,7 +136,7 @@ class ReviewBidsController < ApplicationController
     matched_topics = run_bidding_algorithm
 
     if matched_topics.blank?
-      flash[:alert] = 'Topic or assignment is missing'
+      flash[:alert] = 'Topics or assignment is missing'
       redirect_back fallback_location: root_path && return
     end
 
@@ -168,7 +175,7 @@ class ReviewBidsController < ApplicationController
   end
 
   # Check for necessary authorizations for list action
-  def list_authorization_check
+  def current_user_has_review_permissions?
     return true unless %w[list].include?(action_name)
 
     are_needed_authorizations_present?(params[:id], 'participant', 'reviewer')
@@ -181,7 +188,7 @@ class ReviewBidsController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
-  def current_user_can_modify_participant?(participant_id)
+  def current_user_can_modify_bids?(participant_id)
     return true if current_user_has_ta_privileges?
 
     current_user.assignment_participants.exists?(id: participant_id)

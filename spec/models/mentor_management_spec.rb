@@ -113,13 +113,16 @@ describe MentorManagement do
       r = Random.new(42)
       team_ids = team_count.times.map do
         random_id = r.rand(1000..10_000)
-        FactoryBot.create(:team, id: random_id)
+        FactoryBot.create(:team, id: random_id, parent_id: assignment.id)
         random_id
       end
-      team_ids.each { |team_id| FactoryBot.create(:team_user, team_id: team_id, user_id: ta.id) }
+      team_ids.each do |team_id|
+        FactoryBot.create(:team_user, team_id: team_id, user_id: mentor.user_id)
+      end
       expect(MentorManagement.zip_mentors_with_team_count(assignment.id)).to eq [[mentor.user_id, team_count]]
     end
   end
+
 
   #   E2351 Testing: Mentor Management for Assignments without Topics
   describe "select_mentor" do

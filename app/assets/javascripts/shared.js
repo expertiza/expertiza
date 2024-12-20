@@ -45,6 +45,20 @@ function checkForParticipantColumnDuplicate() {
     }
 }
 
+function checkForGithubAssociationDuplicate() {
+    var expertiza = document.getElementById("select1");
+    var github = document.getElementById("select2");
+
+    var expertiza_username = expertiza.options[expertiza.selectedIndex].value;
+    var github_username = github.options[github.selectedIndex].value;
+
+    if (expertiza_username === github_username) {
+        alert("No two columns can have the same value.");
+    } else {
+        github_column_form.submit();
+    }
+}
+
 function checkTopicForDuplicatesAndRequiredColumns(optional_count) {
 
     var sel1 = document.getElementById("select1");

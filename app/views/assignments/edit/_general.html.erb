@@ -132,6 +132,14 @@
             <%= label_tag('assignment_form[assignment][has_badge]', 'Has badge?') %>
         </td>
     </tr>
+      <!--Github-->
+  <tr>
+    <td style='padding:5px' id='assignment_use_github_metrics'>
+      <input name="assignment_form[assignment][use_github_metrics]" type="hidden" value="false" id="use_github_metrics" </input>
+      <%= check_box_tag('assignment_form[assignment][use_github_metrics]', 'true', @assignment_form.assignment.use_github_metrics) %>
+      <%= label_tag('assignment_form[assignment][use_github_metrics]', 'Use GitHub metrics?') %>
+    </td>
+  </tr>
     <!--Conference-->
     <tr>
         <td style='padding:5px' id='assignment_is_conference_assignment_field' colspan="2">
@@ -248,6 +256,7 @@
             // Otherwise, hide topics tab
             jQuery("#topics_tab_header").hide();
         }
+        
     });
     
     function topicsChanged() {

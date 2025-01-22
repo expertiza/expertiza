@@ -6,7 +6,7 @@ on:
     branches: [main, development]
     paths-ignore: ['**.md']
   push:
-    branches: [main, development]
+    branches: [bugfix/workflow, development]
     paths-ignore: ['**.md']
   
 jobs:

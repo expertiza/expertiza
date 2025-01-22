@@ -507,11 +507,12 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # I found the test case by internet, and I think it will fail if the website update in future
   describe 'get_link_updated_at' do
-    it 'should return ? by input http://www.example.com' do
+    it 'should return the last-modified time for a given link' do
+      mock_response = instance_double(Net::HTTPResponse, '[]' => 'Thu, 17 Oct 2019 03:18:26 GMT')
+      allow(Net::HTTP).to receive(:get_response).and_return(mock_response)
       updated_time = get_link_updated_at('http://www.example.com')
-      expect(updated_time).to eq('2019-10-17 03:18:26.000000000 -0400')
+      expect(updated_time).to eq(Time.parse('2019-10-17 03:18:26 GMT'))
     end
   end
 

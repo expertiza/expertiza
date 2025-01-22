@@ -83,7 +83,7 @@ class GradesController < ApplicationController
     @assignment = @participant.assignment
     @team = @participant.team
     @team_id = @team.id
-    questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id, topic_id: nil).map(&:questionnaire)
+    questionnaires = AssignmentQuestionnaire.where(assignment_id: @assignment.id,topic_id: nil).map(&:questionnaire)
     @questions = retrieve_questions(questionnaires, @assignment.id)
     @pscore = participant_scores(@participant, @questions)
     @penalties = calculate_penalty(@participant.id)

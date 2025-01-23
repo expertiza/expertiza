@@ -11,7 +11,7 @@ on:
   
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix: # we will be running rspec tests in controllers, models, helpers, and lib folders
          folder: [controllers, models, helpers, lib]

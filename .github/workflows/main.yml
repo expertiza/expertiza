@@ -70,7 +70,7 @@ jobs:
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-artifacts
+          name: code-coverage-artifacts-${{ matrix.folder }}
           path: coverage/
   
   # Publish code coverage report to code climate 

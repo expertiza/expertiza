@@ -68,9 +68,9 @@ jobs:
         run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json"
 
       - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-artifacts
+          name: code-coverage-artifacts-${{ matrix.folder }}
           path: coverage/
   
   # Publish code coverage report to code climate 
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: code-coverage-artifacts
           path: coverage

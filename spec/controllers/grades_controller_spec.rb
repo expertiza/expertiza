@@ -113,9 +113,16 @@ describe GradesController do
     end
   end
 
-  xdescribe '#view_team' do
+  describe '#view_team' do
     it 'renders grades#view_team page' do
+      allow(participant).to receive(:id).and_return(1)
       allow(participant).to receive(:team).and_return(team2)
+      allow(participant).to receive(:assignment).and_return(assignment)
+      assignment_questionnaire = instance_double(AssignmentQuestionnaire, used_in_round: 1)
+      allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: assignment.id, questionnaire_id: anything).and_return(assignment_questionnaire)
+      allow(controller).to receive(:retrieve_questions).and_return({ review1: [question] })
+      allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
+      allow(controller).to receive(:participant_scores).and_return({ total: 90 })
       request_params = { id: 1 }
       get :view_team, params: request_params
       expect(response).to render_template(:view_team)
@@ -126,19 +133,18 @@ describe GradesController do
     render_views
     context 'when view_team page is viewed by a student who is also a TA for another course' do
       it 'renders grades#view_team page' do
+        allow(participant).to receive(:id).and_return(1)
         allow(participant).to receive(:team).and_return(team)
-        allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-        allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
-        allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
-        allow(assignment).to receive(:late_policy_id).and_return(false)
-        allow(assignment).to receive(:calculate_penalty).and_return(false)
-        allow_any_instance_of(GradesController).to receive(:compute_total_score).with(assignment, any_args).and_return(100)
-        allow(review_questionnaire).to receive(:get_assessments_round_for).with(participant, 1).and_return([review_response])
-        allow(Answer).to receive(:compute_scores).with([review_response], [question]).and_return(max: 95, min: 88, avg: 90)
-        request_params = { id: 1 }
-        allow(TaMapping).to receive(:exists?).with(ta_id: 1, course_id: 1).and_return(true)
-        stub_current_user(ta, ta.role.name, ta.role)
+        allow(participant).to receive(:assignment).and_return(assignment)
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, topic_id: nil).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 2).and_return([assignment_questionnaire])
+        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, questionnaire_id: 1).and_return([assignment_questionnaire])
+        allow(controller).to receive(:retrieve_questions).with([review_questionnaire], assignment.id).and_return({ review1: [question] })
+        allow(controller).to receive(:calculate_penalty).with(participant.id).and_return({ submission: 0, review: 0, meta_review: 0 })
+        allow(controller).to receive(:participant_scores).with(participant, { review1: [question] }).and_return({ total: 90 })
+        request_params = { id: participant.id }
         get :view_team, params: request_params
+        expect(response).to render_template(:view_team)
         expect(response.body).not_to have_content 'TA'
       end
     end

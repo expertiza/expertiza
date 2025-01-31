@@ -25,6 +25,7 @@ describe ReviewMappingController do
     allow(participant1).to receive(:get_reviewer).and_return(participant1)
     allow(participant2).to receive(:get_reviewer).and_return(participant2)
     allow(reviewer).to receive(:get_reviewer).and_return(reviewer)
+    allow(controller).to receive(:create_grading_history).and_return(nil)
   end
 
   describe '#add_calibration' do

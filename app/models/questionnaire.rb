@@ -32,6 +32,18 @@ class Questionnaire < ApplicationRecord
                          'QuizQuestionnaire'].freeze
   has_paper_trail
 
+  def post_initialization(display_type)
+    self.display_type = display_type
+  end
+
+  def symbol(name)
+    name.to_sym
+  end
+
+  def get_assessments_for(participant, assessment_type)
+    participant.send(assessment_type)
+  end
+
   def get_weighted_score(assignment, scores)
     # create symbol for "varying rubrics" feature -Yang
     round = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: id).used_in_round

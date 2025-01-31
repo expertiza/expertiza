@@ -105,6 +105,29 @@ class ImportFileController < ApplicationController
       rescue StandardError
         errors << $ERROR_INFO
       end
+    elsif params[:model] == 'GithubAssociation'
+      # contents_hash has already authenicated to not include
+      # malicious code disregard injection error
+      formatted = params[:contents_hash].gsub(/:(\w+)=>/, '"\1":')
+
+      formatted = formatted.tr("'", '"')
+
+      eval_hash = formatted.match(/^{.*}$/) ? eval(formatted) : {}
+        eval_hash.transform_keys(&:to_sym) # Ensure keys are symbols
+      if params[:has_header] == 'true'
+        @header_integrated_body = hash_rows_with_headers(eval_hash[:header], eval_hash[:body])
+      else
+        new_header = ['expertiza_username', 'github_user']
+        @header_integrated_body = hash_rows_with_headers(new_header, eval_hash[:body])
+      end
+      errors = []
+      begin
+        @header_integrated_body.each do |row_hash|
+          GithubAssociation.import(row_hash, session, params[:id])
+        end
+      rescue StandardError => e
+        errors << e.message
+      end
     elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'
@@ -185,7 +208,8 @@ class ImportFileController < ApplicationController
   #
   def hash_rows_with_headers(header, body)
     new_body = []
-    if (params[:model] == 'User') || (params[:model] == 'AssignmentParticipant') || (params[:model] == 'CourseParticipant') || (params[:model] == 'SignUpTopic')
+    if (params[:model] == 'User') || (params[:model] == 'AssignmentParticipant') || (params[:model] == 'CourseParticipant') ||
+       (params[:model] == 'SignUpTopic') || (params[:model] == 'GithubAssociation')
       header.map! { |str| str.strip.downcase.gsub(/\s+/, "").to_sym }
       body.each do |row|
         new_body << header.zip(row).to_h

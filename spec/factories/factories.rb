@@ -243,6 +243,14 @@ FactoryBot.define do
     auto_assign_mentor false
   end
 
+  factory :github_metric do
+    participant_id { 1 }
+    assignment_id { 1 }
+    token { "valid-github-token" }
+
+    initialize_with { new(participant_id, assignment_id, token) }
+  end
+
   factory :late_policy, class: LatePolicy do
     # Help multiple factory-created assignments get unique names
     # Let the first created assignment have the name 'final2' to avoid breaking some fragile existing tests
@@ -266,7 +274,8 @@ FactoryBot.define do
     comments_for_advertisement nil
     advertise_for_partner nil
     submitted_hyperlinks '---
-- https://www.expertiza.ncsu.edu'
+- https://www.expertiza.ncsu.edu
+- https://github.com/expertiza/expertiza/pull/1261'
     directory_num 0
   end
 

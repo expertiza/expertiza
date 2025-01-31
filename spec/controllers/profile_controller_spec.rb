@@ -3,7 +3,7 @@ require 'rails_helper'
 describe ProfileController do
   # initialize objects using factories.rb required for stubbing in test cases
   let(:super_admin) { build(:superadmin, id: 1) }
-  let(:instructor1) { build(:instructor, id: 10, name: 'Instructor1') }
+  let(:instructor1) { build(:instructor, id: 10, username: 'Instructor1') }
   let(:questionnaire) { build(:questionnaire, id: 666) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
 

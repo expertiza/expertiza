@@ -44,7 +44,7 @@
         <% @team_member_count > 1 ? @rspan = @team_member_count : @rspan = 1 %>      
         <!-- for a valid reviewer -->
         <%if Participant.exists?(id: reviewer.reviewer_id) %>
-          <% @reviewer_name = @user.fullname(session[:ip]) %>
+          <% @reviewer_name = @user.name(session[:ip]) %>
           <!--Reviewer-->
           <td rowspan= <%= @rspan %>>
             <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => reviewer.reviewer_id, :assignment_id => @id%>
@@ -66,7 +66,7 @@
               <% @reviewee = rm.reviewee.user %>
                 <!--Teammate reviewed-->
                 <td id = "green" align = 'left' colspan=1>
-                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:username => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 </td>
                 <!--Last reviewed at-->
@@ -80,7 +80,7 @@
                   <%= 'N/A' %>
                 <% else %>
                   <% @reviewee = rm.reviewee.user %>
-                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:name => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
+                  <%= link_to @reviewee.name(session[:ip]), impersonate_impersonate_path(:user => {:username => @reviewee.name}), :method => :post, :title => "Click here to impersonate this user" %>
                   (<%= @reviewee.fullname(session[:ip]) %>)
                 <% end %>
               </td>

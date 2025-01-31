@@ -1,12 +1,12 @@
 <h1>Super-Administrators</h1>
 
 <table>
-  <tr><th>Name</th><th>Full name</th><th>E-mail address</th></tr>
+  <tr><th>User name</th><th>Full name</th><th>E-mail address</th></tr>
   <% for user in @users %>
     <tr>
-      <td><%= link_to user.name(session[:ip]), :action => 'show_super_administrator',
+      <td><%= link_to user.username(session[:ip]), :action => 'show_super_administrator',
         :id => user.id %></td>
-      <td><%= user.fullname(session[:ip]) %></td>
+      <td><%= user.name(session[:ip]) %></td>
       <td><%= user.email(session[:ip]) %></td>
     </tr>
   <% end -%>

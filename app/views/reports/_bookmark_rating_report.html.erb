@@ -19,7 +19,7 @@
   <% if maps.count > 0 %>
       <!--Reviewer-->
     <td bgcolor=<%= @bgcolor %> rowspan= <%= maps.count %>>
-      <% @reviewer_name = @user.fullname(session[:ip]) %>
+      <% @reviewer_name = @user.name(session[:ip]) %>
       <%= link_to @reviewer_name, :controller => 'popup', :action => 'reviewer_details_popup', :id => r.reviewer_id, :assignment_id => @id %>
     </td>
 
@@ -38,8 +38,8 @@
 
         <!-- Submitted by-->
         <td id = "green" bgcolor=<%= @bgcolor %> style="color:#DD3300" align="left" colspan=1>
-          <% reviewed_by_user = User.find(@reviewee.user_id).name %>
-          <%= link_to reviewed_by_user, impersonate_impersonate_path(:user => {:name => reviewed_by_user}), :method => :post, :title => "Click here to impersonate this user" %>
+          <% reviewed_by_user = User.find(@reviewee.user_id).username %>
+          <%= link_to reviewed_by_user, impersonate_impersonate_path(:user => {:username => reviewed_by_user}), :method => :post, :title => "Click here to impersonate this user" %>
         </td>
 
         <!--Last reviewed at-->

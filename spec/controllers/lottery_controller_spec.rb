@@ -2,12 +2,12 @@ describe LotteryController do
   let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
   let(:assignment_2) { create(:assignment, is_intelligent: false, name: 'assignment_2', directory_path: 'assignment_2') }
 
-  let(:student1) { create(:student, name: 'student1') }
-  let(:student2) { create(:student, name: 'student2') }
-  let(:student3) { create(:student, name: 'student3') }
-  let(:student4) { create(:student, name: 'student4') }
-  let(:student5) { create(:student, name: 'student5') }
-  let(:student6) { create(:student, name: 'student6') }
+  let(:student1) { create(:student, username: 'student1') }
+  let(:student2) { create(:student, username: 'student2') }
+  let(:student3) { create(:student, username: 'student3') }
+  let(:student4) { create(:student, username: 'student4') }
+  let(:student5) { create(:student, username: 'student5') }
+  let(:student6) { create(:student, username: 'student6') }
 
   let(:topic1) { create(:topic, assignment_id: assignment.id) }
   let(:topic2) { create(:topic, assignment_id: assignment.id) }

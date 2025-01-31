@@ -16,7 +16,7 @@ RSpec.describe LtiController, type: :controller do
       'other_param' => 'value'
     }
   end
-  let(:user) { User.create(name: 'testuser', email: 'testuser@ncsu.edu') }
+  let(:user) { User.create(username: 'testuser', email: 'testuser@ncsu.edu') }
   let(:shared_secret) { 'shared_secret' }
 
   before do
@@ -140,10 +140,10 @@ RSpec.describe LtiController, type: :controller do
     
     describe '#authenticate_and_login_user' do
       context 'when user exists' do
-        let(:user) { User.create(name: 'testuser', email: 'testuser@ncsu.edu') }
+        let(:user) { User.create(username: 'testuser', email: 'testuser@ncsu.edu') }
         
         before do
-          allow(User).to receive(:find_by).with(name: 'testuser').and_return(user)
+          allow(User).to receive(:find_by).with(username: 'testuser').and_return(user)
           allow(controller).to receive(:redirect_to)
           allow(controller).to receive(:session).and_return({})
           allow(AuthController).to receive(:set_current_role)
@@ -159,7 +159,7 @@ RSpec.describe LtiController, type: :controller do
 
       context 'when user does not exist' do
         before do
-          allow(User).to receive(:find_by).with(name: 'testuser').and_return(nil)
+          allow(User).to receive(:find_by).with(username: 'testuser').and_return(nil)
           allow(controller).to receive(:redirect_to)
         end
 
@@ -171,7 +171,7 @@ RSpec.describe LtiController, type: :controller do
 
       context 'when an error occurs' do
         before do
-          allow(User).to receive(:find_by).with(name: 'testuser').and_raise(StandardError.new('Test error'))
+          allow(User).to receive(:find_by).with(username: 'testuser').and_raise(StandardError.new('Test error'))
           allow(controller).to receive(:redirect_to)
           allow(Rails.logger).to receive(:error)
         end

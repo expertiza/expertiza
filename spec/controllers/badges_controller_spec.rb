@@ -1,7 +1,7 @@
 describe BadgesController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:admin) { build(:admin, id: 3) }
-  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, username: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
   let(:ta) { build(:teaching_assistant, id: 6) }
   let(:badge) {build(:badge, id:1, name: 'test', description: 'test desc', image_name: 'test.png')}  

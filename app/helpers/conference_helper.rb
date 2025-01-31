@@ -36,7 +36,7 @@ module ConferenceHelper
   end
 
   def create_author
-    params[:user][:name] = params[:user][:email] unless !params[:user][:name].nil? && !params[:user][:name].empty?
+    params[:user][:username] = params[:user][:email] unless !params[:user][:username].nil? && !params[:user][:username].empty?
     is_author = true
     # Assign all user params for creating author using assign_user_params function
     @user = assign_user_params(is_author)
@@ -53,7 +53,7 @@ module ConferenceHelper
   end
 
   def create_coauthor
-    check = User.find_by(name: params[:user][:name])
+    check = User.find_by(username: params[:user][:name])
     params[:user][:name] = params[:user][:email] unless check.nil?
     User.skip_callback(:create, :after, :email_welcome)
     is_author = false
@@ -66,7 +66,7 @@ module ConferenceHelper
       # password is regenerated so that we could provide it in a mail
       password = @user.reset_password
       # Mail to be sent to co-author once the user has been created. New partial is used as content for email is different from normal user
-      MailerHelper.send_mail_for_conference_user(@user, 'Your Expertiza account has been created.', 'user_conference_invitation', password, current_user.name).deliver
+      MailerHelper.send_mail_for_conference_user(@user, 'Your Expertiza account has been created.', 'user_conference_invitation', password, current_user.username).deliver
       @user
     end
   end
@@ -90,7 +90,7 @@ module ConferenceHelper
     @user = User.new(user_params)
     # Checks if its a co-author
     if !is_author
-      @user.email = params[:user][:name]
+      @user.email = params[:user][:username]
       # parent_id denotes who created the co-author
       @user.parent_id = session[:user].id
       # co-author role is same as student hence role_id =1
@@ -119,8 +119,8 @@ module ConferenceHelper
   end
 
   def user_params
-    params.require(:user).permit(:name,
-                                 :fullname,
+    params.require(:user).permit(:username,
+                                 :name,
                                  :role_id,
                                  :email,
                                  :parent_id,

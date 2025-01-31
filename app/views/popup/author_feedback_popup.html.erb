@@ -13,9 +13,9 @@
   <br/>
 <%else%>
   <% if params[:source] == 'author_feedback' %>
-    <h3> Author Feedback to <%= @user.fullname(session[:ip]) %></h3>
+    <h3> Author Feedback to <%= @user.name(session[:ip]) %></h3>
   <% elsif params[:source] == 'teammate_review' %>
-    <h3> Teammate Review to <%= @user.fullname(session[:ip]) %></h3>
+    <h3> Teammate Review to <%= @user.name(session[:ip]) %></h3>
   <% end %>
   <table>
     <tr>

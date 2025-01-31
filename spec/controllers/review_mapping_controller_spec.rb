@@ -61,11 +61,11 @@ describe ReviewMappingController do
 
   describe '#add_reviewer and #get_reviewer' do
     before(:each) do
-      allow(User).to receive_message_chain(:where, :first).with(name: 'expertiza').with(no_args).and_return(double('User', id: 1))
+      allow(User).to receive_message_chain(:where, :first).with(username: 'expertiza').with(no_args).and_return(double('User', id: 1))
       @params = {
         id: 1,
         topic_id: 1,
-        user: { name: 'expertiza' },
+        user: { username: 'expertiza' },
         contributor_id: 1
       }
     end
@@ -289,12 +289,12 @@ describe ReviewMappingController do
     end
 
     it 'redirects to review_mapping#list_mappings page' do
-      user = double('User', id: 1, name: 'no one')
+      user = double('User', id: 1, username: 'no one')
       allow(User).to receive(:from_params).with(any_args).and_return(user)
       # allow_any_instance_of(ReviewMappingController).to receive(:url_for).with(action: 'add_user_to_assignment', id: 1, user_id: 1).and_return('')
       allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
         .with(user, assignment, 'http://test.host/review_mapping/add_user_to_assignment?id=1&user_id=1')
-        .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
+        .and_return(double('AssignmentParticipant', id: 1, username: 'no one'))
       allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([nil])
       request_params = { id: 1 }
       post :add_metareviewer, params: request_params

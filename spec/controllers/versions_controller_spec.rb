@@ -1,7 +1,7 @@
 describe VersionsController do
   let(:admin) { build(:admin, id: 3) }
   let(:instructor) { build(:instructor, id: 2) }
-  let(:student) { build_stubbed(:student, id: 1, name: 'student') }
+  let(:student) { build_stubbed(:student, id: 1, username: 'student') }
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:version) { build(:version) }
 

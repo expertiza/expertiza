@@ -140,7 +140,7 @@ class ResponseController < ApplicationController
     rescue StandardError
       msg = "Your response was not saved. Cause:189 #{$ERROR_INFO}"
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Your response was submitted: #{@response.is_submitted}", request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, "Your response was submitted: #{@response.is_submitted}", request)
     redirect_to controller: 'response', action: 'save', id: @map.map_id,
                 return: params.permit(:return)[:return], msg: msg, review: params.permit(:review)[:review],
                 save_options: params.permit(:save_options)[:save_options]
@@ -254,7 +254,7 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @return = params[:return]
     @map.save
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Response was successfully saved')
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Response was successfully saved')
     redirect_to action: 'redirect', id: @map.map_id, return: params.permit(:return)[:return], msg: params.permit(:msg)[:msg], error_msg: params.permit(:error_msg)[:error_msg]
   end
 

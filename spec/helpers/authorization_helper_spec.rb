@@ -619,8 +619,8 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if the assignment has some other instructor' do
-      instructor1 = create(:instructor, name: 'test_instructor_1')
-      instructor2 = create(:instructor, name: 'test_instructor_2')
+      instructor1 = create(:instructor, username: 'test_instructor_1')
+      instructor2 = create(:instructor, username: 'test_instructor_2')
       assignment = create(:assignment, instructor_id: instructor1.id)
       stub_current_user(instructor2, instructor2.role.name, instructor2.role)
       expect(current_user_instructs_assignment?(assignment)).to be false
@@ -633,8 +633,8 @@ describe AuthorizationHelper do
     end
 
     it 'returns true if the course associated with the assignment is instructed by the current user' do
-      instructor1 = create(:instructor, name: 'test_instructor_1')
-      instructor2 = create(:instructor, name: 'test_instructor_2')
+      instructor1 = create(:instructor, username: 'test_instructor_1')
+      instructor2 = create(:instructor, username: 'test_instructor_2')
       course = create(:course, instructor_id: instructor1.id)
       assignment = create(:assignment, instructor_id: instructor2.id, course_id: course.id)
       stub_current_user(instructor1, instructor1.role.name, instructor1.role)
@@ -655,8 +655,8 @@ describe AuthorizationHelper do
     end
 
     it 'returns false if the current user and the given assignment are NOT associated by a TA mapping' do
-      ta1 = create(:teaching_assistant, name: 'test_ta_1')
-      ta2 = create(:teaching_assistant, name: 'test_ta_2')
+      ta1 = create(:teaching_assistant, username: 'test_ta_1')
+      ta2 = create(:teaching_assistant, username: 'test_ta_2')
       course = create(:course)
       assignment = create(:assignment, course_id: course.id)
       TaMapping.create(ta_id: ta1.id, course_id: course.id)

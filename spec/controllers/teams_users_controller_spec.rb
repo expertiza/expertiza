@@ -88,11 +88,11 @@ describe TeamsUsersController do
   describe '#create' do
     context 'when user is added to assignment or course team' do
       it 'it throws error when user is not defined' do
-        allow(User).to receive(:find_by).with(name: 'instructor6').and_return(nil)
+        allow(User).to receive(:find_by).with(username: 'instructor6').and_return(nil)
         allow(Team).to receive(:find).with('1').and_return(team1)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'instructor6' }, id: 1
+          user: { username: 'instructor6' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -104,14 +104,14 @@ describe TeamsUsersController do
 
     context 'when user is added to assignment team' do
       it 'it throws error when user added is not a participant of the current assignment' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 1
+          user: { username: 'student2065' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -123,7 +123,7 @@ describe TeamsUsersController do
 
     context 'when user is added to assignment team' do
       it 'it throws error when assignmentTeam has maximum number of participants' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
@@ -131,7 +131,7 @@ describe TeamsUsersController do
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(false)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 1
+          user: { username: 'student2065' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -143,7 +143,7 @@ describe TeamsUsersController do
 
     context 'when user is added to assignment team' do
       it 'new user gets successfully added to the assignment' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with(any_args).and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
@@ -152,7 +152,7 @@ describe TeamsUsersController do
         allow(TeamsUser).to receive(:last).with(any_args).and_return(student1)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 1
+          user: { username: 'student2065' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -162,14 +162,14 @@ describe TeamsUsersController do
 
     context 'when user is added to course team' do
       it 'it throws error when user added to course Team is not defined' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
         allow(CourseParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(nil)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 5
+          user: { username: 'student2065' }, id: 5
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -181,7 +181,7 @@ describe TeamsUsersController do
 
     context 'when user is added to course team' do
       it 'it throws error when courseTeam has maximum number of participants' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
@@ -189,7 +189,7 @@ describe TeamsUsersController do
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(false)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 5
+          user: { username: 'student2065' }, id: 5
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -201,7 +201,7 @@ describe TeamsUsersController do
 
     context 'when user is added to course team' do
       it 'new user gets successfully added to course' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsUser', id: 1))
@@ -212,7 +212,7 @@ describe TeamsUsersController do
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_return(true)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 5
+          user: { username: 'student2065' }, id: 5
         }
         post :create, params: request_params, session: user_session
         # Expect the response to redirect to 'http://test.host/teams/list?id=1'
@@ -222,7 +222,7 @@ describe TeamsUsersController do
 
     context 'when user is already on an assignment team' do
       it 'returns redirect_back' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with(any_args).and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
@@ -232,7 +232,7 @@ describe TeamsUsersController do
         allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 1
+          user: { username: 'student2065' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -244,7 +244,7 @@ describe TeamsUsersController do
 
     context 'when user is added to assignment team while on a team already' do
       it 'it throws error that they are already on a team' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('1').and_return(team1)
         allow(AssignmentTeam).to receive(:find).with('1').and_return(team1)
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
@@ -252,7 +252,7 @@ describe TeamsUsersController do
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 1
+          user: { username: 'student2065' }, id: 1
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -264,7 +264,7 @@ describe TeamsUsersController do
 
     context 'when user is already on a course team' do
       it 'returns redirect_back' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 5).and_return(double('TeamsUser', id: 1))
@@ -276,7 +276,7 @@ describe TeamsUsersController do
         allow(course1).to receive(:user_on_team?).with(student1).and_return(true)
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 5
+          user: { username: 'student2065' }, id: 5
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error
@@ -288,7 +288,7 @@ describe TeamsUsersController do
 
     context 'when user is added to course team while on a team already' do
       it 'it throws error that they are already on a team' do
-        allow(User).to receive(:find_by).with(name: student1.name).and_return(student1)
+        allow(User).to receive(:find_by).with(username: student1.username).and_return(student1)
         allow(Team).to receive(:find).with('5').and_return(team5)
         allow(CourseTeam).to receive(:find).with('5').and_return(team5)
         allow(Course).to receive(:find).with(1).and_return(course1)
@@ -296,7 +296,7 @@ describe TeamsUsersController do
         allow_any_instance_of(CourseTeam).to receive(:add_member).with(any_args).and_raise("Member on existing team error")
         user_session = { user: admin }
         request_params = {
-          user: { name: 'student2065' }, id: 5
+          user: { username: 'student2065' }, id: 5
         }
         post :create, params: request_params, session: user_session
         # Expect to throw error

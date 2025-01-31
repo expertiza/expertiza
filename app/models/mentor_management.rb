@@ -3,7 +3,7 @@ class MentorManagement
   #
   # 1) Find all assignment participants for the
   #    assignment with id [assignment_id] whose
-  #    duty is the same as [Particpant#DUTY_MENTOR].
+  #    duty is the same as [Participant#DUTY_MENTOR].
   # 2) Count the number of teams those participants
   #    are a part of, acting as a proxy for the
   #    number of teams they mentor.

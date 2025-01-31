@@ -33,4 +33,9 @@ Expertiza::Application.configure do
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
+
+  # Enable mock responses for the BiddingAlgorithmService.
+  # When set to true, the service will return MOCK_DATA instead of making real HTTP requests.
+  # Reference: https://wiki.expertiza.ncsu.edu/index.php?title=CSC/ECE_517_Fall_2020_-_E2085._Allow_reviewers_to_bid_on_what_to_review#Webservice
+  config.use_mock_bidding_algorithm = true  
 end

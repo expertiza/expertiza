@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+# The `Participant` class represents a user enrolled in an assignment or course within the application.
+# It manages associations with users, topics, assignments, teams, reviews, badges, and grades.
+# This model includes functionalities such as handling team memberships, managing review mappings,
+# sending notification emails, exporting participant data, and determining authorization roles.
 class Participant < ApplicationRecord
   include Scoring
   include ParticipantsHelper

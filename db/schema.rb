@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20241117200345) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -133,6 +133,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
     t.boolean "enable_pair_programming", default: false
+    t.string "review_choosing_algorithm", default: "Simple Choose"
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"

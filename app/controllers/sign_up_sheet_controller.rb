@@ -17,11 +17,8 @@ class SignUpSheetController < ApplicationController
 
   def action_allowed?
     case params[:action]
-    when 'set_priority', 'sign_up', 'delete_signup', 'list', 'show_team', 'switch_original_topic_to_approved_suggested_topic', 'publish_approved_suggested_topic'
-      (current_user_has_student_privileges? &&
-          (%w[list].include? action_name) &&
-          are_needed_authorizations_present?(params[:id], 'reader', 'submitter', 'reviewer')) ||
-        current_user_has_student_privileges?
+    when *allowed_actions_for_roles
+      current_user_has_student_privileges?
     else
       current_user_has_ta_privileges?
     end
@@ -525,5 +522,17 @@ class SignUpSheetController < ApplicationController
       @sign_up_topic.reassign_topic(team_id)
     end 
   end
-  
+
+  # Actions that require role-based access
+  def allowed_actions_for_roles
+    %w[
+      set_priority
+      sign_up
+      delete_signup
+      list
+      show_team
+      switch_original_topic_to_approved_suggested_topic
+      publish_approved_suggested_topic
+    ]
+  end
 end

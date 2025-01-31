@@ -105,4 +105,76 @@ module SignUpSheetHelper
       out_string
     end
   end
+
+  #to fetch assignment details
+  def fetch_assignment_details(participant)
+    @assignment = participant.assignment
+    @slots_filled = SignUpTopic.find_slots_filled(@assignment.id)
+    @slots_waitlisted = SignUpTopic.find_slots_waitlisted(@assignment.id)
+    @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
+    @max_team_size = @assignment.max_team_size
+    @use_bookmark = @assignment.use_bookmark
+  end
+  
+  def fetch_deadlines(assignment)
+    @signup_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 7)
+    @drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+  end
+  
+  def set_action_display_status(assignment)
+    # Determine if the user is allowed to perform an action based on the signup deadline
+    signup_deadline = assignment.due_dates.find_by(deadline_type_id: 1)
+    return true if signup_deadline.nil?
+    !assignment.staggered_deadline? && (signup_deadline.due_at < Time.now)
+  end
+  
+  def user_sign_up_status(assignment, user_id)
+    users_team = Team.find_team_users(assignment.id, user_id)
+    if users_team.empty?
+      @user_signup_status = nil
+    else
+      @user_signup_status = SignedUpTeam.find_user_signup_topics(assignment.id, users_team.first.t_id)
+    end
+  end
+  
+end
+
+  def extract_due_dates(assignment, deadline_type_id)
+    assignment.due_dates.select { |due_date| due_date.deadline_type_id == deadline_type_id }.map { |due_date| format_due_date(due_date.due_at) }
+  end
+
+  def format_due_date(due_at)
+    DateTime.parse(due_at.to_s).strftime('%Y-%m-%d %H:%M')
+  end
+
+
+ def create_topic_due_date(topic, deadline_type, deadline_type_id, round)
+  TopicDueDate.create(
+    due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
+    deadline_type_id: deadline_type_id,
+    parent_id: topic.id,
+    submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].submission_allowed_id,
+    review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_allowed_id,
+    review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_of_review_allowed_id,
+    round: round,
+    flag: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].flag,
+    threshold: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].threshold,
+    delayed_job_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].delayed_job_id,
+    deadline_name: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].deadline_name,
+    description_url: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].description_url,
+    quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].quiz_allowed_id,
+    teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].teammate_review_allowed_id,
+    type: 'TopicDueDate'
+  )
+end
+
+def update_topic_due_date(topic_due_date, deadline_type, round)
+  topic_due_date.update_attributes(
+    due_at: instance_variable_get('@topic_' + deadline_type + '_due_date'),
+    submission_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].submission_allowed_id,
+    review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_allowed_id,
+    review_of_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].review_of_review_allowed_id,
+    quiz_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].quiz_allowed_id,
+    teammate_review_allowed_id: instance_variable_get('@assignment_' + deadline_type + '_due_dates')[round - 1].teammate_review_allowed_id
+  )
 end

@@ -1,4 +1,12 @@
 FactoryBot.define do
+
+  factory :assignment_participant, class: AssignmentParticipant do
+    can_submit true
+    can_review true
+    submitted_at nil
+    permission_granted false
+  end
+
   factory :institution, class: Institution do
     name 'North Carolina State University'
   end

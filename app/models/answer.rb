@@ -37,4 +37,14 @@ class Answer < ApplicationRecord
                                                  answers.question_id = ? ", assignment_id, reviewee_id, q_id)
     question_answers
   end
+
+  # Creates a duplicate Answer, associates the new Answer object to the specified Response object
+  # and it used while copying calibration submissions.
+  def copy_to_response(response)
+    new_answer = dup
+    new_answer.response_id = response.id
+    new_answer.save
+
+    new_answer
+  end
 end

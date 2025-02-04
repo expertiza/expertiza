@@ -3,54 +3,90 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 #ADDED: Get participant details if user is added to the assignment
+#RENAMED: get_participant_or_reviewer -> find_assignment_participant
   # @param user_id [Integer] The ID of the user.
   # @param parent_id [Integer] The ID of the assignment.
   # @return [AssignmentParticipant or nil] The participant record if found, or nil if not found.
-  def get_participant_or_reviewer(user_id, parent_id)
+
+# Reasoning:
+  #  - Reflects that this method locates an AssignmentParticipant for a given user and assignment.
+  #  - Removes ambiguity around "or reviewer," since it specifically returns a participant.
+  def find_assignment_participant(user_id, parent_id)
     AssignmentParticipant.where(user_id: user_id, parent_id: parent_id).first
   end
 
   #ADDED: Get review response mapping if the participant is assgined as a reviewer to the team.
+  #RENAMED: get_review_response_mapping -> find_review_response_mapping
+
   # @param reviewed_object_id [Integer] The ID of the reviewed object (e.g., assignment ID).
   # @param participant [AssignmentParticipant] The participant acting as a reviewer.
   # @param reviewee_id [Integer] The ID of the team being reviewed.
   # @param calibrate_to [Boolean] Whether the review is a calibration review.
   # @return [ReviewResponseMap or nil] The review response mapping if found, or nil if not found.
-  def get_review_response_mapping(reviewed_object_id, participant, reviewee_id, calibrate_to)
-    ReviewResponseMap.where(reviewed_object_id: reviewed_object_id, reviewer_id: participant.get_reviewer.id, reviewee_id: reviewee_id, calibrate_to: calibrate_to).first
+
+  # Reasoning:
+  #  - "find" is more standard Ruby nomenclature for looking up records.
+  #  - Clarifies that the method returns a single mapping object or nil.
+  def find_review_response_mapping(reviewed_object_id, participant, reviewee_id, calibrate_to)
+    ReviewResponseMap.where(
+    reviewed_object_id: reviewed_object_id,
+    reviewer_id: participant.get_reviewer.id,
+    reviewee_id: reviewee_id,
+    calibrate_to: calibrate_to).first
   end
 
+  # RENAMED: get_assignment -> find_assignment
   #ADDED: Get assignment details using assignment id.
   # @param assignment_id [Integer] The ID of the assignment.
   # @return [Assignment] The assignment record.
-  def get_assignment(assignment_id)
+  # Reasoning:
+    #  - "find" aligns with ActiveRecord naming conventions for retrieving records.
+  def find_assignment(assignment_id)
     Assignment.find(assignment_id)
   end
 
-  #ADDED: Get team details using contributer id
-  # @param contributor_id [Integer] The ID of the contributor (team).
-  # @return [AssignmentTeam] The team record.
-  def get_assignment_team(contributor_id)
+  # RENAMED: get_assignment_team -> find_assignment_team
+    # @param contributor_id [Integer] The ID of the contributor (team).
+    # @return [AssignmentTeam] The team record.
+    #
+    # Reasoning:
+    #  - Matches Ruby convention for retrieving a record with `find_...`
+  def find_assignment_team(contributor_id)
     AssignmentTeam.find(params[:contributor_id])
   end
 
-  def check_for_self_review?(team_id, user_id)
+  # RENAMED: check_for_self_review? -> is_self_review?
+    # @param team_id [Integer] The team ID.
+    # @param user_id [Integer] The user ID.
+    # @return [Boolean] True if it is a self-review, false otherwise.
+    #
+    # Reasoning:
+    #  - Ending with a question mark makes it clear that this returns a boolean.
+    #  - "is_self_review?" succinctly captures the check being performed.
+  def is_self_review?(team_id, user_id)
     TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
   end
 
+
   def get_reviewer(user, assignment, reg_url)
-    reviewer = get_participant_or_reviewer(user.id, assignment.id)
+    reviewer = find_assignment_participant(user.id, assignment.id)
     raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
 
     reviewer.get_reviewer
   rescue StandardError => e
     flash[:error] = e.message
   end
+
+
    #ADDED: Returns the number of team participants, excluding the members that cannot review and submit.
+   # RENAMED: get_num_of_team_participants -> count_active_team_participants
   # @param [Integer] team_id - The ID of the team.
   # @param [Integer] assignment_id - The ID of the assignment.
   # @return [Integer] - The number of team participants who can both review and submit.
-  def get_num_of_team_participants(team_id, assignment_id)
+  # Reasoning:
+    #  - "count" emphasizes returning a quantity.
+    #  - "active_team_participants" clarifies that only participants who can review and submit are counted.
+  def count_active_team_participants(team_id, assignment_id)
     num_team_participants = TeamsUser.where(team_id: team.id).size
     # If there are some submitters or reviewers in this team, they are not treated as normal participants.
     # They should be removed from 'num_team_participants'
@@ -61,7 +97,17 @@ module ReviewMappingHelper
     num_team_participants
   end
 
-  def get_random_reviewer_index(participants, participants_hash, team_id, num_participants)
+
+   # RENAMED: get_random_reviewer_index -> select_random_reviewer_index
+    # @param participants [Array<AssignmentParticipant>] The list of participants.
+     # @param participants_hash [Hash{Integer => Integer}] A hash of participant_id => number_of_reviews_assigned.
+     # @param team_id [Integer] The team ID.
+     # @param num_participants [Integer] The total number of participants.
+     # @return [Integer] Index of the participant chosen as reviewer.
+   # Reasoning:
+     #  - "select_random" indicates that it is choosing an index in a random manner.
+     #  - Clarifies that it returns an index rather than the participant object itself.
+  def select_random_reviewer_index(participants, participants_hash, team_id, num_participants)
     min_value = participants_hash.values.min
     # get the temp array including indices of participants, each participant has minimum review number in hash table.
     participants_with_min_assigned_reviews = []
@@ -71,19 +117,25 @@ module ReviewMappingHelper
     # if participants_with_min_assigned_reviews is blank
     no_min_assigned_reviews = participants_with_min_assigned_reviews.empty?
     # or only one element in participants_with_min_assigned_reviews, prohibit one student to review his/her own artifact
-    has_one_participant_with_self_review = ((participants_with_min_assigned_reviews.size == 1) && check_for_self_review?(team_id, participants[participants_with_min_assigned_reviews[0]].user_id))
+    has_one_participant_with_self_review = ((participants_with_min_assigned_reviews.size == 1) && is_self_review?(team_id, participants[participants_with_min_assigned_reviews[0]].user_id))
     if no_min_assigned_reviews || has_one_participant_with_self_review
       # use original method to get random number
       rand(0..num_participants - 1)
     else
       # rand_num should be the position of this participant in original array
       participants_with_min_assigned_reviews[rand(0..participants_with_min_assigned_reviews.size - 1)]
-    end    
+    end
   end
-    # This method checks if the user is allowed to do any more reviews.
-  # First we find the number of reviews done by that reviewer for that assignment and we compare it with assignment policy
-  # if number of reviews are less than allowed than a user is allowed to request.
-  def review_allowed?(assignment, reviewer)
+
+
+  # RENAMED: review_allowed? -> can_request_additional_reviews?
+    # @param assignment [Assignment] The assignment to check.
+    # @param reviewer [AssignmentParticipant] The reviewer participant.
+    # @return [Boolean] True if this reviewer can still request more reviews, false otherwise.
+    #
+    # Reasoning:
+    #  - "can_request_additional_reviews?" clearly states it returns a boolean and describes the condition checked.
+  def can_request_additional_reviews?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     assignment.num_reviews_allowed > @review_mappings.size
   end
@@ -92,7 +144,10 @@ module ReviewMappingHelper
   # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
-  def check_outstanding_reviews?(assignment, reviewer)
+  # RENAMED: check_outstanding_reviews? -> within_outstanding_review_limit?
+  # Reasoning:
+    #  - "within_outstanding_review_limit?" clarifies we are checking if the reviewer is under the max allowed outstanding reviews.
+  def within_outstanding_review_limit?(assignment, reviewer)
     @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
     @num_reviews_total = @review_mappings.size
     if @num_reviews_total.zero?
@@ -107,9 +162,13 @@ module ReviewMappingHelper
     end
   end
     #ADDED: Check if the topic is selected or not.
+    # RENAMED: check_invalid_topic? -> topic_selection_invalid?
   # @param assignment [Assignment] The current assignment
   # @return [Boolean] True if the topic selection is invalid, false otherwise
-  def check_invalid_topic?(assignment)
+
+  # Reasoning:
+    #  - Uses a question mark and clarifies exactly what is being checked: the validity of the topic selection.
+  def topic_selection_invalid?(assignment)
     params[:i_dont_care].nil? && params[:topic_id].nil? && assignment.topics? && assignment.can_choose_topic_to_review?
   end
   #
@@ -545,7 +604,7 @@ module ReviewMappingHelper
 
   class TeamReviewStrategy < ReviewStrategy
     def reviews_per_team
-      @review_num 
+      @review_num
     end
 
     def reviews_needed

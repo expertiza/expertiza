@@ -110,7 +110,24 @@ class AssignmentsController < ApplicationController
   # displays an assignment via ID
   def show
     @assignment = Assignment.find(params[:id])
+    @rounds_of_reviews = (1..@assignment.rounds_of_reviews).to_a
+  
+    # Ensure session key exists and retrieve only rounds for this specific assignment
+    session[:hidden_review_rounds] ||= {}
+    hidden_rounds = session[:hidden_review_rounds][@assignment.id] || []
+  
+    # Remove the hidden rounds for this specific assignment
+    @rounds_of_reviews -= hidden_rounds
+  
+    # Return JSON response for AJAX requests
+    respond_to do |format|
+      format.html # Render HTML for standard page requests
+      format.json { render json: { removed_rounds: hidden_rounds } }
+    end
   end
+  
+  
+  
 
   # gets an assignment's path/url
   def path
@@ -208,6 +225,32 @@ class AssignmentsController < ApplicationController
   def instant_flash
     render partial: 'shared/flash_messages'
   end
+
+  def hide_review_round
+    round_no = params[:round_no].to_i
+    assignment_id = params[:assignment_id].to_i
+  
+    # Ensure session key exists and scope hidden rounds per assignment
+    session[:hidden_review_rounds] ||= {}
+    session[:hidden_review_rounds][assignment_id] ||= []
+  
+    unless session[:hidden_review_rounds][assignment_id].include?(round_no)
+      session[:hidden_review_rounds][assignment_id] << round_no
+    end
+  
+    render json: { success: true, hidden_rounds: session[:hidden_review_rounds][assignment_id] }
+  end
+  
+  
+  
+  def reset_hidden_rounds
+    assignment_id = params[:assignment_id].to_i
+    session[:hidden_review_rounds][assignment_id] = [] if session[:hidden_review_rounds]
+    head :ok # Respond with success
+  end
+  
+  
+
 
   private
 

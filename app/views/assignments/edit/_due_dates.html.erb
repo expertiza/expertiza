@@ -4,6 +4,16 @@
             changeReviewRounds();
             jQuery("#set_pressed_bool").val(true)
             event.preventDefault(); // Prevent link from following its href
+            $.getJSON(`/assignments/${assignment_id}`, function(response) {
+               let hiddenRounds = response.removed_rounds || [];
+
+               let new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());
+        
+               // If the new round count matches any previously hidden round, reset hidden rounds
+               if (hiddenRounds.includes(new_round_count)) {
+                          resetHiddenRounds(assignment_id);
+                }
+            }).fail(() => console.error("Failed to fetch hidden rounds"));
         });
 
         jQuery("#assignment_form_assignment_rounds_of_reviews").change(function () {
@@ -40,11 +50,15 @@
 
         //E1654. Improve date-picker and deadlines Code change starts
 
+        let assignment_id = '<%= @assignment_form.assignment.id%>';  // Make sure assignment_id is available
+        hidePreviouslyRemovedRounds(assignment_id);
+
+
     });
 
     function addDueDateTableElement(addnameurl, deadline_type, round_no, due_date) {
-//round_no = 0 for submission and review is not possible
-//round_no = 0 is used for other deadlines
+     //round_no = 0 for submission and review is not possible
+     //round_no = 0 is used for other deadlines
         var previous_element;
         if (round_no == 0) {
             if (deadline_type == 'team_formation') {
@@ -110,6 +124,14 @@
         } else {
             html += capitalize(deadline_type.replace("_", " "));
         }
+
+        if (deadline_type == "review") {
+              html += '&nbsp;&nbsp;';
+            html += '<img src="/assets/delete_icon.png" class="remove_due_date" ' +
+       'onclick="removeDueDateTableElementWithConfirm(' + '<%= @assignment_form.assignment.id%>' + ', \'' + deadline_type + '\', ' + round_no + ')" ' +
+       'alt="Delete" />';
+        }
+        
         html += '</td>';
         var due_at = due_date.due_at;
         if (due_at == null) {
@@ -244,6 +266,86 @@
         }
         jQuery(element_id).remove();
     }
+
+
+    function removeDueDateTableElementWithConfirm(assignment_id, deadline_type, round_no) {
+    var element_id = (round_no == 0) ? '#' + deadline_type : '#' + deadline_type + '_round_' + round_no;
+
+    if (jQuery(element_id).length === 0) {
+        alert("Error: The specified deadline does not exist.");
+        return;
+    }
+     console.log("Assignment ID:", assignment_id);
+     console.log("Round No:", round_no);
+
+
+    // Show confirmation popup
+    jQuery.confirm({
+        title: 'Confirm Hide',
+        content: 'Are you sure you want to remove this review round?',
+        buttons: {
+            confirm: function () {
+                jQuery(element_id).hide(); // ✅ Hide from UI immediately
+
+                // ✅ Send AJAX request to store hidden round in session
+               jQuery.ajax({
+                     dataType: "json",
+                     url: '/assignments/hide_review_round',  // No assignment_id in URL
+                     data: { assignment_id: assignment_id, round_no: round_no }, // Pass ID
+                     method: "PATCH",
+                      success: function(response) {
+                           $.alert('Review round removed successfully!');
+                      },
+                      error: function(xhr, textStatus, errorThrown) {
+                          $.alert('Error hiding review round: ' + errorThrown);
+                      }
+                });
+
+            },
+            cancel: function () {
+                $.alert('Hiding cancelled.');
+            }
+        }
+    });
+}
+
+function hidePreviouslyRemovedRounds(assignment_id) {
+    $.getJSON(`/assignments/${assignment_id}.json`, function(response) {
+        if (!response.removed_rounds) {
+            console.warn("No hidden rounds found for assignment:", assignment_id);
+            return;
+        }
+
+        response.removed_rounds.forEach(round_no => {
+            let element_id = `#review_round_${round_no}`;
+            $(element_id).hide();
+            console.log("Hiding element:", element_id);
+        });
+    }).fail(() => console.error("Failed to fetch removed rounds for assignment:", assignment_id));
+}
+
+
+
+// Function to reset hidden rounds
+function resetHiddenRounds(assignment_id) {
+    $.ajax({
+        url: '/assignments/reset_hidden_rounds',
+        type: 'PATCH',
+        data: { assignment_id: assignment_id },
+        success: function () {
+            console.log("Hidden rounds reset successfully.");
+            location.reload();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            console.error("Error resetting hidden rounds:", errorThrown);
+        }
+    });
+}
+
+
+
+
+
 
     function changeReviewRounds() {
         var new_round_count = parseInt(jQuery('#assignment_form_assignment_rounds_of_reviews').val());

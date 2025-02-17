@@ -71,6 +71,7 @@ class MentorManagement
     return unless team_member_added
 
     notify_team_of_mentor_assignment(mentor_user, team)
+    notify_mentor_of_assignment(mentor_user, team)
   end
 
   def self.notify_team_of_mentor_assignment(mentor, team)
@@ -83,6 +84,19 @@ class MentorManagement
     Mailer.delayed_message(bcc: emails,
                            subject: '[Expertiza]: New Mentor Assignment',
                            body: message).deliver_now
+  end
+  
+  def self.notify_mentor_of_assignment(mentor, team)
+    members_info = team.users.map { |mem| "#{mem.fullname} - #{mem.email}" }.join('<br>')
+    assignment_name = Assignment.find(team.parent_id).name
+    mentor_message = "You have been assigned as a mentor for the team working on assignment: #{assignment_name}. <br>Current team members:<br> #{members_info}"
+  
+    Mailer.delayed_message(
+        bcc: [mentor.email],
+        subject: '[Expertiza]: You have been assigned as a Mentor',
+        body: mentor_message
+      ).deliver_now
+
   end
 
   # Returns true if [user] is a mentor, and false if not.

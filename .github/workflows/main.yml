@@ -3,10 +3,10 @@ name: "Test Expertiza"
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main, development]
+    branches: [main, development, bugfix/code_coverage]
     paths-ignore: ['**.md']
   push:
-    branches: [main, development]
+    branches: [main, development, bugfix/code_coverage]
     paths-ignore: ['**.md']
   
 jobs:
@@ -70,7 +70,7 @@ jobs:
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-artifacts-${{ matrix.folder }}
+          name: code-coverage-artifacts
           path: coverage/
   
   # Publish code coverage report to code climate 

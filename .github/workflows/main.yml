@@ -83,13 +83,15 @@ jobs:
       - name: Download all coverage artifacts
         uses: actions/download-artifact@v4
         with:
+          name: code-coverage-artifacts-${{ matrix.folder }}
           path: coverage
+          merge-multiple: true 
       - name: Upload code coverage report
         run: |
           export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
+          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -o coverage/codeclimate.json
           ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
   
   # Deploy the latest version of Expertiza development branch to the development server 

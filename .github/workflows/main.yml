@@ -92,7 +92,7 @@ jobs:
           chmod +x ./cc-test-reporter
           ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -o coverage/codeclimate.json
           export CC_TEST_REPORTER_COVERAGE_FILE=coverage/codeclimate.json
-          ./cc-test-reporter after-build -r ${{ secrets.CC_TEST_REPORTER_ID }}
+          ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
   
   # Deploy the latest version of Expertiza development branch to the development server 
   # when changes are pushed to the development branch

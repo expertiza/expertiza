@@ -19,7 +19,7 @@
         if (round_no == null && duty_id == undefined) {
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type + ':</label></td>';
         } else if (round_no == null && duty_id != undefined) {
-            // E2147 : Add name of duty infront of the questionnaire type to select for which duty the questionnaire is being selected
+            // E2147 : Add name of duty in front of the questionnaire type to select for which duty the questionnaire is being selected
             html += '<td><label for="questionnaire_id">' + questionnaire.display_type +  ' Role ' + duty_name + ':</label></td>';
         }
         else if (round_no!=null && duty_id == undefined) {

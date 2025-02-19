@@ -70,7 +70,7 @@ jobs:
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-artifacts-${{ matrix.folder }} 
+          name: code-coverage-artifacts
           path: coverage/
   
   # Publish code coverage report to code climate 
@@ -80,12 +80,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
-      - name: Download all coverage artifacts
+      - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
-          name: code-coverage-artifacts-${{ matrix.folder }}
           path: coverage
-          merge-multiple: true 
+          merge-multiple: true
       - name: Upload code coverage report
         run: |
           export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"

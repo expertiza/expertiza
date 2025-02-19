@@ -80,11 +80,21 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
+
       - name: Download coverage artifacts
         uses: actions/download-artifact@v4
         with:
           path: coverage
           merge-multiple: true
+
+      - name: Move coverage files after download
+        run: mv coverage/code-coverage-artifacts/* coverage/ || echo "No extra files to move"
+
+      - name: Debug coverage files
+        run: |
+          echo "Checking coverage directory..."
+          ls -lah coverage/
+          
       - name: Upload code coverage report
         run: |
           export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"

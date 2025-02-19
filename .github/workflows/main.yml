@@ -65,7 +65,7 @@ jobs:
           RAILS_ENV: test
       
       - name: Format code coverage report
-        run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json"
+        run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json" coverage/.resultset.json
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4

@@ -32,6 +32,16 @@ class DeadlineRight < ApplicationRecord
       'submission_allowed' => NO,
       'can_review' => NO,
       'review_of_review_allowed' => OK
+    },
+    'bidding_for_topics' => {
+      'submission_allowed' => NO,
+      'can_review' => NO,
+      'review_of_review_allowed' => NO
+    },
+    'bidding_for_reviews' => {
+      'submission_allowed' => NO,
+      'can_review' => NO,
+      'review_of_review_allowed' => NO
     }
   }.freeze
 end

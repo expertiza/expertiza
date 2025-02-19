@@ -11,7 +11,6 @@ require 'sidekiq/testing'
 require 'simplecov'
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                                                                  SimpleCov::Formatter::HTMLFormatter,
-                                                                 SimpleCov::Formatter::JSONFormatter,
                                                                  Coveralls::SimpleCov::Formatter
                                                                ])
 SimpleCov.start 'rails'

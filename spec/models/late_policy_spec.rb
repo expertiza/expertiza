@@ -1,4 +1,3 @@
-require 'penalty_helper'
 require 'active_support/all'
 include ScoreCalculationHelper
 describe LatePolicy do

@@ -90,7 +90,7 @@ jobs:
       - name: Move coverage files after download
         run: mv coverage/code-coverage-artifacts/* coverage/ || echo "No extra files to move"
 
-      - name: Debug coverage files
+      - name: Debuging coverage files
         run: |
           echo "Checking coverage directory..."
           ls -lah coverage/

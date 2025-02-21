@@ -1,4 +1,3 @@
-version: "3.9" # optional since v1.27.0
 services:
   web:
     build:
@@ -17,7 +16,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      JAVA_HOME: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+      JAVA_HOME: "/usr/lib/jvm/java-8-oracle"
       RAILS_ENV: development
       REDIS_HOST: redis
     entrypoint: ["/app/docker_entrypoint.sh"]

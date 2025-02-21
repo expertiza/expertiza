@@ -74,9 +74,15 @@ then
     sudo apt-get update  
     sudo apt-get install build-essential libssl-dev
     sudo apt-get update ca-certificates
-    curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-
-    sudo apt-get install -y nodejs && sudo apt-get install -y npm && sudo ln -s /usr/bin/nodejs /usr/bin/node
+    # curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
+    source ~/.bashrc
+    
+    nvm install 14
+    nvm use 14
+# sudo apt-get install -y nodejs && sudo apt-get install -y npm && sudo ln -s /usr/bin/nodejs /usr/bin/node
     
   # Checking NPM
     echo "Checking for NPM"
@@ -85,10 +91,10 @@ then
     then
         echo "Installing NPM"
         sudo apt-get install -y npm
-    else
-        echo "NPM was already installed"
-        echo "Looking for an update"
-        sudo npm i -g npm
+    # else
+    #     echo "NPM was already installed"
+    #     echo "Looking for an update"
+        # npm i -g npm
     fi
     
     # Installing Bower
@@ -96,7 +102,7 @@ then
     sudo chown -R $USER:$GROUP ~/.npm
     sudo chown -R $USER:$GROUP ~/.config
     
-    sudo npm install -g bower
+    npm install -g bower
     bower install
     sudo apt-get autoremove
     

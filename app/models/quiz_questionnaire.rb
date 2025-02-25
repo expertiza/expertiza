@@ -1,9 +1,6 @@
 class QuizQuestionnaire < Questionnaire
   attr_accessor :questionnaire
-  after_initialize :post_initialization
-  def post_initialization
-    self.display_type = 'Quiz'
-  end
+  after_initialize { post_initialization('Quiz') }
 
   def symbol
     'quiz'.to_sym
@@ -19,7 +16,6 @@ class QuizQuestionnaire < Questionnaire
 
   def compute_weighted_score(scores)
     if scores[:quiz][:scores][:avg]
-      # dont bracket and to_f the whole thing - you get a 0 in the result.. what you do is just to_f the 100 part .. to get the fractions
       scores[:quiz][:scores][:avg] * 100 / 100.to_f
     else
       0

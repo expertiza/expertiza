@@ -42,6 +42,7 @@ describe GradesController do
     allow(Assignment).to receive(:find).with(1).and_return(assignment)
     allow_any_instance_of(Assignment).to receive(:late_policy_id).and_return(1)
     allow(controller).to receive(:calculate_penalty).and_return({ submission: 0, review: 0, meta_review: 0 })
+    allow(controller).to receive(:create_grading_history).and_return(nil)
   end
 
   describe '#view' do

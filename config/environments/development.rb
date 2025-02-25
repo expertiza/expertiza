@@ -47,12 +47,15 @@ Expertiza::Application.configure do
   config.assets.debug = true
   config.react.variant = :development
   config.active_record.logger = nil
-  # Line 63-69 are for 'bullet' gem initialization.
+  
+  # Bullet gem initialization.
   config.after_initialize do
     Bullet.enable = true
-    Bullet.alert = false
-    Bullet.bullet_logger = false
-    Bullet.console = false
-    Bullet.rails_logger = false
+    Bullet.alert = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    # Bullet.growl = true
+    Bullet.rails_logger = true
+    # Bullet.add_footer = true
   end
 end

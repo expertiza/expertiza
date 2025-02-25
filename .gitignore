@@ -221,3 +221,8 @@ pg_data
 mysql2psql.yml
 *.pem
 t.csv
+
+# Output for answer_tags_controller_spec.rb
+answer_tags_controller_rspec_output.txt
+# Output for tag_prompt_deployment_spec.rb
+tag_prompt_deployment_spec_output.txt

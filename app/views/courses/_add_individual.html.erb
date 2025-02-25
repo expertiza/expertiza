@@ -1,5 +1,5 @@
 <%= form_tag form_action, :method => 'post', :remote => remote do %>
-  <p class="form-inline"><label for="user_name">Enter a user login:</label> <%= text_field_with_auto_complete :user, :name, {:size => 41, :class => "form-control"} %>
+  <p class="form-inline"><label for="user_name">Enter a user login:</label> <%= text_field_with_auto_complete :user, :username, {:size => 41, :class => "form-control"} %>
 <%= hidden_field_tag obj_type, obj_id %>
 <%= submit_tag 'Add TA', class: "btn btn-default" %></p>
 <% end %>

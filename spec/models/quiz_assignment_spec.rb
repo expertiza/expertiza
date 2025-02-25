@@ -1,7 +1,7 @@
 describe QuizAssignment do
   let(:assignment) { build(:assignment, id: 1, name: 'no assignment', participants: [participant], teams: [team]) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:student) { build(:student, id: 3, name: 'no one') }
+  let(:student) { build(:student, id: 3, username: 'no one') }
   let(:participant) { build(:participant, id: 1) }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:questionnaire1) { build(:questionnaire, id: 1, type: 'ReviewQuestionnaire') }

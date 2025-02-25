@@ -12,7 +12,7 @@ class SurveyResponseMap < ResponseMap
     user = User.find(participant.user_id)
     defn[:body][:type] = 'Survey Submission'
     defn[:body][:obj_name] = survey_parent.name
-    defn[:body][:first_name] = user.fullname
+    defn[:body][:first_name] = user.name
     defn[:to] = user.email
     Mailer.sync_message(defn).deliver_now
   end

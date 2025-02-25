@@ -5,9 +5,9 @@ describe ResponseMap do
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
   let(:participant2) { build(:participant, id: 3, parent_id: 3, user: student2) }
-  let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
-  let(:student2) { build(:student, id: 3, name: 'name2', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student) { build(:student, id: 1, username: 'name', name: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student1) { build(:student, id: 2, username: 'name1', name: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student2) { build(:student, id: 3, username: 'name2', name: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
   let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt2', rounds_of_reviews: 2) }
 

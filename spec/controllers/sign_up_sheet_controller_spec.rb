@@ -520,7 +520,7 @@ describe SignUpSheetController do
   describe '#signup_as_instructor_action' do
     context 'when user cannot be found' do
       it 'shows an flash error message and redirects to assignment#edit page' do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
+        allow(User).to receive(:find_by).with(username: 'no name').and_return(nil)
         allow(User).to receive(:find).with(8).and_return(student)
         allow(Team).to receive(:find).with(1).and_return(team)
         request_params = { username: 'no name', assignment_id: 1 }
@@ -532,7 +532,7 @@ describe SignUpSheetController do
 
     context 'when user can be found' do
       before(:each) do
-        allow(User).to receive(:find_by).with(name: 'no name').and_return(student)
+        allow(User).to receive(:find_by).with(username: 'no name').and_return(student)
       end
 
       context 'when an assignment_participant can be found' do

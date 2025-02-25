@@ -23,7 +23,7 @@ class Course < ApplicationRecord
   def path
     raise 'Path can not be created. The course must be associated with an instructor.' if instructor_id.nil?
 
-    Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).name) + '/' + FileHelper.clean_path(directory_path) + '/'
+    Rails.root + '/pg_data/' + FileHelper.clean_path(User.find(instructor_id).username) + '/' + FileHelper.clean_path(directory_path) + '/'
   end
 
   def get_participants
@@ -35,14 +35,14 @@ class Course < ApplicationRecord
   end
 
   def add_participant(user_name)
-    user = User.find_by(name: user_name)
+    user = User.find_by(username: user_name)
     if user.nil?
       raise 'No user account exists with the name ' + user_name + ". Please <a href='" + url_for(controller: 'users', action: 'new') + "'>create</a> the user first."
     end
 
     participant = CourseParticipant.where(parent_id: id, user_id: user.id).first
     if participant # If there is already a participant, raise an error. Otherwise, create it
-      raise "The user #{user.name} is already a participant."
+      raise "The user #{user.username} is already a participant."
     else
       CourseParticipant.create(parent_id: id, user_id: user.id, permission_granted: user.master_permission_granted)
     end
@@ -56,7 +56,7 @@ class Course < ApplicationRecord
       user = User.find(participant.user_id)
 
       begin
-        add_participant(user.name)
+        add_participant(user.username)
       rescue StandardError
         errors << $ERROR_INFO
       end

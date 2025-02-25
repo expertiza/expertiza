@@ -93,7 +93,7 @@ class FeedbackResponseMap < ResponseMap
     user = User.find(participant.user_id)
 
     defn[:to] = user.email
-    defn[:body][:first_name] = user.fullname
+    defn[:body][:first_name] = user.name
     Mailer.sync_message(defn).deliver
   end
 end

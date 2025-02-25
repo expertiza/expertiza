@@ -1,10 +1,10 @@
 <% userid << participant.user_id %>
 <tr class= "" style="font-size: 15px">
-  <td ><%= link_to participant.user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => participant.user.name(session[:ip])}), :method => :post %></td>
-  <td ><%= link_to participant.user.fullname(session[:ip]), :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
+  <td ><%= link_to participant.user.username(session[:ip]), impersonate_impersonate_path(:user => {:username => participant.user.username(session[:ip])}), :method => :post %></td>
+  <td ><%= link_to participant.user.name(session[:ip]), :controller=> 'users', :action => 'show', :id => participant.user_id %></td>
   <td><a href="mailto: <%= participant.user.email(session[:ip]) %>"><%= participant.user.email(session[:ip]) %></a></td>
   <td><%= participant.user.role.name %></td>
-  <td align = "left"><%= (User.find(participant.user.parent_id)).name(session[:ip]) %></td>
+  <td align = "left"><%= (User.find(participant.user.parent_id)).username(session[:ip]) %></td>
   <% if  @model == 'Assignment' && participant.assignment.badge? %>
     <td align = "left"><%= get_awarded_badges(participant) %></td>
   <% end %>

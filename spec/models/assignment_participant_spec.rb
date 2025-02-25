@@ -135,7 +135,7 @@ describe AssignmentParticipant do
     context 'when no user is found by offered username' do
       context 'when the record has less than 4 items' do
         it 'raises an ArgumentError' do
-          row = { username: 'no one', fullname: 'no one', email: 'no_one@email.com' }
+          row = { username: 'no one', name: 'no one', email: 'no_one@email.com' }
           expect(ImportFileHelper).not_to receive(:create_new_user)
           expect { AssignmentParticipant.import(row, nil, nil, nil) }.to raise_error('The record containing no one does not have enough items.')
         end
@@ -143,10 +143,10 @@ describe AssignmentParticipant do
 
       context 'when new user needs to be created' do
         let(:row) do
-          { username: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
+          { username: 'no one', name: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
-          { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+          { role_id: 1, name: 'no one', name: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
             email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com' }
         end
         let(:test_user) do
@@ -156,7 +156,7 @@ describe AssignmentParticipant do
           ActionMailer::Base.deliveries.clear
           allow(ImportFileHelper).to receive(:define_attributes).with(row).and_return(attributes)
           allow(ImportFileHelper).to receive(:create_new_user) do
-            test_user = User.new(name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com')
+            test_user = User.new(username: 'abc', name: 'abc bbc', email: 'abcbbc@gmail.com')
             test_user.id = 123
             test_user.save!
             password = test_user.reset_password # the password is reset
@@ -166,7 +166,7 @@ describe AssignmentParticipant do
           end
           # allow(ImportFileHelper).to receive(:create_new_user).with(attributes, {}).and_return()
           allow(Assignment).to receive(:find).with(1).and_return(assignment)
-          allow(User).to receive(:exists?).with(name: 'no one').and_return(false)
+          allow(User).to receive(:exists?).with(username: 'no one').and_return(false)
           allow(participant).to receive(:set_handle).and_return('handle')
           allow(AssignmentParticipant).to receive(:exists?).and_return(false)
           allow(AssignmentParticipant).to receive(:create).and_return(participant)
@@ -177,10 +177,10 @@ describe AssignmentParticipant do
 
       context 'when the record has more than 4 items' do
         let(:row) do
-          { username: 'no one', fullname: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
+          { username: 'no one', name: 'no one', email: 'name@email.com', role: 'user_role_name', parent: 'user_parent_name' }
         end
         let(:attributes) do
-          { role_id: 1, name: 'no one', fullname: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
+          { role_id: 1, name: 'no one', name: 'no one', email: 'name@email.com', email_on_submission: 'name@email.com',
             email_on_review: 'name@email.com', email_on_review_of_review: 'name@email.com' }
         end
         before(:each) do
@@ -213,7 +213,7 @@ describe AssignmentParticipant do
   describe '.export' do
     it 'exports all participants in current assignment' do
       allow(AssignmentParticipant).to receive_message_chain(:where, :find_each).with(parent_id: 1).with(no_args).and_yield(participant)
-      allow(participant).to receive(:user).and_return(build(:student, name: 'student2065', fullname: '2065, student'))
+      allow(participant).to receive(:user).and_return(build(:student, username: 'student2065', name: '2065, student'))
       options = { 'personal_details' => 'true', 'role' => 'true', 'handle' => 'true', 'parent' => 'true', 'email_options' => 'true' }
       expect(AssignmentParticipant.export([], 1, options)).to eq(
         [['student2065',
@@ -230,7 +230,7 @@ describe AssignmentParticipant do
   end
 
   describe '#set_handle' do
-    let(:student) { build(:student, name: 'no one') }
+    let(:student) { build(:student, username: 'no one') }
     before(:each) do
       allow(participant).to receive(:user).and_return(student)
     end

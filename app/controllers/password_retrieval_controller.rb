@@ -18,7 +18,7 @@ class PasswordRetrievalController < ApplicationController
         PasswordReset.save_token(user, token)
         url = request.base_url + url_format + token
         MailerHelper.send_mail_to_user(user, 'Expertiza password reset', 'send_password', url).deliver_now
-        ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'A link to reset your password has been sent to users e-mail address.', request)
+        ExpertizaLogger.info LoggerMessage.new(controller_name, user.username, 'A link to reset your password has been sent to users e-mail address.', request)
         flash[:success] = 'A link to reset your password has been sent to your e-mail address.'
         redirect_to '/'
       else
@@ -71,10 +71,10 @@ class PasswordRetrievalController < ApplicationController
       user.password_confirmation = params[:reset][:repassword]
       if user.save
         PasswordReset.where(user_email: user.email).delete_all
-        ExpertizaLogger.info LoggerMessage.new(controller_name, user.name, 'Password was reset for the user', request)
+        ExpertizaLogger.info LoggerMessage.new(controller_name, user.username, 'Password was reset for the user', request)
         flash[:success] = 'Password was successfully reset'
       else
-        ExpertizaLogger.error LoggerMessage.new(controller_name, user.name, 'Password reset operation failed for the user while saving record', request)
+        ExpertizaLogger.error LoggerMessage.new(controller_name, user.username, 'Password reset operation failed for the user while saving record', request)
         flash[:error] = 'Password cannot be updated. Please try again'
       end
       redirect_to '/'

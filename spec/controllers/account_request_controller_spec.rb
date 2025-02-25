@@ -2,16 +2,16 @@ describe AccountRequestController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }
   let(:instructor) { build(:instructor, id: 2) }
-  let(:student1) { build(:student, id: 1, name: :lily) }
+  let(:student1) { build(:student, id: 1, username: :lily) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
   let(:student5) { build(:student, role_id: 4, parent_id: 3) }
-  let(:student6) { build(:student, role_id: nil, name: :lilith) }
+  let(:student6) { build(:student, role_id: nil, username: :lilith) }
 
   let(:institution1) { build(:institution, id: 1) }
   let(:requested_user1) do
-    AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+    AccountRequest.new id: 4, username: 'requester1', role_id: 2, name: 're, requester1',
                        institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'
   end
   let(:superadmin) { build(:superadmin) }
@@ -118,9 +118,9 @@ describe AccountRequestController do
   context '#create_requested_user_record' do
     request_params = {
       requested_user: { self_introduction: 'I am good' },
-      user: { name: 'instructor6',
+      user: { username: 'instructor6',
               role_id: 2,
-              fullname: '6, instructor',
+              name: '6, instructor',
               institution_id: 1,
               email: 'chenzy@gmail.com' }
     }
@@ -131,7 +131,7 @@ describe AccountRequestController do
     end
 
     it 'if user exists' do
-      allow(User).to receive(:find_by).with(name: 'instructor6').and_return(instructor)
+      allow(User).to receive(:find_by).with(username: 'instructor6').and_return(instructor)
 
       post :create_requested_user_record, params: request_params
       expect(flash[:error]).to eq 'The account you are requesting already exists in Expertiza.'

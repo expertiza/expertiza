@@ -662,7 +662,7 @@ describe 'assignment function' do
       assignment_id = Assignment.where(name: 'participants Assignment').first.id
       visit "/participants/list?id=#{assignment_id}&model=Assignment"
 
-      fill_in 'user_name', with: student.name, match: :first
+      fill_in 'user_name', with: student.username, match: :first
       choose 'user_role_participant', match: :first
 
       expect { click_button 'Add', match: :first; sleep(1) }.to change { Participant.count }.by 1

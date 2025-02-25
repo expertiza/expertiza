@@ -17,8 +17,8 @@ describe 'assignment submisstion test' do
   end
 
   def signup_topic
-    user = User.find_by(name: 'student2064')
-    login_as(user.name)
+    user = User.find_by(username: 'student2064')
+    login_as(user.username)
     stub_current_user(user, user.role.name, user.role)
     visit '/student_task/list'
     visit '/sign_up_sheet/sign_up?id=1&topic_id=1' # signup topic
@@ -146,7 +146,7 @@ describe 'assignment submisstion test' do
 
     it "notifies the reviewer/s who have reviewed the previous submission of the new submission" do
       signup_topic
-      reviewer = AssignmentParticipant.find_by(user: User.find_by(name: "student2065")) # An arbitrary reviewer on the assignment
+      reviewer = AssignmentParticipant.find_by(user: User.find_by(username: "student2065")) # An arbitrary reviewer on the assignment
       create(:review_response_map, reviewer: reviewer) # a reviewer submits a review for this team
       attach_file('uploaded_file',
                   Rails.root + "spec/features/assignment_submission_files/valid_assignment_file.jpg")

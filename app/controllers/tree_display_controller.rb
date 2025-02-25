@@ -317,7 +317,7 @@ class TreeDisplayController < ApplicationController
         'private' => course_is_available?(node)
       )
       json['instructor_id'] = node.get_instructor_id
-      json['instructor'] = node.get_instructor_id ? User.find(node.get_instructor_id).name(session[:ip]) : nil
+      json['instructor'] = node.get_instructor_id ? User.find(node.get_instructor_id).username(session[:ip]) : nil
       json['is_available'] = course_is_available?(node)
       serialize_assignment_to_json(node, json) if folder_type == 'Assignments'
     end
@@ -339,7 +339,7 @@ class TreeDisplayController < ApplicationController
     if (node.type == 'CourseNode') || (node.type == 'AssignmentNode')
       json['directory'] = node.get_directory
       json['instructor_id'] = node.get_instructor_id
-      json['instructor'] = node.get_instructor_id ? User.find(node.get_instructor_id).name(session[:ip]) : nil
+      json['instructor'] = node.get_instructor_id ? User.find(node.get_instructor_id).username(session[:ip]) : nil
       json['is_available'] = course_is_available?(node)
       serialize_assignment_to_json(node, json) if node.type == 'AssignmentNode'
     end

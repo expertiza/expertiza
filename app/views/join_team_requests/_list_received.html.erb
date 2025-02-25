@@ -14,7 +14,7 @@
         <tr>
 
           <td>
-            <%= User.find(Participant.find(join_team_request.participant_id).user_id).name %>
+            <%= User.find(Participant.find(join_team_request.participant_id).user_id).username %>
           </td>
           <td>
             <%= join_team_request.comments %>
@@ -27,7 +27,7 @@
                     <%= hidden_field_tag 'team_id', team_id %>
                     <%= hidden_field_tag 'student_id', teams_user_id %>
                     <%= hidden_field_tag 'session[:dummy][:assignment_id]', Participant.find(join_team_request.participant_id).parent_id %>
-                    <%= hidden_field_tag 'user[name]', User.find(Participant.find(join_team_request.participant_id).user_id).name %>
+                    <%= hidden_field_tag 'user[username]', User.find(Participant.find(join_team_request.participant_id).user_id).username %>
                     <%= hidden_field_tag 'participant_id', join_team_request.participant_id %>
                     <input type='submit' value='Invite'/>
                   <% end %>

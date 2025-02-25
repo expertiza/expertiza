@@ -53,7 +53,7 @@ describe LatePoliciesController do
           id: 1
         }
         get :edit, params: request_params
-        expect(assigns(:penalty_policy).policy_name).to eq('Policy2')
+        expect(assigns(:late_policy).policy_name).to eq('Policy2')
       end
     end
   end
@@ -115,7 +115,7 @@ describe LatePoliciesController do
           }
         }
         post :create, params: request_params
-        expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100')
+        expect(flash[:error]).to eq('Maximum penalty cannot be greater than or equal to 100.')
         expect(response).to redirect_to('/late_policies/new')
       end
     end

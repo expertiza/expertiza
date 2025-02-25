@@ -1,0 +1,54 @@
+<%= form_tag( { controller: 'import_file', action: 'import' },
+              { method: 'post', name: 'github_column_form', id: 'github_column_form' } ) do %>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <% if @has_header == 'true' %>
+          <th style="text-align:center">
+            <%= @contents_hash[:header][0].to_s.capitalize %>
+          </th>
+          <th style="text-align:center">
+            <%= @contents_hash[:header][1].to_s.capitalize %>
+          </th>
+        <% else %>
+          <th>
+            <select name="select1" id="select1" class="form-control" style="background-color:lightgrey">
+              <option value="expertiza_username">Expertiza Username</option>
+              <option value="github_user">GitHub Username</option>
+            </select>
+          </th>
+          <th>
+            <select name="select2" id="select2" class="form-control" style="background-color:lightgrey">
+              <option value="github_user">GitHub Username</option>
+              <option value="expertiza_username">Expertiza Username</option>
+            </select>
+          </th>
+        <% end %>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% @contents_hash[:body].each do |row| %>
+        <tr>
+          <% row.each do |column| %>
+            <td align="center"><%= column %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <%= hidden_field_tag('contents_hash', @contents_hash) %>
+  <%= hidden_field_tag('has_header', @has_header) %>
+  <%= hidden_field_tag('model', 'GithubAssociation') %>
+  <%= hidden_field_tag('id', @id) %>
+
+  <div style="text-align:center">
+    <% if @has_header == 'true' %>
+      <button type="button" class="btn btn-primary" onclick="github_column_form.submit()">Import GitHub Associations</button>
+    <% else %>
+      <button type="button" class="btn btn-primary" onclick="checkForGithubAssociationDuplicate()">Import GitHub Associations</button>
+    <% end %>
+  </div>
+<% end %>

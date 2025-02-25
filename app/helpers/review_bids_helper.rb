@@ -5,9 +5,9 @@ module ReviewBidsHelper
     row_html = ''
     if selected_topics.present?
       selected_topics.each do |selected_topic|
-        row_html = if (selected_topic.topic_id == topic.id) && !selected_topic.is_waitlisted
+        row_html = if (selected_topic.topic_name == topic.id) && !selected_topic.is_waitlisted
                      '<tr bgcolor="yellow">'
-                   elsif (selected_topic.topic_id == topic.id) && selected_topic.is_waitlisted
+                   elsif (selected_topic.topic_name == topic.id) && selected_topic.is_waitlisted
                      '<tr bgcolor="lightgray">'
                    else
                      '<tr id="topic_' + topic.id.to_s + '">'

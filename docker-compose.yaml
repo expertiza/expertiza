@@ -21,13 +21,13 @@ services:
       REDIS_HOST: redis
     entrypoint: ["/app/docker_entrypoint.sh"]
     restart: on-failure:3
-    command: /bin/sh "while sleep 1000; do :; done"
   redis:
-    image: redis
+    image: redis:alpine
     ports:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
+    restart: on-failure:3  # Add restart policy
   mysql:
     image: mysql:5.7
     ports:
@@ -42,7 +42,7 @@ services:
       timeout: 20s
       retries: 25
     restart: on-failure:3
-    user: mysql
+    user: root
     command: [--ignore-db-dir=lost+found]
 volumes:
   logvolume01: {}

@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  Date: 2025-03-01 17:05:48
+  TeamID: MyString
+
+two:
+  Date: 2025-03-01 17:05:48
+  TeamID: MyString

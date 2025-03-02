@@ -3,7 +3,8 @@ class MeetingsController < ApplicationController
 
   # Method to get meeting dates for a particular assignment
   def get_dates
-    @dates = Meeting.pluck(:Date)
+    @dates = Meeting.find_by_sql("SELECT date FROM meetings").map(&:date)
+
     render json: @meetings, status: :ok
   end
 

@@ -1,6 +1,12 @@
 class MeetingsController < ApplicationController
   before_action :set_meeting, only: [:show, :edit, :update, :destroy]
 
+  # Method to get meeting dates for a particular assignment
+  def get_dates
+    @dates = Meeting.pluck(:Date)
+    render json: @meetings, status: :ok
+  end
+
   # GET /meetings
   def index
     @meetings = Meeting.all

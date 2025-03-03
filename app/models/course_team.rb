@@ -10,11 +10,6 @@ class CourseTeam < Team
     nil
   end
 
-  # Prototype method to implement prototype pattern
-  def self.prototype
-    CourseTeam.new
-  end
-
   # Copy this course team to the assignment team
   def copy(assignment_id)
     assignment = Assignment.find_by(id: assignment_id)
@@ -39,13 +34,13 @@ class CourseTeam < Team
   def self.import(row, course_id, options)
     raise ImportError, 'The course with the id "' + course_id.to_s + "\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
 
-    @course_team = prototype
+    @course_team = CourseTeam.new
     Team.import(row, course_id, options, @course_team)
   end
 
   # Export to csv
   def self.export(csv, parent_id, options)
-    @course_team = prototype
+    @course_team = CourseTeam.new
     Team.export(csv, parent_id, options, @course_team)
   end
 

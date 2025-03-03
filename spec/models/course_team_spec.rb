@@ -29,11 +29,6 @@ describe 'CourseTeam' do
       expect(course_team.assignment_id).to be_nil
     end
   end
-  describe '#prototype' do
-    it 'creates a course team' do
-      expect(CourseTeam.prototype.class).to eq(CourseTeam)
-    end
-  end
   describe '#add_participant' do
     it 'adds a participant to the course when it is not already added' do
       allow(CourseParticipant).to receive(:find_by).with(parent_id: 1, user_id: 2).and_return(nil)

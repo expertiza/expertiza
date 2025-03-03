@@ -11,6 +11,18 @@ describe Team do
   before(:each) do
     allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
   end
+
+  describe '#parent_entity_type' do
+    it 'returns parent_entity_type for Course' do
+      course_team = CourseTeam.new
+      expect(course_team.parent_entity_type).to eq('Course')
+    end
+    it 'returns parent_entity_type for Assignment' do
+      assignment_team = AssignmentTeam.new
+      expect(assignment_team.parent_entity_type).to eq('Assignment')
+    end
+  end
+
   describe '#participant' do
     it 'gets the participants of current team, by default returns an empty array' do
       expect(team.participants).to eq([])

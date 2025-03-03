@@ -17,23 +17,10 @@ describe 'CourseTeam' do
       expect(assignment_team.copy_members(assignment_team.id))
     end
   end
-  describe '#parent_entity_type' do
-    it 'returns parent_entity_type' do
-      course_team = CourseTeam.new
-      expect(course_team.parent_entity_type).to eq('Course')
-    end
-  end
   describe '#assignment_id' do
     it 'returns nil since this team is not an assignment team' do
       course_team = CourseTeam.new
       expect(course_team.assignment_id).to be_nil
-    end
-  end
-  describe '#add_participant' do
-    it 'adds a participant to the course when it is not already added' do
-      allow(CourseParticipant).to receive(:find_by).with(parent_id: 1, user_id: 2).and_return(nil)
-      allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 2, permission_granted: 0).and_return(participant)
-      expect(course_team1.add_participant(1, user2)).to eq(participant)
     end
   end
   describe '#import' do

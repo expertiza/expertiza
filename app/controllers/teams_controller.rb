@@ -3,6 +3,9 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
+  # Array to hold Meeting instances for a team.
+  attr_accessor :meetings
+
   # Check if the current user has TA privileges
   def action_allowed?
     current_user_has_ta_privileges?
@@ -61,6 +64,8 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+      # Initialize meetings to empty array for list action, assuming you want to display team list without meetings initially.
+      @meetings = []
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -109,6 +114,9 @@ class TeamsController < ApplicationController
   # Edit the team
   def edit
     @team = Team.find(params[:id])
+    # Fetch meetings associated with the team. Assuming a Team has_many Meetings association.
+    @meetings = @team.meetings if @team.respond_to?(:meetings)
+    @meetings ||= [] # Ensure @meetings is always an array, even if team or meetings association doesn't exist yet.
   end
 
   # Deleting all teams associated with a given parent object
@@ -132,18 +140,18 @@ class TeamsController < ApplicationController
       unless @signed_up_team.nil?
         # If a topic is assigned to this team and there is only one signed up team record, and it's not waitlisted.
         if @signed_up_team.count == 1 && !@signed_up_team.first.is_waitlisted  # if a topic is assigned to this team
-            # Fetch the SignUpTopic object associated with the single signed up team.
-            @signed_topic = SignUpTopic.find_by(id: @signed_up_team.first.topic_id)
-            unless @signed_topic.nil?
-              # Call the instance method `reassign_topic` of SignUpTopic to reassign the topic.
-              @signed_topic.reassign_topic(@signed_up_team.first.team_id)
-            end
+          # Fetch the SignUpTopic object associated with the single signed up team.
+          @signed_topic = SignUpTopic.find_by(id: @signed_up_team.first.topic_id)
+          unless @signed_topic.nil?
+            # Call the instance method `reassign_topic` of SignUpTopic to reassign the topic.
+            @signed_topic.reassign_topic(@signed_up_team.first.team_id)
+          end
         else
           # Drop all waitlists in SignedUpTeam for the specified team ID.
           SignedUpTeam.drop_off_waitlists(params[:id])
         end
       end
-     # @sign_up_team.destroy_all if @sign_up_team
+      # @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")

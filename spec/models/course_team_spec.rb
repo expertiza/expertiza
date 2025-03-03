@@ -12,7 +12,7 @@ describe 'CourseTeam' do
       assignment_team = AssignmentTeam.new
       assignment_team.save
       course_team = CourseTeam.new
-      course_team.copy(assignment_team.id)
+      course_team.copy_to_assignment_team(assignment_team.id)
       expect(AssignmentTeam.create_team_and_node(assignment_team.id))
       expect(assignment_team.copy_members(assignment_team.id))
     end

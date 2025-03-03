@@ -17,10 +17,10 @@ describe 'CourseTeam' do
       expect(assignment_team.copy_members(assignment_team.id))
     end
   end
-  describe '#parent_model' do
-    it 'returns parent_model' do
+  describe '#parent_entity_type' do
+    it 'returns parent_entity_type' do
       course_team = CourseTeam.new
-      expect(course_team.parent_model).to eq('Course')
+      expect(course_team.parent_entity_type).to eq('Course')
     end
   end
   describe '#assignment_id' do

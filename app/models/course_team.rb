@@ -5,15 +5,6 @@ class CourseTeam < Team
   #   currently they are being called: member, participant, user, etc...
   #   suggestion: refactor all to participant
 
-  # Get parent course
-  def parent_model
-    'Course'
-  end
-
-  def self.parent_model(id)
-    Course.find(id)
-  end
-
   # since this team is not an assignment team, the assignment_id is nil.
   def assignment_id
     nil

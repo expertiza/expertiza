@@ -23,6 +23,9 @@ mv node-v${NODE_VERSION}-linux-x64 /usr/local/lib/nodejs
 ln -s /usr/local/lib/nodejs/bin/node /usr/local/bin/node
 ln -s /usr/local/lib/nodejs/bin/npm /usr/local/bin/npm
 
+sudo chown -R $USER:$GROUP ~/.npm
+sudo chown -R $USER:$GROUP ~/.config
+
 # Install bower
 npm install -g bower
 

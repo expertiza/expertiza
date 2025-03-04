@@ -423,30 +423,58 @@ describe ReviewMappingController do
   end
 
   describe '#delete_reviewer' do
-    before(:each) do
-      allow(ReviewResponseMap).to receive(:find_by).with(id: '1').and_return(review_response_map)
+    let(:review_response_map) { instance_double(ReviewResponseMap, id: 1) }
+    let(:responses_relation)  { instance_double(ActiveRecord::Relation) }
+
+    before do
       request.env['HTTP_REFERER'] = 'www.google.com'
+      allow(ReviewResponseMap).to receive(:find_by).with(id: '1').and_return(review_response_map)
     end
 
-    context 'when corresponding response does not exist to current review response map' do
-      it 'shows a success flash message and redirects to previous page' do
-        allow(Response).to receive(:exists?).with(map_id: 1).and_return(false)
-        allow(review_response_map).to receive(:destroy).and_return(true)
-        request_params = { id: 1 }
-        post :delete_reviewer, params: request_params
-        expect(flash[:success]).to eq('The review mapping for "reviewee" and "reviewer" has been deleted.')
-        expect(flash[:error]).to be nil
-        expect(response).to redirect_to('www.google.com')
+    context 'when review_response_map is found' do
+      context 'and responses exist' do
+        it 'destroys the review map, shows success flash, and redirects' do
+          allow(Response).to receive(:where).with(map_id: 1).and_return(responses_relation)
+          allow(responses_relation).to receive(:exists?).and_return(true)
+          allow(responses_relation).to receive(:pluck).with(:id).and_return([42])
+          allow(responses_relation).to receive(:destroy_all)
+
+          allow(Answer).to receive(:where).with(response_id: [42]).and_return(double(pluck: [99]))
+          allow(AnswerTag).to receive(:where).with(answer_id: [99]).and_return(double(destroy_all: true))
+          allow(Answer).to receive(:where).with(id: [99]).and_return(double(destroy_all: true))
+
+          allow(review_response_map).to receive(:destroy)
+
+          allow(review_response_map).to receive_message_chain(:reviewee, :name).and_return('reviewee')
+          allow(review_response_map).to receive_message_chain(:reviewer, :name).and_return('reviewer')
+
+          post :delete_reviewer, params: { id: 1 }
+          expect(flash[:success]).to eq('The review mapping for "reviewee" and "reviewer" has been deleted.')
+          expect(flash[:error]).to be_nil
+          expect(response).to redirect_to('www.google.com')
+        end
+      end
+
+      context 'and no responses exist' do
+        it 'does NOT destroy the map, shows error flash, and redirects' do
+          allow(Response).to receive(:where).with(map_id: 1).and_return(responses_relation)
+          allow(responses_relation).to receive(:exists?).and_return(false)
+
+          post :delete_reviewer, params: { id: 1 }
+          expect(flash[:error]).to eq('This review has already been done. It cannot be deleted.')
+          expect(flash[:success]).to be_nil
+          expect(response).to redirect_to('www.google.com')
+        end
       end
     end
 
-    context 'when corresponding response exists to current review response map' do
-      it 'shows an error flash message and redirects to previous page' do
-        allow(Response).to receive(:exists?).with(map_id: 1).and_return(true)
-        request_params = { id: 1 }
-        post :delete_reviewer, params: request_params
-        expect(flash[:error]).to eq('This review has already been done. It cannot been deleted.')
-        expect(flash[:success]).to be nil
+    context 'when review_response_map is NOT found' do
+      it 'shows an error flash and redirects' do
+        allow(ReviewResponseMap).to receive(:find_by).with(id: '1').and_return(nil)
+
+        post :delete_reviewer, params: { id: 1 }
+        expect(flash[:error]).to eq('Review response map not found.')
+        expect(flash[:success]).to be_nil
         expect(response).to redirect_to('www.google.com')
       end
     end

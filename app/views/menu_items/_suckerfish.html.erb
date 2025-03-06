@@ -1,4 +1,5 @@
 <% level += 1 %>
+
 <% items.each do |item_id|
   item = session[:menu].get_item(item_id)
   next if item.nil?
@@ -29,3 +30,10 @@
     <% end -%>
     </li>
 <% end -%>
+
+<!-- Add "Teams" link for instructors and TA's-->
+<% if session[:user].role.name.in?(%w[Instructor Teaching\ Assistant]) && level == 1%>
+  <li class="dropdown first-level">
+    <a href="<%= meetings_path %>" title="Teams">My Teams</a>
+  </li>
+<% end %>

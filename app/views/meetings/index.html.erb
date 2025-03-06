@@ -1,42 +1,42 @@
 <h1>Mentored Teams</h1>
 
-<table border="1">
+<table>
   <thead>
   <tr>
-    <th>Team Name</th>
-    <th>Members' Names</th>
-    <th>Members' User IDs</th>
-    <th>Emails Concatenated</th>
-    <th>Mentor</th>
-    <th>1st Mtg</th>
-    <th>2nd Mtg</th>
-    <th>3rd Mtg</th>
+    <th class="head">Team Name</th>
+    <th class="head">Members' Names</th>
+    <th class="head">Members' User IDs</th>
+    <th class="head">Emails Concatenated</th>
+    <th class="head">Mentor</th>
+    <th class="head">1st Mtg</th>
+    <th class="head">2nd Mtg</th>
+    <th class="head">3rd Mtg</th>
   </tr>
   </thead>
 
   <tbody>
   <% @mentored_teams.each do |team| %>
-    <tr>
+    <tr class="exp" style = "padding: 5px">
       <!-- Team Name -->
-      <td><%= team.name %></td>
+      <td style = "padding: 5px"><%= team.name %></td>
 
       <!-- Members' Names -->
-      <td><%= team.users.map(&:name).join(', ') %></td>
+      <td style = "padding: 5px"><%= team.users.map(&:name).join(', ') %></td>
 
       <!-- Members' User IDs -->
-      <td><%= team.users.map(&:id).join(', ') %></td>
+      <td style = "padding: 5px"><%= team.users.map(&:id).join(', ') %></td>
 
       <!-- Emails Concatenated -->
-      <td><%= team.users.map(&:email).join(', ') %></td>
+      <td style = "padding: 5px"><%= team.users.map(&:email).join(', ') %></td>
 
       <!-- Mentor Name -->
-      <% mentor = team.mentor || 'N/A' %>
-      <td><%= mentor.is_a?(User) ? mentor.name : mentor %></td>
+      <% mentor = current_user || 'N/A' %>
+      <td style = "padding: 5px"><%= mentor.is_a?(User) ? mentor.name : mentor %></td>
 
       <!-- Meeting Dates -->
-      <% meeting_dates = team.meetings.order(:date).limit(3).pluck(:date) %>
+      <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
       <% 3.times do |i| %>
-        <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '' %></td>
+        <td style = "padding: 5px" ><%= meeting_dates[i]&.strftime('%-m/%-d') || 'Not Scheduled' %></td>
       <% end %>
     </tr>
   <% end %>

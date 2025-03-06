@@ -5,18 +5,16 @@ class MeetingsController < ApplicationController
   # GET /meetings
   def index
     @meetings = Meeting.all
-    @mentored_teams = MentoredTeam.all
-  end
-
-  def filter
-    @team = Team.find(params[:team_id]) # Assuming team_id is passed in params
-    @meetings = @team.meetings # Assuming a has_many relationship exists
+    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
   end
 
   # GET /meetings/:id
   def show
     @meetings = Meeting.all
     @teams = Team.all.includes(:meetings).order('teams.name ASC')
+    if current_role.teaching_assistant?
+      @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
+    end
   end
 
   # POST /meetings

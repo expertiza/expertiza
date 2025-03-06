@@ -54,7 +54,7 @@ describe Team do
 
   describe '#author_names' do
     it 'returns an array of author\'s name' do
-      expect(team.author_names).to eq(['no one'])
+      expect(team.member_names).to eq(['no one'])
     end
   end
 

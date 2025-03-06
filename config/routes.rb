@@ -671,4 +671,5 @@ Expertiza::Application.routes.draw do
   # updated route and added specific controller action upon accessing this route
 
   get 'meetings', to: 'meetings#index'
+
 end

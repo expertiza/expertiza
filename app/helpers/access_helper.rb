@@ -39,6 +39,11 @@ module AccessHelper
     if current_user && current_role.instructor?
       # allow action when the user is an instructor
       true
+    elsif current_user && current_role.name == 'Teaching Assistant' && params[:controller] == 'meetings' && ['index', 'show'].include?(params[:action])
+      # allow action when the user is a Teaching Assistant accessing meetings index or show
+      true
+    else
+      false
     end
   end
 end

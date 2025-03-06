@@ -5,7 +5,7 @@ class MeetingsController < ApplicationController
   # GET /meetings
   def index
     @meetings = Meeting.all
-    render json: @meetings, status: :ok
+    @mentored_teams = MentoredTeam.all
   end
 
   # POST /meetings
@@ -47,14 +47,13 @@ class MeetingsController < ApplicationController
   end
 
   private
+    def meeting_params
+      params.permit(:team_id, :meeting_date)
+    end
 
-  def meeting_params
-    params.permit(:team_id, :meeting_date)
-  end
-
-  def set_meeting
-    @meeting = Meeting.find_by(team_id: params[:team_id], meeting_date: params[:old_date] || params[:meeting_date])
-    unless @meeting
+    def set_meeting
+      @meeting = Meeting.find_by(team_id: params[:team_id], meeting_date: params[:old_date] || params[:meeting_date])
+      unless @meeting
       render json: { status: 'error', message: 'Meeting not found' }, status: :not_found
     end
   end

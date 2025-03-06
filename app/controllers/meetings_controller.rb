@@ -1,9 +1,11 @@
 class MeetingsController < ApplicationController
+  #before_action :redirect_based_on_role, only: [:teams_redirect]
   before_action :set_meeting, only: [:show, :edit, :update, :destroy]
 
   # GET /meetings
   def index
     @meetings = Meeting.all
+    @mentored_teams = MentoredTeam.all
   end
 
   # GET /meetings/1

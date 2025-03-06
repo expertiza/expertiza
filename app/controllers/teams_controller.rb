@@ -3,9 +3,6 @@ class TeamsController < ApplicationController
 
   autocomplete :user, :name
 
-  # Array to hold Meeting instances for a team.
-  attr_accessor :meetings
-
   # Check if the current user has TA privileges
   def action_allowed?
     current_user_has_ta_privileges?
@@ -64,8 +61,7 @@ class TeamsController < ApplicationController
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
-      # Initialize meetings to empty array for list action, assuming you want to display team list without meetings initially.
-      @meetings = []
+
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -114,6 +110,9 @@ class TeamsController < ApplicationController
   # Edit the team
   def edit
     @team = Team.find(params[:id])
+  end
+
+  def edit_meetings
     # Fetch meetings associated with the team. Assuming a Team has_many Meetings association.
     @meetings = @team.meetings if @team.respond_to?(:meetings)
     @meetings ||= [] # Ensure @meetings is always an array, even if team or meetings association doesn't exist yet.

@@ -8,6 +8,17 @@ class MeetingsController < ApplicationController
     render json: @meetings, status: :ok
   end
 
+  def filter
+    @team = Team.find(params[:team_id]) # Assuming team_id is passed in params
+    @meetings = @team.meetings # Assuming a has_many relationship exists
+  end
+
+  # GET /meetings/:id
+  def show
+    @meetings = Meeting.all
+    @teams = Team.all.includes(:meetings).order('teams.name ASC')
+  end
+
   # POST /meetings
   def create
     @meeting = Meeting.new(meeting_params)

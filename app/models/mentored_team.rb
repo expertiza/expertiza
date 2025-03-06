@@ -1,4 +1,6 @@
 class MentoredTeam < AssignmentTeam
+  has_many :meetings, dependent: :destroy
+
     # Class created during refactoring of E2351
     # Overridden method to include the MentorManagement workflow
     def add_member(user, _assignment_id = nil)

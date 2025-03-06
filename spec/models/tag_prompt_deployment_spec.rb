@@ -202,6 +202,7 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].percentage).to eq('0.0')
     end
 
+    #half of answers are tagged
     it 'varies by round, some answers are tagged, some are not' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])

@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  ALLOWED_TEAM_TYPES = %w[Assignment Course].freeze
 
   autocomplete :user, :name
 
@@ -10,7 +11,7 @@ class TeamsController < ApplicationController
 
   # attempt to initialize team type in session
   def init_team_type(type)
-    return unless type && Team.allowed_types.include?(type)
+    return unless type && ALLOWED_TEAM_TYPES.include?(type)
     session[:team_type] = type
     #E2351 - the current method for creating a team does not expand well for creating a subclass of either Assignment or Course Team so this is added logic to help allow for MentoredTeams to be created.
     #Team type is using for various purposes including creating nodes, but a MentoredTeam is an AssignmentTeam and still has a parent assignment, not a parent mentored so an additional variable needed to be created
@@ -49,7 +50,7 @@ class TeamsController < ApplicationController
   # Displays list of teams for a parent object(either assignment/course)
   def list
     init_team_type(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == ALLOWED_TEAM_TYPES[0]
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
@@ -57,7 +58,7 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
-    @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
+    @is_valid_assignment = (session[:team_type] == ALLOWED_TEAM_TYPES[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -68,7 +69,7 @@ class TeamsController < ApplicationController
 
   # Create an empty team manually
   def new
-    init_team_type(Team.allowed_types[0]) unless session[:team_type]
+    init_team_type(ALLOWED_TEAM_TYPES[0]) unless session[:team_type]
     @parent = Object.const_get(session[:team_type]).find(params[:id])
   end
 
@@ -160,7 +161,7 @@ class TeamsController < ApplicationController
   # Handovers all teams to the course that contains the corresponding assignment
   # The team and team members are all copied.
   def bequeath_all
-    if session[:team_type] == Team.allowed_types[1]
+    if session[:team_type] == ALLOWED_TEAM_TYPES[1]
       flash[:error] = 'Invalid team type for bequeath all'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
     else

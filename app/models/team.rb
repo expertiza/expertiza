@@ -11,22 +11,6 @@ class Team < ApplicationRecord
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
-  # Get the parent entity type as a string (ex: "Course" for CourseTeam)
-  def parent_entity_type
-    self.class.name.gsub('Team', '')
-  end
-
-  # Fetch the parent entity instance by ID (ex: Course.find(id) for CourseTeam)
-  def self.find_parent_entity(id)
-    Object.const_get(self.name.gsub('Team', '')).find(id)
-  end
-
-  # Allowed types of teams -- ASSIGNMENT teams or COURSE teams
-  def self.allowed_types
-    # non-interpolated array of single-quoted strings
-    %w[Assignment Course]
-  end
-
   # Get the participants of the given team
   def participants
     users.where(parent_id: parent_id || current_user_id).flat_map(&:participants)
@@ -121,7 +105,7 @@ class Team < ApplicationRecord
     members = TeamsUser.where(team_id: id)
     members.each do |member|
       t_user = TeamsUser.create(team_id: new_team.id, user_id: member.user_id)
-      parent = Object.const_get(parent_entity_type).find(parent_id)
+      parent = Object.const_get(parent_model).find(parent_id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     end
   end
@@ -277,7 +261,7 @@ class Team < ApplicationRecord
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = find_parent_entity id # current_task will be either a course object or an assignment object.
+    parent = parent_model id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
@@ -327,15 +311,5 @@ class Team < ApplicationRecord
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')
              .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
-  end
-
-  # Whether a team includes a given participant or not
-  def has_participant?(participant)
-    participants.include?(participant)
-  end
-
-  # Get team's full name
-  def fullname
-    name
   end
 end

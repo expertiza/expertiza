@@ -1,5 +1,4 @@
 class MeetingsController < ApplicationController
-  #before_action :redirect_based_on_role, only: [:teams_redirect]
   before_action :set_meeting, only: [:show, :edit, :update, :destroy]
 
   # GET /meetings
@@ -50,7 +49,7 @@ class MeetingsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_meeting
-      @meeting = Meeting.find(params[:id])
+      #@meeting = Meeting.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.

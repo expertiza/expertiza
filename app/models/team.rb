@@ -24,11 +24,6 @@ class Team < ApplicationRecord
     end
   end
 
-  # enum method for team clone operations
-  def self.team_operation
-    { inherit: 'inherit', bequeath: 'bequeath' }.freeze
-  end
-
   # Get the response review map
   def responses
     participants.flat_map(&:responses)

@@ -1,6 +1,7 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
   ALLOWED_TEAM_TYPES = %w[Assignment Course].freeze
+  TEAM_OPERATIONS = { inherit: 'inherit', bequeath: 'bequeath' }.freeze
 
   autocomplete :user, :name
 
@@ -155,7 +156,7 @@ class TeamsController < ApplicationController
   # Copies existing teams from a course down to an assignment
   # The team and team members are all copied.
   def inherit
-    copy_teams(Team.team_operation[:inherit])
+    copy_teams(TEAM_OPERATIONS[:inherit])
   end
 
   # Handovers all teams to the course that contains the corresponding assignment
@@ -165,7 +166,7 @@ class TeamsController < ApplicationController
       flash[:error] = 'Invalid team type for bequeath all'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
     else
-      copy_teams(Team.team_operation[:bequeath])
+      copy_teams(TEAM_OPERATIONS[:bequeath])
     end
   end
 
@@ -183,7 +184,7 @@ class TeamsController < ApplicationController
   # Abstraction over different methods
   def choose_copy_type(assignment, operation)
     course = Course.find(assignment.course_id)
-    if operation == Team.team_operation[:bequeath]
+    if operation == TEAM_OPERATIONS[:bequeath]
       bequeath_copy(assignment, course)
     else
       inherit_copy(assignment, course)

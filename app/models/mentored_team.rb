@@ -2,7 +2,7 @@ class MentoredTeam < AssignmentTeam
     # Class created during refactoring of E2351
     # Overridden method to include the MentorManagement workflow
     def add_member(user, _assignment_id = nil)
-        raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+        raise "The user #{user.name} is already a member of the team #{name}" if is_member?(user)
     
         can_add_member = false
         unless full?

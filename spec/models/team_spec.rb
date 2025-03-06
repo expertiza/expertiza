@@ -61,13 +61,13 @@ describe Team do
   describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do
-        expect(team.user?(user)).to be true
+        expect(team.is_member?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
       it 'returns false' do
-        expect(team.user?(double('User'))).to be false
+        expect(team.is_member?(double('User'))).to be false
       end
     end
   end
@@ -110,7 +110,7 @@ describe Team do
     context 'when parameterized user did not join in current team yet' do
       context 'when current team is not full' do
         it 'does not raise an error' do
-          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:is_member?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
           allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))

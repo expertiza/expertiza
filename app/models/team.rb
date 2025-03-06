@@ -49,7 +49,7 @@ class Team < ApplicationRecord
   end
 
   # Check if the user exist
-  def user?(user)
+  def is_member?(user)
     users.include? user
   end
 
@@ -64,7 +64,7 @@ class Team < ApplicationRecord
 
   # Add member to the team, changed to hash by E1776
   def add_member(user, _assignment_id = nil)
-    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+    raise "The user #{user.name} is already a member of the team #{name}" if is_member?(user)
 
     can_add_member = false
     unless full?

@@ -24,11 +24,6 @@ class Team < ApplicationRecord
     end
   end
 
-  # Get the response review map
-  def responses
-    participants.flat_map(&:responses)
-  end
-
   # Delete the given team
   def delete
     TeamsUser.where(team_id: id).find_each(&:destroy)

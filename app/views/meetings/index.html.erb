@@ -3,92 +3,91 @@
 <!-- Instructor and Admin can see all Teams and Meetings -->
 <%if current_user.role.instructor? || current_user.role.admin? %>
 
-    <table>
-      <thead>
-      <tr>
-        <th class="head">Team Name</th>
-        <th class="head">Members' Names</th>
-        <th class="head">Members' User IDs</th>
-        <th class="head">Emails Concatenated</th>
-        <th class="head">Mentor</th>
-        <th class="head">1st Mtg</th>
-        <th class="head">2nd Mtg</th>
-        <th class="head">3rd Mtg</th>
-      </tr>
-      </thead>
+  <table>
+    <thead>
+    <tr>
+      <th class="head">Team Name</th>
+      <th class="head">Members' Names</th>
+      <th class="head">Members' Usernames</th>
+      <th class="head">Emails Concatenated</th>
+      <th class="head">Mentor</th>
+      <th class="head">1st Mtg</th>
+      <th class="head">2nd Mtg</th>
+      <th class="head">3rd Mtg</th>
+    </tr>
+    </thead>
 
-      <tbody>
-      <% @teams.each do |team| %>
-        <tr class="exp" style = "padding: 5px">
+    <tbody>
+    <% @teams.each_with_index do |team, index| %>
+      <tr class="exp" style = "padding: 5px;background-color: <%= index.even? ? '#fa' : '#a0a0a0' %>;">
+        <!-- Team Name -->
+        <td><%= team.name %></td>
+
+        <!-- Members' Names -->
+        <td><%= team.participants.map(&:name).join(', ') %></td>
+
+        <!-- Members' User IDs -->
+        <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+        <!-- Emails Concatenated -->
+        <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+        <!-- Mentor Name -->
+        <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+        <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+        <!-- Meeting Dates -->
+        <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+        <% 3.times do |i| %>
+          <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <%= will_paginate @teams, :inner_window => 1, :outer_window => 1, :params => {:num_versions => 3}%>
+
+<% else %>
+  <table>
+    <thead>
+    <tr>
+      <th class="head">Team Name</th>
+      <th class="head">Members' Names</th>
+      <th class="head">Members' User IDs</th>
+      <th class="head">Emails Concatenated</th>
+      <th class="head">Mentor</th>
+      <th class="head">1st Mtg</th>
+      <th class="head">2nd Mtg</th>
+      <th class="head">3rd Mtg</th>
+    </tr>
+    </thead>
+
+    <tbody>
+      <% @mentored_teams.each_with_index do |team| %>
+        <tr class="exp" style = "padding: 5px;background-color: <%= index.even? ? '#fa' : '#a0a0a0' %>;">
           <!-- Team Name -->
           <td><%= team.name %></td>
 
           <!-- Members' Names -->
-          <td><%= team.users.map(&:name).join(', ') %></td>
+          <td><%= team.participants.map(&:name).join(', ') %></td>
 
           <!-- Members' User IDs -->
-          <td><%= team.users.map(&:id).join(', ') %></td>
+          <td><%= team.participants.map(&:handle).join(', ') %></td>
 
           <!-- Emails Concatenated -->
-          <td><%= team.users.map(&:email).join(', ') %></td>
+          <td><%= team.participants.map(&:user_email).join(', ') %></td>
 
           <!-- Mentor Name -->
-          <% mentor = team.users.find { |user| user.role.ta? || user.role.instructor?} || 'No Mentor Assigned' %>
-          <td><%= mentor.is_a?(User) ? mentor.name : mentor %></td>
+          <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+          <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
 
           <!-- Meeting Dates -->
           <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
           <% 3.times do |i| %>
-            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || 'Not Scheduled' %></td>
+            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
           <% end %>
         </tr>
       <% end %>
-      </tbody>
-    </table>
-    <%= will_paginate @teams, :inner_window => 1, :outer_window => 1, :params => {:num_versions => 3}%>
-
-  <% else if current_user.role.ta? %>
-    <table>
-      <thead>
-      <tr>
-        <th class="head">Team Name</th>
-        <th class="head">Members' Names</th>
-        <th class="head">Members' User IDs</th>
-        <th class="head">Emails Concatenated</th>
-        <th class="head">Mentor</th>
-        <th class="head">1st Mtg</th>
-        <th class="head">2nd Mtg</th>
-        <th class="head">3rd Mtg</th>
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @mentored_teams.each do |team| %>
-        <tr class="exp" style = "padding: 5px">
-          <!-- Team Name -->
-          <td style = "padding: 5px"><%= team.name %></td>
-
-          <!-- Members' Names -->
-          <td style = "padding: 5px"><%= team.users.map(&:name).join(', ') %></td>
-
-          <!-- Members' User IDs -->
-          <td style = "padding: 5px"><%= team.users.map(&:id).join(', ') %></td>
-
-          <!-- Emails Concatenated -->
-          <td style = "padding: 5px"><%= team.users.map(&:email).join(', ') %></td>
-
-          <!-- Mentor Name -->
-          <% mentor = team.participants.find { |user| user.role.ta? || user.role.instructor?} || 'No Mentor Assigned' %>
-          <td style = "padding: 5px"><%= mentor.is_a?(User) ? mentor.name : mentor %></td>
-
-          <!-- Meeting Dates -->
-          <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
-          <% 3.times do |i| %>
-            <td style = "padding: 5px" ><%= meeting_dates[i]&.strftime('%-m/%-d') || 'Not Scheduled' %></td>
-          <% end %>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  <% end %>
+    </tbody>
+  </table>
 <% end %>

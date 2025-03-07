@@ -43,6 +43,10 @@ class Participant < ApplicationRecord
     user.fullname(ip_address)
   end
 
+  def user_email
+    user.email
+  end
+
   def handle(ip_address = nil)
     User.anonymized_view?(ip_address) ? 'handle' : self[:handle]
   end

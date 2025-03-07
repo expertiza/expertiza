@@ -12,7 +12,7 @@ class MeetingsController < ApplicationController
   # GET /meetings/:id
   def show
     @meetings = Meeting.all
-    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
+    @mentored_teams = current_user.teams.select {|team| team.participants.exists?(user: current_user, authorization: 'mentor')}.presence #any team that a mentor belongs to is a team they mentor
   end
 
   # POST /meetings

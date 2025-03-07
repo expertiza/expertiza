@@ -5,16 +5,14 @@ class MeetingsController < ApplicationController
   # GET /meetings
   def index
     @meetings = Meeting.all
+    @teams = Team.paginate(page: params[:page], per_page: 50)
     @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
   end
 
   # GET /meetings/:id
   def show
     @meetings = Meeting.all
-    @teams = Team.all.includes(:meetings).order('teams.name ASC')
-    if current_role.teaching_assistant?
-      @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
-    end
+    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
   end
 
   # POST /meetings

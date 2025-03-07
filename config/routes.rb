@@ -670,6 +670,6 @@ Expertiza::Application.routes.draw do
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
 
-  get 'meetings', to: 'meetings#index'
+  resources :meeting, only: %i[index edit]
 
 end

@@ -47,7 +47,7 @@
   </table>
   <%= will_paginate @teams, :inner_window => 1, :outer_window => 1, :params => {:num_versions => 3}%>
 
-<% elsif current_user.role.ta? %>
+<% else %>
   <table>
     <thead>
     <tr>

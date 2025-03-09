@@ -51,6 +51,7 @@ class TeamsController < ApplicationController
     # Fetch all meetings and courses for the dropdown
     @meetings = Meeting.all
     @courses = Course.all
+    @team_type = params[:type]
 
     # Get the course based on the passed course ID (if present)
     @course = Course.find_by(id: params[:id])
@@ -64,9 +65,12 @@ class TeamsController < ApplicationController
     end
 
     # Handle AJAX requests for dynamic updates
-    respond_to do |format|
-      format.html # Render the full page normally for non-AJAX requests
-      format.js { render partial: 'teams_table_body', locals: { teams: @teams } } # Render only the table body for AJAX requests
+    if request.xhr? # Check if it's an AJAX request
+      render partial: 'teams_table_body', locals: { teams: @teams }
+    else
+      respond_to do |format|
+        format.html # Render the full page normally for non-AJAX requests
+      end
     end
 
     #need to fix logic for course teams... check DB for course->team link

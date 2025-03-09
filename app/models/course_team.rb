@@ -7,7 +7,7 @@ class CourseTeam < Team
   end
 
   # Copy this course team to the assignment team
-  def copy_to_assignment_team(assignment_id)
+  def copy_to_assignment(assignment_id)
     assignment = Assignment.find_by(id: assignment_id)
     new_team = (assignment.auto_assign_mentor ? MentoredTeam : AssignmentTeam).create_team_and_node(assignment_id)
 

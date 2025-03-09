@@ -48,11 +48,33 @@ class TeamsController < ApplicationController
 
   # Displays list of teams for a parent object(either assignment/course)
   def list
-    #added code for testing new list function
+    # Fetch all meetings and courses for the dropdown
     @meetings = Meeting.all
-    @teams = Team.paginate(page: params[:page], per_page: 50)
-    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
+    @courses = Course.all
+
+    # Get the course based on the passed course ID (if present)
     @course = Course.find_by(id: params[:id])
+
+    # If a course is selected, fetch its associated teams
+    if @course.present?
+      @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+    else
+      # Default to no teams if no course is selected
+      @teams = []
+    end
+
+    # Handle AJAX requests for dynamic updates
+    respond_to do |format|
+      format.html # Render the full page normally for non-AJAX requests
+      format.js { render partial: 'teams_table_body', locals: { teams: @teams } } # Render only the table body for AJAX requests
+    end
+
+    #need to fix logic for course teams... check DB for course->team link
+    #if @course.nil?
+    #  @teams = Team.all
+    #else
+    #  @teams = Team.where(course_id: params[:course_id])
+    #end
 
     #original code starts here
     init_team_type(params[:type])

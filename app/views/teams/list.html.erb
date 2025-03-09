@@ -1,6 +1,13 @@
 <link rel="stylesheet" href="/team_list_table.css">
 
-<h1>Teams for <%= @root_node.get_name %></h1>
+<h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
+
+<!-- Dropdown Menu for Filtering -->
+<%= form_with url: teams_path, method: :get, local: true do %>
+  <label for="course_filter">Filter by Course:</label>
+  <%= select_tag :course_id, options_from_collection_for_select(@courses, :id, :name, @course.id), prompt: 'Select a Course', class: 'filter-dropdown' %>
+  <%= submit_tag 'Filter', class: 'filter-button' %>
+<% end %>
 
 <!-- Instructor and Admin can see all Teams and Meetings -->
 <% if current_user.role.instructor? || current_user.role.admin? %>
@@ -10,7 +17,7 @@
       <tr>
         <th class="head">Team Name</th>
         <th class="head">Members' Names</th>
-        <th class="head">Members' Usernames</th>
+        <th class="head">Members' User IDs</th>
         <th class="head">Emails Concatenated</th>
         <th class="head">Mentor</th>
         <th class="head">1st Mtg</th>
@@ -55,7 +62,7 @@
       <% end %>
       </tbody>
     </table>
-    <%= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
+    <%#= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
   </div>
 
 <% else %>
@@ -114,6 +121,23 @@
 
 <% end %>
 <%= render partial: 'team' %>
+
+<!--SCRIPT TO LISTEN TO DROPDOWN AND CHANGE HEADER WHEN ANOTHER COURSE IS SELECTED -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const courseSelect = document.querySelector('.filter-dropdown');
+        const headerElement = document.querySelector('h1');
+
+        courseSelect.addEventListener('change', function() {
+            const selectedCourseId = courseSelect.value;
+            const selectedCourseName = courseSelect.options[courseSelect.selectedIndex].text;
+
+            // Update the header with the selected course name
+            headerElement.textContent = `Teams for ${selectedCourseName}`;
+        });
+    });
+</script>
+
 
 
 

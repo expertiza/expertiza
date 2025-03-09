@@ -1,0 +1,34 @@
+<tbody id="teams-table-body">
+<% teams.each_with_index do |team, index| %>
+  <tr>
+    <!-- Team Name -->
+    <td><%= team.name %></td>
+
+    <!-- Members' Names -->
+    <td><%= team.participants.map(&:name).join(', ') %></td>
+
+    <!-- Members' User IDs -->
+    <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+    <!-- Emails Concatenated -->
+    <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+    <!-- Mentor Name -->
+    <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+    <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+    <!-- Meeting Dates -->
+    <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+    <% 3.times do |i| %>
+      <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
+    <% end %>
+
+    <!-- Actions Column -->
+    <td width="15%" align="center" class="actions">
+      <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+      <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+      <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+    </td>
+  </tr>
+<% end %>
+</tbody>

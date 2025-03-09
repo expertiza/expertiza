@@ -1,4 +1,5 @@
 Expertiza::Application.routes.draw do
+  resources :meetings
   get 'lti/launch'
   post 'lti/launch' => 'lti#launch'
 
@@ -668,4 +669,7 @@ Expertiza::Application.routes.draw do
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
+
+  resources :meeting, only: %i[index edit]
+
 end

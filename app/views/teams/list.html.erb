@@ -1,5 +1,169 @@
-<h1>Teams for <%= @root_node.get_name %></h1>
+<link rel="stylesheet" href="/team_list_table.css">
 
+<h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
+
+<!-- Dropdown Menu for Filtering -->
+<%= form_with url: teams_path, method: :get, local: true do %>
+  <label for="course_filter">Filter by <%= @team_type %>:</label>
+  <%= select_tag :course_id, options_from_collection_for_select(@dropdown_list, :id, :name, @initial_dropdown_value), prompt: "Select a #{@team_type}", class: 'filter-dropdown' %>
+<% end %>
+
+<!-- Instructor and Admin can see all Teams and Meetings -->
+<% if current_user.role.instructor? || current_user.role.admin? %>
+  <div class="teams-list-table">
+    <table>
+      <thead>
+      <tr>
+        <th class="head">Team Name</th>
+        <th class="head">Members' Names</th>
+        <th class="head">Members' User IDs</th>
+        <th class="head">Emails Concatenated</th>
+        <th class="head">Mentor</th>
+        <th class="head">1st Mtg</th>
+        <th class="head">2nd Mtg</th>
+        <th class="head">3rd Mtg</th>
+        <th class="head">Actions</th> <!-- New Actions Column -->
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @teams.each_with_index do |team, index| %>
+        <tr>
+          <!-- Team Name -->
+          <td><%= team.name %></td>
+
+          <!-- Members' Names -->
+          <td><%= team.participants.map(&:name).join(', ') %></td>
+
+          <!-- Members' User IDs -->
+          <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+          <!-- Emails Concatenated -->
+          <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+          <!-- Mentor Name -->
+          <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+          <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+          <!-- Meeting Dates -->
+          <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+          <% 3.times do |i| %>
+            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
+          <% end %>
+
+          <!-- Actions Column -->
+          <td width="15%" align="center" class="actions">
+            <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+            <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+            <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+    <%#= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
+  </div>
+
+<% else %>
+  <div class="teams-list-table">
+    <table>
+      <thead>
+      <tr>
+        <th class="head">Team Name</th>
+        <th class="head">Members' Names</th>
+        <th class="head">Members' User IDs</th>
+        <th class="head">Emails Concatenated</th>
+        <th class="head">Mentor</th>
+        <th class="head">1st Mtg</th>
+        <th class="head">2nd Mtg</th>
+        <th class="head">3rd Mtg</th>
+        <th class="head">Actions</th> <!-- New Actions Column -->
+      </tr>
+      </thead>
+
+      <tbody>
+      <% @mentored_teams.each_with_index do |team, index| %>
+        <tr>
+          <!-- Team Name -->
+          <td><%= team.name %></td>
+
+          <!-- Members' Names -->
+          <td><%= team.participants.map(&:name).join(', ') %></td>
+
+          <!-- Members' User IDs -->
+          <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+          <!-- Emails Concatenated -->
+          <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+          <!-- Mentor Name -->
+          <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+          <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+          <!-- Meeting Dates -->
+          <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+          <% 3.times do |i| %>
+            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
+          <% end %>
+
+          <!-- Actions Column -->
+          <td width="15%" align="center">
+            <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+            <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+            <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+
+<% end %>
+<%= render partial: 'team' %>
+
+<!--SCRIPT TO LISTEN TO DROPDOWN AND CHANGE HEADER WHEN ANOTHER COURSE IS SELECTED -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const courseSelect = document.querySelector('.filter-dropdown');
+        const headerElement = document.querySelector('#course-header');
+        const tableBody = document.querySelector('tbody'); // Ensure this targets only the table body
+
+        courseSelect.addEventListener('change', function () {
+            const selectedId = courseSelect.value;
+            const selectedName = courseSelect.options[courseSelect.selectedIndex].text;
+
+            // Update the header with the selected name
+            headerElement.textContent = `Teams for ${selectedName}`;
+
+            // Fetch new table data via AJAX
+            const url = `/teams/list?type=<%= @team_type %>&id=${selectedId}`;
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then((data) => {
+                    // Replace only the table body content with returned rows (<tr>)
+                    tableBody.innerHTML = data;
+                })
+                .catch((error) => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        });
+    });
+</script>
+
+
+
+
+
+
+
+<!-- THIS IS THE OLD CODE COMMENTED OUT 3/8/25
 <script>
   $(function(){
     $("#tabs").tabs();
@@ -8,20 +172,25 @@
 <div id="tabs">
   <ul>
     <li><a href="#tabs-1" id="General">Teams</a></li>
-    <% if @is_valid_assignment %>
+    <%# if @is_valid_assignment %>
       <li><a href="#tabs-2" id="Topics">Students without teams</a></li>
-    <% end %>
+    <%# end %>
   </ul>
-  <div id="tabs-1"><%= render partial: 'team' %></div>
-    <% if @is_valid_assignment %>
-      <% participants_without_team = get_participants_without_team(@assignment) %>
+
+
+
+
+  <div id="tabs-1"><%#= render partial: 'team' %></div>
+    <%# if @is_valid_assignment %>
+      <%# participants_without_team = get_participants_without_team(@assignment) %>
       <div id="tabs-2">
         <table>
           <th>name</th>
-          <% participants_without_team.each_with_index do |participant, index| %>
-            <tr class=<%= index.odd? ? 'odd' : 'even' %>><td><%= participant.name(session[:ip]) %></td></tr>
-          <% end %>
+          <%# participants_without_team.each_with_index do |participant, index| %>
+            <tr class=<%#= index.odd? ? 'odd' : 'even' %>><td><%#= participant.name(session[:ip]) %></td></tr>
+          <%# end %>
         </table>
       </div>
-    <% end %>
+    <%# end %>
 </div>
+-->

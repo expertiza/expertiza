@@ -1,12 +1,11 @@
 <link rel="stylesheet" href="/team_list_table.css">
 
 <h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
-<h2>Team Type: <%= @team_type %></h2>
 
 <!-- Dropdown Menu for Filtering -->
 <%= form_with url: teams_path, method: :get, local: true do %>
-  <label for="course_filter">Filter by Course:</label>
-  <%#= select_tag :course_id, options_from_collection_for_select(@courses, :id, :name, @course.id), prompt: 'Select a Course', class: 'filter-dropdown' %>
+  <label for="course_filter">Filter by <%= @team_type %>:</label>
+  <%= select_tag :course_id, options_from_collection_for_select(@dropdown_list, :id, :name, @initial_dropdown_value), prompt: "Select a #{@team_type}", class: 'filter-dropdown' %>
 <% end %>
 
 <!-- Instructor and Admin can see all Teams and Meetings -->
@@ -130,14 +129,15 @@
         const tableBody = document.querySelector('tbody'); // Ensure this targets only the table body
 
         courseSelect.addEventListener('change', function () {
-            const selectedCourseId = courseSelect.value;
-            const selectedCourseName = courseSelect.options[courseSelect.selectedIndex].text;
+            const selectedId = courseSelect.value;
+            const selectedName = courseSelect.options[courseSelect.selectedIndex].text;
 
-            // Update the header with the selected course name
-            headerElement.textContent = `Teams for ${selectedCourseName}`;
+            // Update the header with the selected name
+            headerElement.textContent = `Teams for ${selectedName}`;
 
             // Fetch new table data via AJAX
-            fetch(`/teams/list?id=${selectedCourseId}`, {
+            const url = `/teams/list?type=<%= @team_type %>&id=${selectedId}`;
+            fetch(url, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
             })
                 .then((response) => {

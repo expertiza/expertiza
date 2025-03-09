@@ -50,18 +50,30 @@ class TeamsController < ApplicationController
   def list
     # Fetch all meetings and courses for the dropdown
     @meetings = Meeting.all
-    @courses = Course.all
     @team_type = params[:type]
 
-    # Get the course based on the passed course ID (if present)
-    @course = Course.find_by(id: params[:id])
-
     # If a course is selected, fetch its associated teams
-    if @course.present?
+    if @team_type == "Course"
+      # Get the course based on the passed course ID (if present)
+      @course = Course.find_by(id: params[:id])
+      #get teams associated with the course
       @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+      #set the search type of the view to the courses
+      @dropdown_list = Course.all
+      #set initial value of dropdown
+      @initial_dropdown_value = @course.id
     else
-      # Default to no teams if no course is selected
-      @teams = []
+      #if the type is not course, it is assignment
+      # get the assignment from its ID
+      @assignment = Assignment.find_by(id: params[:id])
+      #get the course of the assignment
+      @course = Course.find_by(id:@assignment.course_id)
+      #get the inital list of teams from the url link request
+      @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
+      #set the search type of the view to the courses
+      @dropdown_list = Assignment.where(course_id: @course.id)
+      #set initial value of dropdown
+      @initial_dropdown_value = @assignment.id
     end
 
     # Handle AJAX requests for dynamic updates

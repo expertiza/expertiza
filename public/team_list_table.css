@@ -1,0 +1,43 @@
+/* General table styling */
+.teams-list-table table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    margin-top: 20px;
+}
+
+/* Header styling */
+.teams-list-table th {
+    background-color: #4CAF50; /* Green header */
+    color: white;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px;
+    border: 1px solid #ddd; /* Add border to header cells */
+}
+
+/* Row styling with alternating colors */
+.teams-list-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Light gray for even rows */
+}
+
+.teams-list-table tbody tr:nth-child(odd) {
+    background-color: #ffffff; /* White for odd rows */
+}
+
+/* Hover effect for rows */
+.teams-list-table tbody tr:hover {
+    background-color: #f1f1f1; /* Light gray on hover */
+}
+
+/* Cell styling */
+.teams-list-table td {
+    padding: 10px;
+    border: 1px solid #ddd; /* Add border to table cells */
+}
+
+/* Add spacing between rows and columns */
+.teams-list-table th,
+.teams-list-table td {
+    text-align: left;
+}

@@ -48,6 +48,12 @@ class TeamsController < ApplicationController
 
   # Displays list of teams for a parent object(either assignment/course)
   def list
+    #added code for testing new list function
+    @meetings = Meeting.all
+    @teams = Team.paginate(page: params[:page], per_page: 50)
+    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
+
+    #original code starts here
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?

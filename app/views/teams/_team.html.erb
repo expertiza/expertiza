@@ -2,7 +2,9 @@
 <%= render :partial => '/tree_display/page_footer' %><br/>
 <% session[:return_to] = request.url %>
 <% @model %>
+
 <%= link_to 'Create Team', :action => 'new', :id=> @root_node.node_object_id, :model => @model %>
+
 <% if @root_node.class == AssignmentNode %>
   <% if @assignment.auto_assign_mentor %>
     <% modelType = 'MentoredTeam' %>
@@ -12,6 +14,7 @@
 <% else %>
   <% modelType = 'CourseTeam' %>
 <% end %>
+
 | <%= link_to 'Import Teams',
               :controller=>'import_file',
               :action=>'start',

@@ -8,17 +8,17 @@
 
 /* Header styling */
 .teams-list-table th {
-    background-color: #4CAF50; /* Green header */
+    background-color: #ba2a2a; /* Green header */
     color: white;
     font-weight: bold;
-    text-align: left;
+    text-align: center;
     padding: 12px;
     border: 1px solid #ddd; /* Add border to header cells */
 }
 
 /* Row styling with alternating colors */
 .teams-list-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9; /* Light gray for even rows */
+    background-color: #d3d3d3; /* Light gray for even rows */
 }
 
 .teams-list-table tbody tr:nth-child(odd) {
@@ -40,4 +40,14 @@
 .teams-list-table th,
 .teams-list-table td {
     text-align: left;
+}
+
+/* Make the Actions column narrower */
+.teams-list-table td.actions {
+    width: 5%; /* Adjust width as needed */
+    text-align: center;
+}
+
+.teams-list-table th.actions {
+    width: 10%; /* Ensure header aligns with the column */
 }

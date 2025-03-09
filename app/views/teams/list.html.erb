@@ -1,9 +1,6 @@
-<%#= stylesheet_link_tag 'team_list_table', media: 'all' %>
 <link rel="stylesheet" href="/team_list_table.css">
 
 <h1>Teams for <%= @root_node.get_name %></h1>
-
-<h1>Mentored Teams Meetings</h1>
 
 <!-- Instructor and Admin can see all Teams and Meetings -->
 <% if current_user.role.instructor? || current_user.role.admin? %>
@@ -19,6 +16,7 @@
         <th class="head">1st Mtg</th>
         <th class="head">2nd Mtg</th>
         <th class="head">3rd Mtg</th>
+        <th class="head">Actions</th> <!-- New Actions Column -->
       </tr>
       </thead>
 
@@ -46,11 +44,18 @@
           <% 3.times do |i| %>
             <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
           <% end %>
+
+          <!-- Actions Column -->
+          <td width="15%" align="center" class="actions">
+            <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+            <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+            <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+          </td>
         </tr>
       <% end %>
       </tbody>
     </table>
-    <%= will_paginate @teams, :inner_window => 1, :outer_window => 1, :params => { :num_versions => 3 } %>
+    <%= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
   </div>
 
 <% else %>
@@ -66,6 +71,7 @@
         <th class="head">1st Mtg</th>
         <th class="head">2nd Mtg</th>
         <th class="head">3rd Mtg</th>
+        <th class="head">Actions</th> <!-- New Actions Column -->
       </tr>
       </thead>
 
@@ -93,6 +99,13 @@
           <% 3.times do |i| %>
             <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
           <% end %>
+
+          <!-- Actions Column -->
+          <td width="15%" align="center">
+            <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+            <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+            <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+          </td>
         </tr>
       <% end %>
       </tbody>
@@ -100,8 +113,7 @@
   </div>
 
 <% end %>
-
-
+<%= render partial: 'team' %>
 
 
 

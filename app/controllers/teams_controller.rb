@@ -52,6 +52,7 @@ class TeamsController < ApplicationController
     @meetings = Meeting.all
     @teams = Team.paginate(page: params[:page], per_page: 50)
     @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
+    @course = Course.find_by(id: params[:id])
 
     #original code starts here
     init_team_type(params[:type])

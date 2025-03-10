@@ -15,7 +15,7 @@
     </tr>
     <tr>
         <th>Name</th>
-        <th>Fullname</th>
+        <th>Name</th>
         <th>Publish Rights</th>
         <th>Verified</th>
     </tr>
@@ -35,8 +35,8 @@
             </td>
             
             <% users.each do |user| %>
+                <td> <%=user[:username]%> </td>
                 <td> <%=user[:name]%> </td>
-                <td> <%=user[:fullname]%> </td>
                 <td> <%=user[:pub_rights]%> </td>
                 <td>
                     <% if user[:verified] %>

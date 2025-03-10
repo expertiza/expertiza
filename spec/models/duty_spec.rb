@@ -3,9 +3,9 @@ describe Duty do
   let(:participant) { build(:participant, id: 1, user_id: 1) }
   let(:participant2) { build(:participant, id: 2, user_id: 2) }
   let(:participant3) { build(:participant, id: 3, user_id: 3) }
-  let(:user) { build(:student, id: 1, name: 'no name', fullname: 'no one', participants: [participant]) }
-  let(:user2) { build(:student, id: 2, name: 'no name2', fullname: 'no one2', participants: [participant2]) }
-  let(:user3) { build(:student, id: 3, name: 'no name3', fullname: 'no one3', participants: [participant3]) }
+  let(:user) { build(:student, id: 1, username: 'no name', name: 'no one', participants: [participant]) }
+  let(:user2) { build(:student, id: 2, username: 'no name2', name: 'no one2', participants: [participant2]) }
+  let(:user3) { build(:student, id: 3, username: 'no name3', name: 'no one3', participants: [participant3]) }
 
   let(:team1) { build(:assignment_team, id: 1, name: 'no team', users: [user, user2, user3]) }
   let(:sample_duty_taken) { build(:duty, id: 1, name: 'Developer', max_members_for_duty: 1, assignment_id: 1) }

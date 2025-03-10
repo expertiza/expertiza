@@ -3,10 +3,10 @@ describe CourseTeam do
   let(:course_team1) { build(:course_team, id: 1) }
   let(:course_team2) { build(:course_team, id: 2) }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2) { User.new name: 'bcd', fullname: 'cbd ccd', email: 'bcdccd@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:participant) { build(:participant, user: build(:student, name: 'Jane', fullname: 'Doe, Jane', id: 1)) }
-  let(:participant2) { build(:participant, user: build(:student, name: 'John', fullname: 'Doe, John', id: 2)) }
+  let(:user1) { User.new username: 'abc', name: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user2) { User.new username: 'bcd', name: 'cbd ccd', email: 'bcdccd@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:participant) { build(:participant, user: build(:student, username: 'Jane', name: 'Doe, Jane', id: 1)) }
+  let(:participant2) { build(:participant, user: build(:student, username: 'John', name: 'Doe, John', id: 2)) }
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
 
   describe 'validations' do
@@ -59,14 +59,14 @@ describe CourseTeam do
   describe '#add_participant' do
     context 'when the user cannot be found' do
       it 'returns an error and requests that the user creates a user with the username' do
-        allow(User).to receive(:find_by).with(name: 'bcd').and_return(nil)
+        allow(User).to receive(:find_by).with(username: 'bcd').and_return(nil)
         allow(course).to receive(:url_for).and_return('users/new')
         expect { course.add_participant('bcd') }.to raise_error(RuntimeError)
       end
     end
     context 'if the user is already added to the course' do
       it 'returns an error that the user is already a participant' do
-        allow(User).to receive(:find_by).with(name: 'abc').and_return(user1)
+        allow(User).to receive(:find_by).with(username: 'abc').and_return(user1)
         allow(user1).to receive(:id).and_return(1)
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([participant])
         expect { course.add_participant('abc') }.to raise_error('The user abc is already a participant.')
@@ -74,7 +74,7 @@ describe CourseTeam do
     end
     context 'the user can be added successfully' do
       it 'returns a participant to the course' do
-        allow(User).to receive(:find_by).with(name: 'abc').and_return(user1)
+        allow(User).to receive(:find_by).with(username: 'abc').and_return(user1)
         allow(user1).to receive(:id).and_return(1)
         allow(CourseParticipant).to receive(:where).with(parent_id: 1, user_id: 1).and_return([nil])
         allow(CourseParticipant).to receive(:create).with(parent_id: 1, user_id: 1, permission_granted: 0).and_return(participant)

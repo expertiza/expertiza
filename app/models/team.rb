@@ -57,7 +57,7 @@ class Team < ApplicationRecord
   def author_names
     names = []
     users.each do |user|
-      names << user.fullname
+      names << user.name
     end
     names
   end
@@ -191,7 +191,7 @@ class Team < ApplicationRecord
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
     row_hash[:teammembers].each_with_index do |teammate, _index|
-      user = User.find_by(name: teammate.to_s)
+      user = User.find_by(username: teammate.to_s)
       if user.nil?
         raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
       else
@@ -257,7 +257,7 @@ class Team < ApplicationRecord
       if options[:team_name] == 'false'
         team_members = TeamsUser.where(team_id: team.id)
         team_members.each do |user|
-          output.push(user.name)
+          output.push(user.user.username)
         end
       end
       csv << output

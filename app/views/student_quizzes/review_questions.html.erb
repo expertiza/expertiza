@@ -20,7 +20,7 @@
             <% response_maps.each do |response_map| %>
               <% reviewer_paritcipant_id = response_map.reviewer_id%>
               <% reviewer_user_id = Participant.find(reviewer_paritcipant_id).user_id%>
-              <td> <%=User.find(reviewer_user_id).fullname%></td>
+              <td> <%=User.find(reviewer_user_id).name%></td>
             <%end%>
           </tr>
           <% quiz_scores = [] %>

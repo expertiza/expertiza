@@ -1,6 +1,6 @@
 describe StudentViewController do
   let(:instructor) { build(:instructor, id: 2) }
-  let(:student1) { build(:student, id: 30, name: :Amanda) }
+  let(:student1) { build(:student, id: 30, username: :Amanda) }
   # student view is only accessible to instructors, so we will make one
 
   before(:each) do

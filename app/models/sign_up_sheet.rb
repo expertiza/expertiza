@@ -89,7 +89,7 @@ class SignUpSheet < ApplicationRecord
     while row_hash.length > params
       index = 'user_name_' + params.to_s
 
-      user = User.find_by(name: row_hash[index.to_sym].to_s)
+      user = User.find_by(username: row_hash[index.to_sym].to_s)
       raise ImportError, 'The user, ' + row_hash[index.to_sym].to_s.strip + ', was not found.' if user.nil?
 
       participant = AssignmentParticipant.where(parent_id: session[:assignment_id], user_id: user.id).first

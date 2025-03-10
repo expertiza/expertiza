@@ -3,7 +3,7 @@
     <% pscore = @scores[:participants][participant.id.to_s.to_sym] %>
     <tr style="background-color: white">
       <td>
-        <b> <%= participant.fullname(session[:ip]) %></b>
+        <b> <%= participant.(session[:ip]) %></b>
         <FONT SIZE="-1"><a href="../grades/view_team?id=<%= participant.id%>"  >view heatgrid</a></FONT>
       </td>
     </tr>

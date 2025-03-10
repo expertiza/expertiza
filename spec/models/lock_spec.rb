@@ -7,10 +7,10 @@ describe Lock do
   before(:each) do
     # I was unable to use regular create! calls for user.
     # I think this might be because the writers of user.rb overrode User.initialize
-    @smyoder = User.new(name: 'smyoder', fullname: 'John Bumgardner', email: 'smyoder@ncsu.edu')
+    @smyoder = User.new(username: 'smyoder', name: 'John Bumgardner', email: 'smyoder@ncsu.edu')
     @smyoder.save!
 
-    @smyoder1 = User.new(name: 'smyoder1', fullname: 'John Bumgardner', email: 'smyoder1@ncsu.edu')
+    @smyoder1 = User.new(username: 'smyoder1', name: 'John Bumgardner', email: 'smyoder1@ncsu.edu')
     @smyoder1.save!
     @response = Response.create!(round: 1)
   end

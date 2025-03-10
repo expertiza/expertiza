@@ -5,7 +5,7 @@
   <%= text_field 'user', 'name'  %></p>
 
 <% new_user ||= false %>
-<%= render :partial => 'users/name' %>
+<%= render :partial => 'users/username' %>
 <%= render :partial => 'users/email' %>
 <% if @assignment.nil? %>
   <%= render :partial => 'users/password', :locals => { :new_user => new_user, :request_user => request_user } if edit%>

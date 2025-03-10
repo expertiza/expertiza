@@ -68,8 +68,8 @@
 			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
               <%= index + 1 %>.
-              <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
-              (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
+              <%= link_to user.username(session[:ip]), impersonate_impersonate_path(:user => {:username => user.username(session[:ip])}), :method => :post, :class => "user_unityID" %>
+              (<span class="user_name"><%= user.name(session[:ip]) %></span>)
             </td>
             <!--# reviews done-->
             <td align = 'left'>

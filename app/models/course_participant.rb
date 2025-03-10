@@ -15,7 +15,7 @@ class CourseParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
 
-    user = User.find_by(name: row_hash[:username])
+    user = User.find_by(username: row_hash[:username])
     if user.nil?
       raise ArgumentError, "The record containing #{row_hash[:username]} does not have enough items." if row_hash.length < 4
 

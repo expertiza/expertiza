@@ -1,5 +1,5 @@
 describe BookmarkRating do
-  let(:user1) { create(:student, name: 'expertizauser', id: 1) }
+  let(:user1) { create(:student, username: 'expertizauser', id: 1) }
   bookmark1 = nil
 
   before(:each) do

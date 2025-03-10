@@ -13,7 +13,7 @@
   <% headers["Team name"] = "14%" %>
   <% headers["Team member(s)"] = "18%" %>
 <% else %>
-  <% headers["Participant name"] = "18%" %>
+  <% headers["Participant User name"] = "18%" %>
 <% end %>                              
 <% headers["Submitted item(s)"] = nil %>
 <!--E1877: table id changed -->
@@ -34,7 +34,7 @@
             <% pair_programming_enabled = false %>
           <% end %>
         <% else %>
-          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant name</th>
+          <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Participant User name</th>
         <% end %>  
         <th class="sorter-true" style="font-weight: bold; font-size: 15px;">Links</th> 
         <th class="sorter-false" style="font-weight: bold; font-size: 15px;"></th>
@@ -66,11 +66,11 @@
           <% end %>
         <% end %>
 
-        <!--Team member(s) / Participant name-->
+        <!--Team member(s) / Participant User name-->
           <td>
               <% users_for_curr_team.each do |user| %>
-                  <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post %>
-                  (<%= user.fullname(session[:ip])%>)<br>
+                  <%= link_to user.username(session[:ip]), impersonate_impersonate_path(:user => {:username => user.username(session[:ip])}), :method => :post %>
+                  (<%= user.name(session[:ip])%>)<br>
               <% end %>
           </td>
 

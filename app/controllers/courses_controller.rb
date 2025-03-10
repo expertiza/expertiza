@@ -16,9 +16,9 @@ class CoursesController < ApplicationController
   end
 
   def auto_complete_for_user_name
-    search = params[:user][:name].to_s
+    search = params[:user][:username].to_s
     @users = User.where(role_id: 6) if search.present?
-    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    render inline: "<%= auto_complete_result @users, 'username' %>", layout: false
   end
 
   # Creates a new course
@@ -121,18 +121,18 @@ class CoursesController < ApplicationController
   # Adds a teaching assistant to a course
   def add_ta
     @course = Course.find(params[:course_id])
-    @user = User.find_by(name: params[:user][:name])
+    @user = User.find_by(username: params[:user][:username])
     if @user.nil?
-      flash.now[:error] = 'The user inputted "' + params[:user][:name] + '" does not exist.'
+      flash.now[:error] = 'The user inputted "' + params[:user][:username] + '" does not exist.'
     elsif !TaMapping.where(ta_id: @user.id, course_id: @course.id).empty?
-      flash.now[:error] = 'The user inputted "' + params[:user][:name] + '" is already a TA for this course.'
+      flash.now[:error] = 'The user inputted "' + params[:user][:username] + '" is already a TA for this course.'
     else
       @ta_mapping = TaMapping.create(ta_id: @user.id, course_id: @course.id)
       @user.role = Role.find_by name: 'Teaching Assistant'
       @user.save
 
       @course = @ta_mapping
-      undo_link("The TA \"#{@user.name}\" has been successfully added.")
+      undo_link("The TA \"#{@user.username}\" has been successfully added.")
     end
     render action: 'add_ta.js.erb', layout: false
   end
@@ -151,7 +151,7 @@ class CoursesController < ApplicationController
     @ta_mapping.destroy
 
     @course = @ta_mapping
-    undo_link("The TA \"#{@ta.name}\" has been successfully removed.")
+    undo_link("The TA \"#{@ta.username}\" has been successfully removed.")
 
     render action: 'remove_ta.js.erb', layout: false
   end

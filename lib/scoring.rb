@@ -86,7 +86,7 @@ module Scoring
   # Computes and returns the scores of assignment for participants and teams
   # Returns data in the format of
   # {
-  # :particpant => {
+  # :participant => {
   #   :<participant_id> => participant_scores(participant, questions),
   #   :<participant_id> => participant_scores(participant, questions)
   #   },
@@ -126,7 +126,7 @@ module Scoring
   # Return scores that this participant has been given
   # Returns data in the format of
   # {
-  #    :total_score => participant.grade ? particpant.grade : compute_total_score(assignment, scores)
+  #    :total_score => participant.grade ? participant.grade : compute_total_score(assignment, scores)
   #    :max_pts_available => topic.micropayment if assignment.topics?
   #    :participant => participant,
   #    :questionnaire_symbol1 => {

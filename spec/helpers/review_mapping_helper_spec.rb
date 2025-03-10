@@ -436,7 +436,7 @@ describe ReviewMappingHelper, type: :helper do
     # return the user name if team size equal 1
     it 'should return (Adam) if max_team_size = 1' do
       max_team_size = 1
-      student = create(:student, fullname: 'Adam')
+      student = create(:student, name: 'Adam')
       create(:team_user, user: student, team: @reviewee)
 
       @response = create(:response, response_map: @response_map)
@@ -1005,7 +1005,7 @@ describe ReviewMappingHelper, type: :helper do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: 'name', fullname: 'name')
+      @user = create(:student, username: 'name', name: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
@@ -1023,7 +1023,7 @@ describe ReviewMappingHelper, type: :helper do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: 'name', fullname: 'name')
+      @user = create(:student, username: 'name', name: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @response = create(:response, response_map: @response_map, created_at: '2019-11-01 23:30:00')
@@ -1043,7 +1043,7 @@ describe ReviewMappingHelper, type: :helper do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: 'name', fullname: 'name')
+      @user = create(:student, username: 'name', name: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @id = @assignment1.id
@@ -1059,7 +1059,7 @@ describe ReviewMappingHelper, type: :helper do
       @assignment1 = create(:assignment, name: 'name1')
       @questionnaire = create(:questionnaire)
       @question = create(:question, questionnaire_id: @questionnaire.id)
-      @user = create(:student, name: 'name', fullname: 'name')
+      @user = create(:student, username: 'name', name: 'name')
       @participant = create(:participant, user_id: @user.id, parent_id: @assignment1.id)
       @response_map = create(:review_response_map, reviewer: @participant, assignment: @assignment1)
       @id = @assignment1.id

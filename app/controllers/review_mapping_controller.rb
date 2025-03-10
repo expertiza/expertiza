@@ -54,7 +54,7 @@ class ReviewMappingController < ApplicationController
   def add_reviewer
     assignment = Assignment.find(params[:id])
     topic_id = params[:topic_id]
-    user_id = User.where(name: params[:user][:name]).first.id
+    user_id = User.where(username: params[:user][:username]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
     if TeamsUser.exists?(team_id: params[:contributor_id], user_id: user_id)
@@ -198,7 +198,7 @@ class ReviewMappingController < ApplicationController
       regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
       reviewer = get_reviewer(user, mapping.assignment, regurl)
       unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
-        raise 'The metareviewer "' + reviewer.user.name + '" is already assigned to this reviewer.'
+        raise 'The metareviewer "' + reviewer.user.username + '" is already assigned to this reviewer.'
       end
 
       MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
@@ -224,7 +224,7 @@ class ReviewMappingController < ApplicationController
 
   def get_reviewer(user, assignment, reg_url)
     reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
+    raise "\"#{user.username}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
 
     reviewer.get_reviewer
   rescue StandardError => e

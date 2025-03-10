@@ -59,13 +59,13 @@
       <% if assignment.max_team_size < 2 %>
           <td style="vertical-align:top;">
           <% user_id = TeamsUser.where(team_id: contributor.id).first.user_id %>
-          <%= User.find(user_id).fullname(session[:ip]) %>&nbsp;(<%= User.find(user_id).name(session[:ip]) %>)<br/>
+          <%= User.find(user_id).name(session[:ip]) %>&nbsp;(<%= User.find(user_id).username(session[:ip]) %>)<br/>
       <% else %>
-          <td style="vertical-align:top;"><%= contributor.name %><br/>
+          <td style="vertical-align:top;"><%= contributor.username %><br/>
           <% team_members = TeamsUser.where(team_id: contributor.id) %>
           <% team_members.each do |team_member| %>
-              <font size="1"><%= User.find(team_member['user_id']).fullname(session[:ip]) %>&nbsp;
-              (<%= User.find(team_member['user_id']).name(session[:ip]) %>)</font><br/>
+              <font size="1"><%= User.find(team_member['user_id']).name(session[:ip]) %>&nbsp;
+              (<%= User.find(team_member['user_id']).username(session[:ip]) %>)</font><br/>
           <% end %>
       <% end %>
 

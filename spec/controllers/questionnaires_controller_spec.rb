@@ -72,8 +72,8 @@ describe QuestionnairesController do
           # Otherwise the TA will be indirectly associated with the questionnaire
           teaching_assistant = create(:teaching_assistant)
           stub_current_user(teaching_assistant, teaching_assistant.role.name, teaching_assistant.role)
-          instructor1 = create(:instructor, name: 'test_instructor1')
-          instructor2 = create(:instructor, name: 'test_instructor2')
+          instructor1 = create(:instructor, username: 'test_instructor1')
+          instructor2 = create(:instructor, username: 'test_instructor2')
           course = create(:course, instructor_id: instructor2.id)
           TaMapping.create(ta_id: teaching_assistant.id, course_id: course.id)
           check_access(teaching_assistant).to be false

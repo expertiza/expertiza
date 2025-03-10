@@ -3,8 +3,8 @@ describe ConferenceController do
   let(:super_admin) { build(:superadmin) }
   let(:instructor) { build(:instructor, id: 2) }
   let(:instructor1) { build(:instructor, id: 2, timezonepref: 'Eastern Time (US & Canada)') }
-  let(:student1) { build(:student, id: 1, name: :lily) }
-  let(:student1) { build(:student, id: 2, name: :lily23) }
+  let(:student1) { build(:student, id: 1, username: :lily) }
+  let(:student1) { build(:student, id: 2, username: :lily23) }
   let(:student2) { build(:student) }
   let(:student3) { build(:student, id: 10, role_id: 1, parent_id: nil) }
   let(:student4) { build(:student, id: 20, role_id: 4) }
@@ -14,7 +14,7 @@ describe ConferenceController do
   let(:institution1) { build(:institution, id: 1) }
   let(:assignment1) { build(:assignment, id: 2, is_conference_assignment: 1, max_team_size: 100) }
   let(:requested_user1) do
-    AccountRequest.new id: 4, name: 'requester1', role_id: 2, fullname: 're, requester1',
+    AccountRequest.new id: 4, username: 'requester1', role_id: 2, fullname: 're, requester1',
                        institution_id: 1, email: 'requester1@test.com', status: nil, self_introduction: 'no one'
   end
   let(:superadmin) { build(:superadmin) }
@@ -46,10 +46,10 @@ describe ConferenceController do
 
     it 'save successfully for new Author' do
       request_params = {
-        user: { name: 'lily',
+        user: { username: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -62,10 +62,10 @@ describe ConferenceController do
 
     it 'save successfully for existing user as Author' do
       request_params = {
-        user: { name: 'lily',
+        user: { username: 'lily',
                 assignment: '2' }
       }
-      allow(User).to receive(:find_by).with(name: 'lily').and_return(student1)
+      allow(User).to receive(:find_by).with(username: 'lily').and_return(student1)
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
       allow(Assignment).to receive(:find).with('2').and_return(assignment1)
       allow(AssignmentParticipant).to receive(:create).with(any_args).and_return(participant)
@@ -75,10 +75,10 @@ describe ConferenceController do
     end
     it 'return error if user email already exist' do
       request_params = {
-        user: { name: 'lily',
+        user: { username: 'lily',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -88,10 +88,10 @@ describe ConferenceController do
       post :create, params: request_params
 
       request_params2 = {
-        user: { name: 'lily23',
+        user: { username: 'lily23',
                 role_id: 2,
                 email: 'chenzy@gmail.com',
-                fullname: 'John Bumgardner',
+                name: 'John Bumgardner',
                 assignment: '2' }
       }
       allow(Assignment).to receive(:find_by_id).with('2').and_return(assignment1)
@@ -106,11 +106,11 @@ describe ConferenceController do
     it 'should redirect to root with correct recaptcha' do
       user_session = { user: student1 }
       request_params = {
-        user: { name: 'lily',
+        user: { username: 'lily',
                 crypted_password: 'password',
                 role_id: 1,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy@gmail.com',
                 parent_id: 1,
                 private_by_default: false,
@@ -136,11 +136,11 @@ describe ConferenceController do
     it 'should redirect to join conference page with incorrect recaptcha' do
       user_session = { user: student2 }
       request_params = {
-        user: { name: 'lily2',
+        user: { username: 'lily2',
                 crypted_password: 'password',
                 role_id: 1,
                 password_salt: 1,
-                fullname: '6, instructor',
+                name: '6, instructor',
                 email: 'chenzy2@gmail.com',
                 parent_id: 1,
                 private_by_default: false,

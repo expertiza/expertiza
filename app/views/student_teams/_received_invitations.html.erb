@@ -1,7 +1,7 @@
 <!-- Partial for invitations received for collaboration on an assignment -->
 <% if inv.reply_status == 'W' %>
   <tr>
-    <td><%= inv.from_user.name(session[:ip]) %></td>
+    <td><%= inv.from_user.username(session[:ip]) %></td>
     <td>
       <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
       <% teams_users.each do |teams_user| %>

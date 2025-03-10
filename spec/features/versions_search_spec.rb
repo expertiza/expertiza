@@ -2,7 +2,7 @@ describe 'is able show search logs' do
   it 'admin must be able to search logs' do
     admin = create(:admin, id: 5)
     user = admin
-    login_as(user.name)
+    login_as(user.username)
     visit '/versions/search'
     fill_in 'start_time', with: (Time.now.in_time_zone - 1.day).strftime('%Y/%m/%d %H:%M')
     fill_in 'end_time', with: (Time.now.in_time_zone + 10.days).strftime('%Y/%m/%d %H:%M')
@@ -13,7 +13,7 @@ describe 'is able show search logs' do
   it 'super-admin must be able to search logs' do
     superadmin = create(:superadmin, id: 1)
     user = superadmin
-    login_as(user.name)
+    login_as(user.username)
     visit '/versions/search'
     fill_in 'start_time', with: (Time.now.in_time_zone - 10.days).strftime('%Y/%m/%d %H:%M')
     fill_in 'end_time', with: (Time.now.in_time_zone + 10.days).strftime('%Y/%m/%d %H:%M')
@@ -37,7 +37,7 @@ describe 'search by selection' do
   it 'select type with datetimepicker' do
     admin = create(:admin, id: 5)
     user = admin
-    login_as(user.name)
+    login_as(user.username)
     visit '/versions/search'
     select('Node', from: 'post_item_type')
     fill_in 'start_time', with: (Time.now.in_time_zone + 1.day).strftime('%Y/%m/%d %H:%M')
@@ -49,7 +49,7 @@ describe 'search by selection' do
   it 'select event with datetimepicker', js: true do
     admin = create(:admin, id: 5)
     user = admin
-    login_as(user.name)
+    login_as(user.username)
     visit '/versions/search'
     select('create', from: 'post_event')
     fill_in 'start_time', with: (Time.now.in_time_zone + 1.day).strftime('%Y/%m/%d %H:%M')

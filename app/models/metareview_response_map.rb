@@ -64,11 +64,11 @@ class MetareviewResponseMap < ResponseMap
       contributor = AssignmentTeam.where(name: row_hash[:reviewee].to_s, parent_id: id).first
       raise ImportError, 'Contributor, ' + row_hash[:reviewee].to_s + ', was not found.' if contributor.nil?
 
-      ruser = User.find_by_name(row_hash[:reviewer].to_s.strip)
+      ruser = User.find_by_username(row_hash[:reviewer].to_s.strip)
       reviewee = AssignmentParticipant.where(user_id: ruser.id, parent_id: id).first
       raise ImportError, "Reviewee,  #{row_hash[:reviewer]}, for contributor, #{contributor.name}, was not found." if reviewee.nil?
 
-      muser = User.find_by_name(row.to_s.strip)
+      muser = User.find_by_username(row.to_s.strip)
       reviewer = AssignmentParticipant.where(user_id: muser.id, parent_id: id)
       raise ImportError, "Metareviewer,  #{row}, for contributor, #{contributor.name}, and reviewee, #{row_hash[:reviewer]}, was not found." if reviewer.nil?
 
@@ -88,7 +88,7 @@ class MetareviewResponseMap < ResponseMap
     defn[:body][:type] = 'Metareview'
     reviewee_user = Participant.find(reviewee_id)
     defn[:body][:obj_name] = assignment.name
-    defn[:body][:first_name] = User.find(reviewee_user.user_id).fullname
+    defn[:body][:first_name] = User.find(reviewee_user.user_id).name
     defn[:to] = User.find(reviewee_user.user_id).email
     Mailer.sync_message(defn).deliver
   end

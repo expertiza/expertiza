@@ -72,7 +72,7 @@ class StudentTeamsController < ApplicationController
     if existing_teams.empty?
       if params[:team][:name].blank?
         flash[:notice] = 'The team name is empty.'
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name missing while creating team', request)
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Team name missing while creating team', request)
         redirect_to view_student_teams_path student_id: student.id
         return
       end
@@ -93,7 +93,7 @@ class StudentTeamsController < ApplicationController
 
     else
       flash[:notice] = 'That team name is already in use.'
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Team name being created was already in use', request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].username, 'Team name being created was already in use', request)
       redirect_to view_student_teams_path student_id: student.id
     end
   end
@@ -113,7 +113,7 @@ class StudentTeamsController < ApplicationController
       redirect_to view_student_teams_path student_id: params[:student_id]
     else
       flash[:notice] = 'That team name is already in use.'
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'Team name being updated to was already in use', request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'Team name being updated to was already in use', request)
       redirect_to view_student_teams_path student_id: params[:student_id]
 
     end
@@ -145,7 +145,7 @@ class StudentTeamsController < ApplicationController
 
     team_user.destroy_all
     undo_link "The user \"#{team_user.name}\" has been successfully removed from the team."
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'User removed a participant from the team', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'User removed a participant from the team', request)
   end
 
   def team_created_successfully(current_team = nil)
@@ -154,7 +154,7 @@ class StudentTeamsController < ApplicationController
     else
       undo_link "The team \"#{team.name}\" has been successfully updated."
     end
-    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'The team has been successfully created.', request)
+    ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'The team has been successfully created.', request)
   end
 
   # This method is used to show the Author Feedback Questionnaire of current assignment

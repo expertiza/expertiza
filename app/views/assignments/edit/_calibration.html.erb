@@ -5,7 +5,7 @@
   <table width="100%" cellspacing="0" cellpadding="2" border="1" class="table table-striped">
     <tr>
           <th width = "38%">
-            Participant name
+            Participant User name
           </th>
           <th width = "15%">
             Action
@@ -21,7 +21,7 @@
           <% users_for_curr_team = "" %>
           <% teams_users.each do |teams_user| %>
               <% user = User.find(teams_user.user_id) %>
-              <% users_for_curr_team += user.name(session[:ip]) + ' (' + user.fullname(session[:ip]) + ')' + '<br/>' %>
+              <% users_for_curr_team += user.username(session[:ip]) + ' (' + user.name(session[:ip]) + ')' + '<br/>' %>
               <% participants = Array.new %>
               <% participants << Participant.where(["parent_id = ? AND user_id = ?", assignment.id, user.id]).first %>
           <% end %>

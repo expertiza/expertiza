@@ -20,10 +20,10 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     expect(assignment_test.instructor_id).to eql(instructor6.id)
     expect(assignment_test.course_id).to eql(nil)
-    student_test = create(:student, name: 'student6666', email: 'stu6666@ncsu.edu') # create a student for test
+    student_test = create(:student, username: 'student6666', email: 'stu6666@ncsu.edu') # create a student for test
 
     visit(root_path)
-    fill_in('login_name', with: 'instructor6')
+    fill_in('login_username', with: 'instructor6')
     fill_in('login_password', with: 'password')
     click_button('Sign in')
     expect(current_path).to eql('/tree_display/list')
@@ -31,20 +31,20 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
     expect(page).to have_content('E2086')
-    fill_in('user_name', match: :first, with: instructor6.name)
+    fill_in('user_name', match: :first, with: instructor6.username)
     click_button('Add', match: :first)
-    expect(page).to have_content(instructor6.name)
+    expect(page).to have_content(instructor6.username)
     expect(page).to have_content(instructor6.email)
     click_button('Submit', match: :first)
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
     expect(page).to have_content('E2086')
-    fill_in('user_name', match: :first, with: student_test.name)
+    fill_in('user_name', match: :first, with: student_test.username)
     click_button('Add', match: :first)
-    expect(page).to have_content(student_test.name)
+    expect(page).to have_content(student_test.username)
     expect(page).to have_content(student_test.email)
 
-    user_id = User.find_by(name: 'student6666').id
+    user_id = User.find_by(username: 'student6666').id
     participant_student = Participant.where(user_id: user_id)
     participant_id = participant_student.first.id
     parent_id = participant_student.first.parent_id
@@ -68,10 +68,10 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     visit('/impersonate/start')
     expect(page).to have_content('Enter user account')
-    fill_in('user_name', with: student_test.name)
+    fill_in('user_name', with: student_test.username)
     click_button('Impersonate')
     expect(current_path).to eql('/student_task/list')
-    expect(page).to have_content("User: #{student_test.name}")
+    expect(page).to have_content("User: #{student_test.username}")
     expect(page).to have_content('E2086')
     click_link('E2086')
   end
@@ -93,10 +93,10 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     expect(assignment_test.instructor_id).to eql(instructor6.id)
     expect(assignment_test.course_id).to eql(nil)
-    student_test = create(:student, name: 'student6666', email: 'stu6666@ncsu.edu') # create a student for test
+    student_test = create(:student, username: 'student6666', email: 'stu6666@ncsu.edu') # create a student for test
 
     visit(root_path)
-    fill_in('login_name', with: 'instructor6')
+    fill_in('login_username', with: 'instructor6')
     fill_in('login_password', with: 'password')
     click_button('Sign in')
     expect(current_path).to eql('/tree_display/list')
@@ -104,20 +104,20 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
     expect(page).to have_content('E2086')
-    fill_in('user_name', match: :first, with: instructor6.name)
+    fill_in('user_name', match: :first, with: instructor6.username)
     click_button('Add', match: :first)
-    expect(page).to have_content(instructor6.name)
+    expect(page).to have_content(instructor6.username)
     expect(page).to have_content(instructor6.email)
     click_button('Submit', match: :first)
 
     visit("/participants/list?id=#{assignment_test.id}&model=Assignment")
     expect(page).to have_content('E2086')
-    fill_in('user_name', match: :first, with: student_test.name)
+    fill_in('user_name', match: :first, with: student_test.username)
     click_button('Add', match: :first)
-    expect(page).to have_content(student_test.name)
+    expect(page).to have_content(student_test.username)
     expect(page).to have_content(student_test.email)
 
-    user_id = User.find_by(name: 'student6666').id
+    user_id = User.find_by(username: 'student6666').id
     participant_student = Participant.where(user_id: user_id)
     participant_id = participant_student.first.id
     parent_id = participant_student.first.parent_id

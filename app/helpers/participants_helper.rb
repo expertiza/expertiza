@@ -15,8 +15,8 @@ module ParticipantsHelper
   def self.define_attributes(line_split, config)
     attributes = {}
     attributes['role_id'] = Role.find_by name: 'Student'
-    attributes['name'] = line_split[config['name'].to_i]
-    attributes['fullname'] = config['fullname']
+    attributes['username'] = line_split[config['username'].to_i]
+    attributes['name'] = config['name']
     attributes['email'] = line_split[config['email'].to_i]
     attributes['password'] = (0...8).map { (65 + rand(26)).chr }.join
     attributes['email_on_submission'] = 1
@@ -26,7 +26,7 @@ module ParticipantsHelper
   end
 
   def self.define_user(attrs, session, params, home_page)
-    user = User.find_by(name: attrs['name'])
+    user = User.find_by(username: attrs['username'])
     user = create_new_user(attrs, session) if user.nil?
     if !params[:course_id].nil?
       participant = add_user_to_course(params, user)
@@ -64,8 +64,8 @@ module ParticipantsHelper
     File.open(cfgdir + 'roster_config', 'r') do |infile|
       while (line = infile.gets)
         store_item(line, 'dlm', config)
+        store_item(line, 'username', config)
         store_item(line, 'name', config)
-        store_item(line, 'fullname', config)
         store_item(line, 'email', config)
       end
     end

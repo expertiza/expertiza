@@ -1,6 +1,6 @@
 describe AdviceController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
-  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, name: 'Instructor1') }
+  let(:instructor1) { build(:instructor, id: 10, role_id: 3, parent_id: 3, username: 'Instructor1') }
   let(:student1) { build(:student, id: 21, role_id: 1) }
 
   describe '#action_allowed?' do

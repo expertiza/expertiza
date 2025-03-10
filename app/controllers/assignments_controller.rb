@@ -150,10 +150,10 @@ class AssignmentsController < ApplicationController
       # FixB : Instrucor will be able to delete any assignment belonging to his/her courses.
       if (user.role.name == 'Instructor') || ((user.role.name == 'Teaching Assistant') && (user.id == assignment_form.assignment.instructor_id))
         assignment_form.delete(params[:force])
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "Assignment #{assignment_form.assignment.id} was deleted.", request)
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, "Assignment #{assignment_form.assignment.id} was deleted.", request)
         flash[:success] = 'The assignment was successfully deleted.'
       else
-        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, 'You are not authorized to delete this assignment.', request)
+        ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, 'You are not authorized to delete this assignment.', request)
         flash[:error] = 'You are not authorized to delete this assignment.'
       end
     rescue StandardError => e
@@ -410,7 +410,7 @@ class AssignmentsController < ApplicationController
   def unassigned_rubrics_warning
     if !list_unassigned_rubrics.empty? && request.original_fullpath == "/assignments/#{@assignment_form.assignment.id}/edit"
       rubrics_needed = needed_rubrics(list_unassigned_rubrics)
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].username, "Rubrics missing for #{@assignment_form.assignment.name}.", request)
       if flash.now[:error] != 'Failed to save the assignment: ["Total weight of rubrics should add up to either 0 or 100%"]'
         flash.now[:error] = 'You did not specify all the necessary rubrics. You need ' + rubrics_needed +
                             " of assignment <b>#{@assignment_form.assignment.name}</b> before saving the assignment. You can assign rubrics" \
@@ -445,7 +445,7 @@ class AssignmentsController < ApplicationController
 
   # flash notice if the time zone is not specified for an assignment's due date
   def user_timezone_specified
-    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, 'Timezone not specified', request) if current_user.timezonepref.nil?
+    ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].username, 'Timezone not specified', request) if current_user.timezonepref.nil?
     flash.now[:error] = 'You have not specified your preferred timezone yet. Please do this before you set up the deadlines.' if current_user.timezonepref.nil?
   end
 
@@ -457,11 +457,11 @@ class AssignmentsController < ApplicationController
     @assignment.course_id = params[:course_id]
 
     if @assignment.save
-      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].name, "The assignment was successfully saved: #{@assignment.as_json}", request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].username, "The assignment was successfully saved: #{@assignment.as_json}", request)
       flash[:note] = 'The assignment was successfully saved.'
       redirect_to list_tree_display_index_path
     else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].name, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].username, "Failed assignment: #{@assignment.errors.full_messages.join(' ')}", request)
       flash[:error] = "Failed to save the assignment: #{@assignment.errors.full_messages.join(' ')}"
       redirect_to edit_assignment_path @assignment.id
     end
@@ -501,7 +501,7 @@ class AssignmentsController < ApplicationController
     else
       flash[:error] = "Failed to save the assignment: #{@assignment_form.errors}"
     end
-    ExpertizaLogger.info LoggerMessage.new('', session[:user].name, "The assignment was saved: #{@assignment_form.as_json}", request)
+    ExpertizaLogger.info LoggerMessage.new('', session[:user].username, "The assignment was saved: #{@assignment_form.as_json}", request)
   end
 
   def query_participants_and_alert

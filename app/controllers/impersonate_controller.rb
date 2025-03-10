@@ -27,8 +27,8 @@ class ImpersonateController < ApplicationController
   # This function does not seem to work
 
   def auto_complete_for_user_name
-    @users = session[:user].get_available_users(params[:user][:name])
-    render inline: "<%= auto_complete_result @users, 'name' %>", layout: false
+    @users = session[:user].get_available_users(params[:user][:username])
+    render inline: "<%= auto_complete_result @users, 'username' %>", layout: false
   end
 
   # Called whenever we want to enter the impersonate mode in the application.
@@ -56,11 +56,11 @@ class ImpersonateController < ApplicationController
 
   def overwrite_session
     if params[:impersonate].nil?
-      user = real_user(params[:user][:name])
+      user = real_user(params[:user][:username])
       session[:super_user] = session[:user] if session[:super_user].nil?
       generate_session(user)
-    elsif !params[:impersonate][:name].empty?
-      user = real_user(params[:impersonate][:name])
+    elsif !params[:impersonate][:username].empty?
+      user = real_user(params[:impersonate][:username])
       generate_session(user)
     else
       session[:user] = session[:super_user]
@@ -75,7 +75,7 @@ class ImpersonateController < ApplicationController
   # warn_for_special_chars takes the output from above method and flashes an error if there are any special characters(/\?<>|&$#) in the string
 
   def check_if_input_is_valid
-    if params[:user] && warn_for_special_chars(params[:user][:name], 'Username')
+    if params[:user] && warn_for_special_chars(params[:user][:username], 'Username')
       flash[:error] = 'Please enter valid user name'
       redirect_back fallback_location: root_path
     elsif params[:impersonate] && warn_for_special_chars(params[:impersonate][:name], 'Username')
@@ -92,16 +92,16 @@ class ImpersonateController < ApplicationController
 
   def check_if_user_impersonateable
     if params[:impersonate].nil?
-      user = real_user(params[:user][:name])
+      user = real_user(params[:user][:username])
       unless @original_user.can_impersonate? user
-        @message = "You cannot impersonate '#{params[:user][:name]}'."
+        @message = "You cannot impersonate '#{params[:user][:username]}'."
         temp
         AuthController.clear_user_info(session, nil)
       else
         overwrite_session
       end
     else
-      unless params[:impersonate][:name].empty?
+      unless params[:impersonate][:username].empty?
         overwrite_session
       end
     end
@@ -115,14 +115,14 @@ class ImpersonateController < ApplicationController
     begin
       @original_user = session[:super_user] || session[:user]
       if params[:impersonate].nil?
-        @message = "You cannot impersonate '#{params[:user][:name]}'."
-        @message = 'User name cannot be empty' if params[:user][:name].empty?
-        user = real_user(params[:user][:name])
+        @message = "You cannot impersonate '#{params[:user][:username]}'."
+        @message = 'User name cannot be empty' if params[:user][:username].empty?
+        user = real_user(params[:user][:username])
         check_if_user_impersonateable if user
-      elsif !params[:impersonate][:name].empty?
+      elsif !params[:impersonate][:username].empty?
         # Impersonate a new account
-        @message = "You cannot impersonate '#{params[:impersonate][:name]}'."
-        user = real_user(params[:impersonate][:name])
+        @message = "You cannot impersonate '#{params[:impersonate][:username]}'."
+        user = real_user(params[:impersonate][:username])
         check_if_user_impersonateable if user
       # Revert to original account when currently in the impersonated session
       elsif !session[:super_user].nil?
@@ -143,11 +143,11 @@ class ImpersonateController < ApplicationController
 
   # This method checks if the user is in anonymized view and accordingly returns the user object associated with the parameter
 
-  def real_user(name)
+  def real_user(username)
     if User.anonymized_view?(session[:ip])
-      user = User.real_user_from_anonymized_name(name)
+      user = User.real_user_from_anonymized_username(username)
     else
-      user = User.find_by(name: name)
+      user = User.find_by(username: username)
     end
     return user
   end

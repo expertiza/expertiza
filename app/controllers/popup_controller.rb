@@ -99,7 +99,7 @@ class PopupController < ApplicationController
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def self_review_popup
     @response_id = params[:response_id]
-    @user_fullname = params[:user_fullname]
+    @user_name = params[:user_name]
     unless @response_id.nil?
       first_question_in_questionnaire = Answer.where(response_id: @response_id).first.question_id
       questionnaire_id = Question.find(first_question_in_questionnaire).questionnaire_id

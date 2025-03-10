@@ -51,7 +51,7 @@ describe SuggestionController do
   describe '#add_comment' do
     it 'adds a participant' do
       allow(Assignment).to receive(:find).with('1').and_return(assignment)
-      allow(User).to receive(:find_by).with(name: student.name).and_return(student)
+      allow(User).to receive(:find_by).with(username: student.username).and_return(student)
       allow(SuggestionComment).to receive(:new).and_return(suggestion_comment)
       allow_any_instance_of(SuggestionComment).to receive(:save).and_return(true)
       request_params = { id: 1, suggestion_comment: { vote: 'Y', comments: 'comments' } }

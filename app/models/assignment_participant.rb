@@ -113,7 +113,7 @@ class AssignmentParticipant < Participant
   def self.import(row_hash, _row_header = nil, session, id)
     raise ArgumentError, 'No user id has been specified.' if row_hash.empty?
 
-    user = User.find_by(name: row_hash[:username])
+    user = User.find_by(username: row_hash[:username])
 
     # if user with provided name in csv file is not present then new user will be created.
     if user.nil?
@@ -154,9 +154,9 @@ class AssignmentParticipant < Participant
   # define a handle for a new participant
   def set_handle
     self.handle = if user.handle.nil? || (user.handle == '')
-                    user.name
+                    user.username
                   elsif AssignmentParticipant.exists?(parent_id: assignment.id, handle: user.handle)
-                    user.name
+                    user.username
                   else
                     user.handle
                   end

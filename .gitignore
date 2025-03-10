@@ -16,6 +16,7 @@ nohup.out
 pg_data/*
 .initialized
 expertiza-db/*
+translation_stats*
 
 #################
 ## scrubbed_db ##

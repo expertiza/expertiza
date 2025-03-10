@@ -15,6 +15,23 @@ class Response < ApplicationRecord
   attr_accessor :difficulty_rating
   delegate :questionnaire, :reviewee, :reviewer, to: :map
 
+  # Sort responses specified by map id 
+  # Sort by largest version number 
+  def sortby_largest_vn()
+    prev = Response.where(map_id: @map.id)
+    review_scores = prev.to_a
+    if prev.present?
+      sorted = review_scores.sort do |m1, m2|
+        if m1.version_num.to_i && m2.version_num.to_i
+          m2.version_num.to_i <=> m1.version_num.to_i
+        else
+          m1.version_num ? -1 : 1
+        end
+      end
+    end
+    return sorted
+  end
+
   def response_id
     id
   end
@@ -43,9 +60,9 @@ class Response < ApplicationRecord
     # we accept nil as answer for scorable questions, and they will not be counted towards the total score
     sum = 0
     scores.each do |s|
-      question = Question.find(s.question_id)
+      item = Question.find(s.question_id)
       # For quiz responses, the weights will be 1 or 0, depending on if correct
-      sum += s.answer * question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      sum += s.answer * item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
     end
     sum
   end
@@ -71,8 +88,8 @@ class Response < ApplicationRecord
     # answer for scorable questions, and they will not be counted towards the total score)
     total_weight = 0
     scores.each do |s|
-      question = Question.find(s.question_id)
-      total_weight += question.weight unless s.answer.nil? || !question.is_a?(ScoredQuestion)
+      item = Question.find(s.question_id)
+      total_weight += item.weight unless s.answer.nil? || !item.is_a?(ScoredQuestion)
     end
     questionnaire = if scores.empty?
                       questionnaire_by_answer(nil)
@@ -80,23 +97,6 @@ class Response < ApplicationRecord
                       questionnaire_by_answer(scores.first)
                     end
     total_weight * questionnaire.max_question_score
-  end
-
-  # only two types of responses more should be added
-  def email(partial = 'new_submission')
-    defn = {}
-    defn[:body] = {}
-    defn[:body][:partial_name] = partial
-    response_map = ResponseMap.find map_id
-    participant = Participant.find(response_map.reviewer_id)
-    # parent is used as a common variable name for either an assignment or course depending on what the questionnaire is associated with
-    parent = if response_map.survey?
-               response_map.survey_parent
-             else
-               Assignment.find(participant.parent_id)
-             end
-    defn[:subject] = 'A new submission is available for ' + parent.name
-    response_map.email(defn, participant, parent)
   end
 
   # This create_or_get_response method returns a Response object used to populate the
@@ -179,29 +179,6 @@ class Response < ApplicationRecord
     review_comments_volume
   end
 
-  # compare the current response score with other scores on the same artifact, and test if the difference
-  # is significant enough to notify instructor.
-  # Precondition: the response object is associated with a ReviewResponseMap
-  ### "map_class.assessments_for" method need to be refactored
-  def significant_difference?
-    map_class = map.class
-    existing_responses = map_class.assessments_for(map.reviewee)
-    average_score_on_same_artifact_from_others, count = Response.avg_scores_and_count_for_prev_reviews(existing_responses, self)
-    # if this response is the first on this artifact, there's no grade conflict
-    return false if count.zero?
-
-    # This score has already skipped the unfilled scorable question(s)
-    score = aggregate_questionnaire_score.to_f / maximum_score
-    questionnaire = questionnaire_by_answer(scores.first)
-    assignment = map.assignment
-    assignment_questionnaire = AssignmentQuestionnaire.find_by(assignment_id: assignment.id, questionnaire_id: questionnaire.id)
-    # notification_limit can be specified on 'Rubrics' tab on assignment edit page.
-    allowed_difference_percentage = assignment_questionnaire.notification_limit.to_f
-    # the range of average_score_on_same_artifact_from_others and score is [0,1]
-    # the range of allowed_difference_percentage is [0, 100]
-    (average_score_on_same_artifact_from_others - score).abs * 100 > allowed_difference_percentage
-  end
-
   def self.avg_scores_and_count_for_prev_reviews(existing_responses, current_response)
     scores_assigned = []
     count = 0
@@ -212,31 +189,6 @@ class Response < ApplicationRecord
       end
     end
     [scores_assigned.sum / scores_assigned.size.to_f, count]
-  end
-
-  def notify_instructor_on_difference
-    response_map = map
-    reviewer_participant_id = response_map.reviewer_id
-    reviewer_participant = AssignmentParticipant.find(reviewer_participant_id)
-    reviewer_name = User.find(reviewer_participant.user_id).fullname
-    reviewee_team = AssignmentTeam.find(response_map.reviewee_id)
-    reviewee_participant = reviewee_team.participants.first # for team assignment, use the first member's name.
-    reviewee_name = User.find(reviewee_participant.user_id).fullname
-    assignment = Assignment.find(reviewer_participant.parent_id)
-    Mailer.notify_grade_conflict_message(
-      to: assignment.instructor.email,
-      subject: 'Expertiza Notification: A review score is outside the acceptable range',
-      body: {
-        reviewer_name: reviewer_name,
-        type: 'review',
-        reviewee_name: reviewee_name,
-        new_score: aggregate_questionnaire_score.to_f / maximum_score,
-        assignment: assignment,
-        conflicting_response_url: 'https://expertiza.ncsu.edu/response/view?id=' + response_id.to_s,
-        summary_url: 'https://expertiza.ncsu.edu/grades/view_team?id=' + reviewee_participant.id.to_s,
-        assignment_edit_url: 'https://expertiza.ncsu.edu/assignments/' + assignment.id.to_s + '/edit'
-      }
-    ).deliver_now
   end
 
   # Check if this review was done by TA/instructor return True or False
@@ -276,10 +228,10 @@ class Response < ApplicationRecord
     unless answers.empty?
       questionnaire = questionnaire_by_answer(answers.first)
       questionnaire_max = questionnaire.max_question_score
-      questions = questionnaire.questions.sort_by(&:seq)
+      items = questionnaire.questions.sort_by(&:seq)
       # get the tag settings this questionnaire
       tag_prompt_deployments = show_tags ? TagPromptDeployment.where(questionnaire_id: questionnaire.id, assignment_id: map.assignment.id) : nil
-      code = add_table_rows questionnaire_max, questions, answers, code, tag_prompt_deployments, current_user
+      code = add_table_rows questionnaire_max, items, answers, code, tag_prompt_deployments, current_user
     end
     comment = if additional_comment.nil?
                 ''
@@ -291,27 +243,39 @@ class Response < ApplicationRecord
     code
   end
 
-  def add_table_rows(questionnaire_max, questions, answers, code, tag_prompt_deployments = nil, current_user = nil)
+  def add_table_rows(questionnaire_max, items, answers, code, tag_prompt_deployments = nil, current_user = nil)
     count = 0
     # loop through questions so the the questions are displayed in order based on seq (sequence number)
-    questions.each do |question|
-      count += 1 if !question.is_a?(QuestionnaireHeader) && (question.break_before == true)
-      answer = answers.find { |a| a.question_id == question.id }
+    items.each do |item|
+      count += 1 if !item.is_a?(QuestionnaireHeader) && (item.break_before == true)
+      answer = answers.find { |a| a.question_id == item.id }
       row_class = count.even? ? 'info' : 'warning'
-      row_class = '' if question.is_a? QuestionnaireHeader
+      row_class = '' if item.is_a? QuestionnaireHeader
       code += '<tr class="' + row_class + '"><td>'
-      if !answer.nil? || question.is_a?(QuestionnaireHeader)
-        code += if question.instance_of? Criterion
+      if !answer.nil? || item.is_a?(QuestionnaireHeader)
+        code += if item.instance_of? Criterion
                   # Answer Tags are enabled only for Criterion questions at the moment.
-                  question.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
-                elsif question.instance_of? Scale
-                  question.view_completed_question(count, answer, questionnaire_max) || ''
+                  item.view_completed_question(count, answer, questionnaire_max, tag_prompt_deployments, current_user) || ''
+                elsif item.instance_of? Scale
+                  item.view_completed_question(count, answer, questionnaire_max) || ''
                 else
-                  question.view_completed_question(count, answer) || ''
+                  item.view_completed_question(count, answer) || ''
                 end
       end
       code += '</td></tr>'
     end
     code
+  end
+
+  # This method initialize answers for the questions in the response
+  # Iterates over each questions and create corresponding answer for that
+  def init_answers(items)
+    items.each do |q|
+      # it's unlikely that these answers exist, but in case the user refresh the browser some might have been inserted.
+      answer = Answer.where(response_id: @response.id, question_id: q.id).first
+      if answer.nil?
+        Answer.create(response_id: @response.id, question_id: q.id, answer: nil, comments: '')
+      end
+    end
   end
 end

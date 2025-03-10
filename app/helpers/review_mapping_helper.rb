@@ -3,78 +3,83 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  #
-  # gets the response map data such as reviewer id, reviewed object id and type for the review report
-  #
+  # gets the response map data such as reviewer id, reviewed object id and type for use in the review report
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
+    row_number = 0
     (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
 
     response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
     response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
+      row_number += 1 if Team.exists?(id: ri.reviewee_id)
       responses = ri.response
       (1..@assignment.num_review_rounds).each do |round|
         instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
       end
     end
-    [response_maps, rspan]
+    [response_maps, row_number]
   end
 
-  #
   # gets the team name's color according to review and assignment submission status
-  #
   def get_team_color(response_map)
-    # Storing redundantly computed value in a variable
     assignment_created = @assignment.created_at
-    # Storing redundantly computed value in a variable
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    # Returning colour based on conditions
-    if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
-      elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        obtain_team_color(response_map, assignment_created, assignment_due_dates)
-      end
+
+    return 'red' unless Response.exists?(map_id: response_map.id)
+
+    determine_color(response_map, assignment_created, assignment_due_dates)
+  end
+
+  private def determine_color(response_map, assignment_created, assignment_due_dates)
+    if response_map.try(:reviewer).try(:review_grade).nil?
+      return 'blue' if response_for_each_round?(response_map)
+      get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
     else
-      'red'
+      'brown'
     end
   end
 
   # loops through the number of assignment review rounds and obtains the team colour
-  def obtain_team_color(response_map, assignment_created, assignment_due_dates)
+  def get_team_color_from_submission(response_map, assignment_created, assignment_due_dates)
     color = []
     (1..@assignment.num_review_rounds).each do |round|
-      check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+      color.push(get_submission_state(response_map, assignment_created, assignment_due_dates, round))
     end
     color[-1]
   end
 
   # checks the submission state within each round and assigns team colour
-  def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+  def get_submission_state(response_map, assignment_created, assignment_due_dates, round)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
+      'purple'
     else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
+      process_submission_link(response_map, assignment_created, assignment_due_dates, round)
     end
   end
 
-  # checks if a review was submitted in every round and gives the total responses count
+  # checks the submission link to determine if it exists and assigns team colour
+  private def process_submission_link(response_map, assignment_created, assignment_due_dates, round)
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    if valid_submission_link?(link)
+      'green'
+    else
+      link_updated_date = get_link_updated_at(link)
+      updated_since_last_submission?(round, assignment_due_dates, link_updated_date) ? 'purple' : 'green'
+    end
+  end
+
+  # checks if the submission list exists or fits with standard url format of http:// or https:// and contains keyword "wiki"
+  private def valid_submission_link?(link)
+    link.nil? || (link !~ %r{https*:\/\/wiki(.*)}) # can be extended for github links in future
+  end
+
+  # checks if a review was submitted in every round
   def response_for_each_round?(response_map)
-    num_responses = 0
+    response_count = 0
     total_num_rounds = @assignment.num_review_rounds
     (1..total_num_rounds).each do |round|
-      num_responses += 1 if Response.exists?(map_id: response_map.id, round: round)
+      response_count += 1 if Response.exists?(map_id: response_map.id, round: round)
     end
-    num_responses == total_num_rounds
+    response_count == total_num_rounds
   end
 
   # checks if a work was submitted within a given round
@@ -83,10 +88,15 @@ module ReviewMappingHelper
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
-      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      subm_created_at = submitted_within_round_over_one(round, assignment_due_dates, submission_due_date, submission)
     end
     !subm_created_at.try(:first).try(:created_at).nil?
+  end
+
+  # checks the last round submission date if there is more than one round
+  private def submitted_within_round_over_one(round, assignment_due_dates, submission_due_date, submission)
+    submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+    submission.where(created_at: submission_due_last_round..submission_due_date)
   end
 
   # returns hyperlink of the assignment that has been submitted on the due date
@@ -106,7 +116,7 @@ module ReviewMappingHelper
   end
 
   # checks if a link was updated since last round submission
-  def link_updated_since_last?(round, due_dates, link_updated_at)
+  def updated_since_last_submission?(round, due_dates, link_updated_at)
     submission_due_date = due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
     submission_due_last_round = due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
     (link_updated_at < submission_due_date) && (link_updated_at > submission_due_last_round)
@@ -125,24 +135,13 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
-
-  # gets the review score awarded based on each round of the review
-
+  # get the review score for a specific team and a specific reviewer
   def get_awarded_review_score(reviewer_id, team_id)
-    # Storing redundantly computed value in num_rounds variable
-    num_rounds = @assignment.num_review_rounds
-    # Setting values of instance variables
-    (1..num_rounds).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
-    # Iterating through list
-    (1..num_rounds).each do |round|
+    round_count = @assignment.num_review_rounds
+
+    (1..round_count).each { |round| instance_variable_set('@score_awarded_round_' + round.to_s, '-----') }
+
+    (1..round_count).each do |round|
       # Changing values of instance variable based on below condition
       if @review_scores[reviewer_id] && @review_scores[reviewer_id][round] && @review_scores[reviewer_id][round][team_id] && @review_scores[reviewer_id][round][team_id] != -1.0
         instance_variable_set('@score_awarded_round_' + round.to_s, @review_scores[reviewer_id][round][team_id].to_s + '%')
@@ -150,39 +149,62 @@ module ReviewMappingHelper
     end
   end
 
-  # gets minimum, maximum and average grade value for all the reviews present
+  # Retrieves the minimum, maximum, and average grade values for the reviews in a given round
   def review_metrics(round, team_id)
-    %i[max min avg].each { |metric| instance_variable_set('@' + metric.to_s, '-----') }
-    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |k| @avg_and_ranges[team_id][round].key? k }
+    # Set default values ('-----') for @max, @min, and @avg instance variables
+    %i[max min avg].each { |metric| instance_variable_set("@#{metric}", '-----') }
+
+    # Check if the metrics for the given team and round exist in @avg_and_ranges
+    if @avg_and_ranges[team_id] && @avg_and_ranges[team_id][round] && %i[max min avg].all? { |metric| @avg_and_ranges[team_id][round].key?(metric) }
+
+      # Assign the metric values (or '-----' if they are nil) to the corresponding instance variables
       %i[max min avg].each do |metric|
-        metric_value = @avg_and_ranges[team_id][round][metric].nil? ? '-----' : @avg_and_ranges[team_id][round][metric].round(0).to_s + '%'
-        instance_variable_set('@' + metric.to_s, metric_value)
+        metric_value = @avg_and_ranges[team_id][round][metric]
+        value_to_set = metric_value.nil? ? '-----' : "#{metric_value.round(0)}%"
+        instance_variable_set("@#{metric}", value_to_set)
       end
     end
   end
 
-  # sorts the reviewers by the average volume of reviews in each round, in descending order
-  def sort_reviewer_by_review_volume_desc
-    @reviewers.each do |r|
-      # get the volume of review comments
-      review_volumes = Response.volume_of_review_comments(@assignment.id, r.id)
-      r.avg_vol_per_round = []
+  # Sorts the reviewers by the average volume of reviews in each round, in descending order
+  def sort_reviewers_by_review_volume_desc
+    collect_reviewers_comment_volume
+    # get the number of review rounds for the assignment
+    @num_review_rounds = @assignment.num_review_rounds.to_f.to_i
+    average_comment_volume_overall
+    average_comment_volume_round
+    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
+  end
+
+  # Get the volume of the reviewers comments
+  private def collect_reviewers_comment_volume
+    @reviewers.each do |reviewer|
+      # Get the volume of review comments for the given assignment and reviewer
+      review_volumes = Response.volume_of_review_comments(@assignment.id, reviewer.id)
+      reviewer.avg_vol_per_round = []
+      # Loop through the review comment volumes for each round and set the overall average volume to the first round's review volume.
       review_volumes.each_index do |i|
         if i.zero?
-          r.overall_avg_vol = review_volumes[0]
+          reviewer.overall_avg_vol = review_volumes[0]
         else
-          r.avg_vol_per_round.push(review_volumes[i])
+          # Store the review volumes for the remaining rounds
+          reviewer.avg_vol_per_round.push(review_volumes[i])
         end
       end
     end
-    # get the number of review rounds for the assignment
-    @num_rounds = @assignment.num_review_rounds.to_f.to_i
-    @all_reviewers_avg_vol_per_round = []
-    @all_reviewers_overall_avg_vol = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
-    @num_rounds.times do |round|
-      @all_reviewers_avg_vol_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
+  end
+
+  # Calculate the overall average review volume across all reviewers
+  private def average_comment_volume_overall
+    @all_reviewers_overall_avg_volume = @reviewers.inject(0) { |sum, r| sum + r.overall_avg_vol } / (@reviewers.blank? ? 1 : @reviewers.length)
+  end
+
+  # Get average comment volume across all reviewers per round
+  private def average_comment_volume_round
+    @all_reviewers_avg_volume_per_round = []
+    @num_review_rounds.times do |round|
+      @all_reviewers_avg_volume_per_round.push(@reviewers.inject(0) { |sum, r| sum + r.avg_vol_per_round[round] } / (@reviewers.blank? ? 1 : @reviewers.length))
     end
-    @reviewers.sort! { |r1, r2| r2.overall_avg_vol <=> r1.overall_avg_vol }
   end
 
   # moves data of reviews in each round from a current round
@@ -192,124 +214,93 @@ module ReviewMappingHelper
     reviewer_data = []
     all_reviewers_data = []
 
-    # display avg volume for all reviewers per round
-    @num_rounds.times do |rnd|
-      next unless @all_reviewers_avg_vol_per_round[rnd] > 0
-
+    # Iterate through each round and collect data if the volume for all reviewers is greater than 0
+    @num_review_rounds.times do |rnd|
+      avg_volume_all_reviewers = @all_reviewers_avg_volume_per_round[rnd]
+      # Skip rounds with no data for all reviewers
+      next unless avg_volume_all_reviewers > 0
       round += 1
       labels.push round
       reviewer_data.push reviewer.avg_vol_per_round[rnd]
-      all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
+      all_reviewers_data.push avg_volume_all_reviewers
     end
 
+    # Add 'Total' label and overall averages at the end
     labels.push 'Total'
     reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
+    all_reviewers_data.push @all_reviewers_overall_avg_volume
     [labels, reviewer_data, all_reviewers_data]
   end
 
-  # The data of all the reviews is displayed in the form of a bar chart
+  # Generates the bar chart displaying reviewer volume metrics
   def display_volume_metric_chart(reviewer)
     labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: 'bar-y-axis1',
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: 'bar-y-axis2',
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
-    }
+    data = chart_data(labels, reviewer_data, all_reviewers_data)
+    options = chart_options
     bar_chart data, options
   end
 
-  # E2082 Generate chart for review tagging time intervals
+  # Generates a line chart displaying time intervals for review tagging
   def display_tagging_interval_chart(intervals)
-    # if someone did not do any tagging in 30 seconds, then ignore this interval
-    threshold = 30
-    intervals = intervals.select { |v| v < threshold }
-    unless intervals.empty?
-      interval_mean = intervals.reduce(:+) / intervals.size.to_f
-    end
-    # build the parameters for the chart
-    data = {
-      labels: [*1..intervals.length],
+    intervals = filter_intervals(intervals)
+    return if intervals.empty? # Skip chart generation if there are no valid intervals
+
+    interval_mean = calculate_mean(intervals)
+    data = chart_data(intervals, interval_mean)
+    options = chart_options
+
+    line_chart data, options
+  end
+
+  # Filters out intervals exceeding the threshold time
+  def filter_intervals(intervals, threshold = 30)
+    intervals.select { |interval| interval < threshold }
+  end
+
+  # Calculates the mean of the intervals
+  def calculate_mean(intervals)
+    intervals.reduce(:+) / intervals.size.to_f
+  end
+
+  # Prepares the data for the chart, including intervals and mean if applicable
+  def chart_data(intervals, interval_mean)
+    {
+      labels: (1..intervals.length).to_a, # Labels each interval sequentially
       datasets: [
         {
           backgroundColor: 'rgba(255,99,132,0.8)',
           data: intervals,
           label: 'time intervals'
         },
-        unless intervals.empty?
-          {
-            data: Array.new(intervals.length, interval_mean),
-            label: 'Mean time spent'
-          }
-        end
+        {
+          data: Array.new(intervals.length, interval_mean),
+          label: 'Mean time spent'
+        }
       ]
     }
-    options = {
+  end
+
+  # Configures chart display options, including axis settings
+  def chart_options
+    {
       width: '200',
       height: '125',
       scales: {
-        yAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true
+        yAxes: [
+          {
+            stacked: false,
+            ticks: {
+              beginAtZero: true
+            }
           }
-        }],
-        xAxes: [{
-          stacked: false
-        }]
+        ],
+        xAxes: [
+          {
+            stacked: false
+          }
+        ]
       }
     }
-    line_chart data, options
   end
 
   # Calculate mean, min, max, variance, and stand deviation for tagging intervals
@@ -345,17 +336,35 @@ module ReviewMappingHelper
     html.html_safe
   end
 
-  # Zhewei - 2016-10-20
-  # This is for Dr.Kidd's assignment (806)
-  # She wanted to quickly see if students pasted in a link (in the text field at the end of the rubric) without opening each review
-  # Since we do not have hyperlink question type, we hacked this requirement
-  # Maybe later we can create a hyperlink question type to deal with this situation.
+  # Lists the hyperlink submission in peer review comments for a specific response and question.
+  # This is designed for assignments where instructors want to quickly check if students pasted a link.
   def list_hyperlink_submission(response_map_id, question_id)
-    assignment = Assignment.find(@id)
-    curr_round = assignment.try(:num_review_rounds)
-    curr_response = Response.where(map_id: response_map_id, round: curr_round).first
-    answer_with_link = Answer.where(response_id: curr_response.id, question_id: question_id).first if curr_response
-    comments = answer_with_link.try(:comments)
+    assignment = fetch_assignment
+    current_round = fetch_current_round(assignment)
+
+    comments = fetch_hyperlink_comment(response_map_id, question_id, current_round)
+    generate_hyperlink_html(comments)
+  end
+
+  # Fetches the assignment based on the instance variable @id
+  def fetch_assignment
+    Assignment.find(@id)
+  end
+
+  # Retrieves the current review round number, if available
+  def fetch_current_round(assignment)
+    assignment.try(:num_review_rounds)
+  end
+
+  # Fetches the hyperlink comment from the response and answer records
+  def fetch_hyperlink_comment(response_map_id, question_id, current_round)
+    response = Response.where(map_id: response_map_id, round: current_round).first
+    answer = Answer.where(response_id: response.id, question_id: question_id).first if response
+    answer.try(:comments)
+  end
+
+  # Generates HTML for displaying the hyperlink if it exists and starts with 'http'
+  def generate_hyperlink_html(comments)
     html = ''
     html += display_hyperlink_in_peer_review_question(comments) if comments.present? && comments.start_with?('http')
     html.html_safe
@@ -396,18 +405,15 @@ module ReviewMappingHelper
     @rspan = @review_responses.length
   end
 
-  #
-  # for calibration report
-  #
+  # Determines the CSS class for a calibration report based on the difference
+  # between a student's answer and the instructor's answer.
+  # A smaller difference indicates a closer match to the instructor's answer.
   def get_css_style_for_calibration_report(diff)
-    # diff - difference between stu's answer and instructor's answer
-    dict = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
-    css_class = if dict.key?(diff.abs)
-                  dict[diff.abs]
-                else
-                  'c1'
-                end
-    css_class
+    # CSS class mapping based on the absolute difference value
+    css_class_mapping = { 0 => 'c5', 1 => 'c4', 2 => 'c3', 3 => 'c2' }
+
+    # Return the CSS class based on the difference, defaulting to 'c1' for larger differences
+    css_class_mapping.fetch(diff.abs, 'c1')
   end
 
   class ReviewStrategy

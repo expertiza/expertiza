@@ -275,8 +275,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(check_submitetd).to eq(true)
+      check_submitted = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitted).to eq(true)
     end
 
     # for two round, both of the submissions are late
@@ -293,8 +293,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(check_submitetd).to eq(false)
+      check_submitted = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitted).to eq(false)
     end
 
     # for two round, only the second submission is on time
@@ -314,8 +314,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(check_submitetd).to eq(true)
+      check_submitted = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitted).to eq(true)
     end
 
     # for two round, only the first submission is on time
@@ -333,8 +333,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      check_submitetd = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
-      expect(check_submitetd).to eq(false)
+      check_submitted = submitted_within_round?(@round, @response_map, assignment_created, assignment_due_dates)
+      expect(check_submitted).to eq(false)
     end
   end
 
@@ -456,7 +456,7 @@ describe ReviewMappingHelper, type: :helper do
   end
 
   # the function will sort reviewer based on the comment length
-  describe 'sort_reviewer_by_review_volume_desc' do
+  describe 'sort_reviewers_by_review_volume_desc' do
     before(:each) do
       @assignment = create(:assignment, name: 'assignment', created_at: DateTime.now.in_time_zone - 13.day)
       @reviewee = create(:assignment_team, assignment: @assignment)
@@ -478,7 +478,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_3, @reviewer_1]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewers_by_review_volume_desc
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -490,7 +490,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_2, @reviewer_1, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewers_by_review_volume_desc
       expect(@reviewers).to eq(@reviewers_for_test)
     end
 
@@ -502,7 +502,7 @@ describe ReviewMappingHelper, type: :helper do
       @reviewers = Array[@reviewer_1, @reviewer_2, @reviewer_3]
       @reviewers_for_test = Array[@reviewer_1, @reviewer_2, @reviewer_3]
 
-      sort_reviewer_by_review_volume_desc
+      sort_reviewers_by_review_volume_desc
       expect(@reviewers).to eq(@reviewers_for_test)
     end
   end
@@ -652,7 +652,7 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  describe 'check_submission_state' do
+  describe 'get_submission_state' do
     before(:each) do
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
       @reviewer = create(:participant, review_grade: nil)
@@ -672,9 +672,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
-      expect(resp_color).to eq(['green'])
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
+      expect(resp_color).to eq('green')
     end
 
     it 'should return green color if the submission link is not present' do
@@ -688,9 +687,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
-      expect(resp_color).to eq(['green'])
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
+      expect(resp_color).to eq('green')
     end
 
     it 'should return green color if the assignment was not submitted within the round' do
@@ -705,9 +703,8 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
-      expect(resp_color).to eq(['green'])
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
+      expect(resp_color).to eq('green')
     end
 
     xit 'should return purple color if the assignment was submitted within the round' do
@@ -722,8 +719,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
-      color = []
-      resp_color = check_submission_state(@response_map, assignment_created, assignment_due_dates, round, color)
+      resp_color = get_submission_state(@response_map, assignment_created, assignment_due_dates, round)
       expect(resp_color).to eq(['purple'])
     end
   end
@@ -764,8 +760,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # rspec test for link_updated_since_last? method
-  describe 'link_updated_since_last?' do
+  # rspec test for updated_since_last_submission? method
+  describe 'updated_since_last_submission?' do
     before(:each) do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
@@ -788,7 +784,7 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return false if submission link was not updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 1.day
 
-      result = link_updated_since_last?(@round, @due_dates, link_updated_at)
+      result = updated_since_last_submission?(@round, @due_dates, link_updated_at)
       expect(result).to eq(false)
     end
 
@@ -796,13 +792,13 @@ describe ReviewMappingHelper, type: :helper do
     it 'should return true if submission link was updated between the last round and the current one' do
       link_updated_at = DateTime.now.in_time_zone + 7.day
 
-      result = link_updated_since_last?(@round, @due_dates, link_updated_at)
+      result = updated_since_last_submission?(@round, @due_dates, link_updated_at)
       expect(result).to eq(true)
     end
   end
 
   # rspec test for obtain_team_color method
-  describe 'obtain_team_color' do
+  describe 'get_team_color_from_submission' do
     before(:each) do
       # create assignment and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -826,7 +822,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color_from_submission(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -849,7 +845,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color_from_submission(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -865,7 +861,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color_from_submission(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
 
@@ -883,7 +879,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color_from_submission(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
   end

@@ -5,13 +5,13 @@ FactoryBot.define do
 
   factory :markup_style, class: MarkupStyle do
     name 'Duy Test'
-  end 
+  end
 
   factory :lock, class: Lock do
     lockable_id 123
     lockable_type 'Duy lockable test'
     user_id 1234
-  end 
+  end
 
   factory :review_bid, class: ReviewBid do
     priority 2

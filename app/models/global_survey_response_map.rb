@@ -7,10 +7,6 @@ class GlobalSurveyResponseMap < SurveyResponseMap
     Questionnaire.find_by(id: reviewed_object_id)
   end
 
-  def contributor
-    nil
-  end
-
   def survey_parent
     questionnaire
   end

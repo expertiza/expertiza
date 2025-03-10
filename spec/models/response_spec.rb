@@ -1,4 +1,4 @@
-describe Response do
+describe Response do  
   let(:user) { build(:student, id: 1, role_id: 1, name: 'no name', fullname: 'no one') }
   let(:user2) { build(:student, id: 2, role_id: 2, name: 'no name2', fullname: 'no one2') }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: user) }
@@ -80,14 +80,25 @@ describe Response do
   end
 
   describe '#aggregate_questionnaire_score' do
-    it 'computes the total score of a review' do
-      question2 = double('ScoredQuestion', weight: 2)
-      allow(Question).to receive(:find).with(1).and_return(question2)
-      allow(question2).to receive(:is_a?).with(ScoredQuestion).and_return(true)
-      allow(question2).to receive(:answer).and_return(answer)
-      expect(response.aggregate_questionnaire_score).to eq(2)
+    it 'computes the total score of a review including late penalty' do
+      question = double('ScoredQuestion', weight: 2)
+      allow(Question).to receive(:find).with(1).and_return(question)
+      allow(question).to receive(:is_a?).with(ScoredQuestion).and_return(true)
+      allow(question).to receive(:weight).and_return(2)
+      allow(answer).to receive(:answer).and_return(3)
+      assignment = double('Assignment', submission_deadline: Time.parse('2025-03-01 12:00:00'))
+      response_map = double('ResponseMap', assignment: assignment)
+      allow(response).to receive(:response_map).and_return(response_map)
+     response.define_singleton_method(:submission_deadline) do
+        response_map.assignment.submission_deadline
+     end
+      allow(LatePolicy).to receive(:calculate_penalty).and_return(0.94) 
+     expect(response.aggregate_questionnaire_score).to be_within(0.01).of(5.94)
     end
   end
+
+
+
 
   describe '#delete' do
     it 'delete the corresponding scores when delete the response' do

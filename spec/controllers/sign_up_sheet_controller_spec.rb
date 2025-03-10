@@ -814,4 +814,55 @@ describe SignUpSheetController do
     end
   end
 
+  before do
+    # Log in as instructor
+    allow(controller).to receive(:current_user).and_return(instructor)
+    teams_user # Ensures the team-user association is created
+    participant # Ensures the participant exists
+    drop_deadline # Ensures the drop deadline exists
+  end
+
+  context 'when a single-person team has not submitted work' do
+    it 'drops the participant successfully' do
+      expect {
+        delete :delete_signup_as_instructor, params: { id: team.id, topic_id: topic.id }
+      }.to change { SignUpTopic.where(id: topic.id).exists? }.from(true).to(false)
+      
+      expect(flash[:success]).to eq('You have successfully dropped the student from the topic!')
+      expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+    end
+  end
+
+  context 'when a single-person team has submitted work' do
+    before do
+      allow_any_instance_of(Team).to receive(:submitted_files).and_return(['file1.txt'])
+    end
+
+    it 'does not allow the participant to be dropped' do
+      expect {
+        delete :delete_signup_as_instructor, params: { id: team.id, topic_id: topic.id }
+      }.not_to change { SignUpTopic.where(id: topic.id).exists? }
+
+      expect(flash[:error]).to eq('The student has already submitted their work, so you are not allowed to remove them.')
+      expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+    end
+  end
+
+  context 'when the drop deadline has passed' do
+    before do
+      allow_any_instance_of(Assignment).to receive(:due_dates).and_return([drop_deadline.update(due_at: Time.now - 1.day)])
+    end
+
+    it 'does not allow the participant to be dropped' do
+      expect {
+        delete :delete_signup_as_instructor, params: { id: team.id, topic_id: topic.id }
+      }.not_to change { SignUpTopic.where(id: topic.id).exists? }
+
+      expect(flash[:error]).to eq('You cannot drop a student after the drop topic deadline!')
+      expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+    end
+  end
+end
+
+  
 end

@@ -1,46 +1,38 @@
-class ReviewBidsController < ApplicationController
-  require 'json'
-  require 'uri'
-  require 'net/http'
-  require 'rest_client'
+# frozen_string_literal: true
 
-  # action allowed function checks the action allowed based on the user working
+# The `ReviewBidsController` is responsible for managing the review bidding process
+# for assignments. It handles actions related to displaying review options, setting
+# review priorities, and managing reviews after the bidding process is complete.
+class ReviewBidsController < ApplicationController
+  include AuthorizationHelper
+
+  before_action :authorize_participant, only: [:index]
+
+  # Checks the action allowed based on the authenticated user and authorizations
   def action_allowed?
     case params[:action]
-    when 'show', 'set_priority', 'index'
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator',
-       'Student'].include?(current_role_name) &&
-        ((%w[list].include? action_name) ? are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer') : true)
+    when 'show', 'set_priority', 'index', 'list'
+      current_user_has_student_privileges? && current_user_has_review_permissions?
     else
-      ['Instructor',
-       'Teaching Assistant',
-       'Administrator',
-       'Super-Administrator'].include? current_role_name
+      current_user_has_ta_privileges?
     end
   end
 
-  # provides variables for reviewing page located at views/review_bids/others_work.html.erb
+  # Displays the review bid others work page for the current participant
   def index
-    @participant = AssignmentParticipant.find(params[:id])
-    return unless current_user_id?(@participant.user_id)
-
-    @assignment = @participant.assignment
-    @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-
-    # Finding how many reviews have been completed
-    @num_reviews_completed = 0
-    @review_mappings.each do |map|
-      @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
+    @assignment = participant_service.assignment
+    unless @assignment.is_a?(Assignment)
+      flash[:error] = 'Assignment not found.'
+      redirect_back fallback_location: root_path && return
     end
 
-    # render view for completing reviews after review bidding has been completed
+    @review_mappings = review_service.review_mappings
+    @num_reviews_completed = review_service.review_counts[:completed]
+
     render 'sign_up_sheet/review_bids_others_work'
   end
 
-  # provides variables for review bidding page
+  # Displays the review bidding page for the current participant
   def show
     @participant = AssignmentParticipant.find(params[:id].to_i)
     @assignment = @participant.assignment
@@ -68,54 +60,181 @@ class ReviewBidsController < ApplicationController
     render 'sign_up_sheet/review_bids_show'
   end
 
-  # function that assigns and updates priorities for review bids
+  # Assigns and updates priorities for review bids
   def set_priority
-    if params[:topic].nil?
-      ReviewBid.where(participant_id: params[:id]).destroy_all
-    else
-      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = ReviewBid.where(participant_id: params[:id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
-      signed_up_topics -= params[:topic].map(&:to_i)
-      signed_up_topics.each do |topic|
-        ReviewBid.where(signuptopic_id: topic, participant_id: params[:id]).destroy_all
+    participant_id = params[:participant_id].to_i
+    selected_topic_ids = params[:topic]&.map(&:to_i) || []
+    assignment_id = params[:assignment_id].to_i
+
+    # Redirects with an error message if the user is not authorized to modify bids.
+    unless current_user_can_modify_bids?(participant_id)
+      flash[:error] = 'You are not authorized to modify these bids.'
+      respond_to do |format|
+        format.html { redirect_back fallback_location: root_path }
+        format.json { render json: { status: 'unauthorized' }, status: :unauthorized }
       end
-      params[:topic].each_with_index do |topic_id, index|
-        bid_existence = ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id])
-        if bid_existence.empty?
-          ReviewBid.create(priority: index + 1, signuptopic_id: topic_id, participant_id: params[:id], assignment_id: assignment_id)
-        else
-          ReviewBid.where(signuptopic_id: topic_id, participant_id: params[:id]).update_all(priority: index + 1)
+      return
+    end
+
+    # Resets existing review bids if we don't have any selected topic ids
+    # If selected topics are available, verifies that assignment is not nil
+    # before updating or creating bids based on selected topics
+    if selected_topic_ids.empty?
+      ReviewBid.where(participant_id: participant_id).destroy_all
+    else
+      assignment = Assignment.find_by(id: assignment_id)
+      if assignment.nil?
+        flash[:error] = "Invalid assignment."
+        respond_to do |format|
+          format.html { redirect_back fallback_location: root_path }
+          format.json { render json: { status: 'invalid_assignment' }, status: :unprocessable_entity }
         end
+        return
+      end
+
+      # Verifies that all selected topic IDs belong to the specified assignment
+      unless SignUpTopic.where(id: selected_topic_ids, assignment_id: assignment_id).count == selected_topic_ids.size
+        flash[:error] = "One or more selected topics are invalid."
+        respond_to do |format|
+          format.html { redirect_back fallback_location: root_path }
+          format.json { render json: { status: 'invalid_topics' }, status: :unprocessable_entity }
+        end
+        return
+      end
+
+      # Removes outdated bids for the participant, deleting any bids not in the selected_topic_ids.
+      ReviewBid.where(participant_id: participant_id).where.not(signuptopic_id: selected_topic_ids).destroy_all
+
+      # Creates or updates review bids for the selected topics with assigned priorities.
+      selected_topic_ids.each_with_index do |topic_id, index|
+        bid = ReviewBid.find_or_initialize_by(signuptopic_id: topic_id, participant_id: participant_id)
+        bid.priority = index + 1
+        bid.assignment_id = assignment_id
+        bid.save!
       end
     end
-    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
+
+    respond_to do |format|
+      format.html { redirect_to action: 'show', assignment_id: assignment_id, id: participant_id, notice: 'Review bids updated successfully.' }
+      format.json { render json: { status: 'success' }, status: :ok }
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    flash[:error] = "Failed to update priorities: #{e.message}"
+    respond_to do |format|
+      format.html { redirect_back fallback_location: root_path }
+      format.json { render json: { status: 'error', message: e.message }, status: :unprocessable_entity }
+    end
   end
 
-  # assign bidding topics to reviewers
+  # Assigns bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
-    assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    assignment = validate_assignment(params[:assignment_id])
+
+    reviewers = validate_reviewers(assignment.id)
+    reviewer_ids = reviewers.map(&:id)
+
+    matched_topics = run_bidding_algorithm
+
+    if matched_topics.blank?
+      flash[:alert] = 'Topics or assignment is missing'
+      redirect_back fallback_location: root_path && return
+    end
+
+    leftover_topics = find_leftover_topics(assignment.id, matched_topics)
+    assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+
+    ReviewBid.new.assign_review_topics(matched_topics)
+    assignment.update!(can_choose_topic_to_review: false)
+
+    flash[:notice] = 'Reviewers were successfully assigned to topics.'
+    redirect_back fallback_location: root_path
+  rescue ArgumentError => e
+    Rails.logger.error "ArgumentError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: e.message
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "ActiveRecord::RecordInvalid: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+  rescue ActiveRecord::ActiveRecordError => e
+    Rails.logger.error "ActiveRecord::ActiveRecordError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers due to database error. Please try again later.'
+  rescue StandardError => e
+    Rails.logger.error "StandardError: #{e.message}"
+    redirect_back fallback_location: root_path, alert: 'Failed to assign reviewers. Please try again later.'
+  end
+
+  private
+
+  # Initialize participant service
+  def participant_service
+    @participant_service ||= ParticipantService.new(params[:id], current_user.id)
+  end
+
+  # Initialize review service
+  def review_service
+    @review_service ||= ReviewService.new(participant_service.participant)
+  end
+
+  # Check for necessary authorizations for list action
+  def current_user_has_review_permissions?
+    return true unless %w[list].include?(action_name)
+
+    are_needed_authorizations_present?(params[:id], 'participant', 'reviewer')
+  end
+
+  def authorize_participant
+    return if participant_service.valid_participant?
+
+    flash[:error] = 'Invalid participant access.'
     redirect_back fallback_location: root_path
   end
 
-  # call webserver for running assigning algorithm
-  # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
-  # webserver returns:
-  # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
-    # begin
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
+  def current_user_can_modify_bids?(participant_id)
+    return true if current_user_has_ta_privileges?
+
+    current_user.assignment_participants.exists?(id: participant_id)
+  end
+
+  def find_leftover_topics(assignment_id, matched_topics)
+    all_topic_ids = SignUpTopic.where(assignment_id: assignment_id).pluck(:id)
+    assigned_topic_ids = matched_topics.map { |match| match[:topic_id] }
+
+    # Calculate leftover topics
+    all_topic_ids - assigned_topic_ids
+  end
+
+  def assign_leftover_topics(reviewer_ids, matched_topics, leftover_topics)
+    return if leftover_topics.blank?
+
+    # Find non-bidders by excluding already matched reviewers
+    non_bidders = reviewer_ids - matched_topics.keys
+
+    # Assign leftover topics to non-bidders in a round-robin fashion
+    non_bidders.each_with_index do |reviewer_id, index|
+      topic_id = leftover_topics[index % leftover_topics.length]
+      ReviewBid.create(priority: 1, signuptopic_id: topic_id, participant_id: reviewer_id)
+    end
+  end
+
+  def validate_assignment(assignment_id)
+    assignment = Assignment.find_by(id: assignment_id.to_i)
+    raise ArgumentError, 'Invalid assignment. Please check and try again.' unless assignment
+
+    assignment
+  end
+
+  def validate_reviewers(assignment_id)
+    reviewers = AssignmentParticipant.where(parent_id: assignment_id)
+    raise ArgumentError, 'No reviewers available for the assignment.' if reviewers.empty?
+
+    reviewers
+  end
+
+  def run_bidding_algorithm
+    review_bid = ReviewBid.new
+    bidding_data = review_bid.bidding_data
+    matched_topics = BiddingAlgorithmService.new(bidding_data).run
+    raise ArgumentError, 'Failed to assign reviewers. Please try again later.' unless matched_topics
+
+    matched_topics
   end
 end

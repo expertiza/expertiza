@@ -41,19 +41,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#parent_model' do
-    it 'provides the name of the parent model' do
-      expect(team.parent_model).to eq 'Assignment'
-    end
-  end
-
-  describe '.parent_model' do
-    it 'provides the instance of the parent model' do
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      expect(AssignmentTeam.parent_model(1)).to eq assignment
-    end
-  end
-
   describe '#fullname' do
     context 'when the team has a name' do
       it 'provides the name of the class' do

@@ -41,8 +41,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.create(reviewee_id: id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
   end
 
-  # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
-  def get_reviewer
+  # If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  def reviewer
     self
   end
 

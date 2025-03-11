@@ -293,6 +293,13 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe '#reviewer' do
+    it 'returns the team itself' do
+      team = AssignmentTeam.new
+      expect(team.reviewer).to eq(team)
+    end
+  end
+
   describe '#has_submissions?' do
     context 'when a team has submitted files' do
       it 'has submissions' do

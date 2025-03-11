@@ -122,13 +122,13 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#topic' do
+  describe '#topic_id' do
     context 'when the team has picked a topic' do
       it 'provides the topic id' do
         assignment = team.assignment
         allow(SignUpTopic).to receive(:find_by).with(assignment: assignment).and_return(topic)
         allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
-        expect(team.topic).to eq(topic.id)
+        expect(team.topic_id).to eq(topic.id)
       end
     end
   end

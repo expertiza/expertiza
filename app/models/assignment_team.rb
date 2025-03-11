@@ -52,9 +52,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', id, reviewer.get_reviewer.id, assignment.id).count > 0
   end
 
-  # Topic picked by the team for the assignment
-  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
-  def topic
+  # Topic id picked by the team for the assignment
+  def topic_id
     SignedUpTeam.find_by(team_id: id, is_waitlisted: 0).try(:topic_id)
   end
 

@@ -86,13 +86,14 @@ describe ReviewMappingController do
         allow(User).to receive(:from_params).with(any_args).and_return(user)
         allow(AssignmentParticipant).to receive(:where).with(user_id: 1, parent_id: 1)
                                                        .and_return([reviewer])
+        allow(controller).to receive(:find_user_by_name).with(name: any_args).and_return(user)
         allow(ReviewResponseMap).to receive_message_chain(:where, :first)
           .with(reviewee_id: '1', reviewer_id: 1).with(no_args).and_return(nil)
         allow(ReviewResponseMap).to receive(:create).with(reviewee_id: '1', reviewer_id: 1, reviewed_object_id: 1).and_return(nil)
         post :add_reviewer, params: @params
         expect(response).to redirect_to '/review_mapping/list_mappings?id=1&msg='
       end
-    end
+    end    
 
     context 'when instructor tries to assign a student their own artifact for reviewing' do
       it 'flashes an error message' do
@@ -707,6 +708,40 @@ describe ReviewMappingController do
         }
         post :start_self_review, params: request_params
         expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
+      end
+    end
+  end
+  
+  describe '#select_metareviewer' do
+    context 'when given a valid response map id' do
+      it 'should assign the response map to @mapping' do
+        allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
+        get :select_metareviewer, params: { id: 1 }
+        expect(assigns(:mapping)).to eq(review_response_map)
+      end
+    end
+
+    context 'when given an invalid response map id' do
+      it 'should raise an error' do
+        expect { get :select_metareviewer, params: { id: 2 } }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
+  describe '#select_reviewer' do
+    before(:each) do
+      allow(AssignmentTeam).to receive(:find).with('1').and_return(team)
+    end
+    
+    context 'when called with a valid contributor_id' do
+      it 'assigns the corresponding AssignmentTeam to @contributor' do
+        get :select_reviewer, params: { contributor_id: 1 }
+        expect(assigns(:contributor)).to eq(team)
+      end
+
+      it 'stores the @contributor in the session' do
+        get :select_reviewer, params: { contributor_id: 1 }
+        expect(session[:contributor]).to eq(team)
       end
     end
   end

@@ -76,6 +76,11 @@ class TeamsController < ApplicationController
       @initial_dropdown_value = @assignment.id
     end
 
+    #need to figure out which participant field means they are a mentor
+    #@mentored_teams = @teams.select do |team|
+    #  team.participants.any? { |participant| participant.authorization == 'mentor' }
+    #end
+
     # Handle AJAX requests for dynamic updates
     if request.xhr? # Check if it's an AJAX request
       render partial: 'teams_table_body', locals: { teams: @teams }

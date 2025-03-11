@@ -1,15 +1,18 @@
 <link rel="stylesheet" href="/team_list_table.css">
+<script src="/javascripts/team_table_updater.js"></script>
+<script src="/javascripts/team_meeting_editor.js"></script>
+
 
 <h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
 
 <!-- Dropdown Menu for Filtering -->
 <%= form_with url: teams_path, method: :get, local: true do %>
   <label for="course_filter">Filter by <%= @team_type %>:</label>
-  <%= select_tag :course_id, options_from_collection_for_select(@dropdown_list, :id, :name, @initial_dropdown_value), prompt: "Select a #{@team_type}", class: 'filter-dropdown' %>
+  <%= select_tag :dropdown_value, options_from_collection_for_select(@dropdown_list, :id, :name, @initial_dropdown_value), prompt: "Select a #{@team_type}", class: 'filter-dropdown' %>
 <% end %>
 
-<!-- Instructor and Admin can see all Teams and Meetings -->
-<% if current_user.role.instructor? || current_user.role.admin? %>
+<!-- Instructor, TAs, and Admin can see all Teams and Meetings -->
+<% if current_user.role.instructor? || current_user.role.admin? || current_user.role.teaching_assistant? %>
   <div class="teams-list-table">
     <table>
       <thead>
@@ -45,10 +48,19 @@
           <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
           <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
 
+
+          <!-- Meeting Dates -->
           <!-- Meeting Dates -->
           <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
           <% 3.times do |i| %>
-            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
+            <td style="padding: 10px;">
+    <span style="white-space: nowrap;">
+      <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
+        <%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %>
+      </span>
+      <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
+    </span>
+            </td>
           <% end %>
 
           <!-- Actions Column -->
@@ -121,41 +133,11 @@
 <% end %>
 <%= render partial: 'team' %>
 
-<!--SCRIPT TO LISTEN TO DROPDOWN AND CHANGE HEADER WHEN ANOTHER COURSE IS SELECTED -->
+<!--Setting the team type variable for use in the table updater js function -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const courseSelect = document.querySelector('.filter-dropdown');
-        const headerElement = document.querySelector('#course-header');
-        const tableBody = document.querySelector('tbody'); // Ensure this targets only the table body
-
-        courseSelect.addEventListener('change', function () {
-            const selectedId = courseSelect.value;
-            const selectedName = courseSelect.options[courseSelect.selectedIndex].text;
-
-            // Update the header with the selected name
-            headerElement.textContent = `Teams for ${selectedName}`;
-
-            // Fetch new table data via AJAX
-            const url = `/teams/list?type=<%= @team_type %>&id=${selectedId}`;
-            fetch(url, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.text();
-                })
-                .then((data) => {
-                    // Replace only the table body content with returned rows (<tr>)
-                    tableBody.innerHTML = data;
-                })
-                .catch((error) => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
-        });
-    });
+    var teamType = '<%= @team_type %>';
 </script>
+
 
 
 

@@ -89,11 +89,6 @@ class AssignmentTeam < Team
     super
   end
 
-  # Get the first member of the team
-  def self.first_member(team_id)
-    find_by(id: team_id).try(:participants).try(:first)
-  end
-
   # Return the files residing in the directory of team submissions
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)

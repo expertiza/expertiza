@@ -33,15 +33,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.first_member' do
-    context 'when team id is present' do
-      it 'get first member of the  team' do
-        allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
-        expect(AssignmentTeam.first_member(team.id)).to eq(participant1)
-      end
-    end
-  end
-
   describe '#review_map_type' do
     it 'provides the review map type' do
       expect(team.review_map_type).to eq 'ReviewResponseMap'

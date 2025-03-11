@@ -33,15 +33,6 @@ class AssignmentTeam < Team
     participants.include?(participant)
   end
 
-  # Get the parent of this class=>Assignment
-  def parent_model
-    'Assignment'
-  end
-
-  def self.parent_model(id)
-    Assignment.find(id)
-  end
-
   # Get the name of the class
   def fullname
     name

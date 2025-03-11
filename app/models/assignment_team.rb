@@ -28,11 +28,6 @@ class AssignmentTeam < Team
     @current_user = current_user
   end
 
-  # Get the name of the class
-  def fullname
-    name
-  end
-
   # Get the review response map
   def review_map_type
     'ReviewResponseMap'

@@ -24,15 +24,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#fullname' do
-    context 'when the team has a name' do
-      it 'provides the name of the class' do
-        team = build(:assignment_team, id: 1, name: 'abcd')
-        expect(team.fullname).to eq 'abcd'
-      end
-    end
-  end
-
   describe '.remove_team_by_id' do
     context 'when a team has an id' do
       it 'delete the team by id' do

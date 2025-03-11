@@ -333,4 +333,9 @@ class Team < ApplicationRecord
   def has_participant?(participant)
     participants.include?(participant)
   end
+
+  # Get team's full name
+  def fullname
+    name
+  end
 end

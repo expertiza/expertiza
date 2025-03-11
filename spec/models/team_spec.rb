@@ -383,4 +383,13 @@ describe Team do
       end
     end
   end
+
+  describe '#fullname' do
+    context 'when the team has a name' do
+      it 'provides the name of the class' do
+        team = build(:assignment_team, id: 1, name: 'abcd')
+        expect(team.fullname).to eq 'abcd'
+      end
+    end
+  end
 end

@@ -43,11 +43,6 @@ class AssignmentTeam < Team
     'ReviewResponseMap'
   end
 
-  # Prototype method to implement prototype pattern
-  def self.prototype
-    AssignmentTeam.new
-  end
-
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
   def assign_reviewer(reviewer)
     assignment = Assignment.find(parent_id)
@@ -125,13 +120,13 @@ class AssignmentTeam < Team
       raise ImportError, 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
 
-    @assignment_team = prototype
+    @assignment_team = AssignmentTeam.new
     Team.import(row, assignment_id, options, @assignment_team)
   end
 
   # Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
-    @assignment_team = prototype
+    @assignment_team = AssignmentTeam.new
     Team.export(csv, parent_id, options, @assignment_team)
   end
 

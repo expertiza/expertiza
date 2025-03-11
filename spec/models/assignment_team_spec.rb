@@ -74,13 +74,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.prototype' do
-    it 'provides the instance of the AssignmentTeam' do
-      expect(AssignmentTeam).to receive(:new).with(no_args)
-      AssignmentTeam.prototype
-    end
-  end
-
   describe '#reviewed_by?' do
     context 'when a team has a reviewer' do
       it 'has been reviewed by this reviewer' do

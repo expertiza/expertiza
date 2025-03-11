@@ -28,11 +28,6 @@ class AssignmentTeam < Team
     @current_user = current_user
   end
 
-  # Whether this team includes a given participant or not
-  def includes?(participant)
-    participants.include?(participant)
-  end
-
   # Get the name of the class
   def fullname
     name

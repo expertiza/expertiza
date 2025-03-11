@@ -24,23 +24,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#includes?' do
-    context 'when an assignment team has one participant' do
-      it 'includes one participant' do
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        expect(team.includes?(participant1)).to eq true
-      end
-    end
-
-    context 'when an assignment team has no users' do
-      it 'includes no participants' do
-        allow(team).to receive(:users).with(no_args).and_return([])
-        expect(team.includes?(participant1)).to eq false
-      end
-    end
-  end
-
   describe '#fullname' do
     context 'when the team has a name' do
       it 'provides the name of the class' do

@@ -328,4 +328,9 @@ class Team < ApplicationRecord
              .select('teams.id as t_id')
              .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
   end
+
+  # Whether a team includes a given participant or not
+  def has_participant?(participant)
+    participants.include?(participant)
+  end
 end

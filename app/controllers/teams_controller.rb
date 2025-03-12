@@ -60,9 +60,7 @@ class TeamsController < ApplicationController
       #get teams associated with the course
       @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
       #set the number of meetings columns
-      @num_of_meeting_cols = @teams.map do |team|
-        Meeting.where(team_id: team.id).count
-      end.max + 1
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
       #set the search type of the view to the courses
       @dropdown_list = Course.joins(assignments: :teams).distinct
       #set initial value of dropdown
@@ -75,6 +73,8 @@ class TeamsController < ApplicationController
       @course = Course.find_by(id:@assignment.course_id)
       #get the inital list of teams from the url link request
       @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
+      #set the number of meetings columns
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
       #set the search type of the view to the courses
       @dropdown_list = Assignment.where(course_id: @course.id)
       #set initial value of dropdown
@@ -285,9 +285,8 @@ class TeamsController < ApplicationController
       #get teams associated with the course
       @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
       #set the number of meetings columns
-      @num_of_meeting_cols = @teams.map do |team|
-        Meeting.where(team_id: team.id).count
-      end.max + 1
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+
     else
       #if the type is not course, it is assignment
       # get the assignment from its ID
@@ -295,9 +294,7 @@ class TeamsController < ApplicationController
       #get the inital list of teams from the url link request
       @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
       #set the number of meetings columns
-      @num_of_meeting_cols = @teams.map do |team|
-        Meeting.where(team_id: team.id).count
-      end.max + 1
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
     end
     render partial: 'teams_table_header', locals: { teams: @teams }
   end

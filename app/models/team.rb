@@ -88,6 +88,24 @@ class Team < ApplicationRecord
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+
+      #Add a Mailer function for the addition of team members
+      assignment_name = _assignment_id ? Assignment.find(_assignment_id).name.to_s : ''
+
+        #User is a mentor, not a participant
+      if MentorManagement.user_a_mentor?(user) && !user.is_a?(Participant)
+        MailerHelper.send_mail_about_team_confirmation(user, '[Expertiza] Added to a Team!', 'mentor_added_to_team', name.to_s, assignment_name).deliver
+
+        #User is a participant, not a mentor
+      elsif !MentorManagement.user_a_mentor?(user) && user.is_a?(Participant)
+        MailerHelper.send_mail_about_team_confirmation(user, '[Expertiza] Added to a Team!', 'user_added_to_team', name.to_s, assignment_name).deliver
+
+        #User is both a mentor and a participant
+      elsif MentorManagement.user_a_mentor?(user) && user.is_a?(Participant)
+        MailerHelper.send_mail_about_team_confirmation(user, '[Expertiza] Added to a Team!', 'dual_role_added_to_team', name.to_s, assignment_name).deliver
+
+      end
+
     end
     can_add_member
   end

@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  helper_method :ordinalize
 
   autocomplete :user, :name
 
@@ -58,8 +59,12 @@ class TeamsController < ApplicationController
       @course = Course.find_by(id: params[:id])
       #get teams associated with the course
       @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+      #set the number of meetings columns
+      @num_of_meeting_cols = @teams.map do |team|
+        Meeting.where(team_id: team.id).count
+      end.max + 1
       #set the search type of the view to the courses
-      @dropdown_list = Course.all
+      @dropdown_list = Course.joins(assignments: :teams).distinct
       #set initial value of dropdown
       @initial_dropdown_value = @course.id
     else
@@ -267,4 +272,46 @@ class TeamsController < ApplicationController
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end
+
+
+  def headers
+    # Fetch all team_type
+    @team_type = params[:type]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      # Get the course based on the passed course ID (if present)
+      @course = Course.find_by(id: params[:id])
+      #get teams associated with the course
+      @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+      #set the number of meetings columns
+      @num_of_meeting_cols = @teams.map do |team|
+        Meeting.where(team_id: team.id).count
+      end.max + 1
+    else
+      #if the type is not course, it is assignment
+      # get the assignment from its ID
+      @assignment = Assignment.find_by(id: params[:id])
+      #get the inital list of teams from the url link request
+      @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
+      #set the number of meetings columns
+      @num_of_meeting_cols = @teams.map do |team|
+        Meeting.where(team_id: team.id).count
+      end.max + 1
+    end
+    render partial: 'teams_table_header', locals: { teams: @teams }
+  end
+
+
+  private
+
+  def ordinalize(n)
+    case n
+    when 1 then "#{n}st"
+    when 2 then "#{n}nd"
+    when 3 then "#{n}rd"
+    else "#{n}th"
+    end
+  end
+
 end

@@ -1,6 +1,9 @@
 <link rel="stylesheet" href="/team_list_table.css">
 <script src="/javascripts/team_table_updater.js"></script>
 <script src="/javascripts/team_meeting_editor.js"></script>
+<script src="/javascripts/team_table_header_updater.js"></script>
+
+
 
 
 <h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
@@ -22,9 +25,9 @@
         <th class="head">Members' User IDs</th>
         <th class="head">Emails Concatenated</th>
         <th class="head">Mentor</th>
-        <th class="head">1st Mtg</th>
-        <th class="head">2nd Mtg</th>
-        <th class="head">3rd Mtg</th>
+        <% @num_of_meeting_cols.times do |i| %>
+          <th class="head"><%= ordinalize(i + 1) %> Mtg</th>
+        <% end %>
         <th class="head">Actions</th> <!-- New Actions Column -->
       </tr>
       </thead>
@@ -50,9 +53,8 @@
 
 
           <!-- Meeting Dates -->
-          <!-- Meeting Dates -->
           <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
-          <% 3.times do |i| %>
+          <% @num_of_meeting_cols.times do |i| %>
             <td style="padding: 10px;">
     <span style="white-space: nowrap;">
       <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">

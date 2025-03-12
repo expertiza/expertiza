@@ -1,3 +1,4 @@
+
 <tbody>
 <% teams.each_with_index do |team, index| %>
   <tr>
@@ -19,7 +20,7 @@
 
     <!-- Meeting Dates -->
     <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
-    <% 3.times do |i| %>
+    <% @num_of_meeting_cols.times do |i| %>
       <td style="padding: 10px;">
     <span style="white-space: nowrap;">
       <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">

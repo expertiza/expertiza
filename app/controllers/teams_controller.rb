@@ -73,6 +73,8 @@ class TeamsController < ApplicationController
       end
       #set initial value of dropdown
       @initial_dropdown_value = @course.id
+      #set page header
+      @page_header = "Teams for #{@course.name}"
     else
       #if the type is not course, it is assignment
       # get the assignment from its ID
@@ -88,13 +90,11 @@ class TeamsController < ApplicationController
         @num_of_meeting_cols = 1
       end
       #set the search type of the view to the courses
-      if current_user.role.instructor?
-        @dropdown_list = Assignment.where(instructor_id: current_user.id)
-      else
-        @dropdown_list = Assignment.where(instructor_id: current_user.parent_id)
-      end
+      @dropdown_list = Assignment.where(course_id: @course.id)
       #set initial value of dropdown
       @initial_dropdown_value = @assignment.id
+      #set page header
+      @page_header = "Teams for #{@course.name} - #{@assignment.name}"
     end
 
     #need to figure out which participant field means they are a mentor
@@ -320,6 +320,27 @@ class TeamsController < ApplicationController
       end
     end
     render partial: 'teams_table_header', locals: { teams: @teams }
+  end
+
+  def update_header
+    @team_type = params[:type]
+    if @team_type == "Course"
+      # Get the course based on the passed course ID (if present)
+      @course = Course.find_by(id: params[:id])
+      #set page header
+      @page_header = "Teams for #{@course.name}"
+    else
+      #if the type is not course, it is assignment
+      # get the assignment from its ID
+      @assignment = Assignment.find_by(id: params[:id])
+      #get the course of the assignment
+      @course = Course.find_by(id:@assignment.course_id)
+      #set headers
+      @page_header = "Teams for #{@course.name} - #{@assignment.name}"
+    end
+
+    # Render the header text as JSON
+    render json: { header: @page_header }
   end
 
 

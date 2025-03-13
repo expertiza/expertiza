@@ -3,10 +3,7 @@
 <script src="/javascripts/team_meeting_editor.js"></script>
 <script src="/javascripts/team_table_header_updater.js"></script>
 
-
-
-
-<h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
+<h1 id="course-header"><%= @page_header %></h1>
 
 <!-- Dropdown Menu for Filtering -->
 <%= form_with url: teams_path, method: :get, local: true do %>

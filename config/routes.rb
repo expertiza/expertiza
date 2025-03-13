@@ -672,5 +672,7 @@ Expertiza::Application.routes.draw do
 
   resources :meeting, only: %i[index edit]
   get '/teams/list/headers', to: 'teams#headers', as: 'team_headers'
+  get '/teams/update_header', to: 'teams#update_header'
+
 
 end

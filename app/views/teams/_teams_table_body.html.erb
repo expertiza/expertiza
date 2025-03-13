@@ -1,0 +1,49 @@
+
+<tbody>
+<% if @teams.count() == 0 %>
+  <tr>
+    <td colspan="9">No teams found.</td>
+  </tr>
+<% else %>
+  <% @teams.each_with_index do |team, index| %>
+    <tr>
+      <!-- Team Name -->
+      <td><%= team.name %></td>
+
+      <!-- Members' Names -->
+      <td><%= team.participants.map(&:name).join(', ') %></td>
+
+      <!-- Members' User IDs -->
+      <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+      <!-- Emails Concatenated -->
+      <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+      <!-- Mentor Name -->
+      <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+      <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+      <!-- Meeting Dates -->
+      <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+      <% @num_of_meeting_cols.times do |i| %>
+        <td style="padding: 10px;">
+      <span style="white-space: nowrap;">
+        <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
+          <%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %>
+        </span>
+        <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
+      </span>
+        </td>
+      <% end %>
+
+      <!-- Actions Column -->
+      <td width="15%" align="center" class="actions">
+        <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+        <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+        <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+      </td>
+    </tr>
+  <% end %>
+<% end %>
+</tbody>
+

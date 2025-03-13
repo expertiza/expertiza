@@ -1,0 +1,63 @@
+/* General table styling */
+.teams-list-table table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    margin-top: 20px;
+}
+
+/* Header styling */
+.teams-list-table th {
+    background-color: #ba2a2a; /* Green header */
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #ddd; /* Add border to header cells */
+}
+
+/* Row styling with alternating colors */
+.teams-list-table tbody tr:nth-child(even) {
+    background-color: #d3d3d3; /* Light gray for even rows */
+}
+
+.teams-list-table tbody tr:nth-child(odd) {
+    background-color: #ffffff; /* White for odd rows */
+}
+
+/* Hover effect for rows */
+.teams-list-table tbody tr:hover {
+    background-color: #f1f1f1; /* Light gray on hover */
+}
+
+/* Cell styling */
+.teams-list-table td {
+    padding: 10px;
+    border: 1px solid #ddd; /* Add border to table cells */
+}
+
+/* Add spacing between rows and columns */
+.teams-list-table th,
+.teams-list-table td {
+    text-align: left;
+}
+
+/* Make the Actions column narrower */
+.teams-list-table td.actions {
+    width: 5%; /* Adjust width as needed */
+    text-align: center;
+}
+
+.teams-list-table th.actions {
+    width: 10%; /* Ensure header aligns with the column */
+}
+/* filter style */
+.filter-dropdown {
+    margin-bottom: 20px;
+    padding: 5px;
+}
+
+.filter-button {
+    margin-left: 10px;
+    padding: 5px;
+}

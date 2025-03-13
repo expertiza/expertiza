@@ -1,0 +1,14 @@
+<!-- _table_headers.html.erb -->
+<thead>
+<tr>
+  <th class="head">Team Name</th>
+  <th class="head">Members' Names</th>
+  <th class="head">Members' User IDs</th>
+  <th class="head">Emails Concatenated</th>
+  <th class="head">Mentor</th>
+  <% @num_of_meeting_cols.times do |i| %>
+    <th class="head"><%= ordinalize(i + 1) %> Mtg</th>
+  <% end %>
+  <th class="head">Actions</th> <!-- New Actions Column -->
+</tr>
+</thead>

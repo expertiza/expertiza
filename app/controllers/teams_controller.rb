@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  helper_method :ordinalize
 
   autocomplete :user, :name
 
@@ -48,6 +49,75 @@ class TeamsController < ApplicationController
 
   # Displays list of teams for a parent object(either assignment/course)
   def list
+    # Fetch all meetings and courses for the dropdown
+    @meetings = Meeting.all
+    @team_type = params[:type]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      # Get the course based on the passed course ID (if present)
+      @course = Course.find_by(id: params[:id])
+      #get teams associated with the course
+      @teams = @course.present? ? Assignment.where(course_id: @course.id).flat_map(&:teams) : []
+      #set the number of meetings columns
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
+      #set the search type of the view to the courses
+      if current_user.role.instructor?
+        @dropdown_list = Course.where(instructor_id: current_user.id)
+      else
+        @dropdown_list = Course.where(instructor_id: current_user.parent_id)
+      end
+      #set initial value of dropdown
+      @initial_dropdown_value = @course.id
+    else
+      #if the type is not course, it is assignment
+      # get the assignment from its ID
+      @assignment = Assignment.find_by(id: params[:id])
+      #get the course of the assignment
+      @course = Course.find_by(id:@assignment.course_id)
+      #get the inital list of teams from the url link request
+      @teams = @assignment.present? ? Assignment.where(id: @assignment.id).flat_map(&:teams) : []
+      #set the number of meetings columns
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
+      #set the search type of the view to the courses
+      if current_user.role.instructor?
+        @dropdown_list = Assignment.where(instructor_id: current_user.id)
+      else
+        @dropdown_list = Assignment.where(instructor_id: current_user.parent_id)
+      end
+      #set initial value of dropdown
+      @initial_dropdown_value = @assignment.id
+    end
+
+    #need to figure out which participant field means they are a mentor
+    #@mentored_teams = @teams.select do |team|
+    #  team.participants.any? { |participant| participant.authorization == 'mentor' }
+    #end
+
+    if request.xhr? # Check if it's an AJAX request
+      render partial: 'teams_table_body', locals: { teams: @teams }
+    else
+      respond_to do |format|
+        format.html # Render the full page normally for non-AJAX requests
+      end
+    end
+
+    #need to fix logic for course teams... check DB for course->team link
+    #if @course.nil?
+    #  @teams = Team.all
+    #else
+    #  @teams = Team.where(course_id: params[:course_id])
+    #end
+
+    #original code starts here
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
@@ -217,4 +287,51 @@ class TeamsController < ApplicationController
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end
+
+
+  def headers
+    # Fetch all team_type
+    @team_type = params[:type]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      # Get the course based on the passed course ID (if present)
+      @course = Course.find_by(id: params[:id])
+      #get teams associated with the course
+      @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+      #set the number of meetings columns
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
+
+    else
+      #if the type is not course, it is assignment
+      # get the assignment from its ID
+      @assignment = Assignment.find_by(id: params[:id])
+      #get the inital list of teams from the url link request
+      @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
+      #set the number of meetings columns
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
+    end
+    render partial: 'teams_table_header', locals: { teams: @teams }
+  end
+
+
+  private
+
+  def ordinalize(n)
+    case n
+    when 1 then "#{n}st"
+    when 2 then "#{n}nd"
+    when 3 then "#{n}rd"
+    else "#{n}th"
+    end
+  end
+
 end

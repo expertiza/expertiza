@@ -58,11 +58,19 @@ class TeamsController < ApplicationController
       # Get the course based on the passed course ID (if present)
       @course = Course.find_by(id: params[:id])
       #get teams associated with the course
-      @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
+      @teams = @course.present? ? Assignment.where(course_id: @course.id).flat_map(&:teams) : []
       #set the number of meetings columns
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
       #set the search type of the view to the courses
-      @dropdown_list = Course.joins(assignments: :teams).distinct
+      if current_user.role.instructor?
+        @dropdown_list = Course.where(instructor_id: current_user.id)
+      else
+        @dropdown_list = Course.where(instructor_id: current_user.parent_id)
+      end
       #set initial value of dropdown
       @initial_dropdown_value = @course.id
     else
@@ -72,11 +80,19 @@ class TeamsController < ApplicationController
       #get the course of the assignment
       @course = Course.find_by(id:@assignment.course_id)
       #get the inital list of teams from the url link request
-      @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
+      @teams = @assignment.present? ? Assignment.where(id: @assignment.id).flat_map(&:teams) : []
       #set the number of meetings columns
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
       #set the search type of the view to the courses
-      @dropdown_list = Assignment.where(course_id: @course.id)
+      if current_user.role.instructor?
+        @dropdown_list = Assignment.where(instructor_id: current_user.id)
+      else
+        @dropdown_list = Assignment.where(instructor_id: current_user.parent_id)
+      end
       #set initial value of dropdown
       @initial_dropdown_value = @assignment.id
     end
@@ -86,7 +102,6 @@ class TeamsController < ApplicationController
     #  team.participants.any? { |participant| participant.authorization == 'mentor' }
     #end
 
-    # Handle AJAX requests for dynamic updates
     if request.xhr? # Check if it's an AJAX request
       render partial: 'teams_table_body', locals: { teams: @teams }
     else
@@ -285,7 +300,11 @@ class TeamsController < ApplicationController
       #get teams associated with the course
       @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
       #set the number of meetings columns
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
 
     else
       #if the type is not course, it is assignment
@@ -294,7 +313,11 @@ class TeamsController < ApplicationController
       #get the inital list of teams from the url link request
       @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
       #set the number of meetings columns
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      if @teams.count() > 0
+        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        @num_of_meeting_cols = 1
+      end
     end
     render partial: 'teams_table_header', locals: { teams: @teams }
   end

@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.text();
             })
             .then((data) => {
+                console.log('Response data: ', data); // Debugging response data
                 // Update headers directly
                 tableHeaders.innerHTML = data;
             })

@@ -33,18 +33,6 @@
                        :locals => { items: session[:menu].get_menu(0), level: 0 } %>
           <% end %>
 
-          <!-- Add "My Teams" link for instructors and teaching assistants -->
-          <% if session[:user].role.name == 'Instructor' %>
-            <li class="dropdown first-level">
-              <a href="<%= meetings_path %>" title="Teams">My Teams</a>
-            </li>
-            <% elsif session[:user].role.name == 'Teaching Assistant' %>
-            <li class="dropdown first-level">
-              <a href="<%= meeting_path(current_user.id) %>" title="Teams">My Teams</a>
-            </li>
-          <% end %>
-
-
         <% end %>
       </ul>
 

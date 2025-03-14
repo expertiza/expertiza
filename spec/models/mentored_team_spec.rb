@@ -70,4 +70,19 @@ describe 'MentoredTeam' do
       end
     end
   end
+
+  describe '#size' do
+    before do
+      allow(team).to receive(:users).and_return([mentor, user1, user2])  # 3 users, including mentor
+    end
+
+    it 'returns the number of users minus one (excluding the mentor)' do
+      expect(team.size).to eq(2)  # 3 users - 1 mentor = 2
+    end
+
+    it 'never returns a negative number' do
+      allow(team).to receive(:users).and_return([mentor])  # Only mentor in the team
+      expect(team.size).to eq(0)  # Should be at least 0, not -1
+    end
+  end
 end

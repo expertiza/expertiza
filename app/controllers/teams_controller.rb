@@ -52,55 +52,23 @@ class TeamsController < ApplicationController
     # Fetch all meetings and courses for the dropdown
     @meetings = Meeting.all
     @team_type = params[:type]
+    @ID = params[:id]
 
     # If a course is selected, fetch its associated teams
     if @team_type == "Course"
-      # Get the course based on the passed course ID (if present)
-      @course = Course.find_by(id: params[:id])
-      #get teams associated with the course
-      @teams = @course.present? ? Assignment.where(course_id: @course.id).flat_map(&:teams) : []
-      #set the number of meetings columns
-      if @teams.count() > 0
-        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
-      else
-        @num_of_meeting_cols = 1
-      end
-      #set the search type of the view to the courses
-      if current_user.role.instructor?
-        @dropdown_list = Course.where(instructor_id: current_user.id)
-      else
-        @dropdown_list = Course.where(instructor_id: current_user.parent_id)
-      end
-      #set initial value of dropdown
-      @initial_dropdown_value = @course.id
-      #set page header
-      @page_header = "Teams for #{@course.name}"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
     else
       #if the type is not course, it is assignment
-      # get the assignment from its ID
-      @assignment = Assignment.find_by(id: params[:id])
-      #get the course of the assignment
-      @course = Course.find_by(id:@assignment.course_id)
-      #get the inital list of teams from the url link request
-      @teams = @assignment.present? ? Assignment.where(id: @assignment.id).flat_map(&:teams) : []
-      #set the number of meetings columns
-      if @teams.count() > 0
-        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
-      else
-        @num_of_meeting_cols = 1
-      end
-      #set the search type of the view to the courses
-      @dropdown_list = Assignment.where(course_id: @course.id)
-      #set initial value of dropdown
-      @initial_dropdown_value = @assignment.id
-      #set page header
-      @page_header = "Teams for #{@course.name} - #{@assignment.name}"
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
     end
 
-    #need to figure out which participant field means they are a mentor
-    #@mentored_teams = @teams.select do |team|
-    #  team.participants.any? { |participant| participant.authorization == 'mentor' }
-    #end
+    if @teams.count() > 0
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+    else
+      @num_of_meeting_cols = 1
+    end
 
     if request.xhr? # Check if it's an AJAX request
       render partial: 'teams_table_body', locals: { teams: @teams }
@@ -109,13 +77,6 @@ class TeamsController < ApplicationController
         format.html # Render the full page normally for non-AJAX requests
       end
     end
-
-    #need to fix logic for course teams... check DB for course->team link
-    #if @course.nil?
-    #  @teams = Team.all
-    #else
-    #  @teams = Team.where(course_id: params[:course_id])
-    #end
 
     #original code starts here
     init_team_type(params[:type])
@@ -289,58 +250,46 @@ class TeamsController < ApplicationController
   end
 
 
-  def headers
-    # Fetch all team_type
+  def update_table_headers
     @team_type = params[:type]
+    @ID = params[:id]
 
     # If a course is selected, fetch its associated teams
     if @team_type == "Course"
-      # Get the course based on the passed course ID (if present)
-      @course = Course.find_by(id: params[:id])
-      #get teams associated with the course
-      @teams = Assignment.where(course_id: @course.id).flat_map(&:teams)
-      #set the number of meetings columns
-      if @teams.count() > 0
-        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
-      else
-        @num_of_meeting_cols = 1
-      end
-
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
     else
       #if the type is not course, it is assignment
-      # get the assignment from its ID
-      @assignment = Assignment.find_by(id: params[:id])
-      #get the inital list of teams from the url link request
-      @teams = Assignment.where(id: @assignment.id).flat_map(&:teams)
-      #set the number of meetings columns
-      if @teams.count() > 0
-        @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
-      else
-        @num_of_meeting_cols = 1
-      end
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
     end
+
+    if @teams.count() > 0
+      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+    else
+      @num_of_meeting_cols = 1
+    end
+
     render partial: 'teams_table_header', locals: { teams: @teams }
   end
 
-  def update_header
+
+  def increase_table_columns
+    @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
     @team_type = params[:type]
+    @ID = params[:id]
+
+    # If a course is selected, fetch its associated teams
     if @team_type == "Course"
-      # Get the course based on the passed course ID (if present)
-      @course = Course.find_by(id: params[:id])
-      #set page header
-      @page_header = "Teams for #{@course.name}"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
     else
       #if the type is not course, it is assignment
-      # get the assignment from its ID
-      @assignment = Assignment.find_by(id: params[:id])
-      #get the course of the assignment
-      @course = Course.find_by(id:@assignment.course_id)
-      #set headers
-      @page_header = "Teams for #{@course.name} - #{@assignment.name}"
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
     end
 
-    # Render the header text as JSON
-    render json: { header: @page_header }
+    render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
   end
 
 

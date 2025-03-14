@@ -1,22 +1,12 @@
 <link rel="stylesheet" href="/team_list_table.css">
 <script src="/javascripts/team_table_updater.js"></script>
 <script src="/javascripts/team_meeting_editor.js"></script>
-<script src="/javascripts/team_table_header_updater.js"></script>
+<!--<script src="/javascripts/team_table_header_updater.js"></script>-->
 
-<h1 id="course-header"><%= @page_header %></h1>
 
-<!-- Dropdown Menu for Filtering -->
-<%= form_with url: teams_path, method: :get, local: true do %>
-  <label for="course_filter">Filter by <%= @team_type %>:</label>
-  <%= select_tag :dropdown_value,
-                 options_from_collection_for_select(@dropdown_list, :id, :name, @initial_dropdown_value),
-                 prompt: "Select a #{@team_type}",
-                 class: 'filter-dropdown',
-                 id: 'course_filter' %>
-<% end %>
+<h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
 
-<!-- Instructor, TAs, and Admin can see all Teams and Meetings -->
-<% if current_user.role.instructor? || current_user.role.admin? || current_user.role.teaching_assistant? %>
+<!-- Anyone with access to the parent pages has access to this page -->
   <div class="teams-list-table">
     <table>
       <thead>
@@ -33,68 +23,12 @@
       </tr>
       </thead>
 
-      <tbody>
+      <tbody id="teams_table_body">
       <%= render partial: 'teams_table_body', locals: { teams: @teams } %>
       </tbody>
     </table>
     <%#= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
   </div>
-
-<% else %>
-  <div class="teams-list-table">
-    <table>
-      <thead>
-      <tr>
-        <th class="head">Team Name</th>
-        <th class="head">Members' Names</th>
-        <th class="head">Members' User IDs</th>
-        <th class="head">Emails Concatenated</th>
-        <th class="head">Mentor</th>
-        <th class="head">1st Mtg</th>
-        <th class="head">2nd Mtg</th>
-        <th class="head">3rd Mtg</th>
-        <th class="head">Actions</th> <!-- New Actions Column -->
-      </tr>
-      </thead>
-
-      <tbody>
-      <% @mentored_teams.each_with_index do |team, index| %>
-        <tr>
-          <!-- Team Name -->
-          <td><%= team.name %></td>
-
-          <!-- Members' Names -->
-          <td><%= team.participants.map(&:name).join(', ') %></td>
-
-          <!-- Members' User IDs -->
-          <td><%= team.participants.map(&:handle).join(', ') %></td>
-
-          <!-- Emails Concatenated -->
-          <td><%= team.participants.map(&:user_email).join(', ') %></td>
-
-          <!-- Mentor Name -->
-          <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
-          <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
-
-          <!-- Meeting Dates -->
-          <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
-          <% 3.times do |i| %>
-            <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
-          <% end %>
-
-          <!-- Actions Column -->
-          <td width="15%" align="center">
-            <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
-            <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
-            <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
-          </td>
-        </tr>
-      <% end %>
-      </tbody>
-    </table>
-  </div>
-
-<% end %>
 
 <!-- Footer -->
 <%= render partial: 'team' %>
@@ -102,6 +36,8 @@
 <!--Setting the team type variable for use in the table updater js function -->
 <script>
     var teamType = '<%= @team_type %>';
+    var id = '<%= @ID %>';
+    var currColumnNum = <%= @num_of_meeting_cols %>;
 </script>
 
 

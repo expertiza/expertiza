@@ -1,71 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const courseSelect = document.querySelector('.filter-dropdown');
-    const tableBody = document.querySelector('tbody'); // Ensure this targets only the table body
+    const tableBody = document.getElementById('teams_table_body');
 
-    courseSelect.addEventListener('change', function () {
-        const selectedId = courseSelect.value;
+    // Use event delegation: Attach a single click listener to the table body
+    tableBody.addEventListener('click', function (event) {
+        // Check if the clicked element is an "Add Meeting Column" button
+        if (event.target && event.target.closest('.add-meeting-col')) {
+            event.preventDefault(); // Prevent default link behavior
 
-        console.log('Dropdown changed: ', selectedId); // Debugging dropdown value
+            const button = event.target.closest('.add-meeting-col'); // The clicked button
+            const teamType = button.dataset.teamType; // Get teamType from data attribute
+            const id = button.dataset.id; // Get id from data attribute
+            const currColumnNum = parseInt(window.currColumnNum) || 3; // Use global variable or fallback to 3
 
-        // Fetch new table data via AJAX
-        const url = `/teams/list?type=${teamType}&id=${selectedId}`;
-        fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                return response.text();
+            const url = `/teams/increase_table_columns?type=${teamType}&id=${id}&colNum=${currColumnNum}`;
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then((data) => {
-                console.log('Response data: ', data); // Debugging response data
+                .then(response => response.text())
+                .then(html => {
+                    tableBody.innerHTML = html;
 
-                // Clear the table body before appending new content
-                tableBody.innerHTML = ''; // Clear all rows in the table body
-
-                // If no data is returned, render an empty row
-                if (data.trim() === '') {
-                    tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No teams found.</td></tr>';
-                } else {
-                    // Replace only the table body content with returned rows (<tr>)
-                   tableBody.innerHTML = data;
-                }
-
-                // Update the course header dynamically
-                // Assuming you want to display the selected assignment's name
-                // You might need to fetch this name via AJAX or include it in the response
-                // For simplicity, let's assume you have a function to get the assignment name
-                //const assignmentName =
-                    updateHeader(teamType,selectedId); // Implement this function
-                //courseHeader.innerHTML = `Teams for ${assignmentName}`;
-
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+                    // Increment currColumnNum for subsequent clicks
+                    window.currColumnNum++;
+                })
+                .catch(error => console.error('Error:', error));
+        }
     });
-
-    // Example function to get the assignment name (you need to implement this)
-    function updateHeader(teamType, assignmentId) {
-        const url = `/teams/update_header?type=${teamType}&id=${assignmentId}`;
-        fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                console.log('Response data: ', data); // Debugging response data
-                const courseHeader = document.getElementById('course-header');
-                courseHeader.innerHTML = data.header;
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
-    }
-
 });

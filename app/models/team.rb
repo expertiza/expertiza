@@ -121,7 +121,7 @@ class Team < ApplicationRecord
         users.delete(User.find(teams_user.user_id))
       end
     end
-    teams.reject! { |team| team.users.size >= min_team_size }
+    teams.reject! { |team| team.size >= min_team_size }
     # sort teams that still need members by decreasing team size
     teams.sort_by { |team| team.users.size }.reverse!
     # insert users who are not in any team to teams still need team members
@@ -151,7 +151,7 @@ class Team < ApplicationRecord
   # Assigns list of users to list of teams based on minimum team size
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|
-      curr_team_size = team.users.size
+      curr_team_size = size
       member_num_difference = min_team_size - curr_team_size
       while member_num_difference > 0
         team.add_member(users.first)

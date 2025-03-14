@@ -62,7 +62,7 @@ module MailerHelper
     @email.deliver_now
   end
 
-  def self.send_mail_about_team_confirmation(user, subject, partial_name, name, _assignment_name)
+  def self.send_mail_about_team_confirmation(user, subject, partial_name, team_name, _assignment_name)
     Mailer.generic_message(
         to: user.email,
         subject: subject,
@@ -70,7 +70,7 @@ module MailerHelper
           user: user,
           first_name: ApplicationHelper.get_user_first_name(user),
           partial_name: partial_name,
-          name: name,
+          team_name: team_name,
           assignment_name: _assignment_name
         }
       )

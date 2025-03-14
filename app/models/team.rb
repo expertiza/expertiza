@@ -66,7 +66,7 @@ class Team < ApplicationRecord
     return false if parent_id.nil? # course team, does not max_team_size
 
     max_team_members = Assignment.find(parent_id).max_team_size
-    curr_team_size = users.size
+    curr_team_size = size
     curr_team_size >= max_team_members
   end
 
@@ -84,6 +84,11 @@ class Team < ApplicationRecord
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
     end
     can_add_member
+  end
+
+  # Returns the number of users in the team
+  def size
+    users.size
   end
 
   # Copy method to copy this team

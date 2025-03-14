@@ -86,7 +86,7 @@ describe Team do
       end
       context 'when the current team size is bigger than or equal to max team members' do
         it 'returns true' do
-          allow(team).to receive_message_chain(:users, :size).and_return(6)
+          allow(team).to receive(:size).and_return(6)
           expect(team.full?).to be true
         end
       end

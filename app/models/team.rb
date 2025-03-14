@@ -86,20 +86,6 @@ class Team < ApplicationRecord
     can_add_member
   end
 
-  # Define the size of the team
-  def self.size(team_id)
-    #TeamsUser.where(team_id: team_id).count
-    count = 0
-    members = TeamsUser.where(team_id: team_id)
-    members.each do |member|
-      member_name = member.name
-      unless member_name.include?(' (Mentor)') 
-        count = count + 1
-      end
-    end
-    count
-  end
-
   # Copy method to copy this team
   def copy_members(new_team)
     members = TeamsUser.where(team_id: id)

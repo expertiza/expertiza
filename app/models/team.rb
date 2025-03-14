@@ -66,7 +66,7 @@ class Team < ApplicationRecord
     return false if parent_id.nil? # course team, does not max_team_size
 
     max_team_members = Assignment.find(parent_id).max_team_size
-    curr_team_size = Team.size(id)
+    curr_team_size = users.size
     curr_team_size >= max_team_members
   end
 
@@ -130,9 +130,9 @@ class Team < ApplicationRecord
         users.delete(User.find(teams_user.user_id))
       end
     end
-    teams.reject! { |team| Team.size(team.id) >= min_team_size }
+    teams.reject! { |team| team.users.size >= min_team_size }
     # sort teams that still need members by decreasing team size
-    teams.sort_by { |team| Team.size(team.id) }.reverse!
+    teams.sort_by { |team| team.users.size }.reverse!
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
@@ -160,7 +160,7 @@ class Team < ApplicationRecord
   # Assigns list of users to list of teams based on minimum team size
   def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
     teams.each do |team|
-      curr_team_size = Team.size(team.id)
+      curr_team_size = team.users.size
       member_num_difference = min_team_size - curr_team_size
       while member_num_difference > 0
         team.add_member(users.first)

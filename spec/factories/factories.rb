@@ -270,6 +270,17 @@ FactoryBot.define do
     directory_num 0
   end
 
+  factory :mentored_team, class: MentoredTeam do
+    sequence(:name) { |n| "team#{n}" }
+    assignment { Assignment.first || association(:assignment) }
+    type 'MentoredTeam'
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks '---
+- https://www.expertiza.ncsu.edu'
+    directory_num 0
+  end
+
   factory :course_team, class: CourseTeam do
     sequence(:name) { |n| "team#{n}" }
     course { Course.first || association(:course) }

@@ -261,7 +261,7 @@ class Team < ApplicationRecord
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(id)
-    parent = parent_model id # current_task will be either a course object or an assignment object.
+    parent = find_parent_entity id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = create(name: team_name, parent_id: id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.

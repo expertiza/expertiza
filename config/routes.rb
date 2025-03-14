@@ -671,8 +671,8 @@ Expertiza::Application.routes.draw do
   # updated route and added specific controller action upon accessing this route
 
   resources :meeting, only: %i[index edit]
-  get '/teams/list/headers', to: 'teams#update_table_headers', as: 'team_headers'
-  get '/teams/increase_table_columns', to: 'teams#increase_table_columns', as: 'increase_table_columns'
+  get '/teams/increase_table_headers', to: 'teams#increase_table_headers'
+  get '/teams/increase_table_columns', to: 'teams#increase_table_columns'
 
 
 end

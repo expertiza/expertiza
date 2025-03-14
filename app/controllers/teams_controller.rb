@@ -250,27 +250,11 @@ class TeamsController < ApplicationController
   end
 
 
-  def update_table_headers
+  def increase_table_headers
+    @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
     @team_type = params[:type]
     @ID = params[:id]
-
-    # If a course is selected, fetch its associated teams
-    if @team_type == "Course"
-      #get the course teams
-      @teams = Course.get_teams_by_id(@ID)
-    else
-      #if the type is not course, it is assignment
-      # get the assignment teams
-      @teams = Assignment.get_teams_by_id(@ID)
-    end
-
-    if @teams.count() > 0
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
-    else
-      @num_of_meeting_cols = 1
-    end
-
-    render partial: 'teams_table_header', locals: { teams: @teams }
+    render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
   end
 
 

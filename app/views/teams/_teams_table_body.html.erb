@@ -32,7 +32,7 @@
           <%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %>
         </span>
         <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
-        <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
+
       </span>
         </td>
       <% end %>

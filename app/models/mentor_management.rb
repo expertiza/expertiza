@@ -52,7 +52,7 @@ class MentorManagement
     # return if the assignment or team already have a topic
     return if assignment.topics? || !team.topic_id.nil?
 
-    curr_team_size = team.users.size
+    curr_team_size = team.size
     max_team_members = Assignment.find(assignment_id).max_team_size
 
     # RuboCop 'use guard clause instead of nested conditionals'

@@ -123,7 +123,7 @@ class Team < ApplicationRecord
     end
     teams.reject! { |team| team.size >= min_team_size }
     # sort teams that still need members by decreasing team size
-    teams.sort_by { |team| team.users.size }.reverse!
+    teams.sort_by { |team| team.size }.reverse!
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.

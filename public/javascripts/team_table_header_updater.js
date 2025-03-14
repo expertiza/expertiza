@@ -1,28 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const courseSelect = document.querySelector('.filter-dropdown');
-    const tableHeaders = document.querySelector('thead'); // Target only thead
+    const tableHeaders = document.querySelector('thead'); // Target only the <thead>
 
-    courseSelect.addEventListener('change', function () {
-        const selectedId = courseSelect.value;
+    // Use event delegation to listen for clicks on "Add Meeting Column" buttons in the header
+    tableHeaders.addEventListener('click', function (event) {
+        if (event.target && event.target.closest('.add-meeting-col')) {
+            event.preventDefault(); // Prevent default link behavior
 
-        // Fetch new table headers via AJAX
-        const url = `/teams/list/headers?type=${teamType}&id=${selectedId}`;
-        fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.text();
+            const currColumnNum = parseInt(window.currColumnNum) || 3; // Use global variable or fallback to 3
+            const url = `/teams/increase_table_headers?colNum=${currColumnNum}`;
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then((data) => {
-                console.log('Response data: ', data); // Debugging response data
-                // Update headers directly
-                tableHeaders.innerHTML = data;
-            })
-            .catch((error) => {
-                console.error('There was a problem with the fetch operation:', error);
-            });
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then((html) => {
+                    tableHeaders.innerHTML = html; // Update only the <thead> with new content
+                    window.currColumnNum++; // Increment currColumnNum for subsequent clicks
+                })
+                .catch((error) => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
     });
 });

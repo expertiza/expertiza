@@ -87,7 +87,7 @@ class StudentTeamsController < ApplicationController
       #
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find(student.user_id)
-      team.add_member(user, team.parent_id)
+      team.add_member(user)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 

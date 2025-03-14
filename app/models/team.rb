@@ -151,7 +151,7 @@ class Team < ApplicationRecord
         break if next_team_member_index >= users.length
 
         user = users[next_team_member_index]
-        team.add_member(user, parent.id)
+        team.add_member(user)
         next_team_member_index += 1
       end
     end
@@ -163,7 +163,7 @@ class Team < ApplicationRecord
       curr_team_size = Team.size(team.id)
       member_num_difference = min_team_size - curr_team_size
       while member_num_difference > 0
-        team.add_member(users.first, parent.id)
+        team.add_member(users.first)
         users.delete(users.first)
         member_num_difference -= 1
         break if users.empty?

@@ -123,7 +123,7 @@ describe Team do
 
   describe '.size' do
     it 'returns the size of current team' do
-      expect(Team.size(1)).to eq(1)
+      expect(team.size).to eq(1)
     end
   end
 

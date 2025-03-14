@@ -11,7 +11,15 @@ class Team < ApplicationRecord
     joins(:teams_users).where('teams.parent_id = ? AND teams_users.user_id = ?', assignment_id, user_id)
   }
 
+  # Get the parent entity type as a string (ex: "Course" for CourseTeam)
+  def parent_entity_type
+    self.class.name.gsub('Team', '')
+  end
 
+  # Fetch the parent entity instance by ID (ex: Course.find(id) for CourseTeam)
+  def self.find_parent_entity(id)
+    Object.const_get(self.name.gsub('Team', '')).find(id)
+  end
 
   # Get the participants of the given team
   def participants

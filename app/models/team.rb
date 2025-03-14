@@ -105,7 +105,7 @@ class Team < ApplicationRecord
     members = TeamsUser.where(team_id: id)
     members.each do |member|
       t_user = TeamsUser.create(team_id: new_team.id, user_id: member.user_id)
-      parent = Object.const_get(parent_model).find(parent_id)
+      parent = Object.const_get(parent_entity_type).find(parent_id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     end
   end

@@ -24,45 +24,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#includes?' do
-    context 'when an assignment team has one participant' do
-      it 'includes one participant' do
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        expect(team.includes?(participant1)).to eq true
-      end
-    end
-
-    context 'when an assignment team has no users' do
-      it 'includes no participants' do
-        allow(team).to receive(:users).with(no_args).and_return([])
-        expect(team.includes?(participant1)).to eq false
-      end
-    end
-  end
-
-  describe '#parent_model' do
-    it 'provides the name of the parent model' do
-      expect(team.parent_model).to eq 'Assignment'
-    end
-  end
-
-  describe '.parent_model' do
-    it 'provides the instance of the parent model' do
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      expect(AssignmentTeam.parent_model(1)).to eq assignment
-    end
-  end
-
-  describe '#fullname' do
-    context 'when the team has a name' do
-      it 'provides the name of the class' do
-        team = build(:assignment_team, id: 1, name: 'abcd')
-        expect(team.fullname).to eq 'abcd'
-      end
-    end
-  end
-
   describe '.remove_team_by_id' do
     context 'when a team has an id' do
       it 'delete the team by id' do
@@ -72,25 +33,9 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.first_member' do
-    context 'when team id is present' do
-      it 'get first member of the  team' do
-        allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
-        expect(AssignmentTeam.first_member(team.id)).to eq(participant1)
-      end
-    end
-  end
-
   describe '#review_map_type' do
     it 'provides the review map type' do
       expect(team.review_map_type).to eq 'ReviewResponseMap'
-    end
-  end
-
-  describe '.prototype' do
-    it 'provides the instance of the AssignmentTeam' do
-      expect(AssignmentTeam).to receive(:new).with(no_args)
-      AssignmentTeam.prototype
     end
   end
 
@@ -168,13 +113,13 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#topic' do
+  describe '#topic_id' do
     context 'when the team has picked a topic' do
       it 'provides the topic id' do
         assignment = team.assignment
         allow(SignUpTopic).to receive(:find_by).with(assignment: assignment).and_return(topic)
         allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
-        expect(team.topic).to eq(topic.id)
+        expect(team.topic_id).to eq(topic.id)
       end
     end
   end
@@ -336,6 +281,13 @@ describe 'AssignmentTeam' do
           .with(reviewee_id: team.id, reviewer_id: participant1.id, reviewed_object_id: assignment.id, team_reviewing_enabled: false).and_return(review_response_map)
         expect(team.assign_reviewer(participant1)).to eq(review_response_map)
       end
+    end
+  end
+
+  describe '#reviewer' do
+    it 'returns the team itself' do
+      team = AssignmentTeam.new
+      expect(team.reviewer).to eq(team)
     end
   end
 

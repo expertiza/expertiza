@@ -366,4 +366,30 @@ describe Team do
       expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end
+
+  describe '#has_participant?' do
+    context 'when an assignment team has one participant' do
+      it 'includes one participant' do
+        allow(team).to receive(:users).with(no_args).and_return([user])
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user.id, parent_id: team.parent_id).and_return(participant)
+        expect(team.has_participant?(participant)).to eq true
+      end
+    end
+
+    context 'when an assignment team has no users' do
+      it 'includes no participants' do
+        allow(team).to receive(:users).with(no_args).and_return([])
+        expect(team.has_participant?(participant)).to eq false
+      end
+    end
+  end
+
+  describe '#fullname' do
+    context 'when the team has a name' do
+      it 'provides the name of the class' do
+        team = build(:assignment_team, id: 1, name: 'abcd')
+        expect(team.fullname).to eq 'abcd'
+      end
+    end
+  end
 end

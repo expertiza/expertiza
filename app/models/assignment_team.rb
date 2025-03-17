@@ -28,33 +28,9 @@ class AssignmentTeam < Team
     @current_user = current_user
   end
 
-  # Whether this team includes a given participant or not
-  def includes?(participant)
-    participants.include?(participant)
-  end
-
-  # Get the parent of this class=>Assignment
-  def parent_model
-    'Assignment'
-  end
-
-  def self.parent_model(id)
-    Assignment.find(id)
-  end
-
-  # Get the name of the class
-  def fullname
-    name
-  end
-
   # Get the review response map
   def review_map_type
     'ReviewResponseMap'
-  end
-
-  # Prototype method to implement prototype pattern
-  def self.prototype
-    AssignmentTeam.new
   end
 
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
@@ -65,8 +41,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.create(reviewee_id: id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
   end
 
-  # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
-  def get_reviewer
+  # If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  def reviewer
     self
   end
 
@@ -76,9 +52,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', id, reviewer.get_reviewer.id, assignment.id).count > 0
   end
 
-  # Topic picked by the team for the assignment
-  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
-  def topic
+  # Topic id picked by the team for the assignment
+  def topic_id
     SignedUpTeam.find_by(team_id: id, is_waitlisted: 0).try(:topic_id)
   end
 
@@ -114,11 +89,6 @@ class AssignmentTeam < Team
     super
   end
 
-  # Get the first member of the team
-  def self.first_member(team_id)
-    find_by(id: team_id).try(:participants).try(:first)
-  end
-
   # Return the files residing in the directory of team submissions
   # Main calling method to return the files residing in the directory of team submissions
   def submitted_files(path = self.path)
@@ -134,13 +104,13 @@ class AssignmentTeam < Team
       raise ImportError, 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
 
-    @assignment_team = prototype
+    @assignment_team = AssignmentTeam.new
     Team.import(row, assignment_id, options, @assignment_team)
   end
 
   # Export the existing teams in a csv file
   def self.export(csv, parent_id, options)
-    @assignment_team = prototype
+    @assignment_team = AssignmentTeam.new
     Team.export(csv, parent_id, options, @assignment_team)
   end
 

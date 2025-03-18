@@ -232,7 +232,7 @@ class Team < ApplicationRecord
   end
 
   # Create the team with corresponding tree node
-  def self.create_team_and_node(id)
+  def self.create_team_and_node(id, user_ids = [])
     parent = find_parent_entity id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = create(name: team_name, parent_id: id)

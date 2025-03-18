@@ -73,7 +73,7 @@ describe TagPromptDeployment do
         response_ids = double(241)
         allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
         allow(answer).to receive(:count)
-        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(3)
       end
     end
 

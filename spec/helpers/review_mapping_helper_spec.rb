@@ -1205,3 +1205,14 @@ end
 
 
 
+describe 'display_volume_metric_chart' do
+  it 'should create a bar chart with reviewer and all reviewers data' do
+    reviewer = double('Reviewer', avg_vol_per_round: [10, 20], overall_avg_vol: 30)
+    allow(helper).to receive(:initialize_chart_elements).and_return([[1, 2, 'Total'], [10, 20, 30], [15, 25, 20]])
+    allow(helper).to receive(:bar_chart).and_return('chart_html')
+
+    result = helper.display_volume_metric_chart(reviewer)
+    expect(result).to eq('chart_html')
+    expect(helper).to have_received(:bar_chart)
+  end
+end

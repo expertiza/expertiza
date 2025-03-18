@@ -1194,3 +1194,14 @@ describe 'display_tagging_interval_chart' do
     end
   end
 end
+
+describe 'create_report_table_header' do
+  it 'should render the report table header partial with given headers' do
+    headers = { name: 'Name', score: 'Score' }
+    expect(helper).to receive(:render).with(partial: 'report_table_header', locals: { headers: headers })
+    helper.create_report_table_header(headers)
+  end
+end
+
+
+

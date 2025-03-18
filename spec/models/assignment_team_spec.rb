@@ -325,7 +325,7 @@ describe 'AssignmentTeam' do
     end
     it 'should create a team with users' do
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
-      expect(new_team.users).to include @student
+      expect(new_team.reload.users).to include @student
     end
 
     it 'should remove user from previous team' do

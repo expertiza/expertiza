@@ -127,23 +127,6 @@ describe Team do
     end
   end
 
-  describe '.check_for_existing' do
-    context 'when team exists' do
-      it 'raises a TeamExistsError' do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: 'no name').and_return([team])
-        expect { Team.check_for_existing(assignment, 'no name', 'Assignment') }
-          .to raise_error(TeamExistsError, 'The team name no name is already in use.')
-      end
-    end
-
-    context 'when team exists' do
-      it 'returns nil' do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: 'no name').and_return([])
-        expect(Team.check_for_existing(assignment, 'no name', 'Assignment')).to be nil
-      end
-    end
-  end
-
   describe '.randomize_all_by_parent' do
     it 'forms teams and assigns team members automatically' do
       allow(Participant).to receive(:where).with(parent_id: 1, type: 'AssignmentParticipant', can_mentor: [false, nil])

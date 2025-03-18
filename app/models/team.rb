@@ -1,4 +1,5 @@
 class Team < ApplicationRecord
+  validates :name, uniqueness: { scope: :parent_id, message: "is already in use." }
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
@@ -89,12 +90,6 @@ class Team < ApplicationRecord
   # Returns the number of users in the team
   def size
     users.size
-  end
-
-  # Check if the team exists
-  def self.check_for_existing(parent, name, team_type)
-    list = Object.const_get(team_type + 'Team').where(parent_id: parent.id, name: name)
-    raise TeamExistsError, "The team name #{name} is already in use." unless list.empty?
   end
 
   # Algorithm

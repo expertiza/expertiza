@@ -74,20 +74,26 @@ class TeamsController < ApplicationController
     @parent = Object.const_get(session[:team_type]).find(params[:id])
   end
 
-  # Called when a instructor tries to create an empty team manually
+  # Called when an instructor tries to create an empty team manually
   def create
-    #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     init_team_type(parent.class.name.demodulize)
+
+    team_class = Object.const_get(session[:create_type] + 'Team')
+    @team = team_class.new(name: params[:team][:name], parent_id: parent.id)
+
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+      @team.save!
+      TeamNode.create!(parent_id: parent.id, node_object_id: @team.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
-      redirect_to action: 'new', id: parent.id
+    rescue ActiveRecord::RecordInvalid => e
+      if @team.errors[:name].include?("is already in use.")
+        raise TeamExistsError, "The team name #{@team.name} is already in use."
+      else
+        flash[:error] = e.message
+        redirect_to action: 'new', id: parent.id
+      end
     end
   end
 
@@ -95,15 +101,20 @@ class TeamsController < ApplicationController
   def update
     @team = Team.find(params[:id])
     parent = parent_from_child(@team)
+    @team.name = params[:team][:name]
+
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team.name = params[:team][:name]
-      @team.save
+      @team.save!  # Using save! so that a failure raises an exception
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link('')
       redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
+    rescue ActiveRecord::RecordInvalid => e
+      # Check if the error is due to a duplicate team name
+      if @team.errors[:name].include?("is already in use.")
+        flash[:error] = "The team name #{@team.name} is already in use."
+      else
+        flash[:error] = e.message
+      end
       redirect_to action: 'edit', id: @team.id
     end
   end

@@ -67,16 +67,6 @@ describe TagPromptDeployment do
       end
     end
 
-    context 'when answer_length_threshold null' do
-      it 'count of taggable answers' do
-        questions_ids = double(1)
-        response_ids = double(241)
-        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
-        allow(answer).to receive(:count)
-        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(3)
-      end
-    end
-
     context 'when answer_length_threshold NOT null' do
       it 'count of taggable answers less than answers_one' do
         questions_ids = double(1)

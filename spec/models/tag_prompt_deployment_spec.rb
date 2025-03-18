@@ -31,12 +31,13 @@ describe TagPromptDeployment do
         expect(tag_dep.tag_prompt).to be(tp)
       end
     end
-    
+
     context 'when tag_prompt does not exist' do
       it 'raises an ActiveRecord::RecordNotFound error' do
         allow(TagPrompt).to receive(:find).with(1).and_raise(ActiveRecord::RecordNotFound)
         expect { tag_dep.tag_prompt }.to raise_error(ActiveRecord::RecordNotFound)
       end
+    end
   end
 
 

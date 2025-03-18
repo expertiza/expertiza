@@ -1072,3 +1072,125 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 end
+
+describe ReviewMappingHelper::ReviewStrategy do
+  let(:participants) { [double('Participant'), double('Participant')] }
+  let(:teams) { [double('Team'), double('Team'), double('Team')] }
+  let(:review_num) { 2 }
+  
+  describe 'base class' do
+    it 'should initialize with participants, teams, and review_num' do
+      strategy = ReviewMappingHelper::ReviewStrategy.new(participants, teams, review_num)
+      expect(strategy.participants).to eq(participants)
+      expect(strategy.teams).to eq(teams)
+    end
+  end
+  
+  describe 'StudentReviewStrategy' do
+    subject { ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, review_num) }
+    
+    it 'should calculate correct reviews_per_team' do
+      # (participants.size * review_num * 1.0 / teams.size).round
+      # (2 * 2 * 1.0 / 3).round = 1.33 -> 1
+      expect(subject.reviews_per_team).to eq(1)
+    end
+    
+    it 'should calculate correct reviews_needed' do
+      # participants.size * review_num
+      # 2 * 2 = 4
+      expect(subject.reviews_needed).to eq(4)
+    end
+    
+    it 'should return review_num for reviews_per_student' do
+      expect(subject.reviews_per_student).to eq(2)
+    end
+    
+    it 'should handle edge cases when teams size is zero' do
+      strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, [], review_num)
+      expect { strategy.reviews_per_team }.to raise_error(FloatDomainError)
+
+    end
+  end
+  
+  describe 'TeamReviewStrategy' do
+    subject { ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, review_num) }
+    
+    it 'should return review_num for reviews_per_team' do
+      expect(subject.reviews_per_team).to eq(2)
+    end
+    
+    it 'should calculate correct reviews_needed' do
+      # teams.size * review_num
+      # 3 * 2 = 6
+      expect(subject.reviews_needed).to eq(6)
+    end
+    
+    it 'should calculate correct reviews_per_student' do
+      # (teams.size * review_num * 1.0 / participants.size).round
+      # (3 * 2 * 1.0 / 2).round = 3
+      expect(subject.reviews_per_student).to eq(3)
+    end
+    
+    it 'should handle edge cases when participants size is zero' do
+      strategy = ReviewMappingHelper::TeamReviewStrategy.new([], teams, review_num)
+      expect { strategy.reviews_per_student }.to raise_error(FloatDomainError)
+    end
+  end
+end
+
+describe 'display_tagging_interval_chart' do
+  before(:each) do
+    # Mock line_chart method to return a chart
+    allow(helper).to receive(:line_chart).and_return('chart_html')
+  end
+  
+  it 'should create a chart with valid intervals' do
+    intervals = [5, 10, 15, 20]
+    
+    # Call the method
+    result = helper.display_tagging_interval_chart(intervals)
+    
+    # Verify the chart is returned
+    expect(result).to eq('chart_html')
+    
+    # Verify line_chart was called with appropriate data
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:label]).to eq('time intervals')
+      expect(data[:datasets][0][:data]).to eq(intervals)
+      expect(data[:datasets][1][:label]).to eq('Mean time spent')
+    end
+  end
+  
+  it 'should filter intervals above threshold' do
+    intervals = [5, 10, 35, 20] # 35 is above the threshold of 30
+    
+    # Call the method
+    result = helper.display_tagging_interval_chart(intervals)
+    
+    # Verify the chart is returned
+    expect(result).to eq('chart_html')
+    
+    # Verify line_chart was called with filtered data
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:data]).not_to include(35)
+      expect(data[:datasets][0][:data].length).to eq(3) # Only 3 points after filtering
+    end
+  end
+  
+  it 'should handle empty intervals' do
+    intervals = []
+    
+    # Call the method
+    result = helper.display_tagging_interval_chart(intervals)
+    
+    # Verify the chart is returned
+    expect(result).to eq('chart_html')
+    
+    # Verify line_chart was called with empty data
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:data]).to eq([])
+      # The implementation includes the mean dataset even for empty intervals, so expect 2
+      expect(data[:datasets].length).to eq(2) 
+    end
+  end
+end

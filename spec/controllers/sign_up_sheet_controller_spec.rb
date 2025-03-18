@@ -7,7 +7,7 @@ describe SignUpSheetController do
   let(:assignment6) { create(:assignment, id: 6000, microtask: true, staggered_deadline: false, private: false, directory_path: 'assignment6') }
   let(:assignment7) { create(:assignment, id: 7000, microtask: false, staggered_deadline: true, private: true, directory_path: 'assignment7') }
   let(:instructor) { build(:instructor, id: 6) }
-  let(:student) { build(:student, id: 8) }
+  let(:student) { create(:student, id: 8) }
   let(:participant) { build(:participant, id: 1, user_id: 6, assignment: assignment) }
   let(:topic) { build(:topic, id: 1) }
   let(:signed_up_team) { build(:signed_up_team, team: team, topic: topic) }

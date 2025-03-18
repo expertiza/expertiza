@@ -243,7 +243,9 @@ class Team < ApplicationRecord
 
     # If user IDs are provided, add them to the team.
     user_ids.each do |user_id|
-      remove_user_from_previous_team(parent_id, user_id)
+      team_user = TeamsUser.where(user_id: user_id)
+                           .find { |tu| tu.team.parent_id == parent_id }
+      team_user.destroy if team_user
       team.add_member(User.find(user_id))
     end unless user_ids.empty?
 
@@ -263,16 +265,6 @@ class Team < ApplicationRecord
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
-
-  # Removes the specified user from any team of the specified assignment
-  def self.remove_user_from_previous_team(parent_id, user_id)
-    team_user = TeamsUser.where(user_id: user_id).find { |team_user_obj| team_user_obj.team.parent_id == parent_id }
-    begin
-      team_user.destroy
-    rescue StandardError
-      nil
-    end
-  end
 
   def self.find_team_users(assignment_id, user_id)
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')

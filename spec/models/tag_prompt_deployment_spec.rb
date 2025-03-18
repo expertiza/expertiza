@@ -109,7 +109,7 @@ describe TagPromptDeployment do
       let(:team_user2) { TeamsUser.new(user_id: user2.id, team_id: team.id) }
 
       it 'returns the correct count for each user' do
-        allow(Team).to receive(:joins).with(:teams_users).and.return(team)
+        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
         allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: user1.id).and_return(team)
         allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: user2.id).and_return(team)
         expect(tag_dep1.get_number_of_taggable_answers(user1.id)).to.eq(answer.count)

@@ -110,7 +110,18 @@ class Team < ApplicationRecord
     # sort teams that still need members by decreasing team size
     teams.sort_by { |team| team.size }.reverse!
     # insert users who are not in any team to teams still need team members
-    assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
+    teams.each do |team|
+      # Calculate how many members this team is missing.
+      member_num_difference = min_team_size - team.size
+      while member_num_difference > 0 && !users.empty?
+        # Add the first user from the list to the team.
+        team.add_member(users.first)
+        # Remove that user from the pool.
+        users.shift
+        member_num_difference -= 1
+      end
+      break if users.empty?
+    end
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
     team_from_users(min_team_size, parent, team_type, users) unless users.empty?
   end
@@ -130,21 +141,6 @@ class Team < ApplicationRecord
         team.add_member(user)
         next_team_member_index += 1
       end
-    end
-  end
-
-  # Assigns list of users to list of teams based on minimum team size
-  def self.assign_single_users_to_teams(min_team_size, parent, teams, users)
-    teams.each do |team|
-      curr_team_size = size
-      member_num_difference = min_team_size - curr_team_size
-      while member_num_difference > 0
-        team.add_member(users.first)
-        users.delete(users.first)
-        member_num_difference -= 1
-        break if users.empty?
-      end
-      break if users.empty?
     end
   end
 

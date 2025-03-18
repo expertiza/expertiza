@@ -232,12 +232,13 @@ class Team < ApplicationRecord
   end
 
   # Create the team with corresponding tree node
-  def self.create_team_and_node(id, user_ids = [])
-    parent = find_parent_entity id # current_task will be either a course object or an assignment object.
+  def self.create_team_and_node(parent_id, user_ids = [])
+
+    parent = find_parent_entity parent_id # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
-    team = create(name: team_name, parent_id: id)
+    team = create(name: team_name, parent_id: parent_id)
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
-    TeamNode.create(parent_id: id, node_object_id: team.id)
+    TeamNode.create(parent_id: parent_id, node_object_id: team.id)
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
 
     # If user IDs are provided, add them to the team.

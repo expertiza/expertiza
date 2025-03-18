@@ -23,14 +23,24 @@ describe TagPromptDeployment do
     Answer.new(id: 3, question_id: 1, answer: 3, comments: 'comment length within threshold', response_id: 2313),
     Answer.new(id: 4, question_id: 2, answer: 1, comments: 'com1', response_id: 241)
   ]
-
+  ##tag_prompt method testing
   describe '#tag_prompt' do
-    it 'returns the associated tag prompt with the deployment' do
-      allow(TagPrompt).to receive(:find).with(1).and_return(tp)
-      expect(tag_dep.tag_prompt).to be(tp)
+    context 'when tag_prompt exists' do
+      it 'returns the associated tag prompt with the deployment' do
+        allow(TagPrompt).to receive(:find).with(1).and_return(tp)
+        expect(tag_dep.tag_prompt).to be(tp)
+      end
     end
+    
+    context 'when tag_prompt does not exist' do
+      it 'raises an ActiveRecord::RecordNotFound error' do
+        allow(TagPrompt).to receive(:find).with(1).and_raise(ActiveRecord::RecordNotFound)
+        expect { tag_dep.tag_prompt }.to raise_error(ActiveRecord::RecordNotFound)
+      end
   end
 
+
+  ##get_number_of_taggable_answers method testing
   # get_number_of_taggable_answers calculates total taggable answers assigned to an user who participated in "tag review assignment".
   describe '#get_number_of_taggable_answers' do
     before(:each) do
@@ -47,6 +57,7 @@ describe TagPromptDeployment do
       allow(question).to receive(:map).with(any_args).and_return(questions_ids)
       allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
     end
+    
     context 'when user_id is null' do
       it 'given out an error message' do
         allow(Team).to receive(:joins).with(:teams_users).and_return(team)
@@ -54,6 +65,7 @@ describe TagPromptDeployment do
         expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError
       end
     end
+
     context 'when answer_length_threshold null' do
       it 'count of taggable answers' do
         questions_ids = double(1)
@@ -63,6 +75,7 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
       end
     end
+
     context 'when answer_length_threshold NOT null' do
       it 'count of taggable answers less than answers_one' do
         questions_ids = double(1)
@@ -74,20 +87,37 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
       end
     end
+
     context 'when responses empty' do
       it 'count of taggable answers zero' do
         allow(rp).to receive(:empty?).and_return(true)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
     end
+
     context 'when questions empty' do
       it 'count of taggable answers zero' do
         allow(question).to receive(:empty?).and_return(true)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
+
+    context 'when there are multiple users' do
+      let(:user2) { User.new(id: 2) }
+      let(:team_user1) { TeamsUser.new(user_id: user1.id, team_id: team.id) }
+      let(:team_user2) { TeamsUser.new(user_id: user2.id, team_id: team.id) }
+
+      it 'returns the correct count for each user' do
+        allow(Team).to.receive(:joins).with(:teams_users).and.return(team)
+        allow(team).to.receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: user1.id).and.return(team)
+        allow(team).to.receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: user2.id).and.return(team)
+        expect(tag_dep1.get_number_of_taggable_answers(user1.id)).to.eq(answer.count)
+        expect(tag_dep1.get_number_of_taggable_answers(user2.id)).to.eq(answer.count)
+      end
     end
   end
 
+
+  ##assignment_tagging_progress method testing
   describe 'assignment_tagging_progress' do
     it 'does nothing when no teams are found' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([])

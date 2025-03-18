@@ -268,6 +268,7 @@ FactoryBot.define do
     submitted_hyperlinks '---
 - https://www.expertiza.ncsu.edu'
     directory_num 0
+    max_team_size {3}
   end
 
   factory :mentored_team, class: MentoredTeam do

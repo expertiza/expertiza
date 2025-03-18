@@ -101,6 +101,7 @@ describe TagPromptDeployment do
         allow(question).to receive(:empty?).and_return(true)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
+    end
 
     context 'when there are multiple users' do
       let(:user2) { User.new(id: 2) }

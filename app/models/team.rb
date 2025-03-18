@@ -112,12 +112,12 @@ class Team < ApplicationRecord
     # insert users who are not in any team to teams still need team members
     assign_single_users_to_teams(min_team_size, parent, teams, users) if !users.empty? && !teams.empty?
     # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    create_team_from_single_users(min_team_size, parent, team_type, users) unless users.empty?
+    team_from_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
   # Creates teams from a list of users based on minimum team size
   # Then assigns the created team to the parent object
-  def self.create_team_from_single_users(min_team_size, parent, team_type, users)
+  def self.team_from_users(min_team_size, parent, team_type, users)
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     (1..num_of_teams).to_a.each do |i|

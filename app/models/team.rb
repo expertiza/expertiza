@@ -239,6 +239,13 @@ class Team < ApplicationRecord
     # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
     TeamNode.create(parent_id: id, node_object_id: team.id)
     ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
+
+    # If user IDs are provided, add them to the team.
+    user_ids.each do |user_id|
+      remove_user_from_previous_team(parent_id, user_id)
+      team.add_member(User.find(user_id))
+    end unless user_ids.empty?
+
     team
   end
 
@@ -255,19 +262,6 @@ class Team < ApplicationRecord
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
-
-  # Create the team with corresponding tree node and given users
-  def self.create_team_with_users(parent_id, user_ids)
-    team = create_team_and_node(parent_id)
-
-    user_ids.each do |user_id|
-      remove_user_from_previous_team(parent_id, user_id)
-
-      # Create new team_user and team_user node
-      team.add_member(User.find(user_id))
-    end
-    team
-  end
 
   # Removes the specified user from any team of the specified assignment
   def self.remove_user_from_previous_team(parent_id, user_id)

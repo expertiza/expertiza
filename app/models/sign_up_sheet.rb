@@ -5,7 +5,7 @@ class SignUpSheet < ApplicationRecord
     team_id = Team.find_team_users(assignment_id, user_id)&.first&.t_id
     # If the team doesn't exist, create a new team and assign the team ID
     if team_id.nil?
-      team = AssignmentTeam.create_team_with_users(assignment_id, [user_id])
+      team = AssignmentTeam.create_team_and_node(assignment_id, [user_id])
       team_id = team.id
     end
     # Confirm the signup topic if a topic ID is provided

@@ -42,7 +42,7 @@ class TeamsController < ApplicationController
     #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     init_team_type(parent.class.name.demodulize)
-    Team.randomize_all_by_parent(parent, session[:create_type], params[:team_size].to_i)
+    Team.create_random_teams(parent, session[:create_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id

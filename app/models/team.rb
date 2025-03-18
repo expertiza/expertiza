@@ -95,7 +95,7 @@ class Team < ApplicationRecord
   # Algorithm
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
-  def self.randomize_all_by_parent(parent, team_type, min_team_size)
+  def self.create_random_teams(parent, team_type, min_team_size)
     participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', can_mentor: [false, nil])
     participants = participants.sort { rand(-1..1) }
     users = participants.map { |p| User.find(p.user_id) }.to_a

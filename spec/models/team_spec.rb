@@ -137,7 +137,7 @@ describe Team do
       allow(Team).to receive(:where).with(parent_id: 1, type: 'AssignmentTeam').and_return([team])
       allow(Team).to receive(:size).with(any_args).and_return(1)
       allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
-      expect(Team.randomize_all_by_parent(assignment, 'Assignment', 2)).to eq([1])
+      expect(Team.create_random_teams(assignment, 'Assignment', 2)).to eq([1])
     end
   end
 

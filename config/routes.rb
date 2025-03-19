@@ -544,6 +544,7 @@ Expertiza::Application.routes.draw do
       get :delete_all
       get :bequeath_all
     end
+    resources :meeting, only: %i[index edit create destroy]
   end
 
   resources :teams_users, only: %i[new create update] do
@@ -670,7 +671,6 @@ Expertiza::Application.routes.draw do
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
 
-  resources :meeting, only: %i[index edit]
   get '/teams/increase_table_headers', to: 'teams#increase_table_headers'
   get '/teams/increase_table_columns', to: 'teams#increase_table_columns'
   get '/teams/decrease_table_headers', to: 'teams#decrease_table_headers'

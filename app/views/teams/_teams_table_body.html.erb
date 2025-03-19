@@ -22,21 +22,34 @@
       <!-- Mentor Name -->
       <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
       <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
-
+      <td></td>
       <!-- Meeting Dates -->
       <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(@num_of_meeting_cols).pluck(:date) %>
+      <% meetings = Meeting.where(team_id: team.id)%>
       <% @num_of_meeting_cols.times do |i| %>
         <td style="padding: 10px;">
       <span style="white-space: nowrap;">
-        <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
-          <%= meeting_dates[i]&.strftime('%-m/%-d') || 'mm-dd-yy' %>
-        </span>
-        <%= link_to image_tag('Check-icon.png', border: 0,
-                              alt: 'Save Date', title: 'Save Meeting Date'), '#',
-                              controller: 'meetings', action: 'create', team_id: team.id, meeting_date: meeting_dates[i],
-                              id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
+        <% if meeting_dates[i].nil? %>
+          <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
+            mm-dd-yy
+          </span>
+              <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                          meetings_path(team_id: team.id, meeting: { meeting_date: meeting_dates[i] }),
+                          method: :post,
+                          style: 'margin-left: 10px;',
+                          class: "save-meeting-button"%>
 
-      </span>
+        <% else %>
+          <span id="meeting-date-display-<%= i %>-<%= team.id %>">
+            <%= meeting_dates[i].strftime('%-m/%-d') %>
+          </span>
+              <%= link_to image_tag('delete_icon.png', border: 0, alt: 'Delete Meeting Date', title: 'Delete Meeting Date'),
+                          meetings_path(team_id: team.id, id: meetings[i].id),
+                          method: :delete,
+                          data: { confirm: 'Are you sure?' },
+                          style: 'margin-left: 10px;' %>
+        <% end %>
+          </span>
         </td>
       <% end %>
 

@@ -1,7 +1,9 @@
 //This file will need to change to implement the save function for the meeting
 document.addEventListener('turbolinks:load', function() {
+
     // Find all save buttons and add event listeners
     const saveButtons = document.querySelectorAll('[id^="save-meeting-date-"]');
+
     saveButtons.forEach(button => {
         button.addEventListener('click', function(event) {
             event.preventDefault(); // Prevent default link behavior
@@ -26,4 +28,5 @@ document.addEventListener('turbolinks:load', function() {
                 .catch(error => console.error('Error updating meeting date:', error));
         });
     });
+
 });

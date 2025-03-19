@@ -22,7 +22,8 @@ class MeetingsController < ApplicationController
     if @meeting.save
       # TODO: Re-implement email notification for meeting creation
       # MentorMeetingNotifications.send_notification(@meeting.team_id, @meeting.meeting_date)
-      render json: { status: 'success', message: 'Meeting date added' }, status: :created
+      # render json: { status: 'success', message: 'Meeting date added' }, status: :created
+      redirect_back(fallback_location: root_path) # Redirect back
     else
       render json: { status: 'error', message: 'Unable to add meeting date', errors: @meeting.errors.full_messages }, status: :unprocessable_entity
     end
@@ -47,7 +48,8 @@ class MeetingsController < ApplicationController
     if @meeting.destroy
       # TODO: Re-implement email notification for meeting deletion
       # ActiveSupport::Notifications.instrument('mentor_meeting.deleted', team_id: team_id, meeting_date: meeting_date)
-      render json: { status: 'success', message: 'Meeting deleted successfully' }
+      # render json: { status: 'success', message: 'Meeting deleted successfully' }
+      redirect_back(fallback_location: root_path) # Redirect back
     else
       render json: { status: 'error', message: 'Failed to delete meeting', errors: @meeting.errors.full_messages }, status: :unprocessable_entity
     end

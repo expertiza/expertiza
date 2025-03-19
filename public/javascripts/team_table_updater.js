@@ -48,4 +48,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
     });
+
+    // Listen for clicks on "Remove Meeting Column" buttons in the header
+    tableHeaders.addEventListener('click', function (event) {
+        if (event.target && event.target.closest('.remove-meeting-col')) {
+            event.preventDefault(); // Prevent default link behavior
+
+            const button = event.target.closest('.remove-meeting-col'); // The clicked button
+            const teamType = button.dataset.teamType; // Get teamType from data attribute
+            const id = button.dataset.id; // Get id from data attribute
+            const currColumnNum = window.currColumnNum; // Get current column count
+
+            console.log(id);
+            console.log(teamType);
+
+            const headerUrl = `/teams/decrease_table_headers?type=${teamType}&id=${id}&colNum=${currColumnNum}`;
+            const bodyUrl = `/teams/decrease_table_columns?type=${teamType}&id=${id}&colNum=${currColumnNum}`;
+
+            // Update headers and body together
+            Promise.all([
+                fetch(headerUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } }),
+                fetch(bodyUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            ])
+                .then(async ([headerResponse, bodyResponse]) => {
+                    if (!headerResponse.ok || !bodyResponse.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const headerHtml = await headerResponse.text();
+                    const bodyHtml = await bodyResponse.text();
+
+                    //console.log(headerHtml);
+                    //console.log(bodyHtml);
+                    tableHeaders.innerHTML = headerHtml; // Update only the <thead> with new content
+                    tableBody.innerHTML = bodyHtml; // Update only the <tbody> with new content
+
+                    window.currColumnNum--; // decrement currColumnNum for subsequent clicks
+                })
+                .catch((error) => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    });
 });

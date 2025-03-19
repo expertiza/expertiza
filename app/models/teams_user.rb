@@ -1,5 +1,6 @@
 class TeamsUser < ApplicationRecord
-  belongs_to :user
+  self.table_name = 'teams_participants'
+  belongs_to :user, foreign_key: 'participant_id'
   belongs_to :team
   has_one :team_user_node, foreign_key: 'node_object_id', dependent: :destroy
   has_paper_trail
@@ -27,7 +28,7 @@ class TeamsUser < ApplicationRecord
 
   # Removes entry in the TeamUsers table for the given user and given team id
   def self.remove_team(user_id, team_id)
-    team_user = TeamsUser.where('user_id = ? and team_id = ?', user_id, team_id).first
+    team_user = TeamsUser.where('participant_id = ? and team_id = ?', user_id, team_id).first
     team_user&.destroy
   end
 
@@ -45,7 +46,7 @@ class TeamsUser < ApplicationRecord
   # Add member to the team they were invited to and accepted the invite for
   def self.add_member_to_invited_team(invitee_user_id, invited_user_id, assignment_id)
     can_add_member = false
-    users_teams = TeamsUser.where(['user_id = ?', invitee_user_id])
+    users_teams = TeamsUser.where(['participant_id = ?', invitee_user_id])
     users_teams.each do |team|
       new_team = AssignmentTeam.where(['id = ? and parent_id = ?', team.team_id, assignment_id]).first
       unless new_team.nil?
@@ -60,7 +61,7 @@ class TeamsUser < ApplicationRecord
   def self.team_id(assignment_id, user_id)
     # team_id variable represents the team_id for this user in this assignment
     team_id = nil
-    teams_users = TeamsUser.where(user_id: user_id)
+    teams_users = TeamsUser.where(participant_id: user_id)
     teams_users.each do |teams_user|
       if teams_user.team_id == nil
         next

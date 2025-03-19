@@ -52,6 +52,7 @@
 
   <%= link_to 'New user',:role => "Student", :action => 'new' %> |
   <%= link_to 'Import users', :controller=>'import_file', :action=>'start', :model => 'User', :expected_fields => 'username&nbsp;&nbsp;|&nbsp;&nbsp;full name (first [middle] last)&nbsp;&nbsp;|&nbsp;&nbsp;e-mail address' %> |
-  <%= link_to 'Export users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %>
+  <%= link_to 'Export users', :controller=>'export_file',:action=>'start',:model=> 'User',:id=> 1 %> |
+  <%= link_to 'Import Github users', :controller=>'import_file',:action=>'start',:model=> 'GithubAssociation', :expected_fields => 'expertiza_username&nbsp;&nbsp;|&nbsp;&nbsp;github_user' %>
 
 </p>

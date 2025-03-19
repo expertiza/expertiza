@@ -145,6 +145,30 @@ describe ReviewMappingHelper, type: :helper do
       color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
+
+    it 'color should be purple if submission link has been updated since due date for a specified round' do
+      # deadline_right inspired from bookmark_review_spec
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee_with_assignment)
+
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee_with_assignment.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      # Stub the link_updated_since_last? method to return true
+      allow(helper).to receive(:link_updated_since_last?).and_return(true)
+      # Also stub get_link_updated_at to return a time
+      allow(helper).to receive(:get_link_updated_at).and_return(DateTime.now.in_time_zone - 6.day)
+      
+      create(:response, response_map: response_map_with_reviewee)
+
+      color = get_team_color(response_map_with_reviewee)
+      expect(color).to eq('purple')
+    end
   end
 
   describe 'response_for_each_round?' do
@@ -710,15 +734,27 @@ describe ReviewMappingHelper, type: :helper do
       expect(resp_color).to eq(['green'])
     end
 
-    xit 'should return purple color if the assignment was submitted within the round' do
+    it 'should return purple color if the assignment was submitted within the round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
+      
+      # Create a submission record with a wiki link
       create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      
       create(:response, response_map: @response_map)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
-
+    
+      # Stub submitted_within_round? to return true
+      allow(helper).to receive(:submitted_within_round?).and_return(true)
+      
+      # Stub link_updated_since_last? to return true
+      allow(helper).to receive(:link_updated_since_last?).and_return(true)
+      
+      # Stub get_link_updated_at to return a time
+      allow(helper).to receive(:get_link_updated_at).and_return(DateTime.now.in_time_zone - 6.day)
+    
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2

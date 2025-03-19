@@ -673,6 +673,8 @@ Expertiza::Application.routes.draw do
   resources :meeting, only: %i[index edit]
   get '/teams/increase_table_headers', to: 'teams#increase_table_headers'
   get '/teams/increase_table_columns', to: 'teams#increase_table_columns'
+  get '/teams/decrease_table_headers', to: 'teams#decrease_table_headers'
+  get '/teams/decrease_table_columns', to: 'teams#decrease_table_columns'
 
 
 end

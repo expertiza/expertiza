@@ -5,6 +5,13 @@
 
 <h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
 
+<% if notice %>
+  <p style="color: green"><%= notice %></p>
+<% end %>
+<% if alert %>
+  <p style="color: red"><%= alert %></p>
+<% end %>
+
 <!-- Anyone with access to the parent pages has access to this page -->
   <div class="teams-list-table">
     <table>

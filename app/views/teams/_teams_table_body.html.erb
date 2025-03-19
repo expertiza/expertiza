@@ -22,34 +22,44 @@
       <!-- Mentor Name -->
       <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
       <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
       <!-- Meeting Dates -->
-      <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(@num_of_meeting_cols).pluck(:date) %>
+      <% meeting_dates = Meeting.where(team_id: team.id).order(:meeting_date).limit(@num_of_meeting_cols).pluck(:meeting_date) %>
       <% meetings = Meeting.where(team_id: team.id)%>
+
       <% @num_of_meeting_cols.times do |i| %>
         <td style="padding: 10px;">
-      <span style="white-space: nowrap;">
-        <% if meeting_dates[i].nil? %>
-          <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
-            mm-dd-yy
-          </span>
-          <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
+          <span style="white-space: nowrap;">
+            <% if meeting_dates[i].nil? %>
+              <input type="date"
+                     id="meeting-date-<%= i %>-<%= team.id %>"
+                     style="width: 150px; padding: 5px; border: 1px solid #ddd;"
+                     value="<%= meeting_dates[i] %>" />
 
-        <% else %>
-          <span id="meeting-date-display-<%= i %>-<%= team.id %>">
-            <%= meeting_dates[i].strftime('%-m-%-d-%y') %>
-          </span>
+              <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                          '#',
+                          id: "save-meeting-date-#{i}-#{team.id}",
+                          data: { meeting_index: i, team_id: team.id },
+                          style: 'margin-left: 10px;' %>
+            <% else %>
+              <span id="meeting-date-display-<%= i %>-<%= team.id %>">
+                <%= meeting_dates[i].strftime('%-m-%-d-%y') %>
+              </span>
+
               <%= link_to image_tag('delete_icon.png', border: 0, alt: 'Delete Meeting Date', title: 'Delete Meeting Date'),
-                          meetings_path(team_id: team.id, id: meetings[i].id),
+                          team_meeting_path(meetings[i].id, team_id: team.id),
                           method: :delete,
                           data: { confirm: 'Are you sure?' },
                           style: 'margin-left: 10px;' %>
-        <% end %>
+
+              <% Rails.logger.debug("Delete Link: #{team_meeting_path(team.id, meetings[i].id)}") %>
+            <% end %>
           </span>
         </td>
       <% end %>
 
       <!-- Actions Column -->
-      <td width="15%" align="center" class="actions">
+      <td class="actions">
         <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
         <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
         <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>

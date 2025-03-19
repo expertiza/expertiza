@@ -1,5 +1,4 @@
 Expertiza::Application.routes.draw do
-  resources :meetings
   get 'lti/launch'
   post 'lti/launch' => 'lti#launch'
 
@@ -544,7 +543,7 @@ Expertiza::Application.routes.draw do
       get :delete_all
       get :bequeath_all
     end
-    resources :meeting, only: %i[index edit create destroy]
+    resources :meetings, only: %i[index edit create destroy]
   end
 
   resources :teams_users, only: %i[new create update] do

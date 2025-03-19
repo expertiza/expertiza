@@ -7,8 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
         window.currColumnNum = 3; // Default to 3 if not already set
     }
 
+
+
     // Listen for clicks on "Add Meeting Column" buttons in the header
     tableHeaders.addEventListener('click', function (event) {
+
         if (event.target && event.target.closest('.add-meeting-col')) {
             event.preventDefault(); // Prevent default link behavior
 

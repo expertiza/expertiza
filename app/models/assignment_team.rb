@@ -7,6 +7,7 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
+  has_many :meetings
   # START of contributor methods, shared with AssignmentParticipant
 
   # Added for E1973, Team reviews.

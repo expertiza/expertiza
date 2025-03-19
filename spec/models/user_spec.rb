@@ -3,8 +3,12 @@ describe User do
     User.new name: 'abc', fullname: 'abc xyz', email: 'abcxyz@gmail.com', password: '12345678', password_confirmation: '12345678',
              email_on_submission: 1, email_on_review: 1, email_on_review_of_review: 0, copy_of_emails: 1, handle: 'handle'
   end
-  let(:user1) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', password_confirmation: '123456789' }
-  let(:user2) { User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', password_confirmation: '123456789' }
+  let(:user1) {
+ User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbc@gmail.com', password: '123456789', 
+          password_confirmation: '123456789' }
+  let(:user2) {
+ User.new name: 'abc', fullname: 'abc bbc', email: 'abcbbe@gmail.com', password: '123456789', 
+          password_confirmation: '123456789' }
 
   describe '#name' do
     it 'returns the name of the user' do
@@ -77,12 +81,6 @@ describe User do
     end
   end
 
-  describe '#salt_first?' do
-    it 'will always return true' do
-      expect(user.salt_first?).to be true
-    end
-  end
-
   describe '#get_available_users' do
     before(:each) do
       role = Role.new
@@ -92,8 +90,10 @@ describe User do
       allow(user1).to receive(:role).and_return('Student')
       allow(user2).to receive(:role).and_return('Student')
       expect(user.role.get_parents).to eq(['Student'])
-      allow(User).to receive(:all).with(conditions: ['name LIKE ?', 'abc%'], limit: 20).and_return([user1, user2])
-      expect(user.get_available_users(user.name)).to eq([user1, user2])
+      allow(User).to receive(:all).with(conditions: ['name LIKE ?', 'abc%'],
+                                        limit: 20).and_return([user1, user2])
+      expect(user.get_visible_users_with_lesser_roles(user.name))
+        .to eq([user1, user2])
     end
   end
 
@@ -192,19 +192,6 @@ describe User do
     end
   end
 
-  describe '#creator_of?' do
-    it 'returns true of current user (user) is the creator of target user (user1)' do
-      allow(user1).to receive(:creator).and_return(user)
-      expect(user.creator_of?(user1)).to be true
-    end
-
-    it 'returns false of current user (user) is not the creator of target user (user1)' do
-      allow(user1).to receive(:creator).and_return(user2)
-      expect(user.creator_of?(user1)).to be false
-      expect(user2.creator_of?(user1)).to be true
-    end
-  end
-
   describe '.import' do
     it 'raises error if import column does not equal to 3' do
       row = { 'name' => 'abc', 'fullname' => 'abc xyz' }
@@ -299,8 +286,10 @@ describe User do
 
     it 'exports all information setting in options' do
       @csv = []
-      User.export(@csv, nil, 'personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true')
-      expect(@csv).to eq([['abc', 'abc xyz', 'abcxyz@gmail.com', 'Student', 'Instructor', true, true, false, true, 'handle']])
+      User.export(@csv, nil, 'personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 
+                             'email_options' => 'true', 'handle' => 'true')
+      expect(@csv).to eq([['abc', 'abc xyz', 'abcxyz@gmail.com', 'Student', 'Instructor', true, true, false, true, 
+'handle']])
     end
 
     it 'exports only personal_details' do
@@ -330,8 +319,10 @@ describe User do
 
   describe '.export_fields' do
     it 'exports all information setting in options' do
-      expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 'email_options' => 'true', 'handle' => 'true'))
-        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 'email on metareview', 'copy of emails', 'handle'])
+      expect(User.export_fields('personal_details' => 'true', 'role' => 'true', 'parent' => 'true', 
+                                'email_options' => 'true', 'handle' => 'true'))
+        .to eq(['name', 'full name', 'email', 'role', 'parent', 'email on submission', 'email on review', 
+'email on metareview', 'copy of emails', 'handle'])
     end
 
     it 'exports only personal_details' do
@@ -367,8 +358,11 @@ describe User do
     end
 
     it 'raises an error when Expertiza cannot find user' do
-      allow_any_instance_of(Object).to receive(:url_for).with(controller: 'users', action: 'new').and_return('users/new/1')
-      expect { User.from_params(user: {}) }.to raise_error(RuntimeError, %r{a href='users/new/1'>create an account</a> for this user to continue})
+      allow_any_instance_of(Object).to receive(:url_for).with(controller: 'users', 
+                                                              action: 'new').and_return('users/new/1')
+      expect {
+ User.from_params(user: {}) }.to raise_error(RuntimeError, 
+                                             %r{a href='users/new/1'>create an account</a> for this user to continue})
     end
   end
 
@@ -454,9 +448,12 @@ describe User do
     let(:role) { Role.new }
 
     before(:each) do
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', role.get_available_roles, @user_id, '%name%')
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', role.get_available_roles, @user_id, '%fullname%')
-      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', role.get_available_roles, @user_id, '%email%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and name like ?', 
+                                                                role.get_available_roles, @user_id, '%name%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and fullname like ?', 
+                                                                role.get_available_roles, @user_id, '%fullname%')
+      allow(User).to receive_message_chain(:order, :where).with('(role_id in (?) or id = ?) and email like ?', 
+                                                                role.get_available_roles, @user_id, '%email%')
       user_id = double
     end
 

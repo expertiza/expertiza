@@ -29,6 +29,7 @@
 //= require Chart.min
 //= require moment
 //= require bootstrap-datetimepicker
+//= require assignment_topics
 // Eliminate the “element.dispatchEvent is not a function” error
 
 jQuery.noConflict();

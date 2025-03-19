@@ -41,7 +41,7 @@
 
         <% else %>
           <span id="meeting-date-display-<%= i %>-<%= team.id %>">
-            <%= meeting_dates[i].strftime('%-m/%-d') %>
+            <%= meeting_dates[i].strftime('%-m-%-d-%y') %>
           </span>
               <%= link_to image_tag('delete_icon.png', border: 0, alt: 'Delete Meeting Date', title: 'Delete Meeting Date'),
                           meetings_path(team_id: team.id, id: meetings[i].id),

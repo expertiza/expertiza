@@ -34,14 +34,11 @@
             <td>
               <b><%= "#{title} #{review_no}." %></b>
               <!--In ‘review_bids/index’ page, if the topic_identifier is empty, ‘:’ sign should not be displayed.-->
-              <% if !topic_id.nil? %>
-                  <% if SignUpTopic.find(topic_id).topic_identifier != '' %>
-                      <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
-                  <% else %>
-                      <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
-                  <% end %>
+              <% if !topic_id.nil? && SignUpTopic.find(topic_id).topic_identifier != '' %>
+                <%= " #{SignUpTopic.find(topic_id).topic_identifier}: #{SignUpTopic.find(topic_id).topic_name}" %>
+              <% elsif !topic_id.nil? %>
+                <%= " #{SignUpTopic.find(topic_id).topic_name}" %>
               <% end %>
-
               <%if !@assignment.is_anonymous%>
                 &nbsp; (author: <%= participant.fullname%>)
               <%end%>

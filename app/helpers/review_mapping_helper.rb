@@ -80,12 +80,25 @@ module ReviewMappingHelper
   # checks if a work was submitted within a given round
   def submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    
+    # Return false early if submission_due_date is nil
+    return false unless submission_due_date
+    
     submission = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: ['Submit File', 'Submit Hyperlink'])
+    
+    # First round logic (or fallback for any round)
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
+    
+    # Special handling for rounds after the first one
     if round > 1
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      
+      # Only replace subm_created_at if we have a valid previous round due date
+      if submission_due_last_round
+        subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
+      end
     end
+    
     !subm_created_at.try(:first).try(:created_at).nil?
   end
 

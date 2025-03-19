@@ -1124,13 +1124,12 @@ describe ReviewMappingHelper::ReviewStrategy do
       # 3 * 2 = 6
       expect(subject.reviews_needed).to eq(6)
     end
-    
+
     it 'should calculate correct reviews_per_student' do
       # (teams.size * review_num * 1.0 / participants.size).round
       # (3 * 2 * 1.0 / 2).round = 3
       expect(subject.reviews_per_student).to eq(3)
     end
-    
     it 'should handle edge cases when participants size is zero' do
       strategy = ReviewMappingHelper::TeamReviewStrategy.new([], teams, review_num)
       expect { strategy.reviews_per_student }.to raise_error(FloatDomainError)
@@ -1146,13 +1145,9 @@ describe 'display_tagging_interval_chart' do
   
   it 'should create a chart with valid intervals' do
     intervals = [5, 10, 15, 20]
-    
-    # Call the method
     result = helper.display_tagging_interval_chart(intervals)
-    
     # Verify the chart is returned
     expect(result).to eq('chart_html')
-    
     # Verify line_chart was called with appropriate data
     expect(helper).to have_received(:line_chart) do |data, _options|
       expect(data[:datasets][0][:label]).to eq('time intervals')
@@ -1162,14 +1157,11 @@ describe 'display_tagging_interval_chart' do
   end
   
   it 'should filter intervals above threshold' do
-    intervals = [5, 10, 35, 20] # 35 is above the threshold of 30
-    
+    intervals = [5, 10, 35, 20] 
     # Call the method
     result = helper.display_tagging_interval_chart(intervals)
-    
     # Verify the chart is returned
     expect(result).to eq('chart_html')
-    
     # Verify line_chart was called with filtered data
     expect(helper).to have_received(:line_chart) do |data, _options|
       expect(data[:datasets][0][:data]).not_to include(35)
@@ -1179,17 +1171,10 @@ describe 'display_tagging_interval_chart' do
   
   it 'should handle empty intervals' do
     intervals = []
-    
-    # Call the method
     result = helper.display_tagging_interval_chart(intervals)
-    
-    # Verify the chart is returned
     expect(result).to eq('chart_html')
-    
-    # Verify line_chart was called with empty data
     expect(helper).to have_received(:line_chart) do |data, _options|
       expect(data[:datasets][0][:data]).to eq([])
-      # The implementation includes the mean dataset even for empty intervals, so expect 2
       expect(data[:datasets].length).to eq(2) 
     end
   end
@@ -1210,9 +1195,54 @@ describe 'display_volume_metric_chart' do
     reviewer = double('Reviewer', avg_vol_per_round: [10, 20], overall_avg_vol: 30)
     allow(helper).to receive(:initialize_chart_elements).and_return([[1, 2, 'Total'], [10, 20, 30], [15, 25, 20]])
     allow(helper).to receive(:bar_chart).and_return('chart_html')
-
     result = helper.display_volume_metric_chart(reviewer)
     expect(result).to eq('chart_html')
     expect(helper).to have_received(:bar_chart)
+  end
+end
+
+describe 'get_certain_review_and_feedback_response_map' do
+  it 'should set instance variables for review and feedback responses' do
+    author = create(:participant)
+    team = create(:assignment_team)
+    review_response_map = create(:review_response_map, reviewer: author, reviewee: team)
+    response = create(:response, map_id: review_response_map.id)
+    feedback_response_map = create(:feedback_response_map, reviewed_object_id: response.id, reviewer_id: author.id)
+    helper.instance_variable_set(:@all_review_response_ids, [response.id])
+    allow(TeamsUser).to receive(:team_id).and_return(team.id)
+    allow(ReviewResponseMap).to receive(:where).and_return(double(pluck: [review_response_map.id]))
+    allow(Response).to receive(:where).and_return([response])
+    helper.get_certain_review_and_feedback_response_map(author)
+    expect(helper.instance_variable_get(:@feedback_response_maps)).to include(feedback_response_map)
+    expect(helper.instance_variable_get(:@review_responses)).to include(response)
+  end
+end
+
+
+describe 'get_data_for_review_report' do
+  it 'should return response maps and rspan for a given reviewer and reviewed object' do
+    assignment = create(:assignment)
+    allow(assignment).to receive(:num_review_rounds).and_return(2)
+    response_map = create(:review_response_map, reviewed_object_id: assignment.id, reviewer_id: 1, type: 'ReviewResponseMap')
+    allow(Team).to receive(:exists?).and_return(true)
+    allow(Response).to receive(:exists?).and_return(true)
+
+    @assignment = assignment
+    result = helper.get_data_for_review_report(assignment.id, 1, 'ReviewResponseMap')
+    expect(result.first).to include(response_map)
+    expect(result.last).to eq(1)
+  end
+end
+
+describe 'initialize_chart_elements' do
+  it 'should return labels, reviewer_data, and all_reviewers_data arrays' do
+    reviewer = double('Reviewer', avg_vol_per_round: [10, 20], overall_avg_vol: 30)
+    @num_rounds = 2
+    @all_reviewers_avg_vol_per_round = [15, 25]
+    @all_reviewers_overall_avg_vol = 20 
+    result = helper.initialize_chart_elements(reviewer)
+    expect(result[0]).to eq([1, 2, 'Total']) # labels
+    expect(result[1]).to eq([10, 20, 30])   # reviewer_data
+    expect(result[2]).to eq([15, 25, 20])   # all_reviewers_data
   end
 end

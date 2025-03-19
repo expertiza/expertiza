@@ -88,6 +88,7 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
+
     @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])

@@ -22,7 +22,6 @@
       <!-- Mentor Name -->
       <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
       <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
-      <td></td>
       <!-- Meeting Dates -->
       <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(@num_of_meeting_cols).pluck(:date) %>
       <% meetings = Meeting.where(team_id: team.id)%>
@@ -33,11 +32,7 @@
           <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
             mm-dd-yy
           </span>
-              <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
-                          meetings_path(team_id: team.id, meeting: { meeting_date: meeting_dates[i] }),
-                          method: :post,
-                          style: 'margin-left: 10px;',
-                          class: "save-meeting-button"%>
+          <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
 
         <% else %>
           <span id="meeting-date-display-<%= i %>-<%= team.id %>">

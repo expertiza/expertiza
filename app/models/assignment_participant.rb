@@ -153,15 +153,22 @@ class AssignmentParticipant < Participant
 
   # define a handle for a new participant
   def set_handle
-    self.handle = if user.handle.nil? || (user.handle == '')
-                    user.name
-                  elsif AssignmentParticipant.exists?(parent_id: assignment.id, handle: user.handle)
-                    user.name
-                  else
-                    user.handle
-                  end
+    user.handle = user.handle.to_s.dup
+    user.handle = user.handle.encode('ISO-8859-1', 'UTF-8', invalid: :replace, undef: :replace, replace: '')
+    user.handle = user.handle.sub(/\A\xEF\xBB\xBF/, '')
+  
+    self.handle =
+      if user.handle.nil? || user.handle.strip.empty?
+        user.name
+      elsif AssignmentParticipant.exists?(parent_id: assignment.id, handle: user.handle)
+        user.name
+      else
+        user.handle
+      end
+  
     save!
   end
+  
 
   def path
     assignment.path + '/' + team.directory_num.to_s

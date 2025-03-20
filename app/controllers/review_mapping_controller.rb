@@ -154,19 +154,10 @@ class ReviewMappingController < ApplicationController
   # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
+  # Checks if the reviewer has exceeded the maximum number of outstanding (incomplete) reviews
+  # for the given assignment. Delegates the logic to the `AssignmentParticipant` model.
   def check_outstanding_reviews?(assignment, reviewer)
-    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-    @num_reviews_total = @review_mappings.size
-    if @num_reviews_total.zero?
-      true
-    else
-      @num_reviews_completed = 0
-      @review_mappings.each do |map|
-        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-      end
-      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      @num_reviews_in_progress < Assignment.max_outstanding_reviews
-    end
+    reviewer.below_outstanding_reviews_limit?(assignment)
   end
 
   # assigns the quiz dynamically to the participant

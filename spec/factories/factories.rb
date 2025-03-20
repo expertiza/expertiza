@@ -756,6 +756,15 @@ FactoryBot.define do
     answer_length_threshold 6
   end
 
+  factory :assignment_participant do
+    association :assignment
+    association :user, factory: :student
+    can_submit { true }
+    can_review { true }
+    can_take_quiz { true }
+    handle { 'handle' }
+  end
+
   factory :ta_mapping, class: TaMapping do
     id 1
     ta_id 1

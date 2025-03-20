@@ -177,25 +177,13 @@ module ReviewMappingHelper
 
   # moves data of reviews in each round from a current round
   def initialize_chart_elements(reviewer)
-    round = 0
-    labels = []
-    reviewer_data = []
-    all_reviewers_data = []
-
-    # display avg volume for all reviewers per round
-    @num_rounds.times do |rnd|
-      next unless @all_reviewers_avg_vol_per_round[rnd] > 0
-
-      round += 1
-      labels.push round
-      reviewer_data.push reviewer.avg_vol_per_round[rnd]
-      all_reviewers_data.push @all_reviewers_avg_vol_per_round[rnd]
-    end
-
-    labels.push 'Total'
-    reviewer_data.push reviewer.overall_avg_vol
-    all_reviewers_data.push @all_reviewers_overall_avg_vol
-    [labels, reviewer_data, all_reviewers_data]
+    chart_service = ChartInitializationService.new(
+      reviewer,
+      @num_rounds,
+      @all_reviewers_avg_vol_per_round,
+      @all_reviewers_overall_avg_vol
+    )
+    chart_service.initialize_chart_elements
   end
 
   # The data of all the reviews is displayed in the form of a bar chart

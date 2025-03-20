@@ -10,17 +10,9 @@ module ReviewMappingHelper
   def get_team_color(response_map)
     assignment_created = @assignment.created_at
     assignment_due_dates = DueDate.where(parent_id: response_map.reviewed_object_id)
-    if Response.exists?(map_id: response_map.id)
-      if !response_map.try(:reviewer).try(:review_grade).nil?
-        'brown'
-      elsif response_for_each_round?(response_map)
-        'blue'
-      else
-        get_team_color(response_map, assignment_created, assignment_due_dates)
-      end
-    else
-      'red'
-    end
+    return 'red' unless Response.exists?(map_id: response_map.id)
+    return 'brown' unless response_map.try(:reviewer).try(:review_grade).nil?
+    return 'blue' if response_for_each_round?(response_map)
   end
 
   def get_team_color(response_map, assignment_created, assignment_due_dates)
@@ -33,16 +25,16 @@ module ReviewMappingHelper
 
   def check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
     if submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)
-      color.push 'purple'
-    else
-      link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
-      if link.nil? || (link !~ %r{https*:\/\/wiki(.*)})
-        color.push 'green'
-      else
-        link_updated_at = get_link_updated_at(link)
-        color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
-      end
+      return color.push 'purple'
     end
+    
+    link = submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
+    if link.nil? || (link !~ %r{https*:\/\/wiki(.*)})
+      return color.push 'green'
+    end
+    
+    link_updated_at = get_link_updated_at(link)
+    color.push link_updated_since_last?(round, assignment_due_dates, link_updated_at) ? 'purple' : 'green'
   end
 
   def response_for_each_round?(response_map)
@@ -63,13 +55,12 @@ module ReviewMappingHelper
     
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     
-    if round > 1
-      submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
-      
-      if submission_due_last_round
-        subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
-      end
-    end
+    return unless round > 1
+
+    submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+    return unless submission_due_last_round
+
+    subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
     
     !subm_created_at.try(:first).try(:created_at).nil?
   end

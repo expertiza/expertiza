@@ -122,6 +122,13 @@ class Team < ApplicationRecord
     raise TeamExistsError, "The team name #{name} is already in use." unless list.empty?
   end
 
+  # Returns the team corresponding to the given response map.
+  # Looks up the team using the reviewee_id from the response map.
+  def self.from_response_map(response_map)
+    find_by(id: response_map.reviewee_id)
+  end
+  
+
   # Algorithm
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.

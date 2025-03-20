@@ -3,15 +3,15 @@
     <% data[:response_maps].each_with_index do |reviewer_map, index| %>
       <% team_name_color = get_team_color(reviewer_map) %>
       <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
-      <% if Team.exists?(id: reviewer_map.reviewee_id) %>
+      <% if team = Team.from_response_map(reviewer_map) %>
         <% if index == 0 %>
-          <% if Response.exists?(map_id: reviewer_map.id) %>
+          <% if reviewer_response_map.has_response? %>
             <div id="<%= team_name_color %>">&#10004;
           <% else %>
             <div id="<%= team_name_color %>">
           <% end %>
         <% else %>
-          <% if Response.exists?(map_id: reviewer_map.id) %>
+          <% if reviewer_response_map.has_response? %>
             <div id="<%= team_name_color %>" style="border-top: solid; border-width: 1px;">&#10004;
           <% else %>
             <div id="<%= team_name_color %>" style="border-top: solid; border-width: 1px;">

@@ -36,15 +36,23 @@
                      style="width: 150px; padding: 5px; border: 1px solid #ddd;"
                      value="<%= meeting_dates[i] %>" />
 
-                    <%= link_to image_tag('save-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
-                          '#',
-                          id: "save-meeting-date-#{i}-#{team.id}",
-                          data: { meeting_index: i, team_id: team.id },
-                          style: 'margin-left: 10px;' %>
+                    <%= link_to image_tag('save_icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                                '#',
+                                id: "save-meeting-date-#{i}-#{team.id}",
+                                data: { meeting_index: i, team_id: team.id, delete: 0, meeting_id: 9999},
+                                style: 'margin-left: 10px;' %>
+
             <% else %>
+
               <span id="meeting-date-display-<%= i %>-<%= team.id %>">
                 <%= meeting_dates[i].strftime('%-m-%-d-%y') %>
               </span>
+
+              <%= link_to image_tag('delete_icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                          '#',
+                          id: "save-meeting-date-#{i}-#{team.id}",
+                          data: { meeting_index: i, team_id: team.id, delete: 1, meeting_id: meetings[i].id },
+                          style: 'margin-left: 10px;' %>
 
               <% Rails.logger.debug("Delete Link: #{team_meeting_path(team.id, meetings[i].id)}") %>
             <% end %>

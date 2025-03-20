@@ -4,8 +4,8 @@ module ReviewMappingHelper
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    ReviewReportService.new(@assignment).get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+  def get_data_for_review_report(reviewed_object_id, reviewer_id, type, assignment)
+    ReviewReportService.new(assignment).get_data_for_review_report(reviewed_object_id, reviewer_id, type, assignment)
   end
 
   #

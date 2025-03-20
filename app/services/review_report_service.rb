@@ -10,20 +10,19 @@ class ReviewReportService
     #
     # Gets the response map data such as reviewer id, reviewed object id, and type for the review report
     #
-    def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
+    def get_data_for_review_report(reviewed_object_id, reviewer_id, type, assignment)
       rspan = 0
-      initialize_review_round_counters
+      initialize_review_round_counters(assignment)
   
       response_maps = fetch_response_maps(reviewed_object_id, reviewer_id, type)
-      process_response_maps(response_maps, rspan)
+      process_response_maps(response_maps, rspan, assignment)
     end
-  
     private
   
     # Initialize counters for each review round
-    def initialize_review_round_counters
+    def initialize_review_round_counters(assignment)
       @review_round_counters = {}
-      (1..@assignment.num_review_rounds).each do |round|
+      (1..assignment.num_review_rounds).each do |round|
         @review_round_counters["review_in_round_#{round}"] = 0
       end
     end
@@ -34,18 +33,18 @@ class ReviewReportService
     end
   
     # Process each response map and update counters
-    def process_response_maps(response_maps, rspan)
+    def process_response_maps(response_maps, rspan, assignment)
       response_maps.each do |response_map|
         rspan += 1 if Team.exists?(id: response_map.reviewee_id)
-        update_review_round_counters(response_map)
+        update_review_round_counters(response_map, assignment)
       end
       [response_maps, rspan, @review_round_counters]
     end
   
     # Update review round counters based on responses
-    def update_review_round_counters(response_map)
+    def update_review_round_counters(response_map, assignment)
       responses = response_map.response
-      (1..@assignment.num_review_rounds).each do |round|
+      (1..assignment.num_review_rounds).each do |round|
         if responses.exists?(round: round)
           @review_round_counters["review_in_round_#{round}"] += 1
         end

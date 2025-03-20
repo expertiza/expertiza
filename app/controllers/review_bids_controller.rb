@@ -111,7 +111,7 @@ class ReviewBidsController < ApplicationController
   # returns matched assignments as json body
   def run_bidding_algorithm(bidding_data)
     # begin
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
+    url = 'http://152.7.178.10:8080/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
     JSON.parse(response.body)
   rescue StandardError

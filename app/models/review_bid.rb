@@ -15,13 +15,18 @@ class ReviewBid < ApplicationRecord
 
     # loop through reviewer_ids to get reviewer specific bidding data
     reviewer_ids.each do |reviewer_id|
-      bidding_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
+      reviewer_data = reviewer_bidding_data(reviewer_id, assignment_id)
+      bidding_data['users'][reviewer_id] = {
+        'bids' => reviewer_data['bids'],
+        'otid' => reviewer_data['otid']
+      }
     end
     bidding_data
   end
 
   # assigns topics to reviews as matched by the webservice algorithm
   def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
+    return if matched_topics == false
     # if review response map already created, delete it
     if ReviewResponseMap.where(reviewed_object_id: assignment_id)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
@@ -29,6 +34,7 @@ class ReviewBid < ApplicationRecord
     # loop through reviewer_ids to assign reviews to each reviewer
     reviewer_ids.each do |reviewer_id|
       topics_to_assign = matched_topics[reviewer_id.to_s]
+      next if topics_to_assign.nil?
       topics_to_assign.each do |topic|
         assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       end
@@ -46,14 +52,16 @@ class ReviewBid < ApplicationRecord
   def self.reviewer_bidding_data(reviewer_id, assignment_id)
     reviewer_user_id = AssignmentParticipant.find(reviewer_id).user_id
     self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
-    bidding_data = { 'tid' => [], 'otid' => self_topic, 'priority' => [], 'time' => [] }
+    bidding_data = { 'bids' => [], 'otid' => self_topic }
     bids = ReviewBid.where(participant_id: reviewer_id)
 
     # loop through each bid for a topic to get specific data
     bids.each do |bid|
-      bidding_data['tid'] << bid.signuptopic_id
-      bidding_data['priority'] << bid.priority
-      bidding_data['time'] << bid.updated_at
+      bidding_data['bids'] << {
+        'tid' => bid.signuptopic_id,
+        'priority' => bid.priority,
+        'timestamp' => bid.updated_at
+      }
     end
     bidding_data
   end

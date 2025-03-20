@@ -145,6 +145,30 @@ describe ReviewMappingHelper, type: :helper do
       color = get_team_color(response_map_with_reviewee)
       expect(color).to eq('purple')
     end
+
+    it 'color should be purple if submission link has been updated since due date for a specified round' do
+      # deadline_right inspired from bookmark_review_spec
+      create(:deadline_right, name: 'No')
+      create(:deadline_right, name: 'Late')
+      create(:deadline_right, name: 'OK')
+
+      response_map_with_reviewee = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee_with_assignment)
+
+      create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee_with_assignment.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
+      create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
+
+      # Stub the link_updated_since_last? method to return true
+      allow(helper).to receive(:link_updated_since_last?).and_return(true)
+      # Also stub get_link_updated_at to return a time
+      allow(helper).to receive(:get_link_updated_at).and_return(DateTime.now.in_time_zone - 6.day)
+      
+      create(:response, response_map: response_map_with_reviewee)
+
+      color = get_team_color(response_map_with_reviewee)
+      expect(color).to eq('purple')
+    end
   end
 
   describe 'response_for_each_round?' do
@@ -710,15 +734,27 @@ describe ReviewMappingHelper, type: :helper do
       expect(resp_color).to eq(['green'])
     end
 
-    xit 'should return purple color if the assignment was submitted within the round' do
+    it 'should return purple color if the assignment was submitted within the round' do
       create(:deadline_right, name: 'No')
       create(:deadline_right, name: 'Late')
       create(:deadline_right, name: 'OK')
+      
+      # Create a submission record with a wiki link
       create(:submission_record, assignment_id: @assignment.id, team_id: @reviewee.id, operation: 'Submit Hyperlink', content: 'https://wiki.archlinux.org/', created_at: DateTime.now.in_time_zone - 7.day)
+      
       create(:response, response_map: @response_map)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 1, due_at: DateTime.now.in_time_zone - 5.day)
       create(:assignment_due_date, assignment: @assignment, parent_id: @assignment.id, round: 2, due_at: DateTime.now.in_time_zone + 6.day)
-
+    
+      # Stub submitted_within_round? to return true
+      allow(helper).to receive(:submitted_within_round?).and_return(true)
+      
+      # Stub link_updated_since_last? to return true
+      allow(helper).to receive(:link_updated_since_last?).and_return(true)
+      
+      # Stub get_link_updated_at to return a time
+      allow(helper).to receive(:get_link_updated_at).and_return(DateTime.now.in_time_zone - 6.day)
+    
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
       round = 2
@@ -801,8 +837,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # rspec test for obtain_team_color method
-  describe 'obtain_team_color' do
+  # rspec test for get_team_color method
+  describe 'get_team_color' do
     before(:each) do
       # create assignment and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -811,7 +847,7 @@ describe ReviewMappingHelper, type: :helper do
       @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
     end
 
-    # Following test cases to assert whether the right color is returned by obtain_team_color for the given combination of pre-conditions
+    # Following test cases to assert whether the right color is returned by get_team_color for the given combination of pre-conditions
 
     it 'should return purple if previous round was not submitted but submitted in current round' do
       create(:deadline_right, name: 'No')
@@ -826,7 +862,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -849,7 +885,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -865,7 +901,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
 
@@ -883,7 +919,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
   end
@@ -1070,5 +1106,179 @@ describe ReviewMappingHelper, type: :helper do
       result = helper.list_hyperlink_submission(@response_map.id, @question.id)
       expect(result).to start_with('<a target="_blank"')
     end
+  end
+end
+
+describe ReviewMappingHelper::ReviewStrategy do
+  let(:participants) { [double('Participant'), double('Participant')] }
+  let(:teams) { [double('Team'), double('Team'), double('Team')] }
+  let(:review_num) { 2 }
+  
+  describe 'base class' do
+    it 'should initialize with participants, teams, and review_num' do
+      strategy = ReviewMappingHelper::ReviewStrategy.new(participants, teams, review_num)
+      expect(strategy.participants).to eq(participants)
+      expect(strategy.teams).to eq(teams)
+    end
+  end
+  
+  describe 'StudentReviewStrategy' do
+    subject { ReviewMappingHelper::StudentReviewStrategy.new(participants, teams, review_num) }
+    
+    it 'should calculate correct reviews_per_team' do
+      # (participants.size * review_num * 1.0 / teams.size).round
+      # (2 * 2 * 1.0 / 3).round = 1.33 -> 1
+      expect(subject.reviews_per_team).to eq(1)
+    end
+    
+    it 'should calculate correct reviews_needed' do
+      # participants.size * review_num
+      # 2 * 2 = 4
+      expect(subject.reviews_needed).to eq(4)
+    end
+    
+    it 'should return review_num for reviews_per_student' do
+      expect(subject.reviews_per_student).to eq(2)
+    end
+    
+    it 'should handle edge cases when teams size is zero' do
+      strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, [], review_num)
+      expect { strategy.reviews_per_team }.to raise_error(FloatDomainError)
+
+    end
+  end
+  
+  describe 'TeamReviewStrategy' do
+    subject { ReviewMappingHelper::TeamReviewStrategy.new(participants, teams, review_num) }
+    
+    it 'should return review_num for reviews_per_team' do
+      expect(subject.reviews_per_team).to eq(2)
+    end
+    
+    it 'should calculate correct reviews_needed' do
+      # teams.size * review_num
+      # 3 * 2 = 6
+      expect(subject.reviews_needed).to eq(6)
+    end
+
+    it 'should calculate correct reviews_per_student' do
+      # (teams.size * review_num * 1.0 / participants.size).round
+      # (3 * 2 * 1.0 / 2).round = 3
+      expect(subject.reviews_per_student).to eq(3)
+    end
+    it 'should handle edge cases when participants size is zero' do
+      strategy = ReviewMappingHelper::TeamReviewStrategy.new([], teams, review_num)
+      expect { strategy.reviews_per_student }.to raise_error(FloatDomainError)
+    end
+  end
+end
+
+describe 'display_tagging_interval_chart' do
+  before(:each) do
+    # Mock line_chart method to return a chart
+    allow(helper).to receive(:line_chart).and_return('chart_html')
+  end
+  
+  it 'should create a chart with valid intervals' do
+    intervals = [5, 10, 15, 20]
+    result = helper.display_tagging_interval_chart(intervals)
+    # Verify the chart is returned
+    expect(result).to eq('chart_html')
+    # Verify line_chart was called with appropriate data
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:label]).to eq('time intervals')
+      expect(data[:datasets][0][:data]).to eq(intervals)
+      expect(data[:datasets][1][:label]).to eq('Mean time spent')
+    end
+  end
+  
+  it 'should filter intervals above threshold' do
+    intervals = [5, 10, 35, 20] 
+    # Call the method
+    result = helper.display_tagging_interval_chart(intervals)
+    # Verify the chart is returned
+    expect(result).to eq('chart_html')
+    # Verify line_chart was called with filtered data
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:data]).not_to include(35)
+      expect(data[:datasets][0][:data].length).to eq(3) # Only 3 points after filtering
+    end
+  end
+  
+  it 'should handle empty intervals' do
+    intervals = []
+    result = helper.display_tagging_interval_chart(intervals)
+    expect(result).to eq('chart_html')
+    expect(helper).to have_received(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:data]).to eq([])
+      expect(data[:datasets].length).to eq(2) 
+    end
+  end
+end
+
+describe 'create_report_table_header' do
+  it 'should render the report table header partial with given headers' do
+    headers = { name: 'Name', score: 'Score' }
+    expect(helper).to receive(:render).with(partial: 'report_table_header', locals: { headers: headers })
+    helper.create_report_table_header(headers)
+  end
+end
+
+
+
+describe 'display_volume_metric_chart' do
+  it 'should create a bar chart with reviewer and all reviewers data' do
+    reviewer = double('Reviewer', avg_vol_per_round: [10, 20], overall_avg_vol: 30)
+    allow(helper).to receive(:initialize_chart_elements).and_return([[1, 2, 'Total'], [10, 20, 30], [15, 25, 20]])
+    allow(helper).to receive(:bar_chart).and_return('chart_html')
+    result = helper.display_volume_metric_chart(reviewer)
+    expect(result).to eq('chart_html')
+    expect(helper).to have_received(:bar_chart)
+  end
+end
+
+describe 'get_certain_review_and_feedback_response_map' do
+  it 'should set instance variables for review and feedback responses' do
+    author = create(:participant)
+    team = create(:assignment_team)
+    review_response_map = create(:review_response_map, reviewer: author, reviewee: team)
+    response = create(:response, map_id: review_response_map.id)
+    feedback_response_map = create(:feedback_response_map, reviewed_object_id: response.id, reviewer_id: author.id)
+    helper.instance_variable_set(:@all_review_response_ids, [response.id])
+    allow(TeamsUser).to receive(:team_id).and_return(team.id)
+    allow(ReviewResponseMap).to receive(:where).and_return(double(pluck: [review_response_map.id]))
+    allow(Response).to receive(:where).and_return([response])
+    helper.get_certain_review_and_feedback_response_map(author)
+    expect(helper.instance_variable_get(:@feedback_response_maps)).to include(feedback_response_map)
+    expect(helper.instance_variable_get(:@review_responses)).to include(response)
+  end
+end
+
+
+describe 'get_data_for_review_report' do
+  it 'should return response maps and rspan for a given reviewer and reviewed object' do
+    assignment = create(:assignment)
+    allow(assignment).to receive(:num_review_rounds).and_return(2)
+    response_map = create(:review_response_map, reviewed_object_id: assignment.id, reviewer_id: 1, type: 'ReviewResponseMap')
+    allow(Team).to receive(:exists?).and_return(true)
+    allow(Response).to receive(:exists?).and_return(true)
+
+    @assignment = assignment
+    result = helper.get_data_for_review_report(assignment.id, 1, 'ReviewResponseMap')
+    expect(result.first).to include(response_map)
+    expect(result.last).to eq(1)
+  end
+end
+
+describe 'initialize_chart_elements' do
+  it 'should return labels, reviewer_data, and all_reviewers_data arrays' do
+    reviewer = double('Reviewer', avg_vol_per_round: [10, 20], overall_avg_vol: 30)
+    @num_rounds = 2
+    @all_reviewers_avg_vol_per_round = [15, 25]
+    @all_reviewers_overall_avg_vol = 20 
+    result = helper.initialize_chart_elements(reviewer)
+    expect(result[0]).to eq([1, 2, 'Total']) # labels
+    expect(result[1]).to eq([10, 20, 30])   # reviewer_data
+    expect(result[2]).to eq([15, 25, 20])   # all_reviewers_data
   end
 end

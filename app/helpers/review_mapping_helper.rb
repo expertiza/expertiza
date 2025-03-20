@@ -1,28 +1,15 @@
 module ReviewMappingHelper
+  # Renders the report table header
   def create_report_table_header(headers = {})
     render partial: 'report_table_header', locals: { headers: headers }
   end
 
-  #
-  # gets the response map data such as reviewer id, reviewed object id and type for the review report
-  #
   def get_data_for_review_report(reviewed_object_id, reviewer_id, type)
-    rspan = 0
-    (1..@assignment.num_review_rounds).each { |round| instance_variable_set('@review_in_round_' + round.to_s, 0) }
-
-    response_maps = ResponseMap.where(['reviewed_object_id = ? AND reviewer_id = ? AND type = ?', reviewed_object_id, reviewer_id, type])
-    response_maps.each do |ri|
-      rspan += 1 if Team.exists?(id: ri.reviewee_id)
-      responses = ri.response
-      (1..@assignment.num_review_rounds).each do |round|
-        instance_variable_set('@review_in_round_' + round.to_s, instance_variable_get('@review_in_round_' + round.to_s) + 1) if responses.exists?(round: round)
-      end
-    end
-    [response_maps, rspan]
+    ReviewReportService.new(@assignment).get_data_for_review_report(reviewed_object_id, reviewer_id, type)
   end
 
   #
-  # gets the team name's color according to review and assignment submission status
+  # Gets the team name's color according to review and assignment submission status
   #
   def get_team_color(response_map)
     # Storing redundantly computed value in a variable
@@ -138,17 +125,7 @@ module ReviewMappingHelper
     team_reviewed_link_name
   end
 
-  # if the current stage is "submission" or "review", function returns the current round number otherwise,
-  # if the current stage is "Finished" or "metareview", function returns the number of rounds of review completed.
-  # def get_current_round(reviewer_id)
-  #   user_id = Participant.find(reviewer_id).user.id
-  #   topic_id = SignedUpTeam.topic_id(@assignment.id, user_id)
-  #   @assignment.number_of_current_round(topic_id)
-  #   @assignment.num_review_rounds if @assignment.get_current_stage(topic_id) == "Finished" || @assignment.get_current_stage(topic_id) == "metareview"
-  # end
-
   # gets the review score awarded based on each round of the review
-
   def get_awarded_review_score(reviewer_id, team_id)
     # Storing redundantly computed value in num_rounds variable
     num_rounds = @assignment.num_review_rounds

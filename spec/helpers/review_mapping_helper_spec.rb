@@ -837,8 +837,8 @@ describe ReviewMappingHelper, type: :helper do
     end
   end
 
-  # rspec test for obtain_team_color method
-  describe 'obtain_team_color' do
+  # rspec test for get_team_color method
+  describe 'get_team_color' do
     before(:each) do
       # create assignment and respective reviewer, reviewee instance variables
       @assignment = create(:assignment, created_at: DateTime.now.in_time_zone - 13.day)
@@ -847,7 +847,7 @@ describe ReviewMappingHelper, type: :helper do
       @response_map = create(:review_response_map, reviewer: @reviewer, reviewee: @reviewee)
     end
 
-    # Following test cases to assert whether the right color is returned by obtain_team_color for the given combination of pre-conditions
+    # Following test cases to assert whether the right color is returned by get_team_color for the given combination of pre-conditions
 
     it 'should return purple if previous round was not submitted but submitted in current round' do
       create(:deadline_right, name: 'No')
@@ -862,7 +862,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -885,7 +885,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
 
@@ -901,7 +901,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('green')
     end
 
@@ -919,7 +919,7 @@ describe ReviewMappingHelper, type: :helper do
       assignment_created = @assignment.created_at
       assignment_due_dates = DueDate.where(parent_id: @response_map.reviewed_object_id)
 
-      last_round_color = obtain_team_color(@response_map, assignment_created, assignment_due_dates)
+      last_round_color = get_team_color(@response_map, assignment_created, assignment_due_dates)
       expect(last_round_color).to eq('purple')
     end
   end

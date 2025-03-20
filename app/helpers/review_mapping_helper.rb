@@ -200,65 +200,12 @@ module ReviewMappingHelper
 
   # The data of all the reviews is displayed in the form of a bar chart
   def display_volume_metric_chart(reviewer)
-    labels, reviewer_data, all_reviewers_data = initialize_chart_elements(reviewer)
-    data = {
-      labels: labels,
-      datasets: [
-        {
-          label: 'vol.',
-          backgroundColor: 'rgba(255,99,132,0.8)',
-          borderWidth: 1,
-          data: reviewer_data,
-          yAxisID: 'bar-y-axis1'
-        },
-        {
-          label: 'avg. vol.',
-          backgroundColor: 'rgba(255,206,86,0.8)',
-          borderWidth: 1,
-          data: all_reviewers_data,
-          yAxisID: 'bar-y-axis2'
-        }
-      ]
-    }
-    options = {
-      legend: {
-        position: 'top',
-        labels: {
-          usePointStyle: true
-        }
-      },
-      width: '200',
-      height: '225',
-      scales: {
-        yAxes: [{
-          stacked: true,
-          id: 'bar-y-axis1',
-          barThickness: 10
-        }, {
-          display: false,
-          stacked: true,
-          id: 'bar-y-axis2',
-          barThickness: 15,
-          type: 'category',
-          categoryPercentage: 0.8,
-          barPercentage: 0.9,
-          gridLines: {
-            offsetGridLines: true
-          }
-        }],
-        xAxes: [{
-          stacked: false,
-          ticks: {
-            beginAtZero: true,
-            stepSize: 50,
-            max: 400
-          }
-        }]
-      }
-    }
+    chart_service = ChartDataService.new(reviewer, @assignment)
+    data = chart_service.volume_metric_chart_data
+    options = chart_service.volume_metric_chart_options
     bar_chart data, options
   end
-
+  
   # E2082 Generate chart for review tagging time intervals
   def display_tagging_interval_chart(intervals)
     # if someone did not do any tagging in 30 seconds, then ignore this interval

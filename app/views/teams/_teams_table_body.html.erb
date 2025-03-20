@@ -36,7 +36,7 @@
                      style="width: 150px; padding: 5px; border: 1px solid #ddd;"
                      value="<%= meeting_dates[i] %>" />
 
-              <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                    <%= link_to image_tag('save-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
                           '#',
                           id: "save-meeting-date-#{i}-#{team.id}",
                           data: { meeting_index: i, team_id: team.id },

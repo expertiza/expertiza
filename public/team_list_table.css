@@ -1,17 +1,29 @@
+
+/* Center the h1 header */
+#course-header {
+    text-align: center; /* Centers text horizontally */
+    margin-top: 20px; /* Adds spacing above */
+    font-size: 36px; /* Adjust font size if needed */
+}
+
+
 /* General table styling */
 .teams-list-table table {
     border-collapse: collapse;
-    width: 100%;
     font-family: Arial, sans-serif;
     margin-top: 20px;
+    margin-left: auto; /* Center table horizontally */
+    margin-right: auto; /* Center table horizontally */
+    table-layout: auto; /* Allow table to size based on content */
 }
 
 /* Header styling */
 .teams-list-table th {
-    background-color: #ba2a2a; /* Green header */
+    text-align: center; /* Centers header content horizontally */
+    vertical-align: middle; /* Centers header content vertically */
+    background-color: #ba2a2a; /* Red header */
     color: white;
     font-weight: bold;
-    text-align: center;
     padding: 12px;
     border: 1px solid #ddd; /* Add border to header cells */
 }
@@ -32,14 +44,25 @@
 
 /* Cell styling */
 .teams-list-table td {
+    text-align: center; /* Centers header content horizontally */
+    vertical-align: middle; /* Centers header content vertically */
     padding: 10px;
     border: 1px solid #ddd; /* Add border to table cells */
 }
 
-/* Add spacing between rows and columns */
-.teams-list-table th,
-.teams-list-table td {
-    text-align: left;
+
+
+/* Adjust Team Name column dynamically */
+.teams-list-table td:first-child,
+.teams-list-table th:first-child {
+    max-width: fit-content; /* Dynamically size based on content */
+}
+
+/* Adjust Emails Concatenated column dynamically and allow wrapping */
+.teams-list-table td:nth-child(4),
+.teams-list-table th:nth-child(4) {
+    word-wrap: break-word; /* Break long words onto multiple lines */
+    white-space: normal; /* Allow text wrapping */
 }
 
 /* Make the Actions column narrower */
@@ -51,13 +74,10 @@
 .teams-list-table th.actions {
     width: 10%; /* Ensure header aligns with the column */
 }
-/* filter style */
-.filter-dropdown {
-    margin-bottom: 20px;
-    padding: 5px;
-}
 
-.filter-button {
-    margin-left: 10px;
-    padding: 5px;
+/* Center the footer */
+.footer-container {
+    text-align: center; /* Centers text horizontally */
+    margin-top: 20px; /* Adds spacing above */
+    font-size: 14px; /* Adjust font size if needed */
 }

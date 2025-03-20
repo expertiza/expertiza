@@ -31,7 +31,7 @@
         <span id="meeting-date-<%= i %>-<%= team.id %>" contenteditable="true" style="width: 100px; padding: 5px; border: 1px solid #ddd;">
           <%= meeting_dates[i]&.strftime('%-m/%-d') || 'mm-dd-yy' %>
         </span>
-        <%= link_to image_tag('Check-icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
+        <%= link_to image_tag('save_icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'), '#', id: "save-meeting-date-#{i}-#{team.id}", style: 'margin-left: 10px;' %>
 
       </span>
         </td>

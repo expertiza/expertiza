@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe Invitation do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
@@ -6,6 +8,8 @@ describe Invitation do
   let(:team2) { build(:assignment_team, id: 2, parent_id: 1) }
   let(:topic) { build(:topic, id: 1, assignment_id: 1) }
   let(:signed_up_team) { build(:signed_up_team, is_waitlisted: true) }
+  let(:invitation) { build(:invitation, id: 1, team_id: 1, from_id: 1, to_id: 2) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }
@@ -126,6 +130,60 @@ describe Invitation do
       allow(SignUpTopic).to receive(:find).with(topic.id).and_return(topic)
       allow(Waitlist).to receive(:cancel_all_waitlists).with(team.id, topic.assignment_id).and_return([topic])
       expect(Invitation.remove_waitlists_for_team(topic.id, assignment.id)).to eq([topic])
+    end
+  end
+
+  describe '#accept' do
+    it 'accepts the invitation and adds the user to the team' do
+      allow(TeamsParticipant).to receive(:create).with(team_id: 1, participant_id: 2).and_return(team_participant)
+      expect(invitation.accept).to be true
+    end
+  end
+
+  describe '#decline' do
+    it 'declines the invitation' do
+      expect(invitation.decline).to be true
+    end
+  end
+
+  describe '#from_user' do
+    it 'returns the user who sent the invitation' do
+      allow(User).to receive(:find).with(1).and_return(build(:user))
+      expect(invitation.from_user).to be_a(User)
+    end
+  end
+
+  describe '#to_user' do
+    it 'returns the user who received the invitation' do
+      allow(User).to receive(:find).with(2).and_return(build(:user))
+      expect(invitation.to_user).to be_a(User)
+    end
+  end
+
+  describe '#team' do
+    it 'returns the team associated with the invitation' do
+      allow(Team).to receive(:find).with(1).and_return(build(:team))
+      expect(invitation.team).to be_a(Team)
+    end
+  end
+
+  describe '#valid?' do
+    it 'validates the invitation' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(invitation.valid?).to be true
+    end
+  end
+
+  describe '#reply_status' do
+    it 'returns the reply status of the invitation' do
+      expect(invitation.reply_status).to eq('W')
+    end
+  end
+
+  describe '#reply_status=' do
+    it 'sets the reply status of the invitation' do
+      invitation.reply_status = 'A'
+      expect(invitation.reply_status).to eq('A')
     end
   end
 end

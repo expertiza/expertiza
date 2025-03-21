@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }
@@ -23,6 +25,10 @@ describe UsersController do
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
+
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:team) { build(:team, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
 
   context '#index' do
     it 'redirects if user is student' do

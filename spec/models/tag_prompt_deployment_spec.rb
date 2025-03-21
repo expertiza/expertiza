@@ -106,6 +106,16 @@ describe TagPromptDeployment do
         allow(answers_one).to receive(:count)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
       end
+
+      it 'count of taggable answers less than answers_one' do
+        questions_ids = double(1)
+        response_ids = double(241)
+        tag_dep1.answer_length_threshold = 15
+        allow(Answer).to.receive(:where).with(question_id: questions_ids, response_id: response_ids).and.return(answer)
+        allow(answer).to.receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and.return([answers_one, answers_one, answers_one])
+        allow_any_instance_of(Array).to.receive(:count).and.return(3)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to.eq(3)
+      end
     end
 
     context 'when responses empty' do

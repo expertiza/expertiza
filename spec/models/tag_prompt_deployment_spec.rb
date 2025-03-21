@@ -1,19 +1,45 @@
 describe TagPromptDeployment do
+
+  # Define a TagPromptDeployment object with specific attributes
   let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: 5, questionnaire: questionnaire, assignment: assignment }
   let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, questionnaire: questionnaire }
+  
+  # Define a TagPrompt object with specific attributes  
   let(:tp) { TagPrompt.new(prompt: 'test prompt', desc: 'test desc', control_type: 'Checkbox') }
+
+  # Define a Team object with a specific ID  
   let(:team) { Team.new(id: 1) }
+
+  # Define an Assignment object with a specific ID
   let(:assignment) { Assignment.new(id: 1) }
+
+  # Define a Questionnaire object with specific attributes
   let(:questionnaire) { Questionnaire.new(id: 1, name: 'question1') }
+
+  # Define a Response object with specific attributes
   let(:rp) { Response.new(map_id: 1, round: 1, additional_comment: 'improvement scope') }
+
+  # Define another Response object with a different set of attributes
   let(:response) { Response.new(map_id: [1, 2], round: [1, 1], additional_comment: ['improvement scope', 'through comments']) }
+
+  # Define a Question object associated with the questionnaire
   let(:question) { Question.new(questionnaire: questionnaire) }
+
+  # Define an Answer object with specific attributes
   let(:answer) { Answer.new(id: [1, 2, 3], question_id: [1, 1, 1], answer: [3, 3, 3], comments: ['comment', 'comment is lengthy', 'comment is too lengthy'], response_id: [241, 241, 241]) }
+  
+  # Define another Answer object with a different set of attributes
   let(:answers_one) { Answer.new(id: [1], question_id: [1], answer: [3], comments: ['comment'], response_id: [241]) }
+
+  # Define a User object with a specific ID
   let(:user1) { User.new(id: 1) }
   let(:user2) { User.new(id: 2) }
+
+  # Define a TeamsUser object associating user1 with a team
   let(:team_user1) { TeamsUser.new(user_id: user1.id, team_id: team.id) }
   let(:team_user2) { TeamsUser.new(user_id: user2.id, team_id: team.id) }
+
+  # Define an AnswerTag object with specific attributes for user1
   let(:tagA) { AnswerTag.new(tag_prompt_deployment_id: tag_dep.id, user_id: user1.id, answer: answer, updated_at: Date.new.to_s) }
   let(:tagB) { AnswerTag.new(tag_prompt_deployment_id: tag_dep.id, user_id: user2.id, answer: answer, updated_at: Date.new.to_s) }
 
@@ -23,6 +49,9 @@ describe TagPromptDeployment do
     Answer.new(id: 3, question_id: 1, answer: 3, comments: 'comment length within threshold', response_id: 2313),
     Answer.new(id: 4, question_id: 2, answer: 1, comments: 'com1', response_id: 241)
   ]
+
+
+  
   ##tag_prompt method testing
   describe '#tag_prompt' do
     context 'when tag_prompt exists' do
@@ -60,7 +89,7 @@ describe TagPromptDeployment do
     end
     
     context 'when user_id is null' do
-      it 'given out an error message' do
+      it 'gives an error message' do
         allow(Team).to receive(:joins).with(:teams_users).and_return(team)
         allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
         expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError

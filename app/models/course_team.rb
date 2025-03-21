@@ -75,4 +75,11 @@ class CourseTeam < Team
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     add_participant(parent_id, user)
   end
+
+  def create_new_team(user_id, signuptopic)
+    t_participant = TeamsParticipant.create(team_id: id, participant_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_participant.id)
+  end
 end

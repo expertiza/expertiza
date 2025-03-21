@@ -76,4 +76,9 @@ class TagPromptDeployment < ApplicationRecord
     end
     user_answer_tagging
   end
+
+  def get_team_members(team)
+    teams_participants = TeamsParticipant.where(team_id: team.id)
+    teams_participants.map(&:participant).map(&:user)
+  end
 end

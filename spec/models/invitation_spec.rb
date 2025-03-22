@@ -10,6 +10,8 @@ describe Invitation do
   let(:signed_up_team) { build(:signed_up_team, is_waitlisted: true) }
   let(:invitation) { build(:invitation, id: 1, team_id: 1, from_id: 1, to_id: 2) }
   let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:participant2) { build(:participant, id: 2, user: user2) }
+  let(:participant3) { build(:participant, id: 3, user: user3) }
 
   it { should belong_to :to_user }
   it { should belong_to :from_user }
@@ -91,35 +93,27 @@ describe Invitation do
   end
 
   describe '#update_users_topic_after_invite_accept' do
-    context 'the invited user was already in another team before accepting their invitation' do
-      it 'updates their team user mapping' do
-        updated_teams_user = TeamsUser.new
-        updated_teams_user.team_id = team.id
-        updated_teams_user.user_id = user3.id
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
-        allow(created_teams_user).to receive(:id).and_return(1)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
-        allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_user)
-        allow(TeamsUser).to receive(:update).with(1, team_id: team.id).and_return(updated_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+    context 'the invited user was in another team before accepting their invitation' do
+      it 'updates the team participant mapping' do
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
+        allow(TeamsParticipant).to receive(:find_by).with(team_id: team2.id, participant_id: participant3.id).and_return(team_participant)
+        allow(TeamsParticipant).to receive(:update).with(team_participant.id, team_id: team.id).and_return(true)
+        expect(Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)).to be true
       end
     end
+
     context 'the invited user was never in another team before accepting their invitation' do
-      it 'creates a team user mapping' do
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(nil)
-        allow(TeamsUser).to receive(:create).with(team_id: team.id, user_id: user3.id).and_return(created_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+      it 'creates a team participant mapping' do
+        created_teams_participant = TeamsParticipant.new
+        created_teams_participant.team_id = team.id
+        created_teams_participant.participant_id = participant3.id
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, user3.id).and_return(nil)
+        allow(TeamsParticipant).to receive(:create).with(team_id: team.id, participant_id: participant3.id).and_return(created_teams_participant)
+        teams_participant = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+        expect(teams_participant.team_id).to eq(team.id)
+        expect(teams_participant.participant_id).to eq(participant3.id)
       end
     end
   end

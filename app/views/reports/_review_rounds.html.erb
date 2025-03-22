@@ -1,0 +1,29 @@
+<tr>
+  <td align="left">
+    <% data[:response_maps].each_with_index do |reviewer_map, index| %>
+      <% team_name_color = get_team_color(reviewer_map) %>
+      <% team_reviewed_link_name = get_team_reviewed_link_name(@assignment.max_team_size, reviewer_map.response, reviewer_map.reviewee_id, session[:ip]) %>
+      <% if team = Team.from_response_map(reviewer_map) %>
+        <% if index == 0 %>
+          <% if reviewer_response_map.has_response? %>
+            <div id="<%= team_name_color %>">&#10004;
+          <% else %>
+            <div id="<%= team_name_color %>">
+          <% end %>
+        <% else %>
+          <% if reviewer_response_map.has_response? %>
+            <div id="<%= team_name_color %>" style="border-top: solid; border-width: 1px;">&#10004;
+          <% else %>
+            <div id="<%= team_name_color %>" style="border-top: solid; border-width: 1px;">
+          <% end %>
+        <% end %>
+          <%= link_to team_reviewed_link_name, controller: 'popup', action: 'team_users_popup', id: reviewer_map.reviewee_id, id2: reviewer_map.id, assignment_id: @id %>
+          <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
+          <% if defined?(hyperlink_question_id) && hyperlink_question_id.present? %>
+            <%= list_hyperlink_submission(reviewer_map.id, hyperlink_question_id) %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </td>
+</tr>

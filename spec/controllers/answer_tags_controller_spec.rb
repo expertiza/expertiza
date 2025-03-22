@@ -51,6 +51,88 @@ describe AnswerTagsController do
         expect(controller.send(:action_allowed?)).to be false
       end
     end
+
+    #new
+    context 'when a user without a role tries to access restricted actions' do
+      let(:guest_user) { build(:student, id: 4, role: nil) }
+    
+      before(:each) do
+        controller.request.session[:user] = guest_user
+      end
+    
+      it 'denies access when a user without a role tries to access index' do
+        controller.params = { action: 'index' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    
+      it 'denies access when a user without a role tries to access create_edit' do
+        controller.params = { action: 'create_edit' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+
+    context 'when a teaching assistant tries to access restricted actions' do
+      let(:ta) { build(:teaching_assistant, id: 2) }
+    
+      before(:each) do
+        controller.request.session[:user] = ta
+      end
+    
+      it 'denies access when TA tries to access index' do
+        controller.params = { action: 'index' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    
+      it 'denies access when TA tries to access create_edit' do
+        controller.params = { action: 'create_edit' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+    
+    context 'when the action is not recognized by the controller' do
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+    
+      it 'denies access for unrecognized actions' do
+        controller.params = { action: 'destroy' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+
+    context 'when a student tries to access an unsupported action' do
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+    
+      it 'denies access for unsupported action: show' do
+        controller.params = { action: 'show' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+
+    context 'when an instructor tries to access an unsupported action' do
+      before(:each) do
+        controller.request.session[:user] = instructor
+      end
+    
+      it 'denies access for action: destroy' do
+        controller.params = { action: 'destroy' }
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+
+    context 'when student session is active but no action is given' do
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+    
+      it 'denies access if no action param is present' do
+        controller.params = {}
+        expect(controller.send(:action_allowed?)).to be false
+      end
+    end
+    
   end
 
   # Test index method used to return all tag prompt deployments in JSON format

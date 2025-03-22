@@ -1,12 +1,12 @@
 <!-- Partial view for rendering reviewer information -->
 <tr>
-  <% unless reviewer.id == 1 %>
+  <% unless user.super_admin? %>
     <% user = Participant.find(reviewer.id).user %>
     <!-- Reviewer -->
     <td>
       <%= index + 1 %>.
-      <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
-      (<span class="user_name"><%= user.fullname(session[:ip]) %></span>)
+      <%= link_to user.name(@session_ip), impersonate_impersonate_path(:user => {:name => user.name(@session_ip)}), :method => :post, :class => "user_unityID" %>
+      (<span class="user_name"><%= user.fullname(@session_ip) %></span>)
     </td>
     <!-- Reviews done -->
     <td align='left'>

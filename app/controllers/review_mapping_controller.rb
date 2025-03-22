@@ -335,6 +335,10 @@ class ReviewMappingController < ApplicationController
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
+
+      # Retrieve the session IP once here
+      @session_ip = session[:ip]
+      
     # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
     @items = AssignmentTeam.where(parent_id: @assignment.id)

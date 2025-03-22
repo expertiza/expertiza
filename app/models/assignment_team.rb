@@ -32,7 +32,7 @@ class AssignmentTeam < Team
 
   # E1973
   # stores the current user so that we can check them when returning the user_id
-  def set_current_user(current_user)
+  def store_current_user(current_user)
     @current_user = current_user
   end
 

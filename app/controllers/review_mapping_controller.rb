@@ -227,12 +227,16 @@ class ReviewMappingController < ApplicationController
   end
 
   def get_reviewer(user, assignment, reg_url)
-    reviewer = AssignmentParticipant.where(user_id: user.id, parent_id: assignment.id).first
-    raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue." if reviewer.nil?
+    reviewer = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+
+    if reviewer.nil?
+      raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
+    end
 
     reviewer.get_reviewer
   rescue StandardError => e
     flash[:error] = e.message
+    nil
   end
 
   def delete_outstanding_reviewers

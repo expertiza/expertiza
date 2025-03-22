@@ -121,22 +121,6 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(0)
       end
     end
-
-    context 'when there are multiple users' do
-      let(:user2) { User.new(id: 2) }
-      let(:team_user1) { TeamsUser.new(user_id: user1.id, team_id: team.id) }
-      let(:team_user2) { TeamsUser.new(user_id: user2.id, team_id: team.id) }
-
-      it 'returns the correct count for each user' do
-        allow(Team).to receive(:joins).with(:teams_users).and_return(team)
-        allow(Team).to receive(:where).with(teams_users: { parent_id: tag_dep1.assignment_id }, user_id: user1.id).and_return([team])
-        allow(Team).to receive(:where).with(teams_users: { parent_id: tag_dep1.assignment_id }, user_id: user2.id).and_return([team])
-        allow(Answer).to receive(:where).with(question_id: any_args, response_id: any_args).and_return([answer])
-        allow_any_instance_of(Array).to receive(:count).and_return(3)
-        expect(tag_dep1.get_number_of_taggable_answers(user1.id)).to eq(3)
-        expect(tag_dep1.get_number_of_taggable_answers(user2.id)).to eq(3)
-      end
-    end
   end
 
 

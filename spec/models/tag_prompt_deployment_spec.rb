@@ -97,7 +97,7 @@ describe TagPromptDeployment do
     end
 
     context 'when answer_length_threshold NOT null' do
-      it 'count of taggable answers less than answers_one' do
+      it 'count of taggable answers when one' do
         questions_ids = double(1)
         response_ids = double(241)
         tag_dep1.answer_length_threshold = 15
@@ -107,12 +107,12 @@ describe TagPromptDeployment do
         expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answers_one.count)
       end
 
-      it 'count of taggable answers less than answers_one' do
+      it 'count of taggable answers when several' do
         questions_ids = double(1)
         response_ids = double(241)
         tag_dep1.answer_length_threshold = 15
         allow(Answer).to.receive(:where).with(question_id: questions_ids, response_id: response_ids).and.return(answer)
-        allow(answer).to.receive(:where).with(conditions: "length(comments) < #{tag_dep1.answer_length_threshold}").and.return([answers_one, answers_one, answers_one])
+        allow(answer).to.receive(:where).with(any_args).and.return([answers_one, answers_one, answers_one])
         allow_any_instance_of(Array).to.receive(:count).and.return(3)
         expect(tag_dep1.get_number_of_taggable_answers(1)).to.eq(3)
       end

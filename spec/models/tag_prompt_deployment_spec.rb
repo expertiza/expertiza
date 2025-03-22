@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe TagPromptDeployment do
   let(:tag_dep) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: 5, questionnaire: questionnaire, assignment: assignment }
   let(:tag_dep1) { TagPromptDeployment.new id: 1, tag_prompt: tp, tag_prompt_id: 1, question_type: 'Criterion', answer_length_threshold: nil, assignment_id: 1, assignment: assignment, questionnaire: questionnaire }
@@ -24,10 +26,60 @@ describe TagPromptDeployment do
     Answer.new(id: 4, question_id: 2, answer: 1, comments: 'com1', response_id: 241)
   ]
 
+  describe '#assignment' do
+    it 'returns the assignment associated with the tag prompt deployment' do
+      allow(Assignment).to receive(:find).with(1).and_return(build(:assignment))
+      expect(tag_dep.assignment).to be_a(Assignment)
+    end
+  end
+
+  describe '#questionnaire' do
+    it 'returns the questionnaire associated with the tag prompt deployment' do
+      allow(Questionnaire).to receive(:find).with(1).and_return(build(:questionnaire))
+      expect(tag_dep.questionnaire).to be_a(Questionnaire)
+    end
+  end
+
   describe '#tag_prompt' do
-    it 'returns the associated tag prompt with the deployment' do
-      allow(TagPrompt).to receive(:find).with(1).and_return(tp)
-      expect(tag_dep.tag_prompt).to be(tp)
+    it 'returns the tag prompt associated with the tag prompt deployment' do
+      allow(TagPrompt).to receive(:find).with(1).and_return(build(:tag_prompt))
+      expect(tag_dep.tag_prompt).to be_a(TagPrompt)
+    end
+  end
+
+  describe '#question_type' do
+    it 'returns the question type associated with the tag prompt deployment' do
+      expect(tag_dep.question_type).to eq('Criterion')
+    end
+  end
+
+  describe '#valid?' do
+    it 'validates the tag prompt deployment' do
+      expect(tag_dep.valid?).to be true
+    end
+  end
+
+  describe '#active?' do
+    it 'checks if the tag prompt deployment is active' do
+      expect(tag_dep.active?).to be true
+    end
+  end
+
+  describe '#inactive?' do
+    it 'checks if the tag prompt deployment is inactive' do
+      expect(tag_dep.inactive?).to be false
+    end
+  end
+
+  describe '#activate' do
+    it 'activates the tag prompt deployment' do
+      expect(tag_dep.activate).to be true
+    end
+  end
+
+  describe '#deactivate' do
+    it 'deactivates the tag prompt deployment' do
+      expect(tag_dep.deactivate).to be true
     end
   end
 

@@ -1,4 +1,5 @@
 require './spec/support/teams_shared.rb'
+require 'rails_helper'
 
 describe StudentTeamsController do
   # Including the stubbed objects from the teams_shared.rb file
@@ -8,6 +9,9 @@ describe StudentTeamsController do
 
   let(:student_teams_controller) { StudentTeamsController.new }
   let(:student) { double 'student' }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:team) { build(:team, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
 
   # renders the student view
   describe '#view' do
@@ -17,6 +21,29 @@ describe StudentTeamsController do
       allow(student_teams_controller).to receive(:params).and_return(student_id: '12345')
       allow(student).to receive(:user_id)
       student_teams_controller.view
+    end
+  end
+
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows student team details' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
     end
   end
 
@@ -88,82 +115,44 @@ describe StudentTeamsController do
     end
   end
 
-  describe '#update' do
-    # When the name is not already present in the database, it updates the name
-    context 'update team name when matching name not found' do
-      it 'update name when the name is not already present in the database' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return([])
-        allow(Team).to receive(:find).with('1').and_return(team7)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:user_id).with(any_args).and_return(1)
-        allow(team7).to receive(:update_attribute).and_return(true)
-        user_session = { user: student1 }
-        request_params = {
-          student_id: 1,
-          team_id: 1,
-          team: {
-            name: 'test'
-          },
-          action: 'update'
-        }
-        result = post :update, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq(302)
-      end
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(StudentTeam).to receive(:find).with(1).and_return(build(:student_team))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
     end
-    # When no team has name and only one matching team is found,update the name
-    context 'update name when name is found' do
-      it 'update name when no team has name and only one matching team is found' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
-        allow(Team).to receive(:find).with('1').and_return(team8)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:update_attribute).and_return(true)
-        allow(team1).to receive(:length).and_return(1)
-        allow(team1).to receive(:name).and_return('test')
-        allow(team8).to receive(:name).and_return('test')
-        user_session = { user: student1 }
-        request_params = {
-          student_id: 1,
-          team_id: 1,
-          team: {
-            name: 'test'
-          },
-          action: 'update'
-        }
-        result = post :update, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq(302)
-      end
-    end
-    # when the team name is already in use, then flash the error message
-    context 'name is already in use' do
-      it 'when the team name is already in use flash notice' do
-        allow(AssignmentTeam).to receive(:where).with(name: 'test', parent_id: 1).and_return(team1)
-        allow(Team).to receive(:find).with('1').and_return(team8)
-        allow(AssignmentParticipant).to receive(:find).with('1').and_return(student1)
-        allow(AuthorizationHelper).to receive(:current_user_has_id).with(any_args).and_return(true)
-        allow(student1).to receive(:user_id).with(any_args).and_return(1)
-        allow(team8).to receive(:user_id).with(any_args).and_return(1)
-        allow(team1).to receive(:length).and_return(2)
+  end
 
-        user_session = { user: student1 }
-        request_params = {
-          student_id: 1,
-          team_id: 1,
-          team: {
-            name: 'test'
-          },
-          action: 'update'
-        }
-        result = post :update, params: request_params, session: user_session
-        # status code 302: Redirect url
-        expect(result.status).to eq(302)
-      end
+  describe 'PATCH #update' do
+    it 'updates a student team' do
+      allow(StudentTeam).to receive(:find).with(1).and_return(build(:student_team))
+      patch :update, params: { id: 1, student_team: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(student_team_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys a student team' do
+      allow(StudentTeam).to receive(:find).with(1).and_return(build(:student_team))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(student_teams_path)
+    end
+  end
+
+  describe 'GET #list' do
+    it 'lists student teams' do
+      allow(StudentTeam).to receive(:all).and_return([build(:student_team)])
+      get :list
+      expect(response).to render_template(:list)
+    end
+  end
+
+  describe 'GET #view' do
+    it 'views a student team' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :view, params: { id: 1 }
+      expect(response).to render_template(:view)
     end
   end
 

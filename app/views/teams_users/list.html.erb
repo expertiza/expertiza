@@ -1,17 +1,10 @@
-<H1>Team Members for <%= @assignment.name %></H1>
+<% @page_title = "Team Members" %>
 
+<% @teams_participants.each do |teams_participant| %>
+  <div class="team-member">
+    <p><%= teams_participant.participant.user.name(session[:ip]) %></p>
+    <p>Duty: <%= teams_participant.duty&.name || 'Not assigned' %></p>
+  </div>
+<% end %>
 
-<H3>Team Name: <%= @team.name(session[:ip]) %></H3>
-
-<%
-    column_definitions = []
-column_definitions << {:name => 'Team Member', :type => 'fetch', :model => 'User', :field => 'name', :column => 'user_id'}
-column_definitions << {:name => 'Remove from Team',      :action => 'delete_team_user', :controller => 'teams_users'}
-
-delete_options = {:enabled => true, :controller => 'teams_users'}
-%>
-<%= render :partial => 'shared_scripts/selectTable', :locals => {:column_definitions => column_definitions, :delete_options => delete_options, :elements => @teams_users} %>
-
-<BR/>
-<%= link_to 'New Team Member', :action => 'new', :id => @team %>
-| <%= link_to 'Back', :action => 'list', :controller => 'teams', :id => @team.parent_id %>
+<%= link_to 'Add Team Member', new_teams_participant_path(id: @team.id), class: 'btn btn-primary' %>

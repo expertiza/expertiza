@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe GradesController do
   let(:review_response) { build(:response) }
   let(:assignment) { build(:assignment, id: 1, max_team_size: 2, questionnaires: [review_questionnaire], is_penalty_calculated: true) }
@@ -20,6 +22,7 @@ describe GradesController do
   let(:assignment_due_date) { build(:assignment_due_date) }
   let(:ta) { build(:teaching_assistant, id: 8) }
   let(:late_policy) { build(:late_policy) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
   score_view_setup_query = '
   CREATE OR REPLACE VIEW score_views AS SELECT ques.weight question_weight,ques.type AS type,
       q1.id "q1_id",q1.NAME AS q1_name,q1.instructor_id AS q1_instructor_id,q1.private AS q1_private,
@@ -94,7 +97,7 @@ describe GradesController do
 
     context 'when view_my_scores page is allow to access' do
       it 'renders grades#view_my_scores page' do
-        allow(TeamsUser).to receive(:where).with(any_args).and_return([double('TeamsUser', team_id: 1)])
+        allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentQuestionnaire).to receive(:find_by).with(assignment_id: 1, questionnaire_id: 1).and_return(assignment_questionnaire)
         allow(AssignmentQuestionnaire).to receive(:where).with(any_args).and_return([assignment_questionnaire])
@@ -308,7 +311,7 @@ describe GradesController do
         session
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
-        allow(TeamsUser).to receive(:team_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).and_return(1)
         get :view_my_scores, params: request_params
         expect(response).to redirect_to('/')
       end

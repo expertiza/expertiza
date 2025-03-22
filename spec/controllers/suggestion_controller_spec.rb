@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe SuggestionController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'same path',
@@ -14,6 +16,9 @@ describe SuggestionController do
   let(:comment) { build(:comment) }
   let(:assignment_questionnaire) { build(:assignment_questionnaire, id: 1, questionnaire: questionnaire) }
   let(:suggestion_comment) { build(:suggestion_comment) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:team) { build(:team, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -85,6 +90,85 @@ describe SuggestionController do
         get :submit, params: request_params, session: user_session, xhr: true
         expect(flash[:success]).to eq 'The suggestion was successfully approved.'
       end
+    end
+  end
+
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows suggestion details' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new suggestion' do
+      post :create, params: { suggestion: { title: 'Test Suggestion', description: 'Test Description' } }
+      expect(response).to redirect_to(suggestion_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates a suggestion' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      patch :update, params: { id: 1, suggestion: { title: 'Updated Suggestion' } }
+      expect(response).to redirect_to(suggestion_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys a suggestion' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(suggestions_path)
+    end
+  end
+
+  describe 'GET #list' do
+    it 'lists suggestions' do
+      allow(Suggestion).to receive(:all).and_return([build(:suggestion)])
+      get :list
+      expect(response).to render_template(:list)
+    end
+  end
+
+  describe 'GET #approve' do
+    it 'approves a suggestion' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      get :approve, params: { id: 1 }
+      expect(response).to redirect_to(suggestion_path(1))
+    end
+  end
+
+  describe 'GET #reject' do
+    it 'rejects a suggestion' do
+      allow(Suggestion).to receive(:find).with(1).and_return(build(:suggestion))
+      get :reject, params: { id: 1 }
+      expect(response).to redirect_to(suggestion_path(1))
     end
   end
 end

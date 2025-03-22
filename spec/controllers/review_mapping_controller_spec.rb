@@ -16,6 +16,7 @@ describe ReviewMappingController do
   let(:participant2) { double('AssignmentParticipant', id: 3, can_review: true, user: user) }
   let(:team) { double('AssignmentTeam', name: 'no one') }
   let(:team1) { double('AssignmentTeam', name: 'no one1') }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)

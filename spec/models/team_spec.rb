@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe Team do
   let(:assignment) { build(:assignment, id: 1, name: 'no assgt') }
   let(:participant) { build(:participant, user_id: 1) }
@@ -7,9 +9,9 @@ describe Team do
   let(:user2) { build(:student, id: 2) }
   let(:user3) { build(:student, id: 3) }
   let(:team) { build(:assignment_team, id: 1, name: 'no team', users: [user]) }
-  let(:team_user) { build(:team_user, id: 1, user: user) }
+  let(:team_user) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
   before(:each) do
-    allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+    allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
   end
   describe '#participant' do
     it 'gets the participants of current team, by default returns an empty array' do
@@ -25,7 +27,7 @@ describe Team do
 
   describe '#delete' do
     it 'deletes the current team and related objects and return self' do
-      allow(TeamsUser).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
+      allow(TeamsParticipant).to receive_message_chain(:where, :find_each).with(team_id: 1).with(no_args).and_yield(team_user)
       allow(team_user).to receive(:destroy).and_return(team_user)
       node = double('TeamNode')
       allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
@@ -74,14 +76,14 @@ describe Team do
       end
       context 'when the current team size is bigger than or equal to max team members' do
         it 'returns true' do
-          allow(Team).to receive(:size).and_return(6)
+          allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
           expect(team.full?).to be true
         end
       end
 
       context 'when the current team size is smaller than max team members' do
         it 'returns false' do
-          allow(Team).to receive(:size).and_return(1)
+          allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([])
           expect(team.full?).to be false
         end
       end
@@ -100,7 +102,7 @@ describe Team do
         it 'does not raise an error' do
           allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
-          allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
+          allow(TeamsParticipant).to receive(:create).with(participant_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
           allow_any_instance_of(Team).to receive(:add_participant).with(1, user).and_return(double('Participant'))
           expect(team.add_member(user)).to be true
@@ -109,17 +111,27 @@ describe Team do
     end
   end
 
-  describe '.size' do
-    it 'returns the size of current team' do
-      expect(Team.size(1)).to eq(1)
+  describe '#remove_member' do
+    it 'removes a member from the team' do
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1, participant_id: 1).and_return(team_user)
+      expect(team.remove_member(team_user.participant)).to be true
+    end
+  end
+
+  describe '#size' do
+    it 'returns the size of the team' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
+      expect(team.size).to eq(1)
     end
   end
 
   describe '#copy_members' do
-    it 'copies members from current team to a new team' do
-      allow(TeamsUser).to receive(:create).with(team_id: 2, user_id: 1).and_return(team_user)
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      expect(team.copy_members(double('Team', id: 2))).to eq([team_user])
+    it 'copies members from one team to another' do
+      new_team = build(:team, id: 2)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(TeamsParticipant).to receive(:create).with(team_id: 2, participant_id: 1).and_return(team_user)
+      team.copy_members(new_team)
+      expect(TeamsParticipant).to have_received(:create).with(team_id: 2, participant_id: 1)
     end
   end
 
@@ -172,7 +184,7 @@ describe Team do
     context 'when can find certain user' do
       it 'adds the user to current team' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(user)
-        allow(TeamsUser).to receive(:find_by).with(team_id: 1, user_id: 1).and_return(nil)
+        allow(TeamsParticipant).to receive(:find_by).with(team_id: 1, participant_id: 1).and_return(nil)
         allow_any_instance_of(Team).to receive(:add_member).with(user).and_return(true)
         expect(team.import_team_members(teammembers: ['no name'])).to eq(['no name'])
       end
@@ -350,7 +362,7 @@ describe Team do
   describe '.export' do
     it 'exports teams to csv' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
       expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
     end
   end

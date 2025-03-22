@@ -241,6 +241,12 @@ FactoryBot.define do
     has_badge false
     allow_selecting_additional_reviews_after_1st_round false
     auto_assign_mentor false
+
+    trait :with_rounds do
+      after(:create) do |assignment, evaluator|
+        allow(assignment).to receive(:num_review_rounds).and_return(2)
+      end
+    end
   end
 
   factory :late_policy, class: LatePolicy do

@@ -53,24 +53,29 @@ describe AnswerTagsController do
     end
 
     #new
+
+    # Ensures that a user without a role is denied access to index and create_edit actions
     context 'when a user without a role tries to access restricted actions' do
       let(:guest_user) { build(:student, id: 4, role: nil) }
     
       before(:each) do
         controller.request.session[:user] = guest_user
       end
-    
+      
+      # Guest user without role should not be allowed to access index
       it 'denies access when a user without a role tries to access index' do
         controller.params = { action: 'index' }
         expect(controller.send(:action_allowed?)).to be false
       end
     
+      # Guest user without role should not be allowed to access create_edit
       it 'denies access when a user without a role tries to access create_edit' do
         controller.params = { action: 'create_edit' }
         expect(controller.send(:action_allowed?)).to be false
       end
     end
 
+    # Ensures teaching assistants are denied access to student-only actions
     context 'when a teaching assistant tries to access restricted actions' do
       let(:ta) { build(:teaching_assistant, id: 2) }
     
@@ -89,44 +94,52 @@ describe AnswerTagsController do
       end
     end
     
+    # Ensures unrecognized actions are blocked even if user is valid
     context 'when the action is not recognized by the controller' do
       before(:each) do
         controller.request.session[:user] = student
       end
     
+      # Action `destroy` is not supported by action_allowed?
       it 'denies access for unrecognized actions' do
         controller.params = { action: 'destroy' }
         expect(controller.send(:action_allowed?)).to be false
       end
     end
 
+    # Ensures student cannot access unsupported controller actions
     context 'when a student tries to access an unsupported action' do
       before(:each) do
         controller.request.session[:user] = student
       end
     
+      # Student tries to access `show`, which isn't supported
       it 'denies access for unsupported action: show' do
         controller.params = { action: 'show' }
         expect(controller.send(:action_allowed?)).to be false
       end
     end
 
+    # Ensures instructor cannot perform restricted actions
     context 'when an instructor tries to access an unsupported action' do
       before(:each) do
         controller.request.session[:user] = instructor
       end
     
+      # Instructor tries to access destroy, which is not allowed
       it 'denies access for action: destroy' do
         controller.params = { action: 'destroy' }
         expect(controller.send(:action_allowed?)).to be false
       end
     end
 
+    # Ensures action_allowed? returns false when action param is missing
     context 'when student session is active but no action is given' do
       before(:each) do
         controller.request.session[:user] = student
       end
     
+      # No action param — should return false
       it 'denies access if no action param is present' do
         controller.params = {}
         expect(controller.send(:action_allowed?)).to be false

@@ -132,7 +132,6 @@ describe AnswerTagsController do
         expect(controller.send(:action_allowed?)).to be false
       end
     end
-    
   end
 
   # Test index method used to return all tag prompt deployments in JSON format
@@ -420,6 +419,130 @@ describe AnswerTagsController do
           post :create_edit, params: request_params
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
+    end
+
+    #new
+    it 'ignores passed user_id param and uses current_user' do
+      controller.request.session[:user] = student  
+    
+      request_params = {
+        user_id: 42, # random other user
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: '1'
+      }
+    
+      post :create_edit, params: request_params
+    
+      created_tag = AnswerTag.find_by(answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id)
+      expect(created_tag.user_id).to eq(student.id)
+    end
+    
+
+    it 'raises error if tag_prompt_deployment_id is a string' do
+      request_params = {
+        answer_id: answer.id,
+        tag_prompt_deployment_id: 'not_an_id',
+        value: '1'
+      }
+    
+      expect {
+        post :create_edit, params: request_params
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    let(:other_student) { create(:student) }
+
+    it 'allows tagging an answer not written by current_user (current logic allows this)' do
+      controller.request.session[:user] = student  
+    
+      request_params = {
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: '2'
+      }
+    
+      post :create_edit, params: request_params
+      tag = AnswerTag.find_by(answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, user_id: student.id)
+      expect(tag.user_id).to eq(student.id)
+    end
+    
+
+    it 'raises error when no parameters are passed' do
+      expect {
+        post :create_edit, params: {}
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'does not create duplicate AnswerTags on repeated calls' do
+      controller.request.session[:user] = student  
+    
+      request_params = {
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: '1'
+      }
+    
+      post :create_edit, params: request_params
+      post :create_edit, params: request_params
+    
+      tags = AnswerTag.where(answer_id: answer.id, tag_prompt_deployment_id: tag_deploy.id, user_id: student.id)
+      expect(tags.count).to eq(1)
+    end
+    
+
+    it 'updates the value when the tag already exists with a different value' do
+      controller.request.session[:user] = student
+    
+      tag = AnswerTag.create!(
+        user_id: student.id,
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: 'old_value'
+      )
+    
+      request_params = {
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: 'new_value'
+      }
+    
+      post :create_edit, params: request_params
+    
+      updated_tag = AnswerTag.find_by(
+        user_id: student.id,
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id
+      )
+    
+      expect(updated_tag.value).to eq('new_value')
+    end
+
+    it 'creates a new tag if one does not exist for this student, answer, and deployment' do
+      controller.request.session[:user] = student
+    
+      # Ensure no pre-existing tag for this combination
+      AnswerTag.where(
+        user_id: student.id,
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id
+      ).destroy_all
+    
+      request_params = {
+        answer_id: answer.id,
+        tag_prompt_deployment_id: tag_deploy.id,
+        value: '3'
+      }
+    
+      expect {
+        post :create_edit, params: request_params
+      }.to change {
+        AnswerTag.where(
+          user_id: student.id,
+          answer_id: answer.id,
+          tag_prompt_deployment_id: tag_deploy.id
+        ).count
+      }.from(0).to(1)
     end
   end
 end

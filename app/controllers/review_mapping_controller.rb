@@ -390,28 +390,28 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  def automatic_review_mapping_strategy(assignment_id,
-                                        participants, teams, student_review_num = 0,
-                                        submission_review_num = 0, exclude_teams = false)
-    participants_hash = {}
-    participants.each { |participant| participants_hash[participant.id] = 0 }
-    #if exclude_teams_without_submission is true check if team has submission if not discard
-    # Filter teams based on the conditions only if exclude_teams is true
-    filtered_teams = exclude_teams ? teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? } : teams
-    # calculate reviewers for each team
-    if !student_review_num.zero? && submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, filtered_teams, student_review_num)
-    elsif student_review_num.zero? && !submission_review_num.zero?
-      review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, filtered_teams, submission_review_num)
-    end
+  # def automatic_review_mapping_strategy(assignment_id,
+  #                                       participants, teams, student_review_num = 0,
+  #                                       submission_review_num = 0, exclude_teams = false)
+  #   participants_hash = {}
+  #   participants.each { |participant| participants_hash[participant.id] = 0 }
+  #   #if exclude_teams_without_submission is true check if team has submission if not discard
+  #   # Filter teams based on the conditions only if exclude_teams is true
+  #   filtered_teams = exclude_teams ? teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? } : teams
+  #   # calculate reviewers for each team
+  #   if !student_review_num.zero? && submission_review_num.zero?
+  #     review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, filtered_teams, student_review_num)
+  #   elsif student_review_num.zero? && !submission_review_num.zero?
+  #     review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, filtered_teams, submission_review_num)
+  #   end
 
-    peer_review_strategy(assignment_id, review_strategy, participants_hash)
+  #   peer_review_strategy(assignment_id, review_strategy, participants_hash)
 
-    # after assigning peer reviews for each team,
-    # if there are still some peer reviewers not obtain enough peer review,
-    # just assign them to valid teams
-    assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-  end
+  #   # after assigning peer reviews for each team,
+  #   # if there are still some peer reviewers not obtain enough peer review,
+  #   # just assign them to valid teams
+  #   assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
+  # end
 
   # This is for staggered deadline assignment
   def automatic_review_mapping_staggered
@@ -506,7 +506,7 @@ class ReviewMappingController < ApplicationController
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
-    num_participants = participants.size
+    num_participants = participants.size map.is_a? ReviewResponseMap
 
     teams.each_with_index do |team, iterator|
       selected_participants = []

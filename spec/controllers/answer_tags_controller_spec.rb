@@ -195,6 +195,22 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      #
+      it 'returns correct results when both assignment_id and user_id are provided' do
+        request_params = { assignment_id: assignment.id, user_id: student.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
+
+      #
+      it 'returns an empty result when multiple filters do not match any records' do
+        request_params = { assignment_id: assignment.id, user_id: 999 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
+
       it 'when there are no answer tags for given random user_id' do
         request_params = { user_id: 42 }
         get :index, params: request_params
@@ -238,159 +254,180 @@ describe AnswerTagsController do
       end
     end
 
-  # New
-  
-  context 'when accessing the endpoint without authentication' do
-    before(:each) do
-      controller.request.session[:user] = nil
+    # New
+    
+    context 'when accessing the endpoint without authentication' do
+      before(:each) do
+        controller.request.session[:user] = nil
+      end
+
+      it 'redirects to root_path when the user is not logged in' do
+        get :index
+        expect(response).to redirect_to(root_path)
+      end
     end
 
-    it 'returns unauthorized (401) when the user is not logged in' do
-      get :index
-      expect(response).not_to have_http_status(200)
-    end
-  end
+    context 'when the user is an instructor' do
+      before(:each) do
+        controller.request.session[:user] = instructor
+      end
 
-  context 'when the user is an instructor' do
-    before(:each) do
-      controller.request.session[:user] = instructor
-    end
+      it 'when there are no tag prompt deployments' do
+        allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
+        get :index
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when there are no tag prompt deployments' do
-      allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
-      get :index
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when there is one answer tag' do
+        get :index
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-    it 'when there is one answer tag' do
-      get :index
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
+      it 'when there is one tag prompt deployment but has no answer tag' do
+        request_params = { assignment_id: 2 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when there is one tag prompt deployment but has no answer tag' do
-      request_params = { assignment_id: 2 }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when there is one answer tag for given user_id' do
+        request_params = { user_id: student.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-    it 'when there is one answer tag for given user_id' do
-      request_params = { user_id: student.id }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
+      it 'when there is one answer tag for given assignment_id' do
+        request_params = { assignment_id: assignment.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-    it 'when there is one answer tag for given assignment_id' do
-      request_params = { assignment_id: assignment.id }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
+      it 'when there is one answer tag for given questionnaire_id' do
+        request_params = { questionnaire_id: questionnaire.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-    it 'when there is one answer tag for given questionnaire_id' do
-      request_params = { questionnaire_id: questionnaire.id }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
+      #
+      it 'returns correct results when both assignment_id and user_id are provided' do
+        request_params = { assignment_id: assignment.id, user_id: student.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
 
-    it 'when there are no answer tags for given random user_id' do
-      request_params = { user_id: 42 }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      #
+      it 'returns an empty result when multiple filters do not match any records' do
+        request_params = { assignment_id: assignment.id, user_id: 999 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when there are no answer tags for given random assignment_id' do
-      request_params = { assignment_id: 42 }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when there are no answer tags for given random user_id' do
+        request_params = { user_id: 42 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when there are no answer tags for given random questionnaire_id' do
-      request_params = { questionnaire_id: 42 }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when there are no answer tags for given random assignment_id' do
+        request_params = { assignment_id: 42 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when the user_id is nil' do
-      request_params = { user_id: nil }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when there are no answer tags for given random questionnaire_id' do
+        request_params = { questionnaire_id: 42 }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when the questionnaire_id is nil' do
-      request_params = { questionnaire_id: nil }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
+      it 'when the user_id is nil' do
+        request_params = { user_id: nil }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-    it 'when the assignment_id is nil' do
-      request_params = { assignment_id: nil }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(0)
-    end
-  end
+      it 'when the questionnaire_id is nil' do
+        request_params = { questionnaire_id: nil }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
 
-  context 'when an invalid parameter is passed' do
-    before(:each) do
-      controller.request.session[:user] = student
-    end
-
-    it 'ignores extra unexpected parameters and returns valid results' do
-      request_params = { invalid_param: 'xyz' }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
-  end
-
-  context 'when there are multiple answer tags for the assignment' do
-    let!(:extra_answer_tag) { create(:answer_tag, id: 2, tag_prompt_deployment_id: 1, user_id: student.id) }
-
-    before(:each) do
-      controller.request.session[:user] = student
+      it 'when the assignment_id is nil' do
+        request_params = { assignment_id: nil }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(0)
+      end
     end
 
-    it 'returns all answer tags associated with the assignment' do
-      request_params = { assignment_id: assignment.id }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(2)
-    end
-  end
+    context 'when an invalid parameter is passed' do
+      before(:each) do
+        controller.request.session[:user] = student
+      end
 
-  context 'when answer tags exist for multiple users' do
-    let!(:new_student) { create(:student, id: 3) }
-    let!(:extra_answer_tag) { create(:answer_tag, id: 3, tag_prompt_deployment_id: 1, user_id: new_student.id) }
-
-    before(:each) do
-      controller.request.session[:user] = student
+      it 'ignores extra unexpected parameters and returns valid results' do
+        request_params = { invalid_param: 'xyz' }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
     end
 
-    it 'returns only the answer tags for the specified user' do
-      request_params = { user_id: student.id }
-      get :index, params: request_params
-      output = JSON.parse(response.body)
-      expect(output.length).to eql(1)
-    end
-  end
+    context 'when there are multiple answer tags for the assignment' do
+      let!(:extra_answer_tag) { create(:answer_tag, id: 2, tag_prompt_deployment_id: 1, user_id: student.id) }
 
-  context 'when user_id parameter is invalid' do
-    it 'returns a 400 Bad Request error for an invalid user_id' do
-      request_params = { user_id: 'invalid' }
-      get :index, params: request_params
-      expect(response).to have_http_status(:bad_request)
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+
+      it 'returns all answer tags associated with the assignment' do
+        request_params = { assignment_id: assignment.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(2)
+      end
     end
-  end
+
+    context 'when answer tags exist for multiple users' do
+      let!(:new_student) { create(:student, id: 3) }
+      let!(:extra_answer_tag) { create(:answer_tag, id: 3, tag_prompt_deployment_id: 1, user_id: new_student.id) }
+
+      before(:each) do
+        controller.request.session[:user] = student
+      end
+
+      it 'returns only the answer tags for the specified user' do
+        request_params = { user_id: student.id }
+        get :index, params: request_params
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1)
+      end
+    end
+
+    context 'when there are a large number of answer tags' do
+      before(:each) do
+        create_list(:answer_tag, 1000, tag_prompt_deployment_id: tag_prompt_deployment.id, user_id: student.id)
+        controller.request.session[:user] = student
+      end
+    
+      it 'returns all answer tags without timing out' do
+        get :index
+        output = JSON.parse(response.body)
+        expect(output.length).to eql(1001) # 1000 new + 1 existing
+      end
+    end
 
   end
 

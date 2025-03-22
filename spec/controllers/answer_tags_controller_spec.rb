@@ -422,6 +422,8 @@ describe AnswerTagsController do
     end
 
     #new
+
+    # Ensures user_id param is ignored and current_user is used for tag creation
     it 'ignores passed user_id param and uses current_user' do
       controller.request.session[:user] = student  
     
@@ -438,7 +440,7 @@ describe AnswerTagsController do
       expect(created_tag.user_id).to eq(student.id)
     end
     
-
+    # Raises error if tag_prompt_deployment_id is invalid (not an integer)
     it 'raises error if tag_prompt_deployment_id is a string' do
       request_params = {
         answer_id: answer.id,
@@ -453,7 +455,8 @@ describe AnswerTagsController do
 
     let(:other_student) { create(:student) }
 
-    it 'allows tagging an answer not written by current_user (current logic allows this)' do
+    # Allows tagging an answer not written by the current_user (based on current logic)
+    it 'allows tagging an answer not written by current_user' do
       controller.request.session[:user] = student  
     
       request_params = {
@@ -467,13 +470,14 @@ describe AnswerTagsController do
       expect(tag.user_id).to eq(student.id)
     end
     
-
+    # Ensures an error is raised when no parameters are passed
     it 'raises error when no parameters are passed' do
       expect {
         post :create_edit, params: {}
       }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
+    # Verifies that duplicate tags are not created for the same user, answer, and deployment
     it 'does not create duplicate AnswerTags on repeated calls' do
       controller.request.session[:user] = student  
     
@@ -490,7 +494,7 @@ describe AnswerTagsController do
       expect(tags.count).to eq(1)
     end
     
-
+    # Ensures the tag value gets updated if an existing tag is found
     it 'updates the value when the tag already exists with a different value' do
       controller.request.session[:user] = student
     
@@ -518,6 +522,7 @@ describe AnswerTagsController do
       expect(updated_tag.value).to eq('new_value')
     end
 
+    # Confirms a new tag is created if no previous tag exists for this combination
     it 'creates a new tag if one does not exist for this student, answer, and deployment' do
       controller.request.session[:user] = student
     

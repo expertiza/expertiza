@@ -1,5 +1,56 @@
-<h1>Teams for <%= @root_node.get_name %></h1>
+<link rel="stylesheet" href="/team_list_table.css">
+<script src="/javascripts/team_table_updater.js"></script>
+<script src="/javascripts/team_meeting_editor.js"></script>
 
+
+<h1 id="course-header">Teams for <%= @root_node.get_name %></h1>
+
+<!-- Anyone with access to the parent pages has access to this page -->
+  <div class="teams-list-table">
+    <table>
+      <thead>
+      <tr>
+        <th class="head">Team Name</th>
+        <th class="head">Members' Names</th>
+        <th class="head">Members' User IDs</th>
+        <th class="head">Emails Concatenated</th>
+        <th class="head">Mentor</th>
+        <% @num_of_meeting_cols.times do |i| %>
+          <th class="head"><%= ordinalize(i + 1) %> Mtg
+          <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
+          </th>
+        <% end %>
+        <th class="head">Actions</th> <!-- New Actions Column -->
+      </tr>
+      </thead>
+
+      <tbody id="teams_table_body">
+      <%= render partial: 'teams_table_body', locals: { teams: @teams } %>
+      </tbody>
+    </table>
+    <%#= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>
+  </div>
+
+<!-- Footer -->
+<div class="footer-container">
+  <%= render partial: 'team' %>
+</div>
+
+<!--Setting the team type variable for use in the table updater js function -->
+<script>
+    var teamType = '<%= @team_type %>';
+    var id = '<%= @ID %>';
+    var currColumnNum = <%= @num_of_meeting_cols %>;
+</script>
+
+
+
+
+
+
+
+
+<!-- THIS IS THE OLD CODE COMMENTED OUT 3/8/25
 <script>
   $(function(){
     $("#tabs").tabs();
@@ -8,20 +59,25 @@
 <div id="tabs">
   <ul>
     <li><a href="#tabs-1" id="General">Teams</a></li>
-    <% if @is_valid_assignment %>
+    <%# if @is_valid_assignment %>
       <li><a href="#tabs-2" id="Topics">Students without teams</a></li>
-    <% end %>
+    <%# end %>
   </ul>
-  <div id="tabs-1"><%= render partial: 'team' %></div>
-    <% if @is_valid_assignment %>
-      <% participants_without_team = get_participants_without_team(@assignment) %>
+
+
+
+
+  <div id="tabs-1"><%#= render partial: 'team' %></div>
+    <%# if @is_valid_assignment %>
+      <%# participants_without_team = get_participants_without_team(@assignment) %>
       <div id="tabs-2">
         <table>
           <th>name</th>
-          <% participants_without_team.each_with_index do |participant, index| %>
-            <tr class=<%= index.odd? ? 'odd' : 'even' %>><td><%= participant.name(session[:ip]) %></td></tr>
-          <% end %>
+          <%# participants_without_team.each_with_index do |participant, index| %>
+            <tr class=<%#= index.odd? ? 'odd' : 'even' %>><td><%#= participant.name(session[:ip]) %></td></tr>
+          <%# end %>
         </table>
       </div>
-    <% end %>
+    <%# end %>
 </div>
+-->

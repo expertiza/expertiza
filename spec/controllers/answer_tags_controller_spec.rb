@@ -149,11 +149,13 @@ describe AnswerTagsController do
 
   # Test index method used to return all tag prompt deployments in JSON format
   describe '#index' do
+    # Ensures the user is authenticated before making requests
     context 'tag prompt deployments are requested' do
       before(:each) do
         controller.request.session[:user] = student
       end
 
+      # Checks when there are no tag prompt deployments
       it 'when there are no tag prompt deployments' do
         allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
         get :index
@@ -161,12 +163,14 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures a single tag prompt deployment is returned
       it 'when there is one answer tag' do
         get :index
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
 
+      # Verifies that a deployment without an answer tag is not returned
       it 'when there is one tag prompt deployment but has no answer tag' do
         request_params = { assignment_id: 2 }
         get :index, params: request_params
@@ -174,6 +178,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Checks if filtering by user_id returns the correct results
       it 'when there is one answer tag for given user_id' do
         request_params = { user_id: student.id }
         get :index, params: request_params
@@ -181,6 +186,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      # Checks if filtering by assignment_id returns the correct results
       it 'when there is one answer tag for given assignment_id' do
         request_params = { assignment_id: assignment.id }
         get :index, params: request_params
@@ -188,6 +194,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      # Checks if filtering by questionnaire_id returns the correct results
       it 'when there is one answer tag for given questionnaire_id' do
         request_params = { questionnaire_id: questionnaire.id }
         get :index, params: request_params
@@ -195,7 +202,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      #
+      ## Ensures that providing both assignment_id and user_id returns correct results
       it 'returns correct results when both assignment_id and user_id are provided' do
         request_params = { assignment_id: assignment.id, user_id: student.id }
         get :index, params: request_params
@@ -203,7 +210,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      #
+      ## Ensures that non-matching filters return an empty result
       it 'returns an empty result when multiple filters do not match any records' do
         request_params = { assignment_id: assignment.id, user_id: 999 }
         get :index, params: request_params
@@ -211,13 +218,15 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
-      it 'when there are no answer tags for given random user_id' do
+      # Ensures no results are returned for a random non-existing user_id
+      it 'when a non exisiting user_id is accesing' do
         request_params = { user_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
-
+      
+      # Ensures no results are returned for a random non-existing assignment_id
       it 'when there are no answer tags for given random assignment_id' do
         request_params = { assignment_id: 42 }
         get :index, params: request_params
@@ -225,6 +234,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned for a random non-existing questionnaire_id
       it 'when there are no answer tags for given random questionnaire_id' do
         request_params = { questionnaire_id: 42 }
         get :index, params: request_params
@@ -232,6 +242,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when user_id is nil
       it 'when the user_id is nil' do
         request_params = { user_id: nil }
         get :index, params: request_params
@@ -239,6 +250,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when questionnaire_id is nil
       it 'when the questionnaire_id is nil' do
         request_params = { questionnaire_id: nil }
         get :index, params: request_params
@@ -246,6 +258,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when assignment_id is nil
       it 'when the assignment_id is nil' do
         request_params = { assignment_id: nil }
         get :index, params: request_params
@@ -256,6 +269,7 @@ describe AnswerTagsController do
 
     # New
     
+    # Ensures unauthorized users are redirected
     context 'when accessing the endpoint without authentication' do
       before(:each) do
         controller.request.session[:user] = nil
@@ -267,11 +281,15 @@ describe AnswerTagsController do
       end
     end
 
+    # Ensures that instructors can access tag prompt deployments
     context 'when the user is an instructor' do
       before(:each) do
         controller.request.session[:user] = instructor
       end
 
+      
+
+      # Checks when there are no tag prompt deployments
       it 'when there are no tag prompt deployments' do
         allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
         get :index
@@ -279,12 +297,14 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures a single tag prompt deployment is returned
       it 'when there is one answer tag' do
         get :index
         output = JSON.parse(response.body)
         expect(output.length).to eql(1)
       end
 
+      # Verifies that a deployment without an answer tag is not returned
       it 'when there is one tag prompt deployment but has no answer tag' do
         request_params = { assignment_id: 2 }
         get :index, params: request_params
@@ -292,6 +312,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Checks if filtering by user_id returns the correct results
       it 'when there is one answer tag for given user_id' do
         request_params = { user_id: student.id }
         get :index, params: request_params
@@ -299,6 +320,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      # Checks if filtering by assignment_id returns the correct results
       it 'when there is one answer tag for given assignment_id' do
         request_params = { assignment_id: assignment.id }
         get :index, params: request_params
@@ -306,6 +328,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
+      # Checks if filtering by questionnaire_id returns the correct results
       it 'when there is one answer tag for given questionnaire_id' do
         request_params = { questionnaire_id: questionnaire.id }
         get :index, params: request_params
@@ -313,7 +336,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      #
+      ## Ensures that providing both assignment_id and user_id returns correct results
       it 'returns correct results when both assignment_id and user_id are provided' do
         request_params = { assignment_id: assignment.id, user_id: student.id }
         get :index, params: request_params
@@ -321,7 +344,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(1)
       end
 
-      #
+      ## Ensures that non-matching filters return an empty result
       it 'returns an empty result when multiple filters do not match any records' do
         request_params = { assignment_id: assignment.id, user_id: 999 }
         get :index, params: request_params
@@ -329,13 +352,15 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
-      it 'when there are no answer tags for given random user_id' do
+      # Ensures no results are returned for a random non-existing user_id
+      it 'when a non exisiting user_id is accesing' do
         request_params = { user_id: 42 }
         get :index, params: request_params
         output = JSON.parse(response.body)
         expect(output.length).to eql(0)
       end
-
+      
+      # Ensures no results are returned for a random non-existing assignment_id
       it 'when there are no answer tags for given random assignment_id' do
         request_params = { assignment_id: 42 }
         get :index, params: request_params
@@ -343,6 +368,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned for a random non-existing questionnaire_id
       it 'when there are no answer tags for given random questionnaire_id' do
         request_params = { questionnaire_id: 42 }
         get :index, params: request_params
@@ -350,6 +376,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when user_id is nil
       it 'when the user_id is nil' do
         request_params = { user_id: nil }
         get :index, params: request_params
@@ -357,6 +384,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when questionnaire_id is nil
       it 'when the questionnaire_id is nil' do
         request_params = { questionnaire_id: nil }
         get :index, params: request_params
@@ -364,6 +392,7 @@ describe AnswerTagsController do
         expect(output.length).to eql(0)
       end
 
+      # Ensures no results are returned when assignment_id is nil
       it 'when the assignment_id is nil' do
         request_params = { assignment_id: nil }
         get :index, params: request_params
@@ -372,6 +401,7 @@ describe AnswerTagsController do
       end
     end
 
+    # Ensures that invalid parameters do not break the system
     context 'when an invalid parameter is passed' do
       before(:each) do
         controller.request.session[:user] = student
@@ -385,6 +415,7 @@ describe AnswerTagsController do
       end
     end
 
+    # Ensures that all answer tags are returned for an assignment
     context 'when there are multiple answer tags for the assignment' do
       let!(:extra_answer_tag) { create(:answer_tag, id: 2, tag_prompt_deployment_id: 1, user_id: student.id) }
 
@@ -400,6 +431,7 @@ describe AnswerTagsController do
       end
     end
 
+    # Ensures answer tags are correctly filtered by user
     context 'when answer tags exist for multiple users' do
       let!(:new_student) { create(:student, id: 3) }
       let!(:extra_answer_tag) { create(:answer_tag, id: 3, tag_prompt_deployment_id: 1, user_id: new_student.id) }
@@ -416,6 +448,7 @@ describe AnswerTagsController do
       end
     end
 
+    # Ensures that large datasets are handled efficiently
     context 'when there are a large number of answer tags' do
       before(:each) do
         create_list(:answer_tag, 1000, tag_prompt_deployment_id: tag_prompt_deployment.id, user_id: student.id)

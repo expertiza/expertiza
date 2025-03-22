@@ -2,7 +2,7 @@
 
 <% @teams_participants.each do |teams_participant| %>
   <div class="team-member">
-    <p><%= teams_participant.participant.name %></p>
+    <p><%= teams_participant.participant.user.name(session[:ip]) %></p>
     <p>Duty: <%= teams_participant.duty&.name || 'Not assigned' %></p>
   </div>
 <% end %>

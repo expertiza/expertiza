@@ -259,53 +259,6 @@ describe AssignmentParticipant do
     end
   end
 
-  describe '#below_outstanding_reviews_limit?' do
-    let(:assignment) { create(:assignment) }
-    let(:student) { create(:student) }
-    let(:participant) { create(:assignment_participant, assignment: assignment, user: student) }
-
-    context 'when no reviews are assigned' do
-      it 'returns true' do
-        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
-      end
-    end
-
-    context 'when reviews are in progress' do
-      before do
-        create(:review_response_map, reviewer: participant, reviewed_object_id: assignment.id)
-      end
-
-      it 'returns true if below the limit' do
-        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
-      end
-
-      it 'returns false if over the limit' do
-        create_list(:review_response_map, Assignment.max_outstanding_reviews, reviewer: participant, reviewed_object_id: assignment.id)
-        expect(participant.below_outstanding_reviews_limit?(assignment)).to be false
-      end
-    end
-
-    context 'when some reviews are completed' do
-      before do
-        # Create a review response map and mark it as completed
-        review_map = create(:review_response_map, reviewer: participant, reviewed_object_id: assignment.id)
-        create(:response, map: review_map, is_submitted: true)
-      end
-
-      it 'returns true if outstanding reviews are below the limit' do
-        # Create additional reviews below the limit
-        create_list(:review_response_map, Assignment.max_outstanding_reviews - 1, reviewer: participant, reviewed_object_id: assignment.id)
-        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
-      end
-
-      it 'returns false if outstanding reviews exceed the limit' do
-        # Create additional reviews to exceed the limit
-        create_list(:review_response_map, Assignment.max_outstanding_reviews + 1, reviewer: participant, reviewed_object_id: assignment.id)
-        expect(participant.below_outstanding_reviews_limit?(assignment)).to be false
-      end
-    end
-  end
-
   describe '#review_file_path' do
     it 'returns the file path for reviewer to upload files during peer review' do
       allow(ResponseMap).to receive(:find).with(1).and_return(build(:review_response_map))
@@ -353,4 +306,52 @@ describe AssignmentParticipant do
       end
     end
   end
+
+  describe '#below_outstanding_reviews_limit?' do
+    let(:assignment) { create(:assignment) }
+    let(:student) { create(:student) }
+    let(:participant) { create(:assignment_participant, assignment: assignment, user: student) }
+
+    context 'when no reviews are assigned' do
+      it 'returns true' do
+        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
+      end
+    end
+
+    context 'when reviews are in progress' do
+      before do
+        create(:review_response_map, reviewer: participant, reviewed_object_id: assignment.id)
+      end
+
+      it 'returns true if below the limit' do
+        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
+      end
+
+      it 'returns false if over the limit' do
+        create_list(:review_response_map, Assignment.max_outstanding_reviews, reviewer: participant, reviewed_object_id: assignment.id)
+        expect(participant.below_outstanding_reviews_limit?(assignment)).to be false
+      end
+    end
+
+    context 'when some reviews are completed' do
+      before do
+        # Create a review response map and mark it as completed
+        review_map = create(:review_response_map, reviewer: participant, reviewed_object_id: assignment.id)
+        create(:response, response_map: review_map, is_submitted: true)
+      end
+
+      it 'returns true if outstanding reviews are below the limit' do
+        # Create additional reviews below the limit
+        create_list(:review_response_map, Assignment.max_outstanding_reviews - 1, reviewer: participant, reviewed_object_id: assignment.id)
+        expect(participant.below_outstanding_reviews_limit?(assignment)).to be true
+      end
+
+      it 'returns false if outstanding reviews exceed the limit' do
+        # Create additional reviews to exceed the limit
+        create_list(:review_response_map, Assignment.max_outstanding_reviews + 1, reviewer: participant, reviewed_object_id: assignment.id)
+        expect(participant.below_outstanding_reviews_limit?(assignment)).to be false
+      end
+    end
+  end
+
 end

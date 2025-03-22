@@ -212,13 +212,17 @@ class ReviewMappingController < ApplicationController
 
   def assign_metareviewer_dynamically
     assignment = Assignment.find(params[:assignment_id])
-    metareviewer = AssignmentParticipant.where(user_id: params[:metareviewer_id], parent_id: assignment.id).first
-    # this will prvide a flash warning instead of page crash when there are no review to Meta review.
+    metareviewer = AssignmentParticipant.find_by(
+        user_id: params[:metareviewer_id],
+        parent_id: assignment.id
+        )
+    
     begin
       assignment.assign_metareviewer_dynamically(metareviewer)
     rescue StandardError => e
       flash[:error] = e.message
     end
+    
     redirect_to controller: 'student_review', action: 'list', id: metareviewer.id
   end
 
@@ -287,28 +291,19 @@ class ReviewMappingController < ApplicationController
     end
     render action: 'unsubmit_review.js.erb', layout: false
   end
+  # E1721 changes End
 
   def delete_reviewer
     review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    if review_response_map
-      responses = Response.where(map_id: review_response_map.id)
-      if responses.exists?
-        response_ids = responses.pluck(:id) 
-        answer_ids = Answer.where(response_id: response_ids).pluck(:id)
-        AnswerTag.where(answer_id: answer_ids).destroy_all 
-        Answer.where(id: answer_ids).destroy_all 
-        responses.destroy_all 
-        review_response_map.destroy 
-        flash[:success] = "The review mapping for \"#{review_response_map.reviewee.name}\" and \"#{review_response_map.reviewer.name}\" has been deleted."
-      else
-        flash[:error] = "This review has already been done. It cannot be deleted."
-      end
+    if review_response_map && !Response.exists?(map_id: review_response_map.id)
+      review_response_map.destroy
+      flash[:success] = 'The review mapping for "' + review_response_map.reviewee.name + '" and "' + review_response_map.reviewer.name + '" has been deleted.'
     else
-      flash[:error] = "Review response map not found."
+      flash[:error] = 'This review has already been done. It cannot been deleted.'
     end
     redirect_back fallback_location: root_path
   end
-  
+
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id

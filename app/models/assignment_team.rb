@@ -17,10 +17,18 @@ class AssignmentTeam < Team
   # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
   # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
   # return that instead for instances where the code uses the current user.
-  def user_id
-    @current_user.id if !@current_user.nil? && users.include?(@current_user)
-    users.first.id
+  
+  # Returns the ID of the current_user if they are part of the team
+  def current_user_id
+    return @current_user.id if @current_user && users.include?(@current_user)
+    nil
   end
+  
+  # Returns the ID of the first user in the team (or nil if empty)
+  def first_user_id
+    users.first&.id
+  end
+  
 
   # E1973
   # stores the current user so that we can check them when returning the user_id

@@ -54,6 +54,9 @@ describe TagPromptDeployment do
   
   ##tag_prompt method testing
   describe '#tag_prompt' do
+    # Valid tag_prompt_id is provided to the TagPromptDeployment instance.
+    # Tests that the tag prompt associated with the provided tag_prompt_id is correctly
+    # returned by the tag_dep.tag_prompt method.
     context 'when tag_prompt exists' do
       it 'returns the associated tag prompt with the deployment' do
         allow(TagPrompt).to receive(:find).with(1).and_return(tp)
@@ -61,6 +64,8 @@ describe TagPromptDeployment do
       end
     end
 
+    # Invalid tag_prompt_id is provided to the TagPromptDeployment instance.
+    # Tests that nil is returned by the tag_dep.tag_prompt method.
     context 'when tag_prompt does not exist' do
       it 'raises an ActiveRecord::RecordNotFound error' do
         allow(TagPrompt).to receive(:find).with(1).and_raise(ActiveRecord::RecordNotFound)
@@ -93,6 +98,16 @@ describe TagPromptDeployment do
         allow(Team).to receive(:joins).with(:teams_users).and_return(team)
         allow(team).to receive(:where).with(team_users: { parent_id: tag_dep1.assignment_id }, user_id: nil).and_raise(ActiveRecord::ActiveRecordError)
         expect { tag_dep1.get_number_of_taggable_answers(nil) }.to raise_error ActiveRecord::ActiveRecordError
+      end
+    end
+
+    context 'when answer_length_threshold null' do
+      it 'count of taggable answers' do
+        questions_ids = double(1)
+        response_ids = double(241)
+        allow(Answer).to receive(:where).with(question_id: questions_ids, response_id: response_ids).and_return(answer)
+        allow(answer).to receive(:count)
+        expect(tag_dep1.get_number_of_taggable_answers(1)).to eq(answer.count)
       end
     end
 
@@ -181,6 +196,7 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].percentage).to eq('100.0')
     end
 
+    #fully tagged
     it 'varies by round' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])
@@ -210,6 +226,7 @@ describe TagPromptDeployment do
       expect(user_answer_tagging[1].percentage).to eq('100.0')
     end
 
+    #no answers are tagged
     it 'varies by round, there are no tags' do
       allow(Team).to receive(:where).with(parent_id: assignment.id).and_return([team])
       allow(Question).to receive(:where).with(questionnaire_id: question.questionnaire.id, type: tag_dep.question_type).and_return([question])

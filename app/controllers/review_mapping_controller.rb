@@ -309,10 +309,12 @@ class ReviewMappingController < ApplicationController
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
-    flash[:note] = 'The metareview mapping for ' + mapping.reviewee.name + ' and ' + mapping.reviewer.name + ' has been deleted.'
+    reviewee_name = mapping.reviewee.name
+    reviewer_name = mapping.reviewer.name
 
     begin
       mapping.delete
+      flash[:note] = "The metareview mapping for #{reviewee_name} and #{reviewer_name} has been deleted."
     rescue StandardError
       flash[:error] = 'A delete action failed:<br/>' + $ERROR_INFO.to_s + "<a href='/review_mapping/delete_metareview/" + mapping.map_id.to_s + "'>Delete this mapping anyway>?"
     end

@@ -543,7 +543,7 @@ Expertiza::Application.routes.draw do
       get :delete_all
       get :bequeath_all
     end
-    resources :meetings, only: %i[index edit create destroy]
+    resources :meetings, only: %i[create destroy]
   end
 
   resources :teams_users, only: %i[new create update] do

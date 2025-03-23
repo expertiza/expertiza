@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
     const tableHeaders = document.querySelector('thead'); // Target only the <thead>
     const tableBody = document.getElementById('teams_table_body'); // Target only the <tbody>
@@ -6,8 +7,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!window.currColumnNum) {
         window.currColumnNum = 3; // Default to 3 if not already set
     }
-
-
 
     // Listen for clicks on "Add Meeting Column" buttons in the header
     tableHeaders.addEventListener('click', function (event) {

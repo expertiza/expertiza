@@ -1,4 +1,4 @@
-//This file will need to change to implement the save function for the meeting
+
 document.addEventListener('DOMContentLoaded', function() {
 
     // Find all save buttons and add event listeners
@@ -9,10 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault(); // Prevent default link behavior
 
             const meetingIndex = button.dataset.meetingIndex;
-            const meetingId = button.dataset.meeting_id;
+            const meetingId = button.dataset.meetingId;
             const teamId = button.dataset.teamId;
-
-            console.log( button.dataset.meeting_id);
 
             if(button.dataset.delete == 1){
                 fetch(`/teams/${teamId}/meetings/${meetingId}`, { // Use the correct route for deleting a meeting
@@ -33,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         console.log('Meeting date deleted successfully:', data);
                         // Handle successful deletion (e.g., update the UI)
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error deleting meeting date:', error);
@@ -71,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         .then(data => {
                             console.log('Meeting date created successfully:', data);
                             // Handle successful creation (e.g., update the UI)
+                            window.location.reload();
                         })
                         .catch(error => {
                             console.error('Error creating meeting date:', error);

@@ -89,8 +89,29 @@ class Team < ApplicationRecord
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
       add_participant(parent_id, user)
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+
+      #Seperated the function for easier readability
+      send_team_addition_email(user, _assignment_id)
+
     end
     can_add_member
+  end
+
+  def send_team_addition_email(user, assignment_id)
+    assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
+
+    role = case
+           when MentorManagement.user_a_mentor?(user) && !user.is_a?(Participant)
+             'mentor_added_to_team'
+           when !MentorManagement.user_a_mentor?(user) && user.is_a?(Participant)
+             'user_added_to_team'
+           when MentorManagement.user_a_mentor?(user) && user.is_a?(Participant)
+             'dual_role_added_to_team'
+           else
+             return # No email sent if none of the conditions match
+           end
+
+    MailerHelper.send_mail_about_team_confirmation(user, '[Expertiza] Added to a Team!', role, name.to_s, assignment_name).deliver
   end
 
   # Define the size of the team

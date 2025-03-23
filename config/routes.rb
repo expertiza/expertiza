@@ -1,4 +1,6 @@
 Expertiza::Application.routes.draw do
+  resources :mentor_meetings
+  resources :meetings
   get 'lti/launch'
   post 'lti/launch' => 'lti#launch'
 

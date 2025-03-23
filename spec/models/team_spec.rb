@@ -212,7 +212,7 @@ describe Team do
   describe '.import' do
     context 'when row is empty and has_column_names option is not true' do
       it 'raises an ArgumentError' do
-        expect { Team.import({}, 1, { has_column_names: 'false' }, AssignmentTeam.new) }
+        expect { Team.import({}, 1, { has_column_names: 'false' }, AssignmentTeam) }
           .to raise_error(ArgumentError, 'Not enough fields on this line.')
       end
     end
@@ -324,21 +324,21 @@ describe Team do
           allow(Assignment).to receive(:find).with(1).and_return(double('Assignment', name: 'no assignment'))
           allow(Team).to receive(:generate_team_name).with('no course').and_return('new team name')
           allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam.new)).to eq('new team name')
-          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', AssignmentTeam.new)).to eq('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', CourseTeam)).to eq('new team name')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'rename', AssignmentTeam)).to eq('new team name')
         end
       end
 
       context 'when handle_dups option is replace' do
         it 'deletes the old team' do
           allow(team).to receive(:delete)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam.new)).to eq('no name')
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace', CourseTeam)).to eq('no name')
         end
       end
 
       context 'when handle_dups option is insert' do
         it 'does nothing and returns nil' do
-          expect(Team.handle_duplicate(team, 'no name', 1, 'insert', CourseTeam.new)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'insert', CourseTeam)).to be nil
         end
       end
 
@@ -352,8 +352,8 @@ describe Team do
           allow(Team).to receive(:generate_team_name).with('no assignment').and_return('new team name')
           allow(team).to receive(:name=).with('new team name')
           allow(team).to receive(:save)
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam.new)).to be nil
-          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam.new)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', CourseTeam)).to be nil
+          expect(Team.handle_duplicate(team, 'no name', 1, 'replace_existing', AssignmentTeam)).to be nil
         end
       end
     end
@@ -363,7 +363,7 @@ describe Team do
     it 'exports teams to csv' do
       allow(AssignmentTeam).to receive(:where).with(parent_id: 1).and_return([team])
       allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
-      expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam.new)).to eq([['no team', 'no name']])
+      expect(Team.export([], 1, { team_name: 'false' }, AssignmentTeam)).to eq([['no team', 'no name']])
     end
   end
 end

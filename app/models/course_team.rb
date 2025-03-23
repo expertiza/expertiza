@@ -15,18 +15,16 @@ class CourseTeam < Team
     copy_members(new_team)
   end
 
-  # Overwrite Team.import() to Import a course_team from csv
+  # Override Team.import() to Import a CourseTeam from csv
   def self.import(row, course_id, options)
     raise ImportError, "The course with the id \"#{course_id}\" was not found. <a href='/courses/new'>Create</a> this course?" if Course.find(course_id).nil?
 
-    @course_team = CourseTeam.new
-    Team.import(row, course_id, options, @course_team)
+    Team.import(row, course_id, options, CourseTeam)
   end
 
-  # Overwrite Team.export() to Export a course_team to csv
+  # Override Team.export() to Export a CourseTeam to csv
   def self.export(csv, parent_id, options)
-    @course_team = CourseTeam.new
-    Team.export(csv, parent_id, options, @course_team)
+    Team.export(csv, parent_id, options, CourseTeam)
   end
 
   # Export the fields of the csv column to be used in export_file_controller.rb

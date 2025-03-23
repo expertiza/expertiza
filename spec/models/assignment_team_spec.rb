@@ -205,8 +205,8 @@ describe 'AssignmentTeam' do
         assignment_id = 1
         options = []
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(assignment)
-        allow(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
-        expect(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        allow(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
+        expect(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
         AssignmentTeam.import(row, assignment_id, options)
       end
     end
@@ -214,8 +214,8 @@ describe 'AssignmentTeam' do
 
   describe '.export' do
     it 'redirects to Team.export with a new AssignmentTeam object' do
-      allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
-      expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+      allow(Team).to receive(:export).with([], 1, [], AssignmentTeam)
+      expect(Team).to receive(:export).with([], 1, [], AssignmentTeam)
       AssignmentTeam.export([], 1, [])
     end
   end

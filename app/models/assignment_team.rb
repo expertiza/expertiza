@@ -79,7 +79,7 @@ class AssignmentTeam < Team
     super
   end
 
-  # Delete Review response map
+  # Deletes all review mappings associated with this team
   def destroy_reviewer
     review_response_maps.each(&:destroy)
     super

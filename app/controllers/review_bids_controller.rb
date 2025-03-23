@@ -113,6 +113,8 @@ class ReviewBidsController < ApplicationController
     # begin
     url = 'http://152.7.178.10:8080/match_topics' # hard coding for the time being
     response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
+    Rails.logger.debug "bidding_data: #{bidding_data}"
+    Rails.logger.debug "Response body: #{JSON.parse(response.body)}"
     JSON.parse(response.body)
   rescue StandardError
     false

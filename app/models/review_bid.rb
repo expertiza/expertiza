@@ -54,7 +54,7 @@ class ReviewBid < ApplicationRecord
     bids = Bid.where(team_id: team_id)
     # loop through each bid for a topic to get specific data
     bids.each do |bid|
-      bidding_data['bids'] << {'tid' => bid.topic_id, 'priority' => bid.priority, 'timestamp' => bid.updated_at.strftime("%a, %d %b %Y %H:%M:%S %Z %:z")}
+      bidding_data['bids'] << { 'tid' => bid.topic_id, 'priority' => bid.priority, 'timestamp' => bid.updated_at.strftime('%a, %d %b %Y %H:%M:%S %Z %:z') }
     end
     bidding_data
   end

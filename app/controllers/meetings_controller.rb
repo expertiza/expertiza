@@ -1,58 +1,67 @@
 class MeetingsController < ApplicationController
-  before_action :set_meeting, only: [:show, :edit, :update, :destroy]
+  before_action :set_meeting, only: [:update, :destroy]
 
   # GET /meetings
   def index
     @meetings = Meeting.all
+    @teams = Team.paginate(page: params[:page], per_page: 50)
+    @mentored_teams = current_user.teams #any team that a mentor belongs to is a team they mentor
   end
 
-  # GET /meetings/1
+  # GET /meetings/:id
   def show
-  end
-
-  # GET /meetings/new
-  def new
-    @meeting = Meeting.new
-  end
-
-  # GET /meetings/1/edit
-  def edit
+    @meetings = Meeting.all
   end
 
   # POST /meetings
   def create
-    @meeting = Meeting.new(meeting_params)
+    @team = Team.find(params[:team_id])
+    @meeting = @team.meetings.new(meeting_params)
 
     if @meeting.save
-      redirect_to @meeting, notice: 'Meeting was successfully created.'
+      # TODO: Re-implement email notification for meeting creation
+      # MentorMeetingNotifications.send_notification(@meeting.team_id, @meeting.meeting_date)
+      render json: { status: 'success', message: 'Meeting date added' }, status: :created
     else
-      render :new
+      render json: { status: 'error', message: 'Unable to add meeting date', errors: @meeting.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /meetings/1
+  # PUT/PATCH /meetings/:id
   def update
     if @meeting.update(meeting_params)
-      redirect_to @meeting, notice: 'Meeting was successfully updated.'
+      # TODO: Re-implement email notification for meeting updates
+      # ActiveSupport::Notifications.instrument('mentor_meeting.updated', team_id: @meeting.team_id, old_meeting_date: params[:old_date], new_meeting_date: @meeting.meeting_date)
+      render json: { status: 'success', message: 'Meeting updated successfully' }
     else
-      render :edit
+      render json: { status: 'error', message: 'Failed to update meeting', errors: @meeting.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
-  # DELETE /meetings/1
+  # DELETE /meetings/:id
   def destroy
-    @meeting.destroy
-    redirect_to meetings_url, notice: 'Meeting was successfully destroyed.'
+    puts "Team ID: #{params[:team_id]}"
+    puts "Meeting ID: #{params[:id]}"
+
+    puts "Meeting: #{@meeting.inspect}"
+
+    if @meeting.destroy
+      render json: { message: 'Meeting deleted successfully' }, status: :ok
+    else
+      render json: { error: 'Failed to delete meeting' }, status: :unprocessable_entity
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_meeting
-      @meeting = Meeting.find(params[:id])
+    def meeting_params
+      params.require(:meeting).permit(:team_id, :meeting_date)
     end
 
-    # Only allow a trusted parameter "white list" through.
-    def meeting_params
-      params.require(:meeting).permit(:Date, :TeamID)
+  def set_meeting
+    @meeting = Meeting.find_by(team_id: params[:team_id], id: params[:id])
+
+    unless @meeting
+      render json: { status: 'error', message: 'Meeting not found' }, status: :not_found
     end
+  end
 end

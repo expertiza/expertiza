@@ -78,6 +78,10 @@ class Course < ApplicationRecord
     users.flatten.include? user
   end
 
+  def self.get_teams_by_id(courseID)
+    CourseTeam.where(parent_id: courseID)
+  end
+
   require 'analytic/course_analytic'
   include CourseAnalytic
 end

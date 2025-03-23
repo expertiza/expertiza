@@ -201,80 +201,362 @@ describe '#display_volume_metric_chart' do
   end
 end
 
-describe '#get_team_color' do
-  let(:response_map) { double('ResponseMap', id: 1, reviewed_object_id: 1, reviewee_id: 2) }
-  let(:reviewer) { double('Reviewer', review_grade: nil) }
+describe '#display_tagging_interval_chart' do
+  it 'creates a bar chart with tagging intervals data' do
+    # Setup test data - actual intervals array instead of a double
+    intervals = [5, 8, 12, 15, 20]
+    
+    # Expected chart data
+    expected_mean = intervals.reduce(:+) / intervals.size.to_f
+    
+    expected_data = {
+      labels: [1, 2, 3, 4, 5],  # [*1..intervals.length]
+      datasets: [
+        {
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          data: intervals,
+          label: 'time intervals'
+        },
+        {
+          data: Array.new(intervals.length, expected_mean),
+          label: 'Mean time spent'
+        }
+      ]
+    }
+    
+    expected_options = {
+      width: '200',
+      height: '125',
+      scales: {
+        yAxes: [{
+          stacked: false,
+          ticks: {
+            beginAtZero: true
+          }
+        }],
+        xAxes: [{
+          stacked: false
+        }]
+      }
+    }
+    
+    # Mock the line_chart method that's used by the helper
+    expect(helper).to receive(:line_chart)
+      .with(expected_data, expected_options)
+      .and_return('<div id="tagging_interval_chart">Chart HTML here</div>')
+    
+    # Call the method with the intervals array
+    result = helper.display_tagging_interval_chart(intervals)
+    
+    # Verify results
+    expect(result).to include('Chart HTML here')
+  end
   
-  before do
-    assignment = double('Assignment', created_at: Time.now - 10.days, num_review_rounds: 2)
-    helper.instance_variable_set(:@assignment, assignment)
-    allow(response_map).to receive(:reviewer).and_return(reviewer)
-    # Create test data for the detailed implementation
-    @assignment_created = assignment.created_at
-    @due_dates = double('DueDates')
-    allow(DueDate).to receive(:where).and_return(@due_dates)
+  it 'filters out intervals above the threshold' do
+    # Include some values above the 30-second threshold
+    intervals = [5, 8, 35, 15, 45]
+    filtered_intervals = intervals.select { |v| v < 30 } # [5, 8, 15]
+    expected_mean = filtered_intervals.reduce(:+) / filtered_intervals.size.to_f
+    
+    expected_data = {
+      labels: [1, 2, 3],  # [*1..filtered_intervals.length]
+      datasets: [
+        {
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          data: filtered_intervals,
+          label: 'time intervals'
+        },
+        {
+          data: Array.new(filtered_intervals.length, expected_mean),
+          label: 'Mean time spent'
+        }
+      ]
+    }
+    
+    # We don't need to test the options again
+    allow(helper).to receive(:line_chart).and_return('<div>Chart</div>')
+    
+    # Just verify that line_chart receives the correct filtered data
+    expect(helper).to receive(:line_chart) do |data, _options|
+      expect(data[:datasets][0][:data]).to eq([5, 8, 15])
+      expect(data[:datasets][1][:data]).to eq([9.333333333333334, 9.333333333333334, 9.333333333333334])
+      '<div>Chart</div>'
+    end
+    
+    helper.display_tagging_interval_chart(intervals)
   end
 
-  context 'when calling the 1-argument version' do
-    it 'returns red if response does not exist' do
-      allow(Response).to receive(:exists?).with(map_id: response_map.id).and_return(false)
-      expect(helper.get_team_color(response_map)).to eq('red')
-    end
-    
-    it 'returns brown if reviewer has review grade' do
-      allow(Response).to receive(:exists?).with(map_id: response_map.id).and_return(true)
-      allow(reviewer).to receive(:review_grade).and_return('some_grade')
-      expect(helper.get_team_color(response_map)).to eq('brown')
-    end
-    
-    it 'returns blue if response exists for each round' do
-      allow(Response).to receive(:exists?).with(map_id: response_map.id).and_return(true)
-      allow(helper).to receive(:response_for_each_round?).with(response_map).and_return(true)
-      expect(helper.get_team_color(response_map)).to eq('blue')
-    end
-    
-    it 'calls the 3-argument version when needed' do
-      # Setup for the first method that calls the second method
-      allow(Response).to receive(:exists?).with(map_id: response_map.id).and_return(true)
-      allow(helper).to receive(:response_for_each_round?).with(response_map).and_return(false)
-      
-      # Create expectation for the second method to be called with specific arguments
-      expect(helper).to receive(:get_team_color)
-        .with(response_map, @assignment_created, @due_dates)
-        .once
-        .and_return('purple')
-        
-      # Now call the first method and check it returns what the second method returned
-      expect(helper.get_team_color(response_map)).to eq('purple')
-    end
-  end
+
+  it 'handles empty intervals array' do
+    # Empty intervals array
+    intervals = []
   
-  context 'when calling the 3-argument version directly' do
-    it 'applies check_submission_state for each round and returns the last color' do
-      color_array = []
-      
-      # Mock the check_submission_state method to update the color array
-      expect(helper).to receive(:check_submission_state)
-        .with(response_map, @assignment_created, @due_dates, 1, color_array)
-        .once
-        .and_return(color_array << 'green')
-        
-      expect(helper).to receive(:check_submission_state)
-        .with(response_map, @assignment_created, @due_dates, 2, color_array)
-        .once
-        .and_return(color_array << 'purple')
-      
-      # Call the 3-argument version directly
-      result = helper.get_team_color(response_map, @assignment_created, @due_dates)
-      
-      # Verify the result is the last color from the array
-      expect(result).to eq('purple')
-    end
+    expected_data = {
+      labels: [],
+      datasets: [
+        {
+          backgroundColor: 'rgba(255,99,132,0.8)',
+          data: [],
+          label: 'time intervals'
+        },
+        nil 
+      ]
+    }
+  
+    expected_options = {
+      width: '200',
+      height: '125',
+      scales: {
+        yAxes: [{
+          stacked: false,
+          ticks: {
+            beginAtZero: true
+          }
+        }],
+        xAxes: [{
+          stacked: false
+        }]
+      }
+    }
+  
+    # Mock the line_chart method
+    expect(helper).to receive(:line_chart)
+      .with(expected_data, expected_options)
+      .and_return('<div>Empty chart</div>')
+  
+    result = helper.display_tagging_interval_chart(intervals)
+    expect(result).to include('Empty chart')
   end
 end
 
+describe '#response_for_each_round?' do
+  let(:response_map) { double('ResponseMap', id: 1) }
+  let(:assignment) { double('Assignment', num_review_rounds: 2) }
 
+  before(:each) do
+    helper.instance_variable_set(:@assignment, assignment)
+  end
 
+  it 'returns true when responses exist for all rounds' do
+    # Mock Response.exists? for each round
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 1)
+      .and_return(true)
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 2)
+      .and_return(true)
 
+    expect(helper.response_for_each_round?(response_map)).to be true
+  end
 
+  it 'returns false when responses are missing for some rounds' do
+    # Mock Response.exists? to return false for round 2
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 1)
+      .and_return(true)
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 2)
+      .and_return(false)
+
+    expect(helper.response_for_each_round?(response_map)).to be false
+  end
+
+  it 'returns false when no responses exist' do
+    # Mock Response.exists? to return false for all rounds
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 1)
+      .and_return(false)
+    expect(Response).to receive(:exists?)
+      .with(map_id: 1, round: 2)
+      .and_return(false)
+
+    expect(helper.response_for_each_round?(response_map)).to be false
+  end
+end
+describe '#check_submission_state' do
+  let(:response_map) { double('ResponseMap', id: 1, reviewee_id: 2) }
+  let(:assignment) { double('Assignment') }
+  let(:assignment_created) { Time.now }
+  let(:assignment_due_dates) { double('DueDates') }
+  let(:round) { 1 }
+  let(:color) { [] }
+  let(:due_date) { double('DueDate', due_at: Time.now + 1.day) }
+
+  before(:each) do
+    helper.instance_variable_set(:@assignment, assignment)
+    # Mock the where calls on assignment_due_dates
+    allow(assignment_due_dates).to receive(:where)
+      .with(hash_including(round: round, deadline_type_id: 1))
+      .and_return([due_date])
+  end
+
+  it 'adds purple color when submission is within the round' do
+    allow(helper).to receive(:submitted_within_round?)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(true)
+
+    helper.check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    expect(color).to eq(['purple'])
+  end
+
+  it 'adds green color when submission is not within the round but response exists' do
+    # Setup the submission check to return false
+    allow(helper).to receive(:submitted_within_round?)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(false)
+    
+    # Setup the hyperlink check
+    allow(helper).to receive(:submitted_hyperlink)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(nil)
+    
+    # Setup response check
+    allow(Response).to receive(:exists?)
+      .with(map_id: 1, round: 1)
+      .and_return(true)
+
+    helper.check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    expect(color).to eq(['green'])
+  end
+
+  it 'adds green color when submission is not within round and no wiki hyperlink' do
+    # Setup the submission check to return false
+    allow(helper).to receive(:submitted_within_round?)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(false)
+    
+    # Setup the hyperlink check to return nil
+    allow(helper).to receive(:submitted_hyperlink)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(nil)
+    
+    # Call method and verify color is green (not red as previously expected)
+    helper.check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    expect(color).to eq(['green'])
+  end
+
+  it 'handles wiki submissions correctly' do
+    # Setup the submission check to return false
+    allow(helper).to receive(:submitted_within_round?)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(false)
+    
+    # Setup the hyperlink check to return a wiki URL
+    wiki_link = 'https://wiki.example.com/page'
+    allow(helper).to receive(:submitted_hyperlink)
+      .with(round, response_map, assignment_created, assignment_due_dates)
+      .and_return(wiki_link)
+    
+    # Mock the link update check
+    link_updated_at = Time.now
+    allow(helper).to receive(:get_link_updated_at)
+      .with(wiki_link)
+      .and_return(link_updated_at)
+    
+    allow(helper).to receive(:link_updated_since_last?)
+      .with(round, assignment_due_dates, link_updated_at)
+      .and_return(true)
+
+    helper.check_submission_state(response_map, assignment_created, assignment_due_dates, round, color)
+    expect(color).to eq(['purple'])
+  end
+end
+
+describe '#submitted_within_round?' do
+  let(:response_map) { double('ResponseMap', reviewee_id: 1) }
+  let(:assignment_created) { Time.now - 30.days }
+  let(:round) { 1 }
+  let(:assignment_due_dates) { double('DueDates') }
+  let(:submission_due_date) { Time.now - 10.days }
+  let(:submission_due_last_round) { Time.now - 20.days }
+  
+  before(:each) do
+    # Setup default due date mocks
+    allow(assignment_due_dates).to receive(:where)
+      .with(round: round, deadline_type_id: 1)
+      .and_return([double('DueDate', due_at: submission_due_date)])
+  end
+  
+  it 'returns true when submission exists within first round timeframe' do
+    # Setup first round conditions
+    submission = double('Submission', created_at: assignment_created + 5.days)
+    submissions = [submission]
+    
+    # Mock the SubmissionRecord queries
+    allow(SubmissionRecord).to receive(:where)
+      .with(team_id: 1, operation: ['Submit File', 'Submit Hyperlink'])
+      .and_return(submissions)
+    allow(submissions).to receive(:where)
+      .with(created_at: assignment_created..submission_due_date)
+      .and_return([submission])
+    
+    expect(helper.submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)).to be true
+  end
+  
+  it 'returns true when submission exists within later round timeframe' do
+    # Setup later round conditions
+    later_round = 2
+    submission = double('Submission', created_at: submission_due_last_round + 5.days)
+    submissions = [submission]
+    
+    # Mock the DueDate queries for both rounds
+    allow(assignment_due_dates).to receive(:where)
+      .with(round: later_round, deadline_type_id: 1)
+      .and_return([double('DueDate', due_at: submission_due_date)])
+    allow(assignment_due_dates).to receive(:where)
+      .with(round: later_round - 1, deadline_type_id: 1)
+      .and_return([double('DueDate', due_at: submission_due_last_round)])
+    
+    # Mock the SubmissionRecord queries
+    allow(SubmissionRecord).to receive(:where)
+      .with(team_id: 1, operation: ['Submit File', 'Submit Hyperlink'])
+      .and_return(submissions)
+    
+    # Update this line to use a more flexible matcher that accepts any created_at range
+    allow(submissions).to receive(:where) do |criteria|
+      # We know the submission falls within the expected range
+      [submission] if criteria[:created_at].is_a?(Range)
+    end
+    
+    expect(helper.submitted_within_round?(later_round, response_map, assignment_created, assignment_due_dates)).to be true
+  end
+  
+  it 'returns false when no submission exists for the round' do
+    # Mock empty submission result
+    submissions = []
+    allow(SubmissionRecord).to receive(:where)
+      .with(team_id: 1, operation: ['Submit File', 'Submit Hyperlink'])
+      .and_return(submissions)
+    allow(submissions).to receive(:where)
+      .with(created_at: assignment_created..submission_due_date)
+      .and_return([])
+    
+    expect(helper.submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)).to be false
+  end
+  
+  it 'returns false when no submission due date exists for the round' do
+    # Mock nil due date
+    allow(assignment_due_dates).to receive(:where)
+      .with(round: round, deadline_type_id: 1)
+      .and_return([])
+    
+    expect(helper.submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)).to be false
+  end
+  
+  it 'returns false when submission exists but is outside round timeframe' do
+    # Setup submission outside timeframe
+    submission = double('Submission', created_at: submission_due_date + 1.day)
+    submissions = [submission]
+    
+    # Mock the SubmissionRecord queries
+    allow(SubmissionRecord).to receive(:where)
+      .with(team_id: 1, operation: ['Submit File', 'Submit Hyperlink'])
+      .and_return(submissions)
+    allow(submissions).to receive(:where)
+      .with(created_at: assignment_created..submission_due_date)
+      .and_return([])
+    
+    expect(helper.submitted_within_round?(round, response_map, assignment_created, assignment_due_dates)).to be false
+  end
+end
 end

@@ -252,27 +252,22 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
+  #E2502
   def delete_all_metareviewers
     mapping = ResponseMap.find(params[:id])
     mmappings = MetareviewResponseMap.where(reviewed_object_id: mapping.map_id)
+    force_delete = ActiveModel::Type::Boolean.new.cast(params[:force])
+
     num_unsuccessful_deletes = 0
     mmappings.each do |mmapping|
       begin
-        mmapping.delete(ActiveModel::Type::Boolean.new.cast(params[:force]))
+        mmapping.delete(force_delete)
       rescue StandardError
         num_unsuccessful_deletes += 1
       end
     end
 
-    if num_unsuccessful_deletes > 0
-      url_yes = url_for action: 'delete_all_metareviewers', id: mapping.map_id, force: 1
-      url_no = url_for action: 'delete_all_metareviewers', id: mapping.map_id
-      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \
-                      'Delete these mappings anyway?' \
-                      "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
-    else
-      flash[:note] = 'All metareview mappings for contributor "' + mapping.reviewee.name + '" and reviewer "' + mapping.reviewer.name + '" have been deleted.'
-    end
+    set_metareviewer_deletion_message(mapping, num_unsucessful_delete)
     redirect_to action: 'list_mappings', id: mapping.assignment.id
   end
 
@@ -589,5 +584,19 @@ class ReviewMappingController < ApplicationController
     params
       .require(:review_grade)
       .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
+  end
+
+  #E2502: added this method in private
+  def set_metareviewer_deletion_message(mapping, num_unsuccessful_deletes)
+    if num_unsuccessful_deletes > 0
+      url_yes = url_for(action: 'delete_all_metareviewers', id: mapping.map_id, force: 1)
+      url_no = url_for(action: 'delete_all_metareviewers', id: mapping.map_id)
+      
+      flash[:error] = "A delete action failed:<br/>#{num_unsuccessful_deletes} metareviews exist for these mappings. " \
+                     'Delete these mappings anyway?' \
+                     "&nbsp;<a href='#{url_yes}'>Yes</a>&nbsp;|&nbsp;<a href='#{url_no}'>No</a><br/>"
+    else
+      flash[:note] = "All metareview mappings for contributor \"#{mapping.reviewee.name}\" and reviewer \"#{mapping.reviewer.name}\" have been deleted."
+    end
   end
 end

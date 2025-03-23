@@ -113,11 +113,15 @@ class AssignmentTeam < Team
     copy_members(new_team)
   end
 
-  # Add Participants to the current Assignment Team
-  def add_participant(assignment_id, user)
-    return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
-
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+  # Given a user and assignment, if they aren't already a participant, make them one
+  # Since this method is on a team and team already belongs to an assignment, assignment_id is not needed.
+  def add_participant(user)
+    AssignmentParticipant.find_or_create_by(
+      parent_id: parent_id, # refers to self.parent_id
+      user_id: user.id
+    ) do |participant|
+      participant.permission_granted = user.master_permission_granted
+    end
   end
 
   def hyperlinks

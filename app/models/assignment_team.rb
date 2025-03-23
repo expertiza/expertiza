@@ -203,7 +203,7 @@ class AssignmentTeam < Team
 
   # Get the path of the team directory
   def path
-    assignment.path + '/' + directory_num.to_s
+    File.join(assignment.path, directory_num.to_s)
   end
 
   # Set the directory number for this team

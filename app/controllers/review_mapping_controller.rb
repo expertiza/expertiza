@@ -231,8 +231,7 @@ class ReviewMappingController < ApplicationController
 
     if reviewer.nil?
       raise "\"#{user.name}\" is not a participant in the assignment. Please <a href='#{reg_url}'>register</a> this user to continue."
-    end
-
+      
     reviewer.get_reviewer
   rescue StandardError => e
     flash[:error] = e.message
@@ -242,16 +241,11 @@ class ReviewMappingController < ApplicationController
   def delete_outstanding_reviewers
     assignment = Assignment.find(params[:id])
     team = AssignmentTeam.find(params[:contributor_id])
-    review_response_maps = team.review_mappings
-    num_remain_review_response_maps = review_response_maps.size
-    review_response_maps.each do |review_response_map|
-      unless Response.exists?(map_id: review_response_map.id)
-        ReviewResponseMap.find(review_response_map.id).destroy
-        num_remain_review_response_maps -= 1
-      end
-    end
-    if num_remain_review_response_maps > 0
-      flash[:error] = "#{num_remain_review_response_maps} reviewer(s) cannot be deleted because they have already started a review."
+
+    result = team.delete_outstanding_reviewers
+    
+    if result[:remaining_count] > 0
+      flash[:error] = "#{result[:remaining_count]} reviewer(s) cannot be deleted because they have already started a review."
     else
       flash[:success] = "All review mappings for \"#{team.name}\" have been deleted."
     end

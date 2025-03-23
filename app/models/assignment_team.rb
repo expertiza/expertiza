@@ -299,4 +299,6 @@ class AssignmentTeam < Team
         map.destroy
         deleted_count += 1
       end
+    end
+  end
 end

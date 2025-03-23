@@ -80,7 +80,7 @@ class AssignmentTeam < Team
   end
 
   # Delete Review response map
-  def destroy
+  def destroy_reviewer
     review_response_maps.each(&:destroy)
     super
   end
@@ -241,8 +241,8 @@ class AssignmentTeam < Team
     get_logged_in_reviewer_id(current_user_id) != nil
   end
 
-  # E2121 Refractor create_new_team
-  def create_new_team(user_id, signuptopic)
+  # Creates a new team linking a user with a signuptopic
+  def link_user_and_topic(user_id, signuptopic)
     t_user = TeamsUser.create(team_id: id, user_id: user_id)
     SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)

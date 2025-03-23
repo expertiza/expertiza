@@ -284,19 +284,25 @@ class ReviewMappingController < ApplicationController
     else
       flash.now[:error] = "The review by \"#{reviewer_name}\" for \"#{reviewee_name}\" could not be unsubmitted."
     end
-    
+
     render action: 'unsubmit_review.js.erb', layout: false
   end
   # E1721 changes End
 
+  # E2502
   def delete_reviewer
-    review_response_map = ReviewResponseMap.find_by(id: params[:id])
-    if review_response_map && !Response.exists?(map_id: review_response_map.id)
-      review_response_map.destroy
-      flash[:success] = 'The review mapping for "' + review_response_map.reviewee.name + '" and "' + review_response_map.reviewer.name + '" has been deleted.'
+    review_map = ReviewResponseMap.find_by(id: params[:id])
+
+    if review_map && !Response.exists?(map_id: review_response_map.id)
+      reviewee_name = review_map.reviewee.name
+      reviewer_name = review_map.reviewer.name
+
+      review_map.destroy
+      flash[:success] = "The review mapping for \"#{reviewee_name}\" and \"#{reviewer_name}\" has been deleted."
     else
-      flash[:error] = 'This review has already been done. It cannot been deleted.'
+      flash[:error] = "This review has already been done. It cannot be deleted."
     end
+
     redirect_back fallback_location: root_path
   end
 

@@ -306,6 +306,7 @@ class ReviewMappingController < ApplicationController
     redirect_back fallback_location: root_path
   end
 
+  # E2502
   def delete_metareviewer
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
@@ -325,9 +326,10 @@ class ReviewMappingController < ApplicationController
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
-    # metareview = mapping.response
-    # metareview.delete
+
     mapping.delete
+    flash[:note] = "The metareview has been deleted"
+    
     redirect_to action: 'list_mappings', id: assignment_id
   end
 

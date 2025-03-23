@@ -181,14 +181,17 @@ class AssignmentTeam < Team
 #     save
 #   end
 
-  # return the team given the participant
+  # Given a participant, find associated AssignmentTeam 
   def self.team(participant)
+    # return nil if there is no participant
     return nil if participant.nil?
 
+    # find all TeamUser records for given user
     team = nil
     teams_users = TeamsUser.where(user_id: participant.user_id)
     return nil unless teams_users
 
+    # for each TeamUser record, fetch team & return it only if both team and participant's parent id match
     teams_users.each do |teams_user|
       if teams_user.team_id == nil
         next

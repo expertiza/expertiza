@@ -124,6 +124,30 @@ class AssignmentTeam < Team
     submitted_hyperlinks.blank? ? [] : YAML.safe_load(submitted_hyperlinks)
   end
 
+  # Manages submission of a hyperlink
+  def submit_hyperlink(hyperlink)
+    hyperlink.strip!
+    raise 'The hyperlink cannot be empty!' if hyperlink.empty?
+
+    hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
+    # If not a valid URL, it will throw an exception
+    response_code = Net::HTTP.get_response(URI(hyperlink))
+    raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
+
+    hyperlinks = self.hyperlinks
+    hyperlinks << hyperlink
+    self.submitted_hyperlinks = YAML.dump(hyperlinks)
+    save
+  end
+
+  # Method manages removal of hyperlink (only here on as-needed basis)
+  def remove_hyperlink(hyperlink_to_delete)
+    hyperlinks = self.hyperlinks
+    hyperlinks.delete(hyperlink_to_delete)
+    self.submitted_hyperlinks = YAML.dump(hyperlinks)
+    save
+  end
+
   # Appends the hyperlink to a list that is stored in YAML format in the DB
   # @exception  If is hyperlink was already there
   #             If it is an invalid URL

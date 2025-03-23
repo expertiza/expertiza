@@ -99,25 +99,9 @@ class ReviewBidsController < ApplicationController
     # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
     bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
+    matched_topics = ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
     redirect_back fallback_location: root_path
-  end
-
-  # call webserver for running assigning algorithm
-  # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
-  # webserver returns:
-  # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
-    # begin
-    url = 'http://152.7.178.10:8080/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    Rails.logger.debug "bidding_data: #{bidding_data}"
-    Rails.logger.debug "Response body: #{JSON.parse(response.body)}"
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
   end
 end

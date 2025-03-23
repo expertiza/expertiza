@@ -191,7 +191,8 @@ class AssignmentTeam < Team
     update_attributes(directory_num: dir_num)
   end
 
-  def received_any_peer_review?
+  # Checks if the AssignmentTeam has recieved any peer reviews
+  def has_been_reviewed?
     ResponseMap.where(reviewee_id: id, reviewed_object_id: parent_id).any?
   end
 

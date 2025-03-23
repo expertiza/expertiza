@@ -104,26 +104,19 @@ class AssignmentTeam < Team
     files = files(path) if directory_num
     files
   end
-
-  # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
-  # Import csv file to form teams directly
+  
+  # Delegates CSV-based team creation to the Team.import method, using AssignmentTeam as the context.
   def self.import(row, assignment_id, options)
-    unless Assignment.find_by(id: assignment_id)
-      raise ImportError, 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
-
-    @assignment_team = AssignmentTeam.new
-    Team.import(row, assignment_id, options, @assignment_team)
+    raise ImportError, "The assignment with the id \"#{assignment_id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?" unless Assignment.find_by(id: assignment_id)
+  
+    Team.import(row, assignment_id, options, AssignmentTeam)
   end
-
-  # Export the existing teams in a csv file
+  
+  # Delegates team export functionality to the Team.export method using AssignmentTeam as the context.
   def self.export(csv, parent_id, options)
-    @assignment_team = AssignmentTeam.new
-    Team.export(csv, parent_id, options, @assignment_team)
+    Team.export(csv, parent_id, options, AssignmentTeam)
   end
-
-  # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
-
+  
   # Copy the current Assignment team to the CourseTeam
   def copy(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)

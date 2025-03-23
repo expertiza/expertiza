@@ -40,21 +40,15 @@ class MeetingsController < ApplicationController
 
   # DELETE /meetings/:id
   def destroy
-    @meeting = Meeting.find(params[:id])
-    team = @meeting.team
+    puts "Team ID: #{params[:team_id]}"
+    puts "Meeting ID: #{params[:id]}"
+
+    puts "Meeting: #{@meeting.inspect}"
 
     if @meeting.destroy
-      # Construct the redirect URL based on the team's assignment
-      redirect_url = teams_list_path(id: team.id, type: team.type) # Assuming 'type' is the assignment attribute
-      render json: { status: 'success', message: 'Meeting destroyed successfully' }
-      redirect_to redirect_url, notice: 'Meeting date deleted'
+      render json: { message: 'Meeting deleted successfully' }, status: :ok
     else
-      render json: { status: 'success', message: 'Meeting not destroyed' }
-
-      # Construct the redirect URL based on the team's assignment
-      redirect_url = teams_list_path(id: team.id, type: team.type)
-
-      redirect_to redirect_url
+      render json: { error: 'Failed to delete meeting' }, status: :unprocessable_entity
     end
   end
 
@@ -63,9 +57,10 @@ class MeetingsController < ApplicationController
       params.require(:meeting).permit(:team_id, :meeting_date)
     end
 
-    def set_meeting
-      @meeting = Meeting.find_by(team_id: params[:team_id], meeting_date: params[:old_date] || params[:meeting_date])
-      unless @meeting
+  def set_meeting
+    @meeting = Meeting.find_by(team_id: params[:team_id], id: params[:id])
+
+    unless @meeting
       render json: { status: 'error', message: 'Meeting not found' }, status: :not_found
     end
   end

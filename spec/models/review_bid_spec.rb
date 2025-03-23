@@ -45,23 +45,23 @@ describe ReviewBid do
       allow(bid2).to receive(:topic_id).and_return(bid2.signuptopic_id)
       result = ReviewBid.bidding_data(bid1.assignment_id, test_reviewers)
       # Check outer structure
-      expect(result["max_accepted_proposals"]).to eq(nil)
-      expect(result["tid"]).to eq([])
+      expect(result['max_accepted_proposals']).to eq(nil)
+      expect(result['tid']).to eq([])
       # Get bidding data for reviewer 1
-      user_bids = result["users"][1]["bids"]
+      user_bids = result['users'][1]['bids']
       expect(user_bids.size).to eq(2)
       # Define regex for the expected timestamp format
       timestamp_regex = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} [A-Z]+ [+-]\d{2}:\d{2}$/
       # Verify first bid
-      expect(user_bids[0]["tid"]).to eq(123)
-      expect(user_bids[0]["priority"]).to eq(3)
-      expect(user_bids[0]["timestamp"]).to match(timestamp_regex)
+      expect(user_bids[0]['tid']).to eq(123)
+      expect(user_bids[0]['priority']).to eq(3)
+      expect(user_bids[0]['timestamp']).to match(timestamp_regex)
       # Verify second bid
-      expect(user_bids[1]["tid"]).to eq(124)
-      expect(user_bids[1]["priority"]).to eq(2)
-      expect(user_bids[1]["timestamp"]).to match(timestamp_regex)
+      expect(user_bids[1]['tid']).to eq(124)
+      expect(user_bids[1]['priority']).to eq(2)
+      expect(user_bids[1]['timestamp']).to match(timestamp_regex)
       # Verify otid
-      expect(result["users"][1]["otid"]).to eq(123)
+      expect(result['users'][1]['otid']).to eq(123)
     end
 end
 
@@ -102,7 +102,7 @@ end
     context 'when a team is found' do
       let(:bid1) { build(:review_bid, priority: 3, signuptopic_id: 123, assignment_id: assignment_id, updated_at: Time.zone.parse('2018-01-01 00:00:00')) }
       let(:bid2) { build(:review_bid, priority: 2, signuptopic_id: 124, assignment_id: assignment_id, updated_at: Time.zone.parse('2018-01-02 00:00:00')) }
-  
+
       before do
         # Stub the participant lookup to return a double with a user_id
         allow(AssignmentParticipant).to receive(:find).with(reviewer_id).and_return(double('Participant', user_id: reviewer_user_id))
@@ -120,12 +120,12 @@ end
         result = ReviewBid.reviewer_bidding_data(reviewer_id, assignment_id)
         expect(result['otid']).to eq(self_topic)
         expect(result['bids'].size).to eq(2)
-  
+
         first_bid = result['bids'][0]
         expect(first_bid['tid']).to eq(bid1.signuptopic_id)
         expect(first_bid['priority']).to eq(bid1.priority)
         expect(first_bid['timestamp']).to match(timestamp_regex)
-  
+
         second_bid = result['bids'][1]
         expect(second_bid['tid']).to eq(bid2.signuptopic_id)
         expect(second_bid['priority']).to eq(bid2.priority)
@@ -144,5 +144,5 @@ end
         expect(result['bids']).to eq([])
       end
     end
-  end  
+  end
 end

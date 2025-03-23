@@ -247,6 +247,7 @@ describe ReviewMappingController do
     end
   end
 
+  # modified test
   describe '#assign_quiz_dynamically' do
     before(:each) do
       allow(AssignmentParticipant).to receive_message_chain(:where, :first)
@@ -259,25 +260,52 @@ describe ReviewMappingController do
       }
     end
 
-    context 'when corresponding response map exists' do
-      it 'shows a flash error and redirects to student_quizzes page' do
-        allow(ResponseMap).to receive_message_chain(:where, :first).with(reviewed_object_id: '1', reviewer_id: '1')
-          .with(no_args).and_return(double('ResponseMap'))
-
+    context 'when participant is not found' do
+      it 'flashes an error and redirects to student_quizzes page' do
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: '1', parent_id: 1).and_return(nil)
         post :assign_quiz_dynamically, params: @params
-        expect(flash[:error]).to eq('You have already taken that quiz.')
+        expect(flash[:error]).to eq('Participant not registered for this assignment')
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
     end
 
-    context 'when corresponding response map does not exist' do
-      it 'creates a new QuizResponseMap and redirects to student_quizzes page' do
-        questionnaire = double('Questionnaire', id: 1, instructor_id: 1)
-        allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire)
-        allow(Questionnaire).to receive(:find_by).with(instructor_id: 1).and_return(questionnaire)
-        allow_any_instance_of(QuizResponseMap).to receive(:save).and_return(true)
+    context 'when participant has already taken the quiz' do
+      it 'flashes an error and redirects to student_quizzes page' do
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: '1', parent_id: 1).and_return(participant)
+        allow(QuizResponseMap).to receive(:exists?).and_return(true)
         post :assign_quiz_dynamically, params: @params
-        expect(flash[:error]).to be nil
+        expect(flash[:error]).to eq('Already taken this quiz')
+        expect(response).to redirect_to('/student_quizzes?id=1')
+      end
+    end
+
+    context 'when quiz assignment is successfully created' do
+      let(:questionnaire) { double('Questionnaire', id: 1, instructor_id: 1) }
+    
+      it 'flashes a success message and redirects to student_quizzes page' do
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: '1', parent_id: 1).and_return(participant)
+        
+        allow(QuizResponseMap).to receive(:exists?).and_return(false)
+        
+        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire)
+        allow(Questionnaire).to receive(:find).with("1").and_return(questionnaire) 
+        
+        allow(QuizResponseMap).to receive(:create!).and_return(true)
+        
+        post :assign_quiz_dynamically, params: @params
+        
+        expect(flash[:success]).to eq('Quiz successfully assigned')
+        expect(response).to redirect_to('/student_quizzes?id=1')
+      end
+    end
+
+    context 'when quiz assignment creation fails' do
+      it 'flashes an error and redirects to student_quizzes page' do
+        allow(AssignmentParticipant).to receive(:find_by).with(user_id: '1', parent_id: 1).and_return(participant)
+        allow(QuizResponseMap).to receive(:exists?).and_return(false)
+        allow(QuizResponseMap).to receive(:create!).and_raise(ActiveRecord::RecordInvalid.new(QuizResponseMap.new))
+        post :assign_quiz_dynamically, params: @params
+        expect(flash[:error]).to be_present
         expect(response).to redirect_to('/student_quizzes?id=1')
       end
     end

@@ -161,25 +161,44 @@ class ReviewMappingController < ApplicationController
   end
 
   # assigns the quiz dynamically to the participant
+  # def assign_quiz_dynamically
+  #   begin
+  #     assignment = Assignment.find(params[:assignment_id])
+  #     reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
+  #     if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
+  #       flash[:error] = 'You have already taken that quiz.'
+  #     else
+  #       @map = QuizResponseMap.new
+  #       @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
+  #       @map.reviewer_id = params[:participant_id]
+  #       @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
+  #       @map.save
+  #     end
+  #   rescue StandardError => e
+  #     flash[:alert] = e.nil? ? $ERROR_INFO : e
+  #   end
+  #   redirect_to student_quizzes_path(id: reviewer.id)
+  # end
+  
   def assign_quiz_dynamically
+    assignment_id = params[:assignment_id].to_i
+    reviewer_id = params[:reviewer_id]
+    questionnaire_id = params[:questionnaire_id].to_i # Convert to integer
+  
     begin
-      assignment = Assignment.find(params[:assignment_id])
-      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
-        flash[:error] = 'You have already taken that quiz.'
-      else
-        @map = QuizResponseMap.new
-        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-        @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
-        @map.save
-      end
+      QuizResponseMap.create_quiz_assignment(assignment_id, reviewer_id, questionnaire_id)
+      flash[:success] = "Quiz successfully assigned"
+    rescue ActiveRecord::RecordNotFound => e
+      flash[:error] = "Participant not registered for this assignment"
+    rescue ActiveRecord::RecordInvalid => e
+      flash[:error] = e.message
     rescue StandardError => e
-      flash[:alert] = e.nil? ? $ERROR_INFO : e
+      flash[:error] = e.message
     end
-    redirect_to student_quizzes_path(id: reviewer.id)
+  
+    redirect_to student_quizzes_path(id: params[:reviewer_id])
   end
-
+  
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
     msg = ''

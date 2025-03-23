@@ -1,3 +1,5 @@
+# Service for running the review bidding algorithm.
+# This class interacts with an external web service to send and receive bidding data
 class ReviewBiddingAlgorithmService
   # Runs the review bidding algorithm by sending data to the web service
   # @param bidding_data [Hash] The data required for the bidding algorithm
@@ -8,17 +10,8 @@ class ReviewBiddingAlgorithmService
     send_bidding_request(url, bidding_data) # Ensures result is returned
   end
 
-  private
-
-  def self.send_bidding_request(url, bidding_data)
-    response = RestClient.post(
-      url,
-      bidding_data.to_json,
-      content_type: 'application/json',
-      accept: :json
-    )
-    Rails.logger.debug "Bidding Data Sent: #{bidding_data.to_json}"
-    Rails.logger.debug "Response Body: #{response.body}"
+  private_class_method def self.send_bidding_request(url, bidding_data)
+    response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
     JSON.parse(response.body)
   rescue StandardError => e
     Rails.logger.error "Error in run_bidding_algorithm: #{e.message}"

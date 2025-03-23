@@ -438,22 +438,16 @@ class ReviewMappingController < ApplicationController
     end
   end
 
-  # E1600
-  # Start self review if not started yet - Creates a self-review mapping when user requests a self-review
+  # Initiates a self-review process for a student
+  # This method creates a self-review mapping if one doesn't already exist
+  # and redirects the user to the review form
   def start_self_review
     user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])
     team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
+    
     begin
-      # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-      # to treat all assignments as team assignments
-      if SelfReviewResponseMap.where(reviewee_id: team.id, reviewer_id: params[:reviewer_id]).first.nil?
-        SelfReviewResponseMap.create(reviewee_id: team.id,
-                                     reviewer_id: params[:reviewer_id],
-                                     reviewed_object_id: assignment.id)
-      else
-        raise 'Self review already assigned!'
-      end
+      SelfReviewResponseMap.create_self_review(team.id, params[:reviewer_id], assignment.id)
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
     rescue StandardError => e
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message

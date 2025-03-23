@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tableBody.innerHTML = bodyHtml; // Update only the <tbody> with new content
 
                     window.currColumnNum++; // Increment currColumnNum for subsequent clicks
+                    window.location.reload();
                 })
                 .catch((error) => {
                     console.error('There was a problem with the fetch operation:', error);
@@ -86,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     tableBody.innerHTML = bodyHtml; // Update only the <tbody> with new content
 
                     window.currColumnNum--; // decrement currColumnNum for subsequent clicks
+                    window.location.reload();
                 })
                 .catch((error) => {
                     console.error('There was a problem with the fetch operation:', error);

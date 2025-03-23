@@ -209,4 +209,15 @@ class AssignmentParticipant < Participant
   def team_user
     TeamsUser.where(team_id: team.id, user_id: user_id).first if team
   end
+  
+  # Returns an array of participant IDs who need more reviews
+  def self.participants_needing_reviews(participants_hash, review_strategy)
+    participants_hash.select { |_, review_num| review_num < review_strategy.reviews_per_student }
+                    .keys
+  end
+
+  # Returns true if the participant is a member of the given team
+  def in_team?(team_id)
+    TeamsUser.exists?(team_id: team_id, user_id: user_id)
+  end
 end

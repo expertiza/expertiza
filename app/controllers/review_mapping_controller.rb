@@ -455,46 +455,33 @@ class ReviewMappingController < ApplicationController
   end
 
   private
-
+  
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id, calibrate_to: 0)
-                        .where('created_at > :time',
-                               time: @@time_create_last_review_mapping_record).size < review_strategy.reviews_needed
+    return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record)
 
-      participants_with_insufficient_review_num = []
-      participants_hash.each do |participant_id, review_num|
-        participants_with_insufficient_review_num << participant_id if review_num < review_strategy.reviews_per_student
-      end
-      unsorted_teams_hash = {}
+    participants_needing_reviews = AssignmentParticipant.participants_needing_reviews(participants_hash, review_strategy)
+    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)
+    
+    assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
+    @@time_create_last_review_mapping_record = ReviewResponseMap.latest_mapping_time(assignment_id)
+  end
 
-      ReviewResponseMap.where(reviewed_object_id: assignment_id,
-                              calibrate_to: 0).each do |response_map|
-        if unsorted_teams_hash.key? response_map.reviewee_id
-          unsorted_teams_hash[response_map.reviewee_id] += 1
-        else
-          unsorted_teams_hash[response_map.reviewee_id] = 1
-        end
-      end
-      teams_hash = unsorted_teams_hash.sort_by { |_, v| v }.to_h
-
-      participants_with_insufficient_review_num.each do |participant_id|
-        teams_hash.each_key do |team_id, _num_review_received|
-          next if TeamsUser.exists?(team_id: team_id,
-                                    user_id: Participant.find(participant_id).user_id)
-
-          participant = AssignmentParticipant.find(participant_id)
-          ReviewResponseMap.where(reviewee_id: team_id, reviewer_id: participant.get_reviewer.id,
-                                  reviewed_object_id: assignment_id).first_or_create
-
-          teams_hash[team_id] += 1
-          teams_hash = teams_hash.sort_by { |_, v| v }.to_h
-          break
-        end
+  def assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
+    participants_needing_reviews.each do |participant_id|
+      team_review_counts.each do |team_id, _|
+        participant = AssignmentParticipant.find(participant_id)
+        next if participant.in_team?(team_id)
+        
+        ReviewResponseMap.create_review_mapping(assignment_id, team_id, participant_id)
+        update_team_review_counts(team_review_counts, team_id)
+        break
       end
     end
-    @@time_create_last_review_mapping_record = ReviewResponseMap
-                                               .where(reviewed_object_id: assignment_id)
-                                               .last.created_at
+  end
+
+  def update_team_review_counts(team_review_counts, team_id)
+    team_review_counts[team_id] += 1
+    team_review_counts.sort_by! { |_, count| count }
   end
 
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)

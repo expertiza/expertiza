@@ -152,22 +152,23 @@ class AssignmentTeam < Team
     save
   end
 
-  # Appends the hyperlink to a list that is stored in YAML format in the DB
-  # @exception  If is hyperlink was already there
-  #             If it is an invalid URL
-
+  # Recursively gathers all files (not directories) within a given directory and its subdirectories
+  # Uses an iterator-based approach as specified.
   def files(directory)
-    files_list = Dir[directory + '/*']
-    files = []
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each { |f| files << f }
-      end
-      files << file
+    # Safety check: if the given path is not a valid directory, return an empty array
+    return [] unless File.directory?(directory)
+  
+    # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')
+    # Then iterate over each entry
+    Dir.children(directory).flat_map do |entry|
+      # Construct the full path to the current entry (file or folder)
+      path = File.join(directory, entry)
+  
+      # If the entry is a subdirectory, recursively gather its files using the same method
+      # If it's a file, return it in a single-element array
+      # flat_map ensures all nested arrays are flattened into a single array of paths
+      File.directory?(path) ? files(path) : [path]
     end
-    files
   end
 
   # Given a participant, find associated AssignmentTeam 

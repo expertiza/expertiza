@@ -262,7 +262,7 @@ describe AssignmentParticipant do
   describe '#review_file_path' do
     it 'returns the file path for reviewer to upload files during peer review' do
       allow(ResponseMap).to receive(:find).with(1).and_return(build(:review_response_map))
-      allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(build(:team_user))
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1).and_return(build(:team_user))
       allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 4).and_return(participant)
       expect(participant.review_file_path(1)).to match('pg_data/instructor6/csc517/test/final_test/0_review/1')
     end

@@ -67,7 +67,7 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(1).and change(User, :count).by(1)
@@ -84,7 +84,7 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)
@@ -99,7 +99,7 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment2)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)

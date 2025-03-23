@@ -73,7 +73,7 @@ development:
       team:
         list: true
         list_assignments: true
-      teams_users:
+      teams_participants:
         list: true
       impersonate:
         start: true
@@ -152,7 +152,7 @@ development:
       student_task: true
       profile: true
       team: true
-      teams_users: true
+      teams_participants: true
       import_file: true
       participant_choices: true
       impersonate: true
@@ -517,7 +517,7 @@ test:
       team:
         list: true
         list_assignments: true
-      teams_users:
+      teams_participants:
         list: true
       impersonate:
         start: true
@@ -594,7 +594,7 @@ test:
       profile: true
       survey_response: true
       team: true
-      teams_users: true
+      teams_participants: true
       impersonate: true
       import_file: true
       review_mapping: true
@@ -949,7 +949,7 @@ production:
       team:
         list: true
         list_assignments: true
-      teams_users:
+      teams_participants:
         list: true
       course_evaluation:
         list: true
@@ -1038,7 +1038,7 @@ production:
       profile: true
       survey_response: true
       team: true
-      teams_users: true
+      teams_participants: true
       import_file: true
       course_evaluation: true
       participant_choices: true

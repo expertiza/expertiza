@@ -7,7 +7,7 @@ class MentoredTeam < AssignmentTeam
         can_add_member = false
         unless full?
           can_add_member = true
-          t_user = TeamsUser.create(user_id: user.id, team_id: id)
+          t_user = TeamsParticipant.create(user_id: user.id, team_id: id)
           parent = TeamNode.find_by(node_object_id: id)
           TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
           add_participant(parent_id, user)
@@ -28,7 +28,7 @@ class MentoredTeam < AssignmentTeam
           if user.nil?
             raise ImportError, "The user '#{teammate}' was not found. <a href='/users/new'>Create</a> this user?"
           else
-            add_member(user, parent_id) if TeamsUser.find_by(team_id: id, user_id: user.id).nil?
+            add_member(user, parent_id) if TeamsParticipant.find_by(team_id: id, user_id: user.id).nil?
           end
         end
       end

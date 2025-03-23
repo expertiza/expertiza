@@ -58,7 +58,7 @@ describe 'CourseTeam' do
   describe '#export' do
     it 'writes to a csv' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
       expect(CourseTeam.export([], 1, team_name: 'false')).to eq([['no team', 'no name']])
     end
   end
@@ -78,7 +78,7 @@ describe 'CourseTeam' do
       it 'creates and returns a participant' do
         node = TeamNode.new
         allow(course_team1).to receive(:user?).with(user2).and_return(false)
-        allow(TeamsUser).to receive(:create).with(user_id: 2, team_id: 1).and_return(team_user)
+        allow(TeamsParticipant).to receive(:create).with(user_id: 2, team_id: 1).and_return(team_user)
         allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(node)
         allow(course_team1).to receive(:add_participant).with(1, user2).and_return(participant)
         allow(course_team1).to receive(:parent_id).and_return(1)

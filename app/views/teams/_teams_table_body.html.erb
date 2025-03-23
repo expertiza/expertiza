@@ -20,8 +20,8 @@
       <td><%= team.participants.map(&:user_email).join(', ') %></td>
 
       <!-- Mentor Name -->
-      <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
-      <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+      <% mentor = team.participants.find { |participant| participant.can_mentor } %>
+      <td><%= mentor ? mentor.user.name : '--' %></td>
 
       <!-- Meeting Dates -->
       <% meeting_dates = Meeting.where(team_id: team.id).order(:meeting_date).limit(@num_of_meeting_cols).pluck(:meeting_date) %>

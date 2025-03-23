@@ -44,18 +44,44 @@ class ReviewBid < ApplicationRecord
   # method for getting individual reviewer_ids bidding data
   # returns user's bidding data hash
   def self.reviewer_bidding_data(reviewer_id, assignment_id)
-    reviewer_user_id = AssignmentParticipant.find(reviewer_id).user_id
-    self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
+    reviewer_user_id = find_reviewer_user_id(reviewer_id)
+    self_topic = fetch_self_topic(assignment_id, reviewer_user_id)
+    team_id = fetch_team_id(assignment_id, reviewer_user_id)
     bidding_data = { 'bids' => [], 'otid' => self_topic }
-    # Retrieve team_id using TeamsUser for the given assignment
-    team_id = TeamsUser.team_id(assignment_id, reviewer_user_id)
-    return bidding_data if team_id.nil?
-    # Fetch bids associated with the team
-    bids = Bid.where(team_id: team_id)
-    # loop through each bid for a topic to get specific data
-    bids.each do |bid|
-      bidding_data['bids'] << { 'tid' => bid.topic_id, 'priority' => bid.priority, 'timestamp' => bid.updated_at.strftime('%a, %d %b %Y %H:%M:%S %Z %:z') }
-    end
+    return bidding_data unless team_id
+
+    bids = fetch_team_bids(team_id)
+    bidding_data['bids'] = bids.map { |bid| format_bid(bid) }
     bidding_data
+  end
+
+  private
+
+  # Retrieve the user id for a given reviewer id.
+  def self.find_reviewer_user_id(reviewer_id)
+    AssignmentParticipant.find(reviewer_id).user_id
+  end
+
+  # Fetch the self topic for the reviewer based on the assignment.
+  def self.fetch_self_topic(assignment_id, reviewer_user_id)
+    SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
+  end
+
+  # Retrieve the team id for the reviewer in the context of the assignment.
+  def self.fetch_team_id(assignment_id, reviewer_user_id)
+    TeamsUser.team_id(assignment_id, reviewer_user_id)
+  end
+
+  # Get all bids associated with the team.
+  def self.fetch_team_bids(team_id)
+    Bid.where(team_id: team_id)
+  end
+
+  def self.format_bid(bid)
+    {
+      'tid' => bid.topic_id,
+      'priority' => bid.priority,
+      'timestamp' => bid.updated_at.strftime('%a, %d %b %Y %H:%M:%S %Z %:z')
+    }
   end
 end

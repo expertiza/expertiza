@@ -268,4 +268,32 @@ class ReviewResponseMap < ResponseMap
   def self.latest_mapping_time(assignment_id)
     where(reviewed_object_id: assignment_id).last.created_at
   end
+  
+  # Creates review mappings for selected participants
+  def self.create_review_mappings_for_participants(assignment_id, team_id, participant_ids)
+    participant_ids.each do |participant_id|
+      where(
+        reviewee_id: team_id,
+        reviewer_id: participant_id,
+        reviewed_object_id: assignment_id
+      ).first_or_create
+    end
+  rescue StandardError
+    false
+  end
+
+  # Returns true if a participant can review a team
+  def self.can_review_team?(participant_id, team_id)
+    !TeamsUser.exists?(team_id: team_id, user_id: participant_id)
+  end
+
+  # Returns the number of valid participants in a team
+  def self.valid_team_participants_count(team_id, assignment_id)
+    count = TeamsUser.where(team_id: team_id).size
+    TeamsUser.where(team_id: team_id).each do |team_user|
+      participant = Participant.where(user_id: team_user.user_id, parent_id: assignment_id).first
+      count -= 1 unless participant&.can_review && participant&.can_submit
+    end
+    count
+  end
 end

@@ -323,23 +323,24 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  # E2502
   def delete_metareview
     mapping = MetareviewResponseMap.find(params[:id])
     assignment_id = mapping.assignment.id
 
     mapping.delete
     flash[:note] = "The metareview has been deleted"
-    
+
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
+  # E2502
   def list_mappings
     flash[:error] = params[:msg] if params[:msg]
     @assignment = Assignment.find(params[:id])
-    # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
-    # to treat all assignments as team assignments
-    @items = AssignmentTeam.where(parent_id: @assignment.id)
-    @items.sort_by(&:name)
+
+    # Get all teams for this assignment
+    @items = AssignmentTeam.where(parent_id: @assignment.id).order(:name)
   end
 
   def automatic_review_mapping

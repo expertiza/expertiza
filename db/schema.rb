@@ -482,7 +482,7 @@ ActiveRecord::Schema.define(version: 20250301220548) do
   end
 
   create_table "meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.datetime "date"
+    t.datetime "meeting_date"
     t.string "team_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -24,7 +24,7 @@
       <td><%= mentor ? mentor.user.name : '--' %></td>
 
       <!-- Meeting Dates -->
-      <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+      <% meeting_dates = Meeting.where(team_id: team.id).order(:meeting_date).limit(3).pluck(:meeting_date) %>
       <% @num_of_meeting_cols.times do |i| %>
         <td style="padding: 10px;">
       <span style="white-space: nowrap;">

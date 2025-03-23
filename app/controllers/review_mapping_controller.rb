@@ -390,28 +390,14 @@ class ReviewMappingController < ApplicationController
     redirect_to action: 'list_mappings', id: assignment_id
   end
 
-  # def automatic_review_mapping_strategy(assignment_id,
-  #                                       participants, teams, student_review_num = 0,
-  #                                       submission_review_num = 0, exclude_teams = false)
-  #   participants_hash = {}
-  #   participants.each { |participant| participants_hash[participant.id] = 0 }
-  #   #if exclude_teams_without_submission is true check if team has submission if not discard
-  #   # Filter teams based on the conditions only if exclude_teams is true
-  #   filtered_teams = exclude_teams ? teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? } : teams
-  #   # calculate reviewers for each team
-  #   if !student_review_num.zero? && submission_review_num.zero?
-  #     review_strategy = ReviewMappingHelper::StudentReviewStrategy.new(participants, filtered_teams, student_review_num)
-  #   elsif student_review_num.zero? && !submission_review_num.zero?
-  #     review_strategy = ReviewMappingHelper::TeamReviewStrategy.new(participants, filtered_teams, submission_review_num)
-  #   end
-
-  #   peer_review_strategy(assignment_id, review_strategy, participants_hash)
-
-  #   # after assigning peer reviews for each team,
-  #   # if there are still some peer reviewers not obtain enough peer review,
-  #   # just assign them to valid teams
-  #   assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-  # end
+  def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num = 0, submission_review_num = 0, exclude_teams = false)
+    reviewer_counts = ReviewMappingHelper.initialize_reviewer_counts(participants)
+    eligible_teams = ReviewMappingHelper.filter_eligible_teams(teams, exclude_teams)
+    review_strategy = ReviewMappingHelper.create_review_strategy(participants, eligible_teams, student_review_num, submission_review_num)
+    
+    assign_initial_reviews(assignment_id, review_strategy, reviewer_counts)
+    assign_remaining_reviews(assignment_id, review_strategy, reviewer_counts)
+  end
 
   # This is for staggered deadline assignment
   def automatic_review_mapping_staggered
@@ -456,10 +442,10 @@ class ReviewMappingController < ApplicationController
 
   private
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-    return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record)
+    return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record)  
     participants_needing_reviews = AssignmentParticipant.participants_needing_reviews(participants_hash, review_strategy)
-    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id) 
-    assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
+    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)  
+    ReviewResponseMap.assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
     @@time_create_last_review_mapping_record = ReviewResponseMap.latest_mapping_time(assignment_id)
   end
 

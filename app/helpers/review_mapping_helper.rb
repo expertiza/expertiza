@@ -447,4 +447,25 @@ module ReviewMappingHelper
       (@teams.size * @review_num * 1.0 / @participants.size).round
     end
   end
+
+  # Creates a review strategy based on the number of reviews per student/submission
+  def self.create_review_strategy(participants, teams, student_review_num, submission_review_num)
+    if student_review_num.positive? && submission_review_num.zero?
+      StudentReviewStrategy.new(participants, teams, student_review_num)
+    elsif student_review_num.zero? && submission_review_num.positive?
+      TeamReviewStrategy.new(participants, teams, submission_review_num)
+    end
+  end
+
+  # Filters teams based on submission status
+  def self.filter_eligible_teams(teams, exclude_teams)
+    return teams unless exclude_teams
+    
+    teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? }
+  end
+
+  # Initializes a hash tracking the number of reviews assigned to each participant
+  def self.initialize_reviewer_counts(participants)
+    participants.each_with_object({}) { |participant, counts| counts[participant.id] = 0 }
+  end
 end

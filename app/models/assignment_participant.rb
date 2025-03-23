@@ -239,7 +239,7 @@ class AssignmentParticipant < Participant
   def self.participants_with_min_reviews(participants, participants_hash)
     min_value = participants_hash.values.min
     participants.each_with_index.select { |participant, _| participants_hash[participant.id] == min_value }
-               .map(&:last)
+                .map(&:last)
   end
 
   # Returns a random participant index based on strategy
@@ -261,7 +261,6 @@ class AssignmentParticipant < Participant
       assignment_id: assignment_id,
       review_strategy: review_strategy
     )
-    
     if team.equal? team.class.last
       select_participants_for_last_team(params)
     else
@@ -273,19 +272,14 @@ class AssignmentParticipant < Participant
   def self.select_participants_for_regular_team(params)
     selected_participants = []
     valid_participants_count = ReviewResponseMap.valid_team_participants_count(params.team.id, params.assignment_id)
-    
     while selected_participants.size < params.review_strategy.reviews_per_team
-      break if selected_participants.size == params.participants.size - valid_participants_count
-      
-      participant_index = select_random_participant(params.iterator, params.participants, params.participants_hash, params.team.id)
-      
-      next unless can_select_participant?(participant_index, params, selected_participants)
-      
+      break if selected_participants.size == params.participants.size - valid_participants_count      
+      participant_index = select_random_participant(params.iterator, params.participants, params.participants_hash, params.team.id)     
+      next unless can_select_participant?(participant_index, params, selected_participants)     
       selected_participants << params.participants[participant_index].id
       params.participants_hash[params.participants[participant_index].id] += 1
       remove_completed_participants(params.participants, params.participants_hash, params.review_strategy, participant_index)
-    end
-    
+    end   
     selected_participants
   end
 
@@ -307,8 +301,7 @@ class AssignmentParticipant < Participant
     participant = params.participants[participant_index]
     return false unless ReviewResponseMap.can_review_team?(participant.user_id, params.team.id)
     return false if params.participants_hash[participant.id] >= params.review_strategy.reviews_per_student
-    return false if selected_participants.include?(participant.id)
-    
+    return false if selected_participants.include?(participant.id)    
     true
   end
 
@@ -324,8 +317,7 @@ class AssignmentParticipant < Participant
   private
 
   def self.select_participant_by_min_reviews(participants, participants_hash, team_id)
-    min_review_indices = participants_with_min_reviews(participants, participants_hash)
-    
+    min_review_indices = participants_with_min_reviews(participants, participants_hash)    
     if min_review_indices.empty? || 
        (min_review_indices.size == 1 && ReviewResponseMap.can_review_team?(participants[min_review_indices[0]].user_id, team_id))
       rand(0..participants.size - 1)

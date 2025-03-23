@@ -28,7 +28,7 @@ class Participant < ApplicationRecord
   DUTY_MENTOR = 'mentor'.freeze
 
   def team
-    TeamsUser.find_by(user: user).try(:team)
+    TeamsParticipant.find_by(user: user).try(:team)
   end
 
   def responses
@@ -57,10 +57,10 @@ class Participant < ApplicationRecord
 
   def force_delete(maps)
     maps && maps.each(&:destroy)
-    if team && (team.teams_users.length == 1)
+    if team && (team.teams_participants.length == 1)
       team.delete
     elsif team
-      team.teams_users.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
+      team.teams_participants.each { |teams_user| teams_user.destroy if teams_user.user_id == id }
     end
     destroy
   end

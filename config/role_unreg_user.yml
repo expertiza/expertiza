@@ -76,7 +76,7 @@ development:
       team:
         list: false
         list_assignments: false
-      teams_users:
+      teams_participants:
         list: false
       course_evaluation:
         list: false
@@ -165,7 +165,7 @@ development:
       profile: false
       survey_response: true
       team: false
-      teams_users: false
+      teams_participants: false
       import_file: false
       course_evaluation: false
       participant_choices: false
@@ -344,7 +344,7 @@ test:
       team:
         list: false
         list_assignments: false
-      teams_users:
+      teams_participants:
         list: false
       course_evaluation:
         list: false
@@ -433,7 +433,7 @@ test:
       profile: false
       survey_response: true
       team: false
-      teams_users: false
+      teams_participants: false
       import_file: false
       course_evaluation: false
       participant_choices: false
@@ -612,7 +612,7 @@ production:
       team:
         list: false
         list_assignments: false
-      teams_users:
+      teams_participants:
         list: false
       course_evaluation:
         list: false
@@ -701,7 +701,7 @@ production:
       profile: false
       survey_response: true
       team: false
-      teams_users: false
+      teams_participants: false
       import_file: false
       course_evaluation: false
       participant_choices: false

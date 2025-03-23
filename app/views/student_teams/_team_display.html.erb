@@ -25,7 +25,7 @@
         <%else%>
           <td>
             <%if  member.user.id == session[:user].id%>
-              <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
+              <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_participant_id => team_user.id}%>
             <%else%>
               Not Selected
             <%end%>

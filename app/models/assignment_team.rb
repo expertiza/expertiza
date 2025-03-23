@@ -161,30 +161,32 @@ class AssignmentTeam < Team
     files
   end
 
-  def submit_hyperlink(hyperlink)
-    hyperlink.strip!
-    raise 'The hyperlink cannot be empty!' if hyperlink.empty?
+#   # Comment out hyperlink-related behaviors; potential artifacts
 
-    hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
-    # If not a valid URL, it will throw an exception
-    response_code = Net::HTTP.get_response(URI(hyperlink))
-    raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
+#   def submit_hyperlink(hyperlink)
+#     hyperlink.strip!
+#     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
 
-    hyperlinks = self.hyperlinks
-    hyperlinks << hyperlink
-    self.submitted_hyperlinks = YAML.dump(hyperlinks)
-    save
-  end
+#     hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
+#     # If not a valid URL, it will throw an exception
+#     response_code = Net::HTTP.get_response(URI(hyperlink))
+#     raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
 
-  # Note: This method is not used yet. It is here in the case it will be needed.
-  # @exception  If the index does not exist in the array
+#     hyperlinks = self.hyperlinks
+#     hyperlinks << hyperlink
+#     self.submitted_hyperlinks = YAML.dump(hyperlinks)
+#     save
+#   end
 
-  def remove_hyperlink(hyperlink_to_delete)
-    hyperlinks = self.hyperlinks
-    hyperlinks.delete(hyperlink_to_delete)
-    self.submitted_hyperlinks = YAML.dump(hyperlinks)
-    save
-  end
+#   # Note: This method is not used yet. It is here in the case it will be needed.
+#   # @exception  If the index does not exist in the array
+
+#   def remove_hyperlink(hyperlink_to_delete)
+#     hyperlinks = self.hyperlinks
+#     hyperlinks.delete(hyperlink_to_delete)
+#     self.submitted_hyperlinks = YAML.dump(hyperlinks)
+#     save
+#   end
 
   # return the team given the participant
   def self.team(participant)

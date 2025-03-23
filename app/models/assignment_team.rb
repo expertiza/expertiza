@@ -7,16 +7,6 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-  # START of contributor methods, shared with AssignmentParticipant
-
-  # Added for E1973, Team reviews.
-  # Some methods prompt a reviewer for a user id. This method just returns the user id of the first user in the team
-  # This is a very hacky way to deal with very complex functionality but the reasoning is this:
-  # The reason this is being added is to give ReviewAssignment#reject_own_submission a way to reject the submission
-  # Of the reviewer. If there are team reviews, there must be team submissions, so any team member's user id will do.
-  # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
-  # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
-  # return that instead for instances where the code uses the current user.
   
   # Returns the ID of the current_user if they are part of the team
   def current_user_id
@@ -29,9 +19,7 @@ class AssignmentTeam < Team
     users.first&.id
   end
   
-
-  # E1973
-  # stores the current user so that we can check them when returning the user_id
+  # Stores the current user so that we can check them when returning the user_id
   def store_current_user(current_user)
     @current_user = current_user
   end
@@ -154,33 +142,6 @@ class AssignmentTeam < Team
     files
   end
 
-#   # Comment out hyperlink-related behaviors; potential artifacts
-
-#   def submit_hyperlink(hyperlink)
-#     hyperlink.strip!
-#     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
-
-#     hyperlink = 'http://' + hyperlink unless hyperlink.start_with?('http://', 'https://')
-#     # If not a valid URL, it will throw an exception
-#     response_code = Net::HTTP.get_response(URI(hyperlink))
-#     raise "HTTP status code: #{response_code}" if response_code =~ /[45][0-9]{2}/
-
-#     hyperlinks = self.hyperlinks
-#     hyperlinks << hyperlink
-#     self.submitted_hyperlinks = YAML.dump(hyperlinks)
-#     save
-#   end
-
-#   # Note: This method is not used yet. It is here in the case it will be needed.
-#   # @exception  If the index does not exist in the array
-
-#   def remove_hyperlink(hyperlink_to_delete)
-#     hyperlinks = self.hyperlinks
-#     hyperlinks.delete(hyperlink_to_delete)
-#     self.submitted_hyperlinks = YAML.dump(hyperlinks)
-#     save
-#   end
-
   # Given a participant, find associated AssignmentTeam 
   def self.team(participant)
     # return nil if there is no participant
@@ -221,8 +182,8 @@ class AssignmentTeam < Team
     assignment.path + '/' + directory_num.to_s
   end
 
-  # Set the directory num for this team
-  def set_student_directory_num
+  # Set the directory number for this team
+  def set_team_directory_num
     return if directory_num && (directory_num >= 0)
 
     max_num = AssignmentTeam.where(parent_id: parent_id).order('directory_num desc').first.directory_num

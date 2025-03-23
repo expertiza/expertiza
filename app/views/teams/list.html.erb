@@ -15,32 +15,99 @@
 <!-- Anyone with access to the parent pages has access to this page -->
   <div class="teams-list-table">
     <table>
-      <thead>
+      <thead id="teams_table_header">
         <tr>
           <th class="head">Team Name</th>
           <th class="head">Members' Names</th>
           <th class="head">Members' User IDs</th>
           <th class="head">Emails Concatenated</th>
           <th class="head">Mentor</th>
-
           <% @num_of_meeting_cols.times do |i| %>
             <th class="head">
               <%= ordinalize(i + 1) %> Mtg
 
-              <% if i == @num_of_meeting_cols - 1%>
+              <% if i == @num_of_meeting_cols - 1 && @num_of_meeting_cols != 1%>
                 <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
                 <%= link_to image_tag("delete.png", border: 0, alt: "Remove Meeting Column", title: "Remove Meeting Column"), '#', class: "remove-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
+              <% elsif @num_of_meeting_cols == 1%>
+                <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
               <% end %>
-              
             </th>
           <% end %>
-
           <th class="head">Actions</th> <!-- New Actions Column -->
         </tr>
+
       </thead>
 
       <tbody id="teams_table_body">
-      <%= render partial: 'teams_table_body', locals: { teams: @teams } %>
+        <% if @teams.count() == 0 %>
+          <tr>
+            <td colspan="9">No <%= @team_type %> teams found.</td>
+          </tr>
+        <% else %>
+          <% @teams.each_with_index do |team, index| %>
+            <tr>
+              <!-- Team Name -->
+              <td><%= team.name %></td>
+
+              <!-- Members' Names -->
+              <td><%= team.participants.map(&:name).join(', ') %></td>
+
+              <!-- Members' User IDs -->
+              <td><%= team.participants.map(&:handle).join(', ') %></td>
+
+              <!-- Emails Concatenated -->
+              <td><%= team.participants.map(&:user_email).join(', ') %></td>
+
+              <!-- Mentor Name -->
+              <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>
+              <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
+
+              <!-- Meeting Dates -->
+              <% meeting_dates = Meeting.where(team_id: team.id).order(:meeting_date).limit(@num_of_meeting_cols).pluck(:meeting_date) %>
+              <% meetings = Meeting.where(team_id: team.id)%>
+
+              <% @num_of_meeting_cols.times do |i| %>
+                <td style="padding: 10px;">
+            <span style="white-space: nowrap;">
+              <% if meeting_dates[i].nil? %>
+                <input type="date"
+                       id="meeting-date-<%= i %>-<%= team.id %>"
+                       style="width: 150px; padding: 5px; border: 1px solid #ddd;"
+                       value="<%= meeting_dates[i] %>" />
+
+                <%= link_to image_tag('save_icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                            '#',
+                            id: "save-meeting-date-#{i}-#{team.id}",
+                            data: { meeting_index: i, team_id: team.id, delete: 0, meeting_id: 9999},
+                            style: 'margin-left: 10px;' %>
+
+              <% else %>
+
+                <span id="meeting-date-display-<%= i %>-<%= team.id %>">
+                  <%= meeting_dates[i].strftime('%-m-%-d-%y') %>
+                </span>
+
+                <%= link_to image_tag('delete_icon.png', border: 0, alt: 'Save Date', title: 'Save Meeting Date'),
+                            '#',
+                            id: "save-meeting-date-#{i}-#{team.id}-#{meetings[i].id}",
+                            data: { meeting_index: i, team_id: team.id, delete: 1, meeting_id: meetings[i].id },
+                            style: 'margin-left: 10px;' %>
+
+              <% end %>
+            </span>
+                </td>
+              <% end %>
+
+              <!-- Actions Column -->
+              <td class="actions">
+                <%= link_to image_tag("plus.png", border: 0, alt: "Add Team Member", title: "Add Team Member"), controller: 'teams_users', action: 'new', id: team.id %>
+                <%= link_to image_tag("delete_icon.png", border: 0, alt: "Delete Team", title: "Delete Team"), controller: 'teams', action: 'delete', id: team.id %>
+                <%= link_to image_tag("edit_icon.png", border: 0, alt: "Edit Team Name", title: "Edit Team Name"), controller: 'teams', action: 'edit', id: team.id %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
       </tbody>
     </table>
     <%#= will_paginate @teams, inner_window: 1, outer_window: 1, params: { num_versions: 3 } %>

@@ -37,7 +37,7 @@
         <td><%= mentor.is_a?(Participant) ? mentor.user.name : mentor %></td>
 
         <!-- Meeting Dates -->
-        <% meeting_dates = Meeting.where(team_id: team.id).order(:date).limit(3).pluck(:date) %>
+        <% meeting_dates = Meeting.where(team_id: team.id).order(:meeting_date).limit(3).pluck(:meeting_date) %>
         <% 3.times do |i| %>
           <td><%= meeting_dates[i]&.strftime('%-m/%-d') || '--' %></td>
         <% end %>

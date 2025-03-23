@@ -27,4 +27,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         }
     });
+
+
+    // Use event delegation to listen for clicks on "Remove Meeting Column" buttons in the header
+    tableHeaders.addEventListener('click', function (event) {
+        if (event.target && event.target.closest('.remove-meeting-col')) {
+            event.preventDefault(); // Prevent default link behavior
+
+            const currColumnNum = parseInt(window.currColumnNum) || 3; // Use global variable or fallback to 3
+            const url = `/teams/decrease_table_headers?colNum=${currColumnNum}`;
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then((html) => {
+                    tableHeaders.innerHTML = html; // Update only the <thead> with new content
+                    window.currColumnNum--; // Increment currColumnNum for subsequent clicks
+                })
+                .catch((error) => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        }
+    });
 });

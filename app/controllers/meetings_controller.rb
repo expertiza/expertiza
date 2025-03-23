@@ -1,5 +1,4 @@
 class MeetingsController < ApplicationController
-
   before_action :set_meeting, only: [:update, :destroy]
 
   # GET /meetings
@@ -12,12 +11,12 @@ class MeetingsController < ApplicationController
   # GET /meetings/:id
   def show
     @meetings = Meeting.all
-    @mentored_teams = current_user.teams.select {|team| team.participants.exists?(user: current_user, authorization: 'mentor')}.presence #any team that a mentor belongs to is a team they mentor
   end
 
   # POST /meetings
   def create
-    @meeting = Meeting.new(meeting_params)
+    @team = Team.find(params[:team_id])
+    @meeting = @team.meetings.new(meeting_params)
 
     if @meeting.save
       # TODO: Re-implement email notification for meeting creation
@@ -41,26 +40,27 @@ class MeetingsController < ApplicationController
 
   # DELETE /meetings/:id
   def destroy
-    team_id = @meeting.team_id
-    meeting_date = @meeting.meeting_date
+    puts "Team ID: #{params[:team_id]}"
+    puts "Meeting ID: #{params[:id]}"
+
+    puts "Meeting: #{@meeting.inspect}"
 
     if @meeting.destroy
-      # TODO: Re-implement email notification for meeting deletion
-      # ActiveSupport::Notifications.instrument('mentor_meeting.deleted', team_id: team_id, meeting_date: meeting_date)
-      render json: { status: 'success', message: 'Meeting deleted successfully' }
+      render json: { message: 'Meeting deleted successfully' }, status: :ok
     else
-      render json: { status: 'error', message: 'Failed to delete meeting', errors: @meeting.errors.full_messages }, status: :unprocessable_entity
+      render json: { error: 'Failed to delete meeting' }, status: :unprocessable_entity
     end
   end
 
   private
     def meeting_params
-      params.permit(:team_id, :meeting_date)
+      params.require(:meeting).permit(:team_id, :meeting_date)
     end
 
-    def set_meeting
-      @meeting = Meeting.find_by(team_id: params[:team_id], meeting_date: params[:old_date] || params[:meeting_date])
-      unless @meeting
+  def set_meeting
+    @meeting = Meeting.find_by(team_id: params[:team_id], id: params[:id])
+
+    unless @meeting
       render json: { status: 'error', message: 'Meeting not found' }, status: :not_found
     end
   end

@@ -88,6 +88,7 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
+
     @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
@@ -257,9 +258,34 @@ class TeamsController < ApplicationController
     render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
   end
 
+  def decrease_table_headers
+    @num_of_meeting_cols = [params[:colNum].to_i - 1, 5].min
+    @team_type = params[:type]
+    @ID = params[:id]
+    render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
+  end
+
 
   def increase_table_columns
     @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
+    @team_type = params[:type]
+    @ID = params[:id]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
+    else
+      #if the type is not course, it is assignment
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
+    end
+
+    render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
+  end
+
+  def decrease_table_columns
+    @num_of_meeting_cols = [params[:colNum].to_i - 1, 5].min
     @team_type = params[:type]
     @ID = params[:id]
 

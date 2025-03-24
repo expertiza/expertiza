@@ -707,26 +707,38 @@ describe ReviewMappingController do
     context 'when saving grade and comment is successful' do
       it 'saves the review grade and shows success message' do
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
-        allow(review_grade).to receive(:attributes=).with(ActionController::Parameters.new({
-          'grade_for_reviewer' => '90',
-          'comment_for_reviewer' => 'Great review!'
-        }).permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at))
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
         allow(review_grade).to receive(:review_graded_at=).with(any_args)
         allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
-        allow(review_grade).to receive(:save!).and_return(true)
-        post :save_grade_and_comment_for_reviewer, params: request_params
+        allow(review_grade).to receive(:save!).and_return(true)   
+        post :save_grade_and_comment_for_reviewer, params: request_params    
         expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
         expect(response).to redirect_to('/reports/response_report?id=1')
       end
-    end
+    end   
     context 'when saving grade and comment fails' do
       it 'shows error message and redirects' do
         error = StandardError.new('Save failed')
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
-        allow(review_grade).to receive(:attributes=).with(ActionController::Parameters.new({
-          'grade_for_reviewer' => '90',
-          'comment_for_reviewer' => 'Great review!'
-        }).permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at))
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
         allow(review_grade).to receive(:review_graded_at=).with(any_args)
         allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
         allow(review_grade).to receive(:save!).and_raise(error)
@@ -738,10 +750,16 @@ describe ReviewMappingController do
     context 'when responding to JS format' do
       it 'renders the JS template' do
         allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
-        allow(review_grade).to receive(:attributes=).with(ActionController::Parameters.new({
-          'grade_for_reviewer' => '90',
-          'comment_for_reviewer' => 'Great review!'
-        }).permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at))
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
         allow(review_grade).to receive(:review_graded_at=).with(any_args)
         allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
         allow(review_grade).to receive(:save!).and_return(true)

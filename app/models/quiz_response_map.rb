@@ -4,6 +4,7 @@ class QuizResponseMap < ResponseMap
   belongs_to :quiz_questionnaire, class_name: 'QuizQuestionnaire', foreign_key: 'reviewed_object_id', inverse_of: false
   belongs_to :assignment, class_name: 'Assignment', inverse_of: false
   has_many :quiz_responses, foreign_key: :map_id, dependent: :destroy, inverse_of: false
+  validate :unique_quiz_assignment
 
   def questionnaire
     quiz_questionnaire
@@ -53,5 +54,29 @@ class QuizResponseMap < ResponseMap
 
     # convert the obtained percentage to float and round it to 1st precision
     calculated_score[0].graded_percent.to_f.round(1)
+  end
+
+  def self.create_quiz_assignment(assignment_id, reviewer_id, questionnaire_id)
+    participant = AssignmentParticipant.find_by(user_id: reviewer_id, parent_id: assignment_id)
+    raise 'Participant not registered for this assignment' unless participant
+  
+    if exists?(reviewer_id: participant.id, reviewed_object_id: questionnaire_id)
+      raise 'Already taken this quiz'
+    end
+  
+    questionnaire = Questionnaire.find(questionnaire_id)
+    create!(
+      reviewee_id: questionnaire.instructor_id,
+      reviewer_id: participant.id,
+      reviewed_object_id: questionnaire.id
+    )
+    true 
+  end
+
+  private
+  def unique_quiz_assignment
+    if QuizResponseMap.exists?(reviewer_id: reviewer_id, reviewed_object_id: reviewed_object_id)
+      errors.add(:base, "You have already taken this quiz")
+    end
   end
 end

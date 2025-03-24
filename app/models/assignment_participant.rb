@@ -220,6 +220,25 @@ class AssignmentParticipant < Participant
     return participant.duty_id if participant
   end
 
+  # Determines if the participant has exceeded the maximum number of outstanding (incomplete) reviews
+  
+  def below_outstanding_reviews_limit?(assignment)
+    total_reviews = ReviewResponseMap.where(
+      reviewer_id: id,
+      reviewed_object_id: assignment.id
+    ).count
+  
+    return true if total_reviews.zero?
+  
+    completed_reviews = Response.joins(:response_map)
+                                .where(response_maps: { reviewer_id: id, reviewed_object_id: assignment.id })
+                                .where(is_submitted: true)
+                                .select("DISTINCT response_maps.id")
+                                .count
+  
+    (total_reviews - completed_reviews) < Assignment.max_outstanding_reviews
+  end
+
   def team_user
     TeamsUser.where(team_id: team.id, user_id: user_id).first if team
   end

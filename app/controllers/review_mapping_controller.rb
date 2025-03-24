@@ -154,60 +154,67 @@ class ReviewMappingController < ApplicationController
   # First we find the reviews done by that student, if he hasn't done any review till now, true is returned
   # else we compute total reviews completed by adding each response
   # we then check of the reviews in progress are less than assignment's policy
+  # Checks if the reviewer has exceeded the maximum number of outstanding (incomplete) reviews
+  # for the given assignment. Delegates the logic to the `AssignmentParticipant` model.
   def check_outstanding_reviews?(assignment, reviewer)
-    @review_mappings = ReviewResponseMap.where(reviewer_id: reviewer.id, reviewed_object_id: assignment.id)
-    @num_reviews_total = @review_mappings.size
-    if @num_reviews_total.zero?
-      true
-    else
-      @num_reviews_completed = 0
-      @review_mappings.each do |map|
-        @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-      end
-      @num_reviews_in_progress = @num_reviews_total - @num_reviews_completed
-      @num_reviews_in_progress < Assignment.max_outstanding_reviews
-    end
+    reviewer.below_outstanding_reviews_limit?(assignment)
   end
 
-  # assigns the quiz dynamically to the participant
   def assign_quiz_dynamically
+    assignment_id = params[:assignment_id].to_i
+    reviewer_id = params[:reviewer_id]
+    questionnaire_id = params[:questionnaire_id].to_i # Convert to integer
+  
     begin
-      assignment = Assignment.find(params[:assignment_id])
-      reviewer = AssignmentParticipant.where(user_id: params[:reviewer_id], parent_id: assignment.id).first
-      if ResponseMap.where(reviewed_object_id: params[:questionnaire_id], reviewer_id: params[:participant_id]).first
-        flash[:error] = 'You have already taken that quiz.'
-      else
-        @map = QuizResponseMap.new
-        @map.reviewee_id = Questionnaire.find(params[:questionnaire_id]).instructor_id
-        @map.reviewer_id = params[:participant_id]
-        @map.reviewed_object_id = Questionnaire.find_by(instructor_id: @map.reviewee_id).id
-        @map.save
-      end
+      QuizResponseMap.create_quiz_assignment(assignment_id, reviewer_id, questionnaire_id)
+      flash[:success] = "Quiz successfully assigned"
+    rescue ActiveRecord::RecordNotFound => e
+      flash[:error] = "Participant not registered for this assignment"
+    rescue ActiveRecord::RecordInvalid => e
+      flash[:error] = e.message
     rescue StandardError => e
-      flash[:alert] = e.nil? ? $ERROR_INFO : e
+      flash[:error] = e.message
     end
-    redirect_to student_quizzes_path(id: reviewer.id)
+  
+    redirect_to student_quizzes_path(id: params[:reviewer_id])
   end
-
+  
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
+    assignment = mapping.assignment
     msg = ''
+  
     begin
-      user = User.from_params(params)
-
-      regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
-      reviewer = get_reviewer(user, mapping.assignment, regurl)
-      unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
-        raise 'The metareviewer "' + reviewer.user.name + '" is already assigned to this reviewer.'
+      user = User.find_by!(name: params[:user][:name])
+      registration_url = url_for(action: 'add_user_to_assignment', 
+                               id: mapping.id,
+                               user_id: user.id)
+      reviewer = get_reviewer(user, assignment, registration_url)
+  
+      metareview = MetareviewResponseMap.find_or_initialize_by(
+        reviewed_object_id: mapping.id,
+        reviewer_id: reviewer.id
+      )
+  
+      if metareview.persisted?
+        raise "Metareviewer already assigned"
+      else
+        metareview.reviewee_id = mapping.reviewer.id
+        metareview.save!
       end
-
-      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
-                                   reviewer_id: reviewer.id,
-                                   reviewee_id: mapping.reviewer.id)
+  
+    rescue ActiveRecord::RecordNotFound => e
+      # Handle both user not found and participant not registered cases
+      msg = if e.message.include?('User')
+              'User not found'
+            else
+              "Registration error: #{e.message}"
+            end
     rescue StandardError => e
       msg = e.message
     end
-    redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
+  
+    redirect_to action: :list_mappings, id: assignment.id, msg: msg
   end
   
 

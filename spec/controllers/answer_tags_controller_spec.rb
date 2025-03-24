@@ -287,8 +287,6 @@ describe AnswerTagsController do
         controller.request.session[:user] = instructor
       end
 
-      
-
       # Checks when there are no tag prompt deployments
       it 'when there are no tag prompt deployments' do
         allow(TagPromptDeployment).to receive(:all).and_return(TagPromptDeployment.none)
@@ -525,15 +523,16 @@ describe AnswerTagsController do
     
     # Raises error if tag_prompt_deployment_id is invalid (not an integer)
     it 'raises error if tag_prompt_deployment_id is a string' do
+      controller.request.session[:user] = student  
       request_params = {
         answer_id: answer.id,
-        tag_prompt_deployment_id: 'not_an_id',
+        tag_prompt_deployment_id: 'invalid', # Invalid type
         value: '1'
       }
-    
+      
       expect {
         post :create_edit, params: request_params
-      }.to raise_error(ActiveRecord::RecordInvalid)
+      }.to raise_error(ActiveRecord::InvalidForeignKey)
     end
 
     let(:other_student) { create(:student) }
@@ -553,8 +552,9 @@ describe AnswerTagsController do
       expect(tag.user_id).to eq(student.id)
     end
     
-    # Ensures an error is raised when no parameters are passed
-    it 'raises error when no parameters are passed' do
+    # Ensures success is not raised when no parameters are passed
+    it 'request is unsuccessful when no parameters are passed' do
+      controller.request.session[:user] = student  
       expect {
         post :create_edit, params: {}
       }.to raise_error(ActiveRecord::RecordInvalid)

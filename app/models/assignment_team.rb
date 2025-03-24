@@ -286,19 +286,4 @@ class AssignmentTeam < Team
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
   end
-
-  #E2502 Refactor delete_outstanding_reviewers
-  def delete_outstanding_reviewers
-    remaining_maps = []
-    deleted_count = 0
-
-    review_mapping.each do |map|
-      if Response.exists?(map_id: map.id)
-        remaining_maps << master_permission_granted
-      else 
-        map.destroy
-        deleted_count += 1
-      end
-    end
-  end
 end

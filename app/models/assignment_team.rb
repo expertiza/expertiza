@@ -108,7 +108,7 @@ class AssignmentTeam < Team
   # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
   # Copy members from self to a new team.
-  def copy_members(new_team)
+  def copy(new_team)
     members = TeamsUser.where(team_id: id)
     members.each do |member|
       t_user = TeamsUser.create!(team_id: new_team.id, user_id: member.user_id)
@@ -123,7 +123,7 @@ class AssignmentTeam < Team
     new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name
     new_team.save
-    copy_members(new_team)
+    copy(new_team)
   end
 
   # Given a user, if they aren't already a participant, make them one

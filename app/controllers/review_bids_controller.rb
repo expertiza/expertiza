@@ -26,16 +26,13 @@ class ReviewBidsController < ApplicationController
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
       @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
     end
-
     # render view for completing reviews after review bidding has been completed
     render 'sign_up_sheet/review_bids_others_work'
   end
@@ -63,7 +60,6 @@ class ReviewBidsController < ApplicationController
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
-
     # explicitly render view since it's in the sign up sheet views
     render 'sign_up_sheet/review_bids_show'
   end
@@ -101,26 +97,24 @@ class ReviewBidsController < ApplicationController
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
     redirect_back fallback_location: root_path
   end
-  
+
   private
-  
+
   def fetch_reviewer_ids(assignment_id)
     AssignmentParticipant.where(parent_id: assignment_id).ids
   end
-  
+
   def process_bidding(assignment_id, reviewer_ids)
-    begin
-      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-      ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
-    rescue StandardError => e
-      Rails.logger.error "Web service unavailable: #{e.message}"
-      ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
-    end
+    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+    ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
+  rescue StandardError => e
+    Rails.logger.error "Web service unavailable: #{e.message}"
+    ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
   end
-  
+
   def ensure_valid_topics(matched_topics, reviewer_ids)
     matched_topics ||= {}
     reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
     Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
-  end  
+  end
 end

@@ -17,10 +17,10 @@ class ReviewBid < ApplicationRecord
     end
 
     def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
-      ReviewResponseMap.where(reviewed_object_id: assignment_id)&.destroy_all
+      ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
     
       reviewer_ids.each do |reviewer_id|
-        topics_to_assign = matched_topics[reviewer_id.to_s] || []  # ✅ Ensure it's always an array
+        topics_to_assign = matched_topics[reviewer_id.to_s] || []  # Ensure it's always an array
         Rails.logger.debug "Assigning topics to reviewer #{reviewer_id}: #{topics_to_assign.inspect}"
     
         topics_to_assign.each do |topic|
@@ -56,6 +56,7 @@ class ReviewBid < ApplicationRecord
       bidding_data
     end
 
+    # method for feedback algorithm
     def fallback_algorithm(assignment_id, reviewer_ids)
       Rails.logger.debug "Fallback algorithm triggered for assignment_id: #{assignment_id}"
       topics = SignUpTopic.where(assignment_id: assignment_id).pluck(:id)

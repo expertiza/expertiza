@@ -63,7 +63,7 @@ describe ReviewBid do
       # Verify otid
       expect(result['users'][1]['otid']).to eq(123)
     end
-end
+  end
 
   describe '#assign_review_topics' do
     it 'calls assigns_topics_to_reviewer for as many topics associated' do
@@ -157,57 +157,47 @@ end
         103 => 1  # Topic 103 has 1 team member
       }
     end
-  
+
     before do
       allow(SignUpTopic).to receive(:where).with(assignment_id: assignment_id).and_return(double(pluck: topics))
-  
       # Mock SignedUpTeam relation chain to support .joins, .group, .count
-      signed_up_team_relation = double("SignedUpTeam Relation")
+      signed_up_team_relation = double('SignedUpTeam Relation')
       allow(SignedUpTeam).to receive(:where).with(topic_id: topics).and_return(signed_up_team_relation)
       allow(signed_up_team_relation).to receive(:joins).and_return(signed_up_team_relation)
       allow(signed_up_team_relation).to receive(:group).and_return(signed_up_team_relation)
       allow(signed_up_team_relation).to receive(:count).and_return(teams)
-  
       allow(SignedUpTeam).to receive(:topic_id).with(assignment_id, 1).and_return(101)
       allow(SignedUpTeam).to receive(:topic_id).with(assignment_id, 2).and_return(102)
       allow(SignedUpTeam).to receive(:topic_id).with(assignment_id, 3).and_return(nil)
     end
-  
+
     it 'assigns topics in a round-robin manner while avoiding self-assignment' do
       result = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
-    
       expect(result['1']).not_to include(101) # Reviewer 1 should not get topic 101
       expect(result['2']).not_to include(102) # Reviewer 2 should not get topic 102
-    
       # Instead of expecting all topics, check if reviewer 3 gets any valid topic
       valid_topics = [101, 102, 103]
       expect(valid_topics).to include(result['3'].first) # Ensure at least one valid topic is assigned
-    
       assigned_topics = result.values.flatten
       expect(assigned_topics.uniq.size).to be <= topics.size # Ensure topics are distributed correctly
     end
-    
-  
+
     it 'returns an empty array if no topics are available' do
       allow(SignUpTopic).to receive(:where).and_return(double(pluck: []))
-  
-      empty_relation = double("Empty Relation")
+      empty_relation = double('Empty Relation')
       allow(SignedUpTeam).to receive(:where).with(topic_id: []).and_return(empty_relation)
       allow(empty_relation).to receive(:joins).and_return(empty_relation)
       allow(empty_relation).to receive(:group).and_return(empty_relation)
       allow(empty_relation).to receive(:count).and_return({})
-  
       result = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
       expect(result.values).to all(be_empty)
     end
-  
+
     it 'ensures the logging messages are triggered' do
       allow(Rails.logger).to receive(:debug).and_call_original
-  
       expect(Rails.logger).to receive(:debug).with(/Fallback algorithm triggered/)
       expect(Rails.logger).to receive(:debug).with(/Available topics/)
       expect(Rails.logger).to receive(:debug).with(/Teams sorted by size/).at_least(:once)
-  
       ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
     end
   end

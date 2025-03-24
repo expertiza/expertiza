@@ -45,4 +45,5 @@ class CourseTeam < Team
     fields.push('Team members') if options[:team_name] == 'false'
     fields.push('Course Name')
   end
+
 end

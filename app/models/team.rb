@@ -81,7 +81,11 @@ class Team < ApplicationRecord
       t_user = TeamsUser.create!(user_id: user.id, team_id: id)
       parent = TeamNode.find_by(node_object_id: id)
       TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      add_participant(parent_id, user)
+
+      if CourseParticipant.find_by(parent_id: parent.id, user_id: user.id).nil?
+        CourseParticipant.create(parent_id: parent.id, user_id: user.id, permission_granted: user.master_permission_granted)
+      end
+
       ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
     end
     can_add_member

@@ -28,7 +28,7 @@ class Team < ApplicationRecord
   end
   alias get_participants participants
 
-  # copies content of one object to the another
+  # # copies content of one object to the another
   def self.copy_content(source, destination)
     source.each do |each_element|
       each_element.copy(destination.id)
@@ -154,6 +154,18 @@ class Team < ApplicationRecord
     team_name
   end
 
+  # E1991 : This method allows us to generate
+  # team names based on whether anonymized view
+  # is set or not. The logic is similar to
+  # existing logic of User model.
+  def name(ip_address = nil)
+    if User.anonymized_view?(ip_address)
+      return "Anonymized_Team_#{self[:id]}"
+    else
+      return self[:name]
+    end
+  end
+
   # Extract team members from the csv and push to DB,  changed to hash by E1776
   def import_team_members(row_hash)
     row_hash[:teammembers].each_with_index do |teammate, _index|
@@ -252,18 +264,6 @@ class Team < ApplicationRecord
     team
   end
 
-  # E1991 : This method allows us to generate
-  # team names based on whether anonymized view
-  # is set or not. The logic is similar to
-  # existing logic of User model.
-  def name(ip_address = nil)
-    if User.anonymized_view?(ip_address)
-      return "Anonymized_Team_#{self[:id]}"
-    else
-      return self[:name]
-    end
-  end
-
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
 
   def self.find_team_for_user(assignment_id, user_id)
@@ -277,8 +277,8 @@ class Team < ApplicationRecord
     participants.include?(participant)
   end
 
-  # Get team's full name
-  def fullname
-    name
-  end
+  # Get team's full name from legacy codebase that is no longer used
+  # def fullname
+  #   name
+  # end
 end

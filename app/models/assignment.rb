@@ -627,6 +627,35 @@ class Assignment < ApplicationRecord
     self.enable_pair_programming
   end
 
+  def assign_reviewers_staggered(num_reviews, num_metareviews)
+    return 'Invalid parameters provided' if num_reviews.nil? || num_metareviews.nil?
+
+    begin
+      participants = AssignmentParticipant.where(parent_id: id).to_a.select(&:can_review).shuffle!
+      teams = AssignmentTeam.where(parent_id: id).to_a.shuffle!
+      # Assign initial reviews
+      participants.each do |participant|
+        num_reviews.to_i.times do
+          team = teams.sample
+          next if team.nil? || participant.in_team?(team.id)
+          ReviewResponseMap.create(reviewed_object_id: id, reviewer_id: participant.id, reviewee_id: team.id)
+        end
+      end
+      # Assign metareviews
+      review_maps = ReviewResponseMap.where(reviewed_object_id: id)
+      participants.each do |participant|
+        num_metareviews.to_i.times do
+          review_map = review_maps.sample
+          next if review_map.nil? || review_map.reviewer_id == participant.id
+          MetareviewResponseMap.create(reviewed_object_id: review_map.id, reviewer_id: participant.id)
+        end
+      end
+      'Reviewers assigned successfully'
+    rescue StandardError => e
+      raise StandardError.new(e.message)
+    end
+  end
+
   private
 
   # returns true if assignment has staggered deadline and topic_id is nil
@@ -669,4 +698,3 @@ class Assignment < ApplicationRecord
   end
 
 end
-

@@ -94,23 +94,33 @@ class ReviewBidsController < ApplicationController
 
   def assign_bidding
     assignment_id = params[:assignment_id].to_i
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-  
-    begin
-      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-      #raise StandardError, "Forcing web service failure for testing"
-      matched_topics = ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
-    rescue StandardError => e
-      Rails.logger.error "Web service unavailable: #{e.message}"
-      matched_topics = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
-    end
-  
-    # Ensure matched_topics is a valid hash with empty arrays
-    matched_topics ||= {}
-    reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
-    Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
+    reviewer_ids = fetch_reviewer_ids(assignment_id)
+    matched_topics = process_bidding(assignment_id, reviewer_ids)
+    ensure_valid_topics(matched_topics, reviewer_ids)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
     redirect_back fallback_location: root_path
   end
+  
+  private
+  
+  def fetch_reviewer_ids(assignment_id)
+    AssignmentParticipant.where(parent_id: assignment_id).ids
+  end
+  
+  def process_bidding(assignment_id, reviewer_ids)
+    begin
+      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+      ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
+    rescue StandardError => e
+      Rails.logger.error "Web service unavailable: #{e.message}"
+      ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
+    end
+  end
+  
+  def ensure_valid_topics(matched_topics, reviewer_ids)
+    matched_topics ||= {}
+    reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
+    Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
+  end  
 end

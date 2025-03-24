@@ -18,23 +18,20 @@ class ReviewBid < ApplicationRecord
 
     def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
-    
       reviewer_ids.each do |reviewer_id|
-        topics_to_assign = matched_topics[reviewer_id.to_s] || []  # Ensure it's always an array
+        topics_to_assign = matched_topics[reviewer_id.to_s] || []
         Rails.logger.debug "Assigning topics to reviewer #{reviewer_id}: #{topics_to_assign.inspect}"
-    
         topics_to_assign.each do |topic|
           assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
         end
       end
     end
-    
+
     # method to assign a single topic to a reviewer
     def assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
       team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
       Rails.logger.debug "team_to_review: #{team_to_review}"
       return [] if team_to_review.nil?
-
       ReviewResponseMap.create(
         reviewed_object_id: assignment_id,
         reviewer_id: reviewer_id,
@@ -50,7 +47,6 @@ class ReviewBid < ApplicationRecord
       team_id = fetch_team_id(assignment_id, reviewer_user_id)
       bidding_data = { 'bids' => [], 'otid' => self_topic }
       return bidding_data unless team_id
-
       bids = fetch_team_bids(team_id)
       bidding_data['bids'] = bids.map { |bid| format_bid(bid) }
       bidding_data
@@ -63,19 +59,20 @@ class ReviewBid < ApplicationRecord
       topic_queue = sorted_topic_queue(topics)
       assign_topics(assignment_id, reviewer_ids, topic_queue)
     end
-    
+
     private
 
     def sorted_topic_queue(topics)
       topic_counts = SignedUpTeam.where(topic_id: topics).joins(:team)
-        .joins("LEFT JOIN teams_users ON teams.id = teams_users.team_id")
-        .group(:topic_id).count("teams_users.user_id")
+                                 .joins('LEFT JOIN teams_users ON teams.id = teams_users.team_id')
+                                 .group(:topic_id).count('teams_users.user_id')
       sorted_topics = topic_counts.sort_by { |_, count| -count }.map(&:first)
       sorted_topics
     end
-    
+
     def assign_topics(assignment_id, reviewer_ids, topic_queue)
-      matched_topics, topic_index = {}, 0
+      matched_topics = {}
+      topic_index = 0
       reviewer_ids.each do |reviewer_id|
         assigned_topic = find_available_topic(assignment_id, reviewer_id, topic_queue, topic_index)
         matched_topics[reviewer_id.to_s] = assigned_topic ? [assigned_topic] : []
@@ -84,8 +81,8 @@ class ReviewBid < ApplicationRecord
       Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
       matched_topics
     end
-    
-    def find_available_topic(assignment_id, reviewer_id, topic_queue, topic_index)
+
+    def find_available_topic(assignment_id, reviewer_id, topic_queue, _topic_index)
       self_topic = fetch_self_topic(assignment_id, reviewer_id)
       topic_queue.each { |topic_id| return topic_id if topic_id != self_topic }
       nil

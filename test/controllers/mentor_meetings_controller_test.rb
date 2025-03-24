@@ -1,48 +1,47 @@
-require 'test_helper'
+require "test_helper"
 
 class MentorMeetingsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @mentor_meeting = mentor_meetings(:one)
+    @team = teams(:one)  # Ensure 'teams.yml' has a fixture named :one
+    @meeting = meetings(:one)  # Ensure 'meetings.yml' has a fixture named :one
   end
 
   test "should get index" do
-    get mentor_meetings_url
+    get meetings_url
+    assert_response :success
+    assert_not_nil assigns(:mentor_meetings)
+    assert_not_nil assigns(:teams)
+    assert_not_nil assigns(:mentored_teams)
+  end
+
+  test "should show meeting" do
+    get meeting_url(@meeting)
     assert_response :success
   end
 
-  test "should get new" do
-    get new_mentor_meeting_url
-    assert_response :success
-  end
-
-  test "should create mentor_meeting" do
-    assert_difference('MentorMeeting.count') do
-      post mentor_meetings_url, params: { mentor_meeting: { meeting_date: @mentor_meeting.meeting_date, team_id: @mentor_meeting.team_id } }
+  test "should create meeting" do
+    assert_difference("Meeting.count" , 1) do
+      post meetings_url, params: { meeting: { team_id: @team.id, meeting_date: "2025-04-01" } }
     end
-
-    assert_redirected_to mentor_meeting_url(MentorMeeting.last)
+    assert_response :created
+    assert_equal "success", JSON.parse(response.body)["status"]
   end
 
-  test "should show mentor_meeting" do
-    get mentor_meeting_url(@mentor_meeting)
+  test "should update meeting" do
+    patch meeting_url(@meeting), params: { meeting: { meeting_date: "2025-05-01" } }
     assert_response :success
+    assert_equal "success", JSON.parse(response.body)["status"]
   end
 
-  test "should get edit" do
-    get edit_mentor_meeting_url(@mentor_meeting)
-    assert_response :success
-  end
-
-  test "should update mentor_meeting" do
-    patch mentor_meeting_url(@mentor_meeting), params: { mentor_meeting: { meeting_date: @mentor_meeting.meeting_date, team_id: @mentor_meeting.team_id } }
-    assert_redirected_to mentor_meeting_url(@mentor_meeting)
-  end
-
-  test "should destroy mentor_meeting" do
-    assert_difference('MentorMeeting.count', -1) do
-      delete mentor_meeting_url(@mentor_meeting)
+  test "should delete meeting" do
+    assert_difference("Meeting.count", -1) do
+      delete meeting_url(@meeting)
     end
+    assert_response :success
+  end
 
-    assert_redirected_to mentor_meetings_url
+  test "should return error for invalid meeting deletion" do
+    delete meeting_url(id: -1, team_id: @team.id)
+    assert_response :not_found
   end
 end

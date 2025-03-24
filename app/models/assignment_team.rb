@@ -203,7 +203,7 @@ class AssignmentTeam < Team
   # Remove a team given the team id
   def self.remove_team_by_id(id)
     old_team = AssignmentTeam.find(id)
-    old_team.destroy unless old_team.nil?
+    old_team.destroy unless old_team.nil? # nil check ensures safety
   end
 
   # Get the path of the team directory

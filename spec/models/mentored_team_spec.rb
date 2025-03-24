@@ -2,6 +2,9 @@ describe 'MentoredTeam' do
   let(:assignment) { create(:assignment) }
   let(:team) { create(:mentored_team, assignment: assignment, parent_id: assignment.id) }
   let(:user) { create(:student) }
+  let(:mentor) { create(:participant, can_mentor: true) }
+  let(:user1) { create(:student) }
+  let(:user2) { create(:student) }
 
   describe '#add_member' do
     before do

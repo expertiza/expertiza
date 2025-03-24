@@ -219,14 +219,14 @@ class Team < ApplicationRecord
       team_exists = !team.nil?
       name = handle_duplicate(team, name, id, options[:handle_dups], teamtype)
     else
-      if (teamtype == CourseTeam)
+      if teamtype == CourseTeam
         name = generate_team_name(Course.find(id).name)
-      elsif (teamtype == AssignmentTeam || teamtype == MentoredTeam)
+      elsif teamtype == AssignmentTeam || teamtype == MentoredTeam
         name = generate_team_name(Assignment.find(id).name)
       end
     end
     if name
-      team = Object.const_get(teamtype.to_s).create_team_and_node(id)
+      team = teamtype.create_team_and_node(id)
       team.name = name
       team.save
     end
@@ -240,9 +240,9 @@ class Team < ApplicationRecord
     return nil if handle_dups == 'ignore' # ignore: do not create the new team
 
     if handle_dups == 'rename' # rename: rename new team
-      if teamtype.is_a?(CourseTeam)
+      if teamtype == CourseTeam
         return generate_team_name(Course.find(id).name)
-      elsif  teamtype.is_a?(AssignmentTeam)
+      elsif  teamtype == AssignmentTeam
         return generate_team_name(Assignment.find(id).name)
       end
     end
@@ -256,9 +256,9 @@ class Team < ApplicationRecord
 
   # Export the teams to csv
   def self.export(csv, parent_id, options, teamtype)
-    if teamtype.is_a?(CourseTeam)
+    if teamtype == CourseTeam
       teams = CourseTeam.where(parent_id: parent_id)
-    elsif teamtype.is_a?(AssignmentTeam)
+    elsif teamtype == AssignmentTeam
       teams = AssignmentTeam.where(parent_id: parent_id)
     end
     teams.each do |team|

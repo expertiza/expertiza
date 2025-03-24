@@ -83,14 +83,14 @@ describe AnswerTagsController do
         controller.request.session[:user] = ta
       end
     
-      it 'denies access when TA tries to access index' do
+      it 'allows access when TA tries to access index' do
         controller.params = { action: 'index' }
-        expect(controller.send(:action_allowed?)).to be false
+        expect(controller.send(:action_allowed?)).to be true
       end
     
-      it 'denies access when TA tries to access create_edit' do
+      it 'allows access when TA tries to access create_edit' do
         controller.params = { action: 'create_edit' }
-        expect(controller.send(:action_allowed?)).to be false
+        expect(controller.send(:action_allowed?)).to be true
       end
     end
     

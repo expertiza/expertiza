@@ -393,8 +393,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num = 0, submission_review_num = 0, exclude_teams = false)
     reviewer_counts = ReviewMappingHelper.initialize_reviewer_counts(participants)
     eligible_teams = ReviewMappingHelper.filter_eligible_teams(teams, exclude_teams)
-    review_strategy = ReviewMappingHelper.create_review_strategy(participants, eligible_teams, student_review_num, submission_review_num)
-    
+    review_strategy = ReviewMappingHelper.create_review_strategy(participants, eligible_teams, student_review_num, submission_review_num)    
     assign_initial_reviews(assignment_id, review_strategy, reviewer_counts)
     assign_remaining_reviews(assignment_id, review_strategy, reviewer_counts)
   end
@@ -430,8 +429,7 @@ class ReviewMappingController < ApplicationController
   def start_self_review
     user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])
-    team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first
-    
+    team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first    
     begin
       SelfReviewResponseMap.create_self_review(team.id, params[:reviewer_id], assignment.id)
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
@@ -441,19 +439,20 @@ class ReviewMappingController < ApplicationController
   end
 
   private
+  
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
     return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record)  
     participants_needing_reviews = AssignmentParticipant.participants_needing_reviews(participants_hash, review_strategy)
-    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)  
+    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)
     ReviewResponseMap.assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
     @@time_create_last_review_mapping_record = ReviewResponseMap.latest_mapping_time(assignment_id)
   end
 
   def assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
     participants_needing_reviews.each do |participant_id|
-      team_review_counts.each do |team_id, _|
+      team_review_counts.each_key do |team_id, _|
         participant = AssignmentParticipant.find(participant_id)
-        next if participant.in_team?(team_id) 
+        next if participant.in_team?(team_id)
         ReviewResponseMap.create_review_mapping(assignment_id, team_id, participant_id)
         update_team_review_counts(team_review_counts, team_id)
         break
@@ -470,12 +469,10 @@ class ReviewMappingController < ApplicationController
   def peer_review_strategy(assignment_id, review_strategy, participants_hash)
     teams = review_strategy.teams
     participants = review_strategy.participants
-
     teams.each_with_index do |team, iterator|
       selected_participants = AssignmentParticipant.select_participants_for_team(
         team, iterator, participants, participants_hash, assignment_id, review_strategy
-      )
-      
+      )      
       unless ReviewResponseMap.create_review_mappings_for_participants(assignment_id, team.id, selected_participants)
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end

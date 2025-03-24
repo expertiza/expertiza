@@ -459,8 +459,7 @@ module ReviewMappingHelper
 
   # Filters teams based on submission status
   def self.filter_eligible_teams(teams, exclude_teams)
-    return teams unless exclude_teams
-    
+    return teams unless exclude_teams    
     teams.reject { |team| team[:submitted_hyperlinks].nil? && team[:directory_num].nil? }
   end
 

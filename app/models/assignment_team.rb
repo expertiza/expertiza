@@ -194,10 +194,10 @@ class AssignmentTeam < Team
 
   # Export the fields
   def self.export_fields(options)
-    fields = []
-    fields.push('Team Name')
-    fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Assignment Name')
+    fields = ['Team Name']
+    fields << 'Team members' if options[:team_name] == 'false'
+    fields << 'Assignment Name'
+    fields
   end
 
   # Remove a team given the team id

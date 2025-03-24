@@ -402,7 +402,7 @@ class ReviewMappingController < ApplicationController
   def automatic_review_mapping_strategy(assignment_id, participants, teams, student_review_num = 0, submission_review_num = 0, exclude_teams = false)
     reviewer_counts = ReviewMappingHelper.initialize_reviewer_counts(participants)
     eligible_teams = ReviewMappingHelper.filter_eligible_teams(teams, exclude_teams)
-    review_strategy = ReviewMappingHelper.create_review_strategy(participants, eligible_teams, student_review_num, submission_review_num)    
+    review_strategy = ReviewMappingHelper.create_review_strategy(participants, eligible_teams, student_review_num, submission_review_num)
     assign_initial_reviews(assignment_id, review_strategy, reviewer_counts)
     assign_remaining_reviews(assignment_id, review_strategy, reviewer_counts)
   end
@@ -410,25 +410,34 @@ class ReviewMappingController < ApplicationController
   # This is for staggered deadline assignment
   def automatic_review_mapping_staggered
     assignment = Assignment.find(params[:id])
-    message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
-    flash[:note] = message
+    if params[:assignment][:num_reviews].blank? || params[:assignment][:num_metareviews].blank?
+      flash[:error] = 'Please specify the number of reviews and metareviews per student.'
+      redirect_to action: 'list_mappings', id: assignment.id
+      return
+    end
+    begin
+      message = assignment.assign_reviewers_staggered(params[:assignment][:num_reviews], params[:assignment][:num_metareviews])
+      flash[:note] = message
+    rescue StandardError => e
+      flash[:error] = e.message
+    end
     redirect_to action: 'list_mappings', id: assignment.id
   end
 
   def save_grade_and_comment_for_reviewer
-    review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
-    review_grade.attributes = review_mapping_params
-    review_grade.review_graded_at = Time.now
-    review_grade.reviewer_id = session[:user].id
+    @review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
+    @review_grade.attributes = review_mapping_params
+    @review_grade.review_graded_at = Time.current
+    @review_grade.reviewer_id = session[:user].id
     begin
-      review_grade.save!
+      @review_grade.save!
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
-    rescue StandardError
-      flash[:error] = $ERROR_INFO
+    rescue StandardError => e
+      flash[:error] = e.message
     end
     respond_to do |format|
-      format.js { render action: 'save_grade_and_comment_for_reviewer.js.erb', layout: false }
       format.html { redirect_to controller: 'reports', action: 'response_report', id: params[:review_grade][:assignment_id] }
+      format.js
     end
   end
 
@@ -436,11 +445,14 @@ class ReviewMappingController < ApplicationController
   # This method creates a self-review mapping if one doesn't already exist
   # and redirects the user to the review form
   def start_self_review
-    user_id = params[:reviewer_userid]
     assignment = Assignment.find(params[:assignment_id])
-    team = Team.find_team_for_assignment_and_user(assignment.id, user_id).first    
+    teams = Team.find_team_for_assignment_and_user(assignment.id, params[:reviewer_userid]) 
+    if teams.empty?
+      redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: 'No team is found for this user'
+      return
+    end
     begin
-      SelfReviewResponseMap.create_self_review(team.id, params[:reviewer_id], assignment.id)
+      SelfReviewResponseMap.create_self_review(teams[0].id, params[:reviewer_id], assignment.id)
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id]
     rescue StandardError => e
       redirect_to controller: 'submitted_content', action: 'edit', id: params[:reviewer_id], msg: e.message
@@ -448,18 +460,18 @@ class ReviewMappingController < ApplicationController
   end
 
   private
-  
+
   def assign_reviewers_for_team(assignment_id, review_strategy, participants_hash)
-    return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record)  
+    return unless ReviewResponseMap.needs_more_reviews?(assignment_id, review_strategy, @@time_create_last_review_mapping_record) 
     participants_needing_reviews = AssignmentParticipant.participants_needing_reviews(participants_hash, review_strategy)
-    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)
+    team_review_counts = ReviewResponseMap.team_review_counts(assignment_id)   
     ReviewResponseMap.assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
     @@time_create_last_review_mapping_record = ReviewResponseMap.latest_mapping_time(assignment_id)
   end
 
   def assign_reviewers_to_teams(assignment_id, participants_needing_reviews, team_review_counts)
     participants_needing_reviews.each do |participant_id|
-      team_review_counts.each_key do |team_id, _|
+      team_review_counts.each do |team_id, _|
         participant = AssignmentParticipant.find(participant_id)
         next if participant.in_team?(team_id)
         ReviewResponseMap.create_review_mapping(assignment_id, team_id, participant_id)
@@ -481,7 +493,7 @@ class ReviewMappingController < ApplicationController
     teams.each_with_index do |team, iterator|
       selected_participants = AssignmentParticipant.select_participants_for_team(
         team, iterator, participants, participants_hash, assignment_id, review_strategy
-      )      
+      )
       unless ReviewResponseMap.create_review_mappings_for_participants(assignment_id, team.id, selected_participants)
         flash[:error] = 'Automatic assignment of reviewer failed.'
       end

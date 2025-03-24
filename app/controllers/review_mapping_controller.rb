@@ -201,23 +201,40 @@ class ReviewMappingController < ApplicationController
   
   def add_metareviewer
     mapping = ResponseMap.find(params[:id])
+    assignment = mapping.assignment
     msg = ''
+  
     begin
-      user = User.from_params(params)
-
-      regurl = url_for action: 'add_user_to_assignment', id: mapping.map_id, user_id: user.id
-      reviewer = get_reviewer(user, mapping.assignment, regurl)
-      unless MetareviewResponseMap.where(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id).first.nil?
-        raise 'The metareviewer "' + reviewer.user.name + '" is already assigned to this reviewer.'
+      user = User.find_by!(name: params[:user][:name])
+      registration_url = url_for(action: 'add_user_to_assignment', 
+                               id: mapping.id,
+                               user_id: user.id)
+      reviewer = get_reviewer(user, assignment, registration_url)
+  
+      metareview = MetareviewResponseMap.find_or_initialize_by(
+        reviewed_object_id: mapping.id,
+        reviewer_id: reviewer.id
+      )
+  
+      if metareview.persisted?
+        raise "Metareviewer already assigned"
+      else
+        metareview.reviewee_id = mapping.reviewer.id
+        metareview.save!
       end
-
-      MetareviewResponseMap.create(reviewed_object_id: mapping.map_id,
-                                   reviewer_id: reviewer.id,
-                                   reviewee_id: mapping.reviewer.id)
+  
+    rescue ActiveRecord::RecordNotFound => e
+      # Handle both user not found and participant not registered cases
+      msg = if e.message.include?('User')
+              'User not found'
+            else
+              "Registration error: #{e.message}"
+            end
     rescue StandardError => e
       msg = e.message
     end
-    redirect_to action: 'list_mappings', id: mapping.assignment.id, msg: msg
+  
+    redirect_to action: :list_mappings, id: assignment.id, msg: msg
   end
 
   def assign_metareviewer_dynamically

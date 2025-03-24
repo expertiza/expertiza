@@ -312,21 +312,68 @@ describe ReviewMappingController do
   end
 
   describe '#add_metareviewer' do
-    before(:each) do
-      allow(ResponseMap).to receive(:find).with('1').and_return(review_response_map)
-    end
+    let(:context) { create(:metareview_test_context) }
+    let(:assignment) { context[:assignment] }
+    let(:review_mapping) { context[:review_mapping] }
+    let(:reviewer_user) { context[:reviewer_user] }
 
-    it 'redirects to review_mapping#list_mappings page' do
-      user = double('User', id: 1, name: 'no one')
-      allow(User).to receive(:from_params).with(any_args).and_return(user)
-      # allow_any_instance_of(ReviewMappingController).to receive(:url_for).with(action: 'add_user_to_assignment', id: 1, user_id: 1).and_return('')
-      allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
-        .with(user, assignment, 'http://test.host/review_mapping/add_user_to_assignment?id=1&user_id=1')
-        .and_return(double('AssignmentParticipant', id: 1, name: 'no one'))
-      allow(ReviewResponseMap).to receive(:where).with(reviewed_object_id: 1, reviewer_id: 1).and_return([nil])
-      request_params = { id: 1 }
-      post :add_metareviewer, params: request_params
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1&msg=')
+    context 'successful assignment' do
+      it 'creates metareview mapping' do
+        expect {
+          post :add_metareviewer, params: { 
+            id: review_mapping.id,
+            user: { name: reviewer_user.name }
+          }
+        }.to change(MetareviewResponseMap, :count).by(1)
+    
+        expect(response).to redirect_to(
+          action: :list_mappings,
+          id: assignment.id,
+          msg: ''
+        )
+      end
+    end
+    
+    context 'duplicate assignment' do
+      before do
+        create(:meta_review_response_map,
+              reviewed_object_id: review_mapping.id,
+              reviewer: Participant.find_by(user: reviewer_user))
+      end
+    
+      it 'rejects duplicate assignment' do
+        expect {
+          post :add_metareviewer, params: { 
+            id: review_mapping.id,
+            user: { name: reviewer_user.name }
+          }
+        }.not_to change(MetareviewResponseMap, :count)
+    
+        expect(response).to redirect_to(
+          action: :list_mappings,
+          id: assignment.id,
+          msg: 'Metareviewer already assigned'
+        )
+      end
+    end
+    
+    context 'when user not registered' do
+      it 'handles unregistered user' do
+        unregistered_user = create(:student)
+        allow_any_instance_of(ReviewMappingController).to receive(:get_reviewer)
+          .and_raise(ActiveRecord::RecordNotFound.new('Participant'))
+    
+        post :add_metareviewer, params: {
+          id: review_mapping.id,
+          user: { name: unregistered_user.name }
+        }
+    
+        expect(response).to redirect_to(
+          action: :list_mappings,
+          id: assignment.id,
+          msg: 'Registration error: Participant'
+        )
+      end
     end
   end
 

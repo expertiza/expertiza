@@ -84,12 +84,12 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#copy' do
+  describe '#copy_assignment_to_course' do
     context 'for given assignment team' do
       it 'copies the assignment team to course team' do
         assignment = team.assignment
         course = assignment.course
-        expect(team.copy(course.id)).to eq([])
+        expect(team.copy_assignment_to_course(course.id)).to eq([])
       end
     end
   end
@@ -98,8 +98,7 @@ describe 'AssignmentTeam' do
     context 'when a user is not a part of the team' do
       it 'adds the user to the team' do
         user = build(:student, id: 10)
-        assignment = team.assignment
-        expect(team.add_participant(assignment.id, user)).to be_an_instance_of(AssignmentParticipant)
+        expect(team.add_participant(user)).to be_an_instance_of(AssignmentParticipant)
       end
     end
 
@@ -107,8 +106,7 @@ describe 'AssignmentTeam' do
       it 'returns without adding user to the team' do
         allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        assignment = team.assignment
-        expect(team.add_participant(assignment.id, user1)).to eq(nil)
+        expect(team.add_participant(user1)).to eq(nil)
       end
     end
   end
@@ -173,13 +171,13 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#set_student_directory_num' do
+  describe '#set_team_directory_num' do
     it 'sets the directory for the team' do
       team = build(:assignment_team, id: 1, parent_id: 1, directory_num: -1)
       max_num = 0
       allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num)
         .with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
-      expect(team.set_student_directory_num).to be true
+      expect(team.set_team_directory_num).to be true
     end
   end
 
@@ -225,10 +223,10 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#received_any_peer_review?' do
+  describe '#has_been_reviewed?' do
     it 'checks if the team has received any reviews' do
       allow(ResponseMap).to receive_message_chain(:where, :any?).with(reviewee_id: team.id, reviewed_object_id: team.parent_id).with(no_args).and_return(true)
-      expect(team.received_any_peer_review?).to be true
+      expect(team.has_been_reviewed?).to be true
     end
   end
 

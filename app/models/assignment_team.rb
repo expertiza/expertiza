@@ -80,7 +80,7 @@ class AssignmentTeam < Team
   end
 
   # Deletes all review mappings associated with this team
-  def destroy_reviewer
+  def destroy
     review_response_maps.each(&:destroy)
     super
   end
@@ -126,15 +126,17 @@ class AssignmentTeam < Team
     copy_members(new_team)
   end
 
-  # Given a user and assignment, if they aren't already a participant, make them one
+  # Given a user, if they aren't already a participant, make them one
   # Since this method is on a team and team already belongs to an assignment, assignment_id is not needed.
   def add_participant(user)
-    AssignmentParticipant.find_or_create_by(
-      parent_id: parent_id, # refers to self.parent_id
-      user_id: user.id
-    ) do |participant|
-      participant.permission_granted = user.master_permission_granted
-    end
+    existing = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
+    return nil if existing
+
+    AssignmentParticipant.create(
+      parent_id: parent_id,
+      user_id: user.id,
+      permission_granted: user.master_permission_granted
+    )
   end
 
   def hyperlinks
@@ -173,7 +175,7 @@ class AssignmentTeam < Team
   
     # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')
     # Then iterate over each entry
-    Dir.children(directory).flat_map do |entry|
+    (Dir.entries(directory) - ['.', '..']).flat_map do |entry|
       # Construct the full path to the current entry (file or folder)
       path = File.join(directory, entry)
   

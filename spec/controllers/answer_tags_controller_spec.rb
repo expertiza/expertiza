@@ -75,7 +75,7 @@ describe AnswerTagsController do
       end
     end
 
-    # Ensures teaching assistants are denied access to student-only actions
+    # Ensures teaching assistants are allowed access to student-only actions
     context 'when a teaching assistant tries to access restricted actions' do
       let(:ta) { build(:teaching_assistant, id: 2) }
     

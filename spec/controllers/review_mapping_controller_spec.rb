@@ -639,74 +639,211 @@ describe ReviewMappingController do
   end
 
   describe '#automatic_review_mapping_staggered' do
-    it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
-      allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_return('Awesome!')
-      request_params = {
-        id: 1,
+    let(:assignment) { build(:assignment, id: 1) }
+    let(:request_params) do
+      {
+        id: assignment.id,
         assignment: {
-          num_reviews: 4,
-          num_metareviews: 2
+          num_reviews: '4',
+          num_metareviews: '2'
         }
       }
-      post :automatic_review_mapping_staggered, params: request_params
-      expect(flash[:note]).to eq('Awesome!')
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+    end
+    before(:each) do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    end
+    context 'when staggered review mapping is successful' do
+      it 'assigns reviewers and shows success message' do
+        success_message = 'Reviewers assigned successfully'
+        allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_return(success_message)
+        post :automatic_review_mapping_staggered, params: request_params
+        expect(flash[:note]).to eq(success_message)
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
+    end
+    context 'when staggered review mapping fails' do
+      it 'handles the error gracefully' do
+        error = StandardError.new('Failed to assign reviewers')
+        allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_raise(error)
+
+        post :automatic_review_mapping_staggered, params: request_params
+
+        expect(flash[:error]).to eq(error.message)
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
+    end
+    context 'with invalid parameters' do
+      it 'handles missing parameters gracefully' do
+        invalid_params = {
+          id: assignment.id,
+          assignment: {
+            num_reviews: nil,
+            num_metareviews: nil
+          }
+        }
+        post :automatic_review_mapping_staggered, params: invalid_params
+        expect(flash[:error]).to eq('Please specify the number of reviews and metareviews per student.')
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
     end
   end
 
   describe '#save_grade_and_comment_for_reviewer' do
-    it 'redirects to reports#response_report page' do
-      # Use factories to create stubs (user must be instructor or above to perform this action)
-      review_grade = build(:review_grade)
-      instructor = build(:instructor)
-      # Stub out other items
-      allow(ReviewGrade).to receive(:find_by).with(participant_id: '1').and_return(review_grade)
-      allow(review_grade).to receive(:save).and_return(true)
-      request_params = {
+    let(:review_grade) { build(:review_grade) }
+    let(:instructor) { build(:instructor) }
+    let(:request_params) do
+      {
         review_grade: {
-          participant_id: 1,
-          grade_for_reviewer: 90,
-          comment_for_reviewer: 'keke'
+          participant_id: '1',
+          grade_for_reviewer: '90',
+          comment_for_reviewer: 'Great review!',
+          assignment_id: '1'
         }
       }
-
-      # Perform test
-      session_params = {user: stub_current_user(instructor, instructor.role.name, instructor.role) }
-      post :save_grade_and_comment_for_reviewer, params: request_params, session: session_params
-      expect(flash[:note]).to be nil
-      expect(response).to redirect_to('/reports/response_report')
+    end
+    before(:each) do
+      session[:user] = instructor
+    end
+    context 'when saving grade and comment is successful' do
+      it 'saves the review grade and shows success message' do
+        allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
+        allow(review_grade).to receive(:review_graded_at=).with(any_args)
+        allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
+        allow(review_grade).to receive(:save!).and_return(true)   
+        post :save_grade_and_comment_for_reviewer, params: request_params    
+        expect(flash[:success]).to eq('Grade and comment for reviewer successfully saved.')
+        expect(response).to redirect_to('/reports/response_report?id=1')
+      end
+    end   
+    context 'when saving grade and comment fails' do
+      it 'shows error message and redirects' do
+        error = StandardError.new('Save failed')
+        allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
+        allow(review_grade).to receive(:review_graded_at=).with(any_args)
+        allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
+        allow(review_grade).to receive(:save!).and_raise(error)
+        post :save_grade_and_comment_for_reviewer, params: request_params
+        expect(flash[:error]).to eq(error.message)
+        expect(response).to redirect_to('/reports/response_report?id=1')
+      end
+    end
+    context 'when responding to JS format' do
+      it 'renders the JS template' do
+        allow(ReviewGrade).to receive(:find_or_create_by).with(participant_id: '1').and_return(review_grade)
+        allow(review_grade).to receive(:attributes=).with(
+          ActionController::Parameters.new({
+            'grade_for_reviewer' => '90',
+            'comment_for_reviewer' => 'Great review!'
+          }).permit(
+            :grade_for_reviewer,
+            :comment_for_reviewer,
+            :review_graded_at
+          )
+        )
+        allow(review_grade).to receive(:review_graded_at=).with(any_args)
+        allow(review_grade).to receive(:reviewer_id=).with(instructor.id)
+        allow(review_grade).to receive(:save!).and_return(true)
+        post :save_grade_and_comment_for_reviewer, params: request_params, format: :js
+        expect(response).to render_template('review_mapping/save_grade_and_comment_for_reviewer')
+      end
     end
   end
 
   describe '#start_self_review' do
-    before(:each) do
-      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
+    let(:assignment) { build(:assignment, id: 1) }
+    let(:team) { build(:assignment_team, id: 1) }
+    let(:user_id) { '1' }
+    let(:reviewer_id) { '1' }
+    let(:request_params) do
+      {
+        assignment_id: assignment.id,
+        reviewer_id: reviewer_id,
+        reviewer_userid: user_id
+      }
     end
 
-    context 'when self review response map does not exist' do
-      it 'creates a new record and redirects to submitted_content#edit page' do
-        allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([nil])
-        allow(SelfReviewResponseMap).to receive(:create).with(reviewee_id: 1, reviewer_id: '1', reviewed_object_id: 1).and_return(true)
-        request_params = {
-          assignment_id: 1,
-          reviewer_userid: 1,
-          reviewer_id: 1
-        }
+    before(:each) do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    end
+
+    context 'when self review is created successfully' do
+      it 'redirects to edit page' do
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([team])
+        allow(SelfReviewResponseMap).to receive(:create_self_review).with(team.id, reviewer_id, assignment.id).and_return(true)
+
         post :start_self_review, params: request_params
-        expect(response).to redirect_to('/submitted_content/1/edit')
+
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id)
       end
     end
 
-    context 'when self review response map exists' do
-      it 'redirects to submitted_content#edit page' do
-        allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([double('SelfReviewResponseMap')])
-        request_params = {
-          assignment_id: 1,
-          reviewer_userid: 1,
-          reviewer_id: 1
-        }
+    context 'when self review creation fails' do
+      it 'redirects with error message' do
+        error = StandardError.new('Self review already exists')
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([team])
+        allow(SelfReviewResponseMap).to receive(:create_self_review).with(team.id, reviewer_id, assignment.id).and_raise(error)
         post :start_self_review, params: request_params
-        expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id, msg: error.message)
+      end
+    end
+    context 'when team is not found' do
+      it 'redirects with error message' do
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([])
+        post :start_self_review, params: request_params
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id, msg: 'No team is found for this user')
+      end
+    end
+  end
+
+  describe '#automatic_review_mapping_strategy' do
+    let(:assignment_id) { 1 }
+    let(:participants) { [participant, participant1, participant2] }
+    let(:teams) { [team, team1] }
+    let(:student_review_num) { 2 }
+    let(:submission_review_num) { 2 }
+    let(:exclude_teams) { false }
+    before(:each) do
+      allow(ReviewMappingHelper).to receive(:initialize_reviewer_counts).with(participants).and_return({})
+      allow(ReviewMappingHelper).to receive(:filter_eligible_teams).with(teams, exclude_teams).and_return(teams)
+      allow(ReviewMappingHelper).to receive(:create_review_strategy).with(participants, teams, student_review_num, submission_review_num).and_return(double('ReviewStrategy'))
+    end
+    context 'when initial review assignment is successful' do
+      it 'assigns initial reviews and remaining reviews' do
+        review_strategy = double('ReviewStrategy')
+        allow(ReviewMappingHelper).to receive(:create_review_strategy).and_return(review_strategy)        
+        expect_any_instance_of(ReviewMappingController).to receive(:assign_initial_reviews).with(assignment_id, review_strategy, {})
+        expect_any_instance_of(ReviewMappingController).to receive(:assign_remaining_reviews).with(assignment_id, review_strategy, {})        
+        controller.send(:automatic_review_mapping_strategy, assignment_id, participants, teams, student_review_num, submission_review_num, exclude_teams)
+      end
+    end
+    context 'when exclude_teams is true' do
+      it 'filters out teams correctly' do
+        allow(ReviewMappingHelper).to receive(:filter_eligible_teams).with(teams, true).and_return([team])        
+        review_strategy = double('ReviewStrategy')
+        allow(ReviewMappingHelper).to receive(:create_review_strategy).with(participants, [team], student_review_num, submission_review_num).and_return(review_strategy)        
+        expect_any_instance_of(ReviewMappingController).to receive(:assign_initial_reviews).with(assignment_id, review_strategy, {})
+        expect_any_instance_of(ReviewMappingController).to receive(:assign_remaining_reviews).with(assignment_id, review_strategy, {})        
+        controller.send(:automatic_review_mapping_strategy, assignment_id, participants, teams, student_review_num, submission_review_num, true)
       end
     end
   end

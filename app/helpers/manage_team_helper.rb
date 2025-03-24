@@ -12,7 +12,7 @@ module ManageTeamHelper
     end
     # find the team with 'team_id' form database and add new user to team
     team = Team.find(team_id)
-    team.add_member(user, team.parent_id)
+    team.add_member(user)
   end
 
   # check if the user specified by 'user' already belongs to team specified by 'team_id'

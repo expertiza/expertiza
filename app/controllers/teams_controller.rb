@@ -1,5 +1,7 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  ALLOWED_TEAM_TYPES = %w[Assignment Course].freeze
+  TEAM_OPERATIONS = { inherit: 'inherit', bequeath: 'bequeath' }.freeze
 
   autocomplete :user, :name
 
@@ -10,7 +12,7 @@ class TeamsController < ApplicationController
 
   # attempt to initialize team type in session
   def init_team_type(type)
-    return unless type && Team.allowed_types.include?(type)
+    return unless type && ALLOWED_TEAM_TYPES.include?(type)
     session[:team_type] = type
     #E2351 - the current method for creating a team does not expand well for creating a subclass of either Assignment or Course Team so this is added logic to help allow for MentoredTeams to be created.
     #Team type is using for various purposes including creating nodes, but a MentoredTeam is an AssignmentTeam and still has a parent assignment, not a parent mentored so an additional variable needed to be created
@@ -40,7 +42,7 @@ class TeamsController < ApplicationController
     #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     init_team_type(parent.class.name.demodulize)
-    Team.randomize_all_by_parent(parent, session[:create_type], params[:team_size].to_i)
+    Team.create_random_teams(parent, session[:create_type], params[:team_size].to_i)
     undo_link('Random teams have been successfully created.')
     ExpertizaLogger.info LoggerMessage.new(controller_name, '', 'Random teams have been successfully created', request)
     redirect_to action: 'list', id: parent.id
@@ -49,7 +51,7 @@ class TeamsController < ApplicationController
   # Displays list of teams for a parent object(either assignment/course)
   def list
     init_team_type(params[:type])
-    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
+    @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == ALLOWED_TEAM_TYPES[0]
     unless @assignment.nil?
       if @assignment.auto_assign_mentor
         @model = MentoredTeam
@@ -57,7 +59,7 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
-    @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
+    @is_valid_assignment = (session[:team_type] == ALLOWED_TEAM_TYPES[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
@@ -68,24 +70,30 @@ class TeamsController < ApplicationController
 
   # Create an empty team manually
   def new
-    init_team_type(Team.allowed_types[0]) unless session[:team_type]
+    init_team_type(ALLOWED_TEAM_TYPES[0]) unless session[:team_type]
     @parent = Object.const_get(session[:team_type]).find(params[:id])
   end
 
-  # Called when a instructor tries to create an empty team manually
+  # Called when an instructor tries to create an empty team manually
   def create
-    #init_team_type(params[:type])
     parent = parent_by_id(params[:id])
     init_team_type(parent.class.name.demodulize)
+
+    team_class = Object.const_get(session[:create_type] + 'Team')
+    @team = team_class.new(name: params[:team][:name], parent_id: parent.id)
+
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team = Object.const_get(session[:create_type] + 'Team').create(name: params[:team][:name], parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: @team.id)
+      @team.save!
+      TeamNode.create!(parent_id: parent.id, node_object_id: @team.id)
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
-      redirect_to action: 'new', id: parent.id
+    rescue ActiveRecord::RecordInvalid => e
+      if @team.errors[:name].include?("is already in use.")
+        raise TeamExistsError, "The team name #{@team.name} is already in use."
+      else
+        flash[:error] = e.message
+        redirect_to action: 'new', id: parent.id
+      end
     end
   end
 
@@ -93,15 +101,20 @@ class TeamsController < ApplicationController
   def update
     @team = Team.find(params[:id])
     parent = parent_from_child(@team)
+    @team.name = params[:team][:name]
+
     begin
-      Team.check_for_existing(parent, params[:team][:name], session[:team_type])
-      @team.name = params[:team][:name]
-      @team.save
+      @team.save!  # Using save! so that a failure raises an exception
       flash[:success] = "The team \"#{@team.name}\" has been successfully updated."
       undo_link('')
       redirect_to action: 'list', id: parent.id
-    rescue TeamExistsError
-      flash[:error] = $ERROR_INFO
+    rescue ActiveRecord::RecordInvalid => e
+      # Check if the error is due to a duplicate team name
+      if @team.errors[:name].include?("is already in use.")
+        flash[:error] = "The team name #{@team.name} is already in use."
+      else
+        flash[:error] = e.message
+      end
       redirect_to action: 'edit', id: @team.id
     end
   end
@@ -154,17 +167,17 @@ class TeamsController < ApplicationController
   # Copies existing teams from a course down to an assignment
   # The team and team members are all copied.
   def inherit
-    copy_teams(Team.team_operation[:inherit])
+    copy_teams(TEAM_OPERATIONS[:inherit])
   end
 
   # Handovers all teams to the course that contains the corresponding assignment
   # The team and team members are all copied.
   def bequeath_all
-    if session[:team_type] == Team.allowed_types[1]
+    if session[:team_type] == ALLOWED_TEAM_TYPES[1]
       flash[:error] = 'Invalid team type for bequeath all'
       redirect_to controller: 'teams', action: 'list', id: params[:id]
     else
-      copy_teams(Team.team_operation[:bequeath])
+      copy_teams(TEAM_OPERATIONS[:bequeath])
     end
   end
 
@@ -182,7 +195,7 @@ class TeamsController < ApplicationController
   # Abstraction over different methods
   def choose_copy_type(assignment, operation)
     course = Course.find(assignment.course_id)
-    if operation == Team.team_operation[:bequeath]
+    if operation == TEAM_OPERATIONS[:bequeath]
       bequeath_copy(assignment, course)
     else
       inherit_copy(assignment, course)

@@ -54,20 +54,20 @@ describe Team do
 
   describe '#author_names' do
     it 'returns an array of author\'s name' do
-      expect(team.author_names).to eq(['no one'])
+      expect(team.member_names).to eq(['no one'])
     end
   end
 
   describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do
-        expect(team.user?(user)).to be true
+        expect(team.is_member?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
       it 'returns false' do
-        expect(team.user?(double('User'))).to be false
+        expect(team.is_member?(double('User'))).to be false
       end
     end
   end
@@ -86,7 +86,7 @@ describe Team do
       end
       context 'when the current team size is bigger than or equal to max team members' do
         it 'returns true' do
-          allow(Team).to receive(:size).and_return(6)
+          allow(team).to receive(:size).and_return(6)
           expect(team.full?).to be true
         end
       end
@@ -110,7 +110,7 @@ describe Team do
     context 'when parameterized user did not join in current team yet' do
       context 'when current team is not full' do
         it 'does not raise an error' do
-          allow_any_instance_of(Team).to receive(:user?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:is_member?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
           allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
@@ -123,32 +123,7 @@ describe Team do
 
   describe '.size' do
     it 'returns the size of current team' do
-      expect(Team.size(1)).to eq(1)
-    end
-  end
-
-  describe '#copy_members' do
-    it 'copies members from current team to a new team' do
-      allow(TeamsUser).to receive(:create).with(team_id: 2, user_id: 1).and_return(team_user)
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      expect(team.copy_members(double('Team', id: 2))).to eq([team_user])
-    end
-  end
-
-  describe '.check_for_existing' do
-    context 'when team exists' do
-      it 'raises a TeamExistsError' do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: 'no name').and_return([team])
-        expect { Team.check_for_existing(assignment, 'no name', 'Assignment') }
-          .to raise_error(TeamExistsError, 'The team name no name is already in use.')
-      end
-    end
-
-    context 'when team exists' do
-      it 'returns nil' do
-        allow(AssignmentTeam).to receive(:where).with(parent_id: 1, name: 'no name').and_return([])
-        expect(Team.check_for_existing(assignment, 'no name', 'Assignment')).to be nil
-      end
+      expect(team.size).to eq(1)
     end
   end
 
@@ -162,7 +137,7 @@ describe Team do
       allow(Team).to receive(:where).with(parent_id: 1, type: 'AssignmentTeam').and_return([team])
       allow(Team).to receive(:size).with(any_args).and_return(1)
       allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
-      expect(Team.randomize_all_by_parent(assignment, 'Assignment', 2)).to eq([1])
+      expect(Team.create_random_teams(assignment, 'Assignment', 2)).to eq([1])
     end
   end
 
@@ -384,12 +359,13 @@ describe Team do
     end
   end
 
-  describe '#fullname' do
-    context 'when the team has a name' do
-      it 'provides the name of the class' do
-        team = build(:assignment_team, id: 1, name: 'abcd')
-        expect(team.fullname).to eq 'abcd'
-      end
-    end
-  end
+  # tests old fullname method from legacy codebase that is no longer used
+  # describe '#fullname' do
+  #   context 'when the team has a name' do
+  #     it 'provides the name of the class' do
+  #       team = build(:assignment_team, id: 1, name: 'abcd')
+  #       expect(team.fullname).to eq 'abcd'
+  #     end
+  #   end
+  # end
 end

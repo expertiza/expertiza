@@ -4,8 +4,12 @@
 one:
   Date: "2025-03-01 17:05:48"
   TeamID: one  # This should reference the 'one' team fixture
+  created_at: "2025-03-01 17:06:48"
+  updated_at: "2025-03-01 17:07:48"
 
 two:
   Date: "2025-03-01 17:05:48"
   TeamID: two  # This should reference the 'two' team fixture
+  created_at: "2025-03-01 17:06:48"
+  updated_at: "2025-03-01 17:07:48"
 

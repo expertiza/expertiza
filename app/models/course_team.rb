@@ -48,9 +48,4 @@ class CourseTeam < Team
     fields.push('Course Name')
   end
 
-  # def add_participant(course_id, user)
-  #   if CourseParticipant.find_by(parent_id: course_id, user_id: user.id).nil?
-  #     CourseParticipant.create(parent_id: course_id, user_id: user.id, permission_granted: user.master_permission_granted)
-  #   end
-  # end
 end

@@ -150,8 +150,8 @@ describe 'AssignmentTeam' do
         assignment_id = 1
         options = []
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(assignment)
-        allow(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
-        expect(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        allow(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
+        expect(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
         AssignmentTeam.import(row, assignment_id, options)
       end
     end
@@ -159,8 +159,8 @@ describe 'AssignmentTeam' do
 
   describe '.export' do
     it 'redirects to Team.export with a new AssignmentTeam object' do
-      allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
-      expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+      allow(Team).to receive(:export).with([], 1, [], AssignmentTeam)
+      expect(Team).to receive(:export).with([], 1, [], AssignmentTeam)
       AssignmentTeam.export([], 1, [])
     end
   end
@@ -324,13 +324,13 @@ describe 'AssignmentTeam' do
       @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
     end
     it 'should create a team with users' do
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
-      expect(new_team.users).to include @student
+      new_team = AssignmentTeam.create_team_and_node(@assignment.id, [@student.id])
+      expect(new_team.reload.users).to include @student
     end
 
     it 'should remove user from previous team' do
       expect(@team.users).to include @student
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
+      new_team = AssignmentTeam.create_team_and_node(@assignment.id, [@student.id])
       expect(@team.users).to_not include @student
     end
   end

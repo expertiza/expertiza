@@ -92,16 +92,25 @@ class ReviewBidsController < ApplicationController
     redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
   end
 
-  # assign bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
     reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
+  
+    begin
+      bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+      #raise StandardError, "Forcing web service failure for testing"
+      matched_topics = ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
+    rescue StandardError => e
+      Rails.logger.error "Web service unavailable: #{e.message}"
+      matched_topics = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
+    end
+  
+    # Ensure matched_topics is a valid hash with empty arrays
+    matched_topics ||= {}
+    reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
+    Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
     redirect_back fallback_location: root_path
   end
 end

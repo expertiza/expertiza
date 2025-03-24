@@ -639,21 +639,59 @@ describe ReviewMappingController do
   end
 
   describe '#automatic_review_mapping_staggered' do
-    it 'shows a note flash message and redirects to review_mapping#list_mappings page' do
-      allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_return('Awesome!')
-      request_params = {
-        id: 1,
+    let(:assignment) { build(:assignment, id: 1) }
+    let(:request_params) do
+      {
+        id: assignment.id,
         assignment: {
-          num_reviews: 4,
-          num_metareviews: 2
+          num_reviews: '4',
+          num_metareviews: '2'
         }
       }
-      post :automatic_review_mapping_staggered, params: request_params
-      expect(flash[:note]).to eq('Awesome!')
-      expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+    end
+    before(:each) do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    end
+    context 'when staggered review mapping is successful' do
+      it 'assigns reviewers and shows success message' do
+        success_message = 'Reviewers assigned successfully'
+        allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_return(success_message)
+
+        post :automatic_review_mapping_staggered, params: request_params
+        expect(flash[:note]).to eq(success_message)
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
+    end
+
+    context 'when staggered review mapping fails' do
+      it 'handles the error gracefully' do
+        error = StandardError.new('Failed to assign reviewers')
+        allow(assignment).to receive(:assign_reviewers_staggered).with('4', '2').and_raise(error)
+
+        post :automatic_review_mapping_staggered, params: request_params
+
+        expect(flash[:error]).to eq(error.message)
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
+    end
+
+    context 'with invalid parameters' do
+      it 'handles missing parameters gracefully' do
+        invalid_params = {
+          id: assignment.id,
+          assignment: {
+            num_reviews: nil,
+            num_metareviews: nil
+          }
+        }
+
+        post :automatic_review_mapping_staggered, params: invalid_params
+
+        expect(flash[:error]).to eq('Please specify the number of reviews and metareviews per student.')
+        expect(response).to redirect_to('/review_mapping/list_mappings?id=1')
+      end
     end
   end
-
   describe '#save_grade_and_comment_for_reviewer' do
     it 'redirects to reports#response_report page' do
       # Use factories to create stubs (user must be instructor or above to perform this action)

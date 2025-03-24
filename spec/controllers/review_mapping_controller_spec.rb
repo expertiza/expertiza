@@ -679,34 +679,47 @@ describe ReviewMappingController do
   end
 
   describe '#start_self_review' do
-    before(:each) do
-      allow(Team).to receive(:find_team_for_assignment_and_user).with(1, '1').and_return([double('Team', id: 1)])
+    let(:assignment) { build(:assignment, id: 1) }
+    let(:team) { build(:assignment_team, id: 1) }
+    let(:user_id) { '1' }
+    let(:reviewer_id) { '1' }
+    let(:request_params) do
+      {
+        assignment_id: assignment.id,
+        reviewer_id: reviewer_id,
+        reviewer_userid: user_id
+      }
     end
 
-    context 'when self review response map does not exist' do
-      it 'creates a new record and redirects to submitted_content#edit page' do
-        allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([nil])
-        allow(SelfReviewResponseMap).to receive(:create).with(reviewee_id: 1, reviewer_id: '1', reviewed_object_id: 1).and_return(true)
-        request_params = {
-          assignment_id: 1,
-          reviewer_userid: 1,
-          reviewer_id: 1
-        }
+    before(:each) do
+      allow(Assignment).to receive(:find).with('1').and_return(assignment)
+    end
+
+    context 'when self review is created successfully' do
+      it 'redirects to edit page' do
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([team])
+        allow(SelfReviewResponseMap).to receive(:create_self_review).with(team.id, reviewer_id, assignment.id).and_return(true)
+
         post :start_self_review, params: request_params
-        expect(response).to redirect_to('/submitted_content/1/edit')
+
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id)
       end
     end
 
-    context 'when self review response map exists' do
-      it 'redirects to submitted_content#edit page' do
-        allow(SelfReviewResponseMap).to receive(:where).with(reviewee_id: 1, reviewer_id: '1').and_return([double('SelfReviewResponseMap')])
-        request_params = {
-          assignment_id: 1,
-          reviewer_userid: 1,
-          reviewer_id: 1
-        }
+    context 'when self review creation fails' do
+      it 'redirects with error message' do
+        error = StandardError.new('Self review already exists')
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([team])
+        allow(SelfReviewResponseMap).to receive(:create_self_review).with(team.id, reviewer_id, assignment.id).and_raise(error)
         post :start_self_review, params: request_params
-        expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id, msg: error.message)
+      end
+    end
+    context 'when team is not found' do
+      it 'redirects with error message' do
+        allow(Team).to receive(:find_team_for_assignment_and_user).with(assignment.id, user_id).and_return([])
+        post :start_self_review, params: request_params
+        expect(response).to redirect_to(controller: 'submitted_content', action: 'edit', id: reviewer_id, msg: 'No team is found for this user')
       end
     end
   end

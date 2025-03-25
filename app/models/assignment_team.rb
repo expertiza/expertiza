@@ -7,54 +7,26 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-  # START of contributor methods, shared with AssignmentParticipant
-
-  # Added for E1973, Team reviews.
-  # Some methods prompt a reviewer for a user id. This method just returns the user id of the first user in the team
-  # This is a very hacky way to deal with very complex functionality but the reasoning is this:
-  # The reason this is being added is to give ReviewAssignment#reject_own_submission a way to reject the submission
-  # Of the reviewer. If there are team reviews, there must be team submissions, so any team member's user id will do.
-  # Hopefully, this logic applies if there are other situations where reviewer.user_id was called
-  # EDIT: A situation was found which differs slightly. If the current user is on the team, we want to
-  # return that instead for instances where the code uses the current user.
-  def user_id
-    @current_user.id if !@current_user.nil? && users.include?(@current_user)
-    users.first.id
+  
+  # Returns the ID of the current_user if they are part of the team
+  def current_user_id
+    return @current_user.id if @current_user && users.include?(@current_user)
+    nil
   end
-
-  # E1973
-  # stores the current user so that we can check them when returning the user_id
-  def set_current_user(current_user)
+  
+  # Returns the ID of the first user in the team (or nil if empty)
+  def first_user_id
+    users.first&.id
+  end
+  
+  # Stores the current user so that we can check them when returning the user_id
+  def store_current_user(current_user)
     @current_user = current_user
-  end
-
-  # Whether this team includes a given participant or not
-  def includes?(participant)
-    participants.include?(participant)
-  end
-
-  # Get the parent of this class=>Assignment
-  def parent_model
-    'Assignment'
-  end
-
-  def self.parent_model(id)
-    Assignment.find(id)
-  end
-
-  # Get the name of the class
-  def fullname
-    name
   end
 
   # Get the review response map
   def review_map_type
     'ReviewResponseMap'
-  end
-
-  # Prototype method to implement prototype pattern
-  def self.prototype
-    AssignmentTeam.new
   end
 
   # Use current object (AssignmentTeam) as reviewee and create the ReviewResponseMap record
@@ -65,8 +37,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.create(reviewee_id: id, reviewer_id: reviewer.get_reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
   end
 
-  # E-1973 If a team is being treated as a reviewer of an assignment, then they are the reviewer
-  def get_reviewer
+  # If a team is being treated as a reviewer of an assignment, then they are the reviewer
+  def reviewer
     self
   end
 
@@ -76,9 +48,8 @@ class AssignmentTeam < Team
     ReviewResponseMap.where('reviewee_id = ? && reviewer_id = ? && reviewed_object_id = ?', id, reviewer.get_reviewer.id, assignment.id).count > 0
   end
 
-  # Topic picked by the team for the assignment
-  # This method needs refactoring: it sounds like it returns a topic object but in fact it returns an id
-  def topic
+  # Topic id picked by the team for the assignment
+  def topic_id
     SignedUpTeam.find_by(team_id: id, is_waitlisted: 0).try(:topic_id)
   end
 
@@ -108,15 +79,10 @@ class AssignmentTeam < Team
     super
   end
 
-  # Delete Review response map
+  # Deletes all review mappings associated with this team
   def destroy
     review_response_maps.each(&:destroy)
     super
-  end
-
-  # Get the first member of the team
-  def self.first_member(team_id)
-    find_by(id: team_id).try(:participants).try(:first)
   end
 
   # Return the files residing in the directory of team submissions
@@ -126,63 +92,58 @@ class AssignmentTeam < Team
     files = files(path) if directory_num
     files
   end
-
-  # REFACTOR BEGIN:: functionality of import,export, handle_duplicate shifted to team.rb
-  # Import csv file to form teams directly
+  
+  # Delegates CSV-based team creation to the Team.import method, using AssignmentTeam as the context.
   def self.import(row, assignment_id, options)
-    unless Assignment.find_by(id: assignment_id)
-      raise ImportError, 'The assignment with the id "' + assignment_id.to_s + "\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
-    end
-
-    @assignment_team = prototype
-    Team.import(row, assignment_id, options, @assignment_team)
+    raise ImportError, "The assignment with the id \"#{assignment_id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?" unless Assignment.find_by(id: assignment_id)
+  
+    Team.import(row, assignment_id, options, AssignmentTeam)
   end
-
-  # Export the existing teams in a csv file
+  
+  # Delegates team export functionality to the Team.export method using AssignmentTeam as the context.
   def self.export(csv, parent_id, options)
-    @assignment_team = prototype
-    Team.export(csv, parent_id, options, @assignment_team)
+    Team.export(csv, parent_id, options, AssignmentTeam)
   end
 
   # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
+  # Copy members from self to a new team.
+  def copy(new_team)
+    members = TeamsUser.where(team_id: id)
+    members.each do |member|
+      t_user = TeamsUser.create!(team_id: new_team.id, user_id: member.user_id)
+      # For AssignmentTeam, the parent is an Assignment
+      parent = Assignment.find(parent_id)
+      TeamUserNode.create!(parent_id: parent.id, node_object_id: t_user.id)
+    end
+  end
+
   # Copy the current Assignment team to the CourseTeam
-  def copy(course_id)
+  def copy_assignment_to_course(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name
     new_team.save
-    copy_members(new_team)
+    copy(new_team)
   end
 
-  # Add Participants to the current Assignment Team
-  def add_participant(assignment_id, user)
-    return if AssignmentParticipant.find_by(parent_id: assignment_id, user_id: user.id)
+  # Given a user, if they aren't already a participant, make them one
+  # Since this method is on a team and team already belongs to an assignment, assignment_id is not needed.
+  def add_participant(user)
+    existing = AssignmentParticipant.find_by(parent_id: parent_id, user_id: user.id)
+    return nil if existing
 
-    AssignmentParticipant.create(parent_id: assignment_id, user_id: user.id, permission_granted: user.master_permission_granted)
+    AssignmentParticipant.create(
+      parent_id: parent_id,
+      user_id: user.id,
+      permission_granted: user.master_permission_granted
+    )
   end
 
   def hyperlinks
     submitted_hyperlinks.blank? ? [] : YAML.safe_load(submitted_hyperlinks)
   end
 
-  # Appends the hyperlink to a list that is stored in YAML format in the DB
-  # @exception  If is hyperlink was already there
-  #             If it is an invalid URL
-
-  def files(directory)
-    files_list = Dir[directory + '/*']
-    files = []
-
-    files_list.each do |file|
-      if File.directory?(file)
-        dir_files = files(file)
-        dir_files.each { |f| files << f }
-      end
-      files << file
-    end
-    files
-  end
-
+  # Manages submission of a hyperlink
   def submit_hyperlink(hyperlink)
     hyperlink.strip!
     raise 'The hyperlink cannot be empty!' if hyperlink.empty?
@@ -198,9 +159,7 @@ class AssignmentTeam < Team
     save
   end
 
-  # Note: This method is not used yet. It is here in the case it will be needed.
-  # @exception  If the index does not exist in the array
-
+  # Method manages removal of hyperlink (only here on as-needed basis)
   def remove_hyperlink(hyperlink_to_delete)
     hyperlinks = self.hyperlinks
     hyperlinks.delete(hyperlink_to_delete)
@@ -208,14 +167,36 @@ class AssignmentTeam < Team
     save
   end
 
-  # return the team given the participant
+  # Recursively gathers all files (not directories) within a given directory and its subdirectories
+  # Uses an iterator-based approach as specified.
+  def files(directory)
+    # Safety check: if the given path is not a valid directory, return an empty array
+    return [] unless File.directory?(directory)
+  
+    # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')
+    # Then iterate over each entry
+    (Dir.entries(directory) - ['.', '..']).flat_map do |entry|
+      # Construct the full path to the current entry (file or folder)
+      path = File.join(directory, entry)
+  
+      # If the entry is a subdirectory, recursively gather its files using the same method
+      # If it's a file, return it in a single-element array
+      # flat_map ensures all nested arrays are flattened into a single array of paths
+      File.directory?(path) ? files(path) : [path]
+    end
+  end
+
+  # Given a participant, find associated AssignmentTeam 
   def self.team(participant)
+    # return nil if there is no participant
     return nil if participant.nil?
 
+    # find all TeamUser records for given user
     team = nil
     teams_users = TeamsUser.where(user_id: participant.user_id)
     return nil unless teams_users
 
+    # for each TeamUser record, fetch team & return it only if both team and participant's parent id match
     teams_users.each do |teams_user|
       if teams_user.team_id == nil
         next
@@ -228,25 +209,25 @@ class AssignmentTeam < Team
 
   # Export the fields
   def self.export_fields(options)
-    fields = []
-    fields.push('Team Name')
-    fields.push('Team members') if options[:team_name] == 'false'
-    fields.push('Assignment Name')
+    fields = ['Team Name']
+    fields << 'Team members' if options[:team_name] == 'false'
+    fields << 'Assignment Name'
+    fields
   end
 
   # Remove a team given the team id
   def self.remove_team_by_id(id)
     old_team = AssignmentTeam.find(id)
-    old_team.destroy unless old_team.nil?
+    old_team.destroy unless old_team.nil? # nil check ensures safety
   end
 
   # Get the path of the team directory
   def path
-    assignment.path + '/' + directory_num.to_s
+    File.join(assignment.path, directory_num.to_s)
   end
 
-  # Set the directory num for this team
-  def set_student_directory_num
+  # Set the directory number for this team
+  def set_team_directory_num
     return if directory_num && (directory_num >= 0)
 
     max_num = AssignmentTeam.where(parent_id: parent_id).order('directory_num desc').first.directory_num
@@ -254,7 +235,8 @@ class AssignmentTeam < Team
     update_attributes(directory_num: dir_num)
   end
 
-  def received_any_peer_review?
+  # Checks if the AssignmentTeam has recieved any peer reviews
+  def has_been_reviewed?
     ResponseMap.where(reviewee_id: id, reviewed_object_id: parent_id).any?
   end
 
@@ -279,8 +261,8 @@ class AssignmentTeam < Team
     get_logged_in_reviewer_id(current_user_id) != nil
   end
 
-  # E2121 Refractor create_new_team
-  def create_new_team(user_id, signuptopic)
+  # Creates a new team linking a user with a signuptopic
+  def link_user_and_topic(user_id, signuptopic)
     t_user = TeamsUser.create(team_id: id, user_id: user_id)
     SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)

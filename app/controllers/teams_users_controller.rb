@@ -54,7 +54,7 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current assignment. Please <a href=\"#{urlAssignmentParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_member(user)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path
@@ -74,7 +74,7 @@ class TeamsUsersController < ApplicationController
           flash[:error] = "\"#{user.name}\" is not a participant of the current course. Please <a href=\"#{urlCourseParticipantList}\">add</a> this user before continuing."
         else
           begin
-            add_member_return = team.add_member(user, team.parent_id)
+            add_member_return = team.add_member(user)
           rescue
             flash[:error] = "The user #{user.name} is already a member of the team #{team.name}"
             redirect_back fallback_location: root_path

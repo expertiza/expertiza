@@ -113,7 +113,7 @@ describe MentorManagement do
       r = Random.new(42)
       team_ids = team_count.times.map do
         random_id = r.rand(1000..10_000)
-        FactoryBot.create(:team, id: random_id, parent_id: assignment.id)
+        FactoryBot.create(:team, id: random_id, parent_id: assignment.id, name: "UniqueTeam_#{random_id}")
         random_id
       end
       team_ids.each do |team_id|

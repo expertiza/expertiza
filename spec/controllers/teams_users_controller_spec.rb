@@ -144,6 +144,7 @@ describe TeamsParticipantController do
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
         allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
+        allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
         user_session = { user: admin }
         request_params = {
           user: { name: 'student2065' }, id: 1
@@ -216,6 +217,7 @@ describe TeamsParticipantController do
         allow(Assignment).to receive(:find).with(1).and_return(assignment1)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: 1, parent_id: 1).and_return(participant)
         allow_any_instance_of(Team).to receive(:add_member).with(any_args).and_return(true)
+        allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
         allow(TeamsParticipant).to receive(:last).with(any_args).and_return(student1)
         allow(assignment1).to receive(:user_on_team?).with(student1).and_return(true)
         user_session = { user: admin }

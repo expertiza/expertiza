@@ -11,7 +11,7 @@ class TagPromptDeployment < ApplicationRecord
   end
 
   def get_number_of_taggable_answers(user_id)
-    team = Team.joins(:teams_users).where(team_users: { parent_id: assignment_id }, user_id: user_id)
+    team = Team.joins(:teams_participants).where(team_users: { parent_id: assignment_id }, user_id: user_id)
     responses = Response.joins(:response_maps).where(response_maps: { reviewed_object_id: assignment.id, reviewee_id: team.id })
     questions = Question.where(questionnaire_id: questionnaire.id, type: question_type)
 
@@ -47,8 +47,8 @@ class TagPromptDeployment < ApplicationRecord
 
         answers = answers.select { |answer| answer.comments.length > answer_length_threshold } unless answer_length_threshold.nil?
         answers_ids = answers.map(&:id)
-        teams_users = TeamsUser.where(team_id: team.id)
-        users = teams_users.map { |teams_user| User.find(teams_user.user_id) }
+        teams_participants = TeamsParticipant.where(team_id: team.id)
+        users = teams_participants.map { |teams_user| User.find(teams_user.user_id) }
 
         users.each do |user|
           tags = AnswerTag.where(tag_prompt_deployment_id: id, user_id: user.id, answer_id: answers_ids)

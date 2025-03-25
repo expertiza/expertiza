@@ -82,7 +82,7 @@ class JoinTeamRequestsController < ApplicationController
   def decline
     @join_team_request.status = 'D'
     @join_team_request.save
-    redirect_to view_student_teams_path student_id: params[:teams_user_id]
+    redirect_to view_student_teams_path student_id: params[:teams_participant_id]
   end
 
   private

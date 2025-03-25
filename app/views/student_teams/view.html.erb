@@ -20,7 +20,7 @@
       %></button>
     <% else %>
       <% button_enabled = false %>
-      <% users = TeamsUser.where(team_id: @student.team.id) %>
+      <% users = TeamsParticipant.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
       <% users.each do |user| %>
         <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
@@ -173,7 +173,7 @@
 <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
-               :teams_user_id=>params[:student_id],
+               :teams_participant_id=>params[:student_id],
                :assignment_id => @student.assignment.id} unless @student.team.nil? %>
     <% if @send_invs && @send_invs.any? %>
     <br/><br/>
@@ -322,7 +322,7 @@
 <br/>
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
-           :locals =>{:teams_user_id=>params[:student_id],
+           :locals =>{:teams_participant_id=>params[:student_id],
                       :assignment_id => @student.assignment.id
            } %>
 <br>

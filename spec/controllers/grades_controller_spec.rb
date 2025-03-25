@@ -312,6 +312,7 @@ describe GradesController do
         allow(participant).to receive(:team).and_return(nil)
         allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
         allow(TeamsParticipant).to receive(:team_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).and_return(1)
         get :view_my_scores, params: request_params
         expect(response).to redirect_to('/')
       end

@@ -342,7 +342,7 @@ describe UsersController do
     it 'check if user was successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -352,7 +352,7 @@ describe UsersController do
     it 'check if user was not successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(nil)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -362,7 +362,7 @@ describe UsersController do
     it 'check if successful destroy leads to redirect' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -372,7 +372,7 @@ describe UsersController do
     it 'check if error during destroy leads to redirect' do
       allow(User).to receive(:find).with(any_args).and_return(nil)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy

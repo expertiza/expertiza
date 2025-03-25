@@ -14,7 +14,7 @@ class SignUpTopic < ApplicationRecord
 
   # This method is not used anywhere
   # def get_team_id_from_topic_id(user_id)
-  #  return find_by_sql("select t.id from teams t,teams_users u where t.id=u.team_id and u.user_id = 5");
+  #  return find_by_sql("select t.id from teams t,teams_participants u where t.id=u.team_id and u.user_id = 5");
   # end
 
   def self.import(row_hash, session, _id = nil)

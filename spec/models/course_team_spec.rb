@@ -69,7 +69,7 @@ describe 'CourseTeam' do
   describe '#export' do
     it 'writes to a csv' do
       allow(CourseTeam).to receive(:where).with(parent_id: 1).and_return([course_team1])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([team_user])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_user])
       expect(CourseTeam.export([], 1, team_name: 'false')).to eq([['no team', 'no name']])
     end
   end

@@ -65,9 +65,15 @@ class TeamsController < ApplicationController
     end
 
     if @teams.count() > 0
-      @num_of_meeting_cols = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      if session[:num_of_meeting_cols].nil?
+        session[:num_of_meeting_cols] = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        # ensure that the session value is not smaller than any new calculation.
+        session[:num_of_meeting_cols] = [[@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min, session[:num_of_meeting_cols]].max
+      end
+      @num_of_meeting_cols = session[:num_of_meeting_cols]
     else
-      @num_of_meeting_cols = 1
+      @num_of_meeting_cols = session[:num_of_meeting_cols] || 1 # Use session value or default to 1
     end
 
     if request.xhr? # Check if it's an AJAX request
@@ -250,24 +256,24 @@ class TeamsController < ApplicationController
     end
   end
 
-
   def increase_table_headers
-    @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) + 1, 5].min
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
     @team_type = params[:type]
     @ID = params[:id]
-    #{render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }}"
   end
 
   def decrease_table_headers
-    @num_of_meeting_cols = [params[:colNum].to_i - 1, 0].max
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) - 1, 1].max # Ensure minimum is 1
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
     @team_type = params[:type]
     @ID = params[:id]
-    #render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
+
   end
 
-
   def increase_table_columns
-    @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) + 1, 5].min
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
     @team_type = params[:type]
     @ID = params[:id]
 
@@ -281,11 +287,11 @@ class TeamsController < ApplicationController
       @teams = Assignment.get_teams_by_id(@ID)
     end
 
-    #render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
   end
 
   def decrease_table_columns
-    @num_of_meeting_cols = [params[:colNum].to_i - 1, 0].max
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) - 1, 1].max # Ensure minimum is 1
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
     @team_type = params[:type]
     @ID = params[:id]
 
@@ -298,8 +304,6 @@ class TeamsController < ApplicationController
       # get the assignment teams
       @teams = Assignment.get_teams_by_id(@ID)
     end
-
-    #render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
   end
 
 

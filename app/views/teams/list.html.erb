@@ -26,7 +26,7 @@
             <th class="head">
               <%= ordinalize(i + 1) %> Mtg
 
-              <% if i == @num_of_meeting_cols - 1 && @num_of_meeting_cols != 1 && @num_of_meeting_cols < 5%>
+              <% if i == @num_of_meeting_cols - 1 && @num_of_meeting_cols != 1 && @num_of_meeting_cols <=5%>
                 <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
 
                 <% column_has_only_nil_entries = true %>
@@ -42,10 +42,11 @@
                 <% if column_has_only_nil_entries %>
                   <%= link_to image_tag("delete.png", border: 0, alt: "Remove Meeting Column", title: "Remove Meeting Column"), '#', class: "remove-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
                 <% end %>
-
               <% elsif @num_of_meeting_cols == 1%>
                 <%= link_to image_tag("plus.png", border: 0, alt: "Add Meeting Column", title: "Add Meeting Column"), '#', class: "add-meeting-col", style: 'margin-left: 10px;', data: { team_type: @team_type, id: @ID } %>
               <% end %>
+
+
             </th>
           <% end %>
           <th class="head">Actions</th> <!-- New Actions Column -->

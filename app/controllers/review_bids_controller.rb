@@ -92,11 +92,6 @@ class ReviewBidsController < ApplicationController
     assignment_id = params[:assignment_id].to_i
     reviewer_ids = fetch_reviewer_ids(assignment_id)
     matched_topics = process_bidding(assignment_id, reviewer_ids)
-    # Trigger fallback algorithm if process_bidding fails (returns nil or empty hash)
-    if matched_topics.nil? || matched_topics.empty?
-      Rails.logger.warn "process_bidding failed, triggering fallback algorithm"
-      matched_topics = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
-    end
     ensure_valid_topics(matched_topics, reviewer_ids)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
     Assignment.find(assignment_id).update(can_choose_topic_to_review: false)

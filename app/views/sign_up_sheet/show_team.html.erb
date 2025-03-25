@@ -29,8 +29,8 @@
 
     <%
       team_members = []
-      TeamsParticipant.where(team_id: result[:team_id]).each{|teamuser|
-        team_members << User.find(teamuser.user_id).name
+      TeamsParticipant.where(team_id: result[:team_id]).each{|team_participant|
+        team_members << team_participant.participant.user.name
       }
       if result[:advertise_for_partner]|| result[:advertise_for_partner] == 1
     %>

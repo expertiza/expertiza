@@ -1,71 +1,64 @@
 class TeamsParticipant < ApplicationRecord
-  # Alias user_id to participant_id for legacy code compatibility
-  alias_attribute :user_id, :participant_id
-
-  belongs_to :participant, class_name: 'User', foreign_key: 'participant_id'
   belongs_to :team
-  has_one :team_participant_node, foreign_key: 'node_object_id', dependent: :destroy
-  has_paper_trail
+  belongs_to :participant
+  belongs_to :duty, optional: true
 
-  # Returns the participant's name, appending " (Mentor)" if applicable.
-  def name(ip_address = nil)
-    participant_name = participant.name(ip_address)
-    participant_name += ' (Mentor)' if MentorManagement.user_a_mentor?(participant)
-    participant_name
+  validates :team_id, presence: true
+  validates :participant_id, presence: true
+  validates :participant_id, uniqueness: { scope: :team_id, message: "is already a member of this team" }
+
+  # Class method to find team_id for a participant in an assignment
+  def self.team_id(assignment_id, user_id)
+    participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
+    return nil unless participant
+    find_by(participant_id: participant.id)&.team_id
   end
 
-  # Deletes the participant record and cleans up the related node.
-  # Also deletes the team if it no longer has any participants.
-  def delete
-    team_participant_node&.destroy
-    team_obj = team
-    destroy
-    team_obj.delete if team_obj.teams_participants.empty?
-  end
-
-  # Placeholder for team members retrieval logic.
-  def get_team_members(team_id)
-    # TODO: Implement retrieval of team members for the given team_id.
-  end
-
-  # Removes the entry in the TeamsParticipants table for the given participant and team.
-  def self.remove_team(participant_id, team_id)
-    record = TeamsParticipant.find_by(participant_id: participant_id, team_id: team_id)
-    record&.destroy
-  end
-
-  # Returns the first participant entry for the given team id.
-  def self.first_by_team_id(team_id)
-    TeamsParticipant.find_by(team_id: team_id)
-  end
-
-  # Determines whether a team has no participants.
+  # Class method to check if a team is empty
   def self.team_empty?(team_id)
-    TeamsParticipant.where(team_id: team_id).empty?
+    where(team_id: team_id).empty?
   end
 
-  # Renamed method: adds a member to the team they were invited to.
-  # Verifies that both the invitee and invited participants exist, fetches team IDs in a batch,
-  # and then adds the member using the associated assignment team.
-  def self.add_member_to_inviting_team(invitee_participant_id, invited_participant_id, assignment_id)
-    invitee = User.find_by(id: invitee_participant_id)
-    invited = User.find_by(id: invited_participant_id)
-    return false if invitee.nil? || invited.nil?
+  # Class method to add a member to an invited team
+  # This method handles adding a participant to a team they've been invited to join
+  # Returns true if successful, false otherwise
+  def self.add_member_to_invited_team(inviter_user_id, invited_user_id, assignment_id)
+    # Find both participants in a single query
+    participants = AssignmentParticipant.where(
+      user_id: [inviter_user_id, invited_user_id],
+      parent_id: assignment_id
+    ).index_by(&:user_id)
 
-    team_ids = TeamsParticipant.where(participant_id: invitee.id).pluck(:team_id)
-    return false if team_ids.empty?
+    # Return false if either participant is missing
+    return false unless participants[inviter_user_id] && participants[invited_user_id]
 
-    new_team = AssignmentTeam.where(id: team_ids, parent_id: assignment_id).first
-    return false if new_team.nil?
+    # Find the inviter's team in a single query
+    inviter_team = find_by(participant_id: participants[inviter_user_id].id)&.team
+    return false unless inviter_team
 
-    new_team.add_member(invited, assignment_id)
+    # Check if team is full
+    return false if inviter_team.full?
+
+    # Create the team participant record
+    begin
+      create!(
+        team_id: inviter_team.id,
+        participant_id: participants[invited_user_id].id
+      )
+      true
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "Failed to add member to team: #{e.message}"
+      false
+    end
   end
 
-  # Returns the team id for a participant in a given assignment.
-  def self.team_id(assignment_id, participant_id)
-    tp = TeamsParticipant.joins(:team)
-                         .where(participant_id: participant_id, teams: { parent_id: assignment_id })
-                         .first
-    tp&.team_id
+  def self.get_team_members(team_id)
+    where(team_id: team_id).map(&:participant).map(&:user)
   end
-end
+
+  def self.get_teams_for_user(user_id)
+    participant = AssignmentParticipant.find_by(user_id: user_id)
+    return [] unless participant
+    where(participant_id: participant.id).map(&:team)
+  end
+end 

@@ -547,10 +547,9 @@ Expertiza::Application.routes.draw do
 
   resources :teams_participants, only: %i[new create update] do
     collection do
-      post :list
-      post :update_duties
+      get :list
       get :delete
-      post :delete_selected
+      get :delete_selected
     end
   end
   resources :popup do

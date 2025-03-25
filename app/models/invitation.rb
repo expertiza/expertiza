@@ -29,11 +29,10 @@ class Invitation < ApplicationRecord
     # if so, update the original record; else create a new record
     original_team_id = TeamsParticipant.team_id(assignment_id, invited_user_id)
     if original_team_id
-      # team_user_mapping = TeamsParticipant.where(team_id: original_team_id, user_id: invited_user_id).first
-      team_user_mapping = TeamsParticipant.find_by(team_id: original_team_id, user_id: invited_user_id)
-      TeamsParticipant.update(team_user_mapping.id, team_id: new_team_id)
+      team_participant = TeamsParticipant.find_by(team_id: original_team_id, participant_id: invited_user_id)
+      TeamsParticipant.update(team_participant.id, team_id: new_team_id)
     else
-      TeamsParticipant.create(team_id: new_team_id, user_id: invited_user_id)
+      TeamsParticipant.create(team_id: new_team_id, participant_id: invited_user_id)
     end
   end
 
@@ -54,9 +53,8 @@ class Invitation < ApplicationRecord
     # If you change your team, remove all your invitations that you send to other people
     Invitation.remove_users_sent_invites_for_assignment(invited_user_id, assignment_id)
 
-    # Create a new team_user entry for the accepted invitation
-    @team_user = TeamsParticipant.new
-    can_add_member = TeamsParticipant.add_member_to_inviting_team(inviter_user_id, invited_user_id, assignment_id)
+    # Create a new team_participant entry for the accepted invitation
+    can_add_member = TeamsParticipant.add_member_to_invited_team(inviter_user_id, invited_user_id, assignment_id)
 
     if can_add_member # The member was successfully added to the team (the team was not full)
       Invitation.update_users_topic_after_invite_accept(inviter_user_id, invited_user_id, assignment_id)

@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe AssignmentParticipant do
   let(:response) { build(:response) }
   let(:team) { build(:assignment_team, id: 1) }
@@ -8,6 +10,8 @@ describe AssignmentParticipant do
   let(:assignment) { build(:assignment, id: 1) }
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:question) { double('Question') }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+
   before(:each) do
     allow(assignment).to receive(:questionnaires).and_return([review_questionnaire])
     allow(participant).to receive(:team).and_return(team)
@@ -262,7 +266,7 @@ describe AssignmentParticipant do
   describe '#review_file_path' do
     it 'returns the file path for reviewer to upload files during peer review' do
       allow(ResponseMap).to receive(:find).with(1).and_return(build(:review_response_map))
-      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1).and_return(build(:team_user))
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1).and_return(team_participant)
       allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 4).and_return(participant)
       expect(participant.review_file_path(1)).to match('pg_data/instructor6/csc517/test/final_test/0_review/1')
     end
@@ -304,6 +308,65 @@ describe AssignmentParticipant do
           expect(participant.stage_deadline).to match('2008-08-08')
         end
       end
+    end
+  end
+
+  describe '#team' do
+    it 'returns the team for the participant' do
+      allow(TeamsParticipant).to receive(:find_by).with(participant_id: 1).and_return(team_participant)
+      expect(participant.team).to eq(team_participant.team)
+    end
+  end
+
+  describe '#team_id' do
+    it 'returns the team id for the participant' do
+      allow(TeamsParticipant).to receive(:find_by).with(participant_id: 1).and_return(team_participant)
+      expect(participant.team_id).to eq(1)
+    end
+  end
+
+  describe '#team_name' do
+    it 'returns the team name for the participant' do
+      allow(TeamsParticipant).to receive(:find_by).with(participant_id: 1).and_return(team_participant)
+      expect(participant.team_name).to eq(team_participant.team.name)
+    end
+  end
+
+  describe '#team_members' do
+    it 'returns the team members for the participant' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(participant.team_members).to eq([team_participant.participant])
+    end
+  end
+
+  describe '#team_member?' do
+    it 'checks if a user is a team member' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(participant.team_member?(team_participant.participant.user)).to be true
+    end
+  end
+
+  describe '#team_full?' do
+    it 'checks if the team is full' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(participant.team_full?).to be false
+    end
+  end
+
+  describe '#team_size' do
+    it 'returns the team size' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(participant.team_size).to eq(1)
+    end
+  end
+
+  describe '#copy_team_members' do
+    it 'copies team members to a new team' do
+      new_team = build(:assignment_team, id: 2)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      allow(TeamsParticipant).to receive(:create).with(team_id: 2, participant_id: 1).and_return(team_participant)
+      participant.copy_team_members(new_team)
+      expect(TeamsParticipant).to have_received(:create).with(team_id: 2, participant_id: 1)
     end
   end
 end

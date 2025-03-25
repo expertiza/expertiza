@@ -2,86 +2,88 @@ class SignedUpTeam < ApplicationRecord
   belongs_to :topic, class_name: 'SignUpTopic'
   belongs_to :team, class_name: 'Team'
 
+  # Validations
   validates :topic_id, :team_id, presence: true
+
+  # Scopes for efficient querying
   scope :by_team_id, ->(team_id) { where(team_id: team_id) }
+  scope :waitlisted, -> { where(is_waitlisted: true) }
+  scope :confirmed, -> { where(is_waitlisted: false) }
+  scope :by_topic_id, ->(topic_id) { where(topic_id: topic_id) }
+  scope :by_assignment_id, ->(assignment_id) { joins(:topic).where(sign_up_topics: { assignment_id: assignment_id }) }
 
-  def self.find_team_participants(assignment_id, ip_address = nil)
-    participants = SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = sign_up_topics.id')
-                               .select('signed_up_teams.id as id, sign_up_topics.id as topic_id, sign_up_topics.topic_name as name,
-                                        sign_up_topics.topic_name as team_name_placeholder, sign_up_topics.topic_name as user_name_placeholder,
-                                        signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
-                               .where('sign_up_topics.assignment_id = ?', assignment_id)
-    participants.each_with_index do |participant, i|
-      participant_names = User.joins('INNER JOIN teams_participants ON users.id = teams_participants.participant_id')
-                              .joins('INNER JOIN teams ON teams.id = teams_participants.team_id')
-                              .select('users.name as u_name, teams.name as team_name')
-                              .where('teams.id = ?', participant.team_id)
-
-      team_name_added = false
-      names = '(missing team)'
-
-      participant_names.each do |participant_name|
-        if team_name_added
-          names += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
-          participant.user_name_placeholder += User.find_by(name: participant_name.u_name).name(ip_address) + ' '
-        else
-          names = '[' + participant_name.team_name + '] ' + User.find_by(name: participant_name.u_name).name(ip_address) + ' '
-          participant.team_name_placeholder = participant_name.team_name
-          participant.user_name_placeholder = User.find_by(name: participant_name.u_name).name(ip_address) + ' '
-          team_name_added = true
-        end
-      end
-      participants[i].name = names
-    end
-
-    participants
-  end
-
-  def self.find_team_users(assignment_id, user_id)
+  # Find team participants for an assignment
+  def self.find_team_participants(assignment_id)
     TeamsParticipant.joins('INNER JOIN teams ON teams_participants.team_id = teams.id')
-             .select('teams.id as t_id')
-             .where('teams.parent_id = ? and teams_participants.participant_id = ?', assignment_id, user_id)
+                    .where('teams.parent_id = ?', assignment_id)
+                    .includes(:participant, :team)
   end
 
-  def self.find_user_signup_topics(assignment_id, team_id)
-    SignedUpTeam.joins('INNER JOIN sign_up_topics ON signed_up_teams.topic_id = signUp_topics.id')
-                .select('sign_up_topics.id as topic_id, sign_up_topics.topic_name as topic_name, signed_up_teams.is_waitlisted as is_waitlisted,
-                         signed_up_teams.preference_priority_number as preference_priority_number')
-                .where('sign_up_topics.assignment_id = ? and signed_up_teams.team_id = ?', assignment_id, team_id)
+  # Find team for a user in an assignment
+  def self.find_team_for_user(assignment_id, user_id)
+    participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
+    return nil unless participant
+    TeamsParticipant.find_by(participant_id: participant.id)&.team
   end
 
-  # If a signup sheet exists then release topics that the given team has selected for the given assignment.
+  # Find signup topics for a team
+  def self.find_team_signup_topics(assignment_id, team_id)
+    joins(:topic)
+      .select('sign_up_topics.id as topic_id, sign_up_topics.topic_name, signed_up_teams.is_waitlisted, signed_up_teams.preference_priority_number')
+      .where('sign_up_topics.assignment_id = ? AND signed_up_teams.team_id = ?', assignment_id, team_id)
+  end
+
+  # Release topics selected by a team for an assignment
   def self.release_topics_selected_by_team_for_assignment(team_id, assignment_id)
-    old_teams_signups = SignedUpTeam.where(team_id: team_id)
-    unless old_teams_signups.nil?
-      old_teams_signups.each do |old_teams_signup|
-        if old_teams_signup.is_waitlisted == false
-          first_waitlisted_signup = SignedUpTeam.find_by(topic_id: old_teams_signup.topic_id, is_waitlisted: true)
-          Invitation.remove_waitlists_for_team(old_teams_signup.topic_id, assignment_id) unless first_waitlisted_signup.nil?
+    transaction do
+      old_teams_signups = where(team_id: team_id)
+      return if old_teams_signups.empty?
+
+      old_teams_signups.each do |signup|
+        if !signup.is_waitlisted
+          first_waitlisted = find_by(topic_id: signup.topic_id, is_waitlisted: true)
+          Invitation.remove_waitlists_for_team(signup.topic_id, assignment_id) if first_waitlisted
         end
-        old_teams_signup.destroy
+        signup.destroy
       end
     end
   end
 
-  def self.topic_id(assignment_id, user_id)
-    team_id = TeamsParticipant.team_id(assignment_id, user_id)
-    topic_id_by_team_id(team_id) if team_id
-  end
-
+  # Get topic ID for a team
   def self.topic_id_by_team_id(team_id)
-    signed_up_teams = SignedUpTeam.where(team_id: team_id, is_waitlisted: 0)
-    signed_up_teams.blank? ? nil : signed_up_teams.first.topic_id
+    confirmed.by_team_id(team_id).first&.topic_id
   end
 
-  # Remove a specific signup record for a given topic and team.
+  # Remove a specific signup record
   def self.drop_signup_record(topic_id, team_id)
-    signup_record = SignedUpTeam.find_by(topic_id: topic_id, team_id: team_id)
-    signup_record.destroy unless signup_record.nil?
+    find_by(topic_id: topic_id, team_id: team_id)&.destroy
   end
 
-  # Remove all waitlisted records associated with a specific team.
+  # Remove all waitlisted records for a team
   def self.drop_off_waitlists(team_id)
-    SignedUpTeam.where(team_id: team_id, is_waitlisted: true).destroy_all
+    waitlisted.by_team_id(team_id).destroy_all
+  end
+
+  # Check if a team is waitlisted for a topic
+  def waitlisted?
+    is_waitlisted
+  end
+
+  # Check if a team is confirmed for a topic
+  def confirmed?
+    !is_waitlisted
+  end
+
+  # class methods
+  def self.topic_id(assignment_id, user_id)
+    participant = AssignmentParticipant.find_by(user_id: user_id, parent_id: assignment_id)
+    return nil unless participant
+    
+    team_participant = TeamsParticipant.find_by(participant_id: participant.id)
+    return nil unless team_participant
+    
+    signed_up_team = where(team_id: team_participant.team_id).first
+    signed_up_team&.topic_id
   end
 end
+

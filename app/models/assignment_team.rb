@@ -89,13 +89,7 @@ class AssignmentTeam < Team
 
   # Get Participants of the team
   def participants
-    users = self.users
-    participants = []
-    users.each do |user|
-      participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: parent_id)
-      participants << participant unless participant.nil?
-    end
-    participants
+    TeamsParticipant.where(team_id: id).map(&:participant)
   end
   alias get_participants participants
 
@@ -213,14 +207,14 @@ class AssignmentTeam < Team
     return nil if participant.nil?
 
     team = nil
-    teams_participants = TeamsParticipant.where(user_id: participant.user_id)
+    teams_participants = TeamsParticipant.where(participant_id: participant.id)
     return nil unless teams_participants
 
-    teams_participants.each do |teams_user|
-      if teams_user.team_id == nil
+    teams_participants.each do |teams_participant|
+      if teams_participant.team_id == nil
         next
       end
-      team = Team.find(teams_user.team_id)
+      team = Team.find(teams_participant.team_id)
       return team if team.parent_id == participant.parent_id
     end
     nil
@@ -281,9 +275,9 @@ class AssignmentTeam < Team
 
   # E2121 Refractor create_new_team
   def create_new_team(user_id, signuptopic)
-    t_user = TeamsParticipant.create(team_id: id, user_id: user_id)
+    t_participant = TeamsParticipant.create(team_id: id, participant_id: user_id)
     SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_participant.id)
   end
 end

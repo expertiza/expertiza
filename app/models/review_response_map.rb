@@ -235,4 +235,14 @@ class ReviewResponseMap < ResponseMap
       }
     end
   end
+
+  def self.create_team_review_mapping(reviewee_team, reviewee_user, reviewer, assignment)
+    # check if the team has been reviewed by this reviewer
+    existing_mapping = ReviewResponseMap.where(reviewee_id: reviewee_team.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id).first
+    return existing_mapping if existing_mapping
+
+    # create a new mapping
+    t_participant = TeamsParticipant.create(team_id: reviewee_team.id, participant_id: reviewee_user.id)
+    ReviewResponseMap.create(reviewee_id: reviewee_team.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
+  end
 end

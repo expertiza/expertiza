@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe 'AssignmentTeam' do
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: '') }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
@@ -9,6 +11,7 @@ describe 'AssignmentTeam' do
   let(:review_response_map) { build(:review_response_map, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   let(:topic) { build(:topic, id: 1, topic_name: 'New Topic') }
   let(:signedupteam) { build(:signed_up_team) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
 
   describe '#hyperlinks' do
     context 'when current teams submitted hyperlinks' do
@@ -380,6 +383,64 @@ describe 'AssignmentTeam' do
       expect(@team.users).to include @student
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
       expect(@team.users).to_not include @student
+    end
+  end
+
+  describe '#add_member' do
+    it 'adds a member to the assignment team' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      allow(TeamsParticipant).to receive(:create).with(participant_id: 1, team_id: 1).and_return(team_participant)
+      expect(team.add_member(team_participant.participant)).to be true
+    end
+  end
+
+  describe '#remove_member' do
+    it 'removes a member from the assignment team' do
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1, participant_id: 1).and_return(team_participant)
+      expect(team.remove_member(team_participant.participant)).to be true
+    end
+  end
+
+  describe '#user?' do
+    it 'checks if a user is a member of the assignment team' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(team.user?(team_participant.participant.user)).to be true
+    end
+  end
+
+  describe '#full?' do
+    it 'checks if the assignment team is full' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(team.full?).to be false
+    end
+  end
+
+  describe '#size' do
+    it 'returns the size of the assignment team' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      expect(team.size).to eq(1)
+    end
+  end
+
+  describe '#copy_members' do
+    it 'copies members from one assignment team to another' do
+      new_team = build(:assignment_team, id: 2)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      allow(TeamsParticipant).to receive(:create).with(team_id: 2, participant_id: 1).and_return(team_participant)
+      team.copy_members(new_team)
+      expect(TeamsParticipant).to have_received(:create).with(team_id: 2, participant_id: 1)
+    end
+  end
+
+  describe '#assignment_id' do
+    it 'returns the assignment id' do
+      expect(team.assignment_id).to eq(1)
+    end
+  end
+
+  describe '#prototype' do
+    it 'creates an assignment team' do
+      expect(AssignmentTeam.prototype.class).to eq(AssignmentTeam)
     end
   end
 end

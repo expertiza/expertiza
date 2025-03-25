@@ -57,7 +57,7 @@ class ReviewMappingController < ApplicationController
     user_id = User.where(name: params[:user][:name]).first.id
     # If instructor want to assign one student to review his/her own artifact,
     # it should be counted as "self-review" and we need to make /app/views/submitted_content/_selfreview.html.erb work.
-    if TeamsParticipant.exists?(team_id: params[:contributor_id], user_id: user_id)
+    if TeamsParticipant.exists?(team_id: params[:contributor_id], participant_id: user_id)
       flash[:error] = 'You cannot assign this student to review his/her own artifact.'
     else
       # Team lazy initialization

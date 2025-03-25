@@ -255,14 +255,14 @@ class TeamsController < ApplicationController
     @num_of_meeting_cols = [params[:colNum].to_i + 1, 5].min
     @team_type = params[:type]
     @ID = params[:id]
-    render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
+    #{render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }}"
   end
 
   def decrease_table_headers
-    @num_of_meeting_cols = [params[:colNum].to_i - 1, 5].min
+    @num_of_meeting_cols = [params[:colNum].to_i - 1, 0].max
     @team_type = params[:type]
     @ID = params[:id]
-    render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
+    #render partial: 'teams_table_header', locals: { num_of_meeting_cols: @num_of_meeting_cols }
   end
 
 
@@ -281,11 +281,11 @@ class TeamsController < ApplicationController
       @teams = Assignment.get_teams_by_id(@ID)
     end
 
-    render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
+    #render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
   end
 
   def decrease_table_columns
-    @num_of_meeting_cols = [params[:colNum].to_i - 1, 5].min
+    @num_of_meeting_cols = [params[:colNum].to_i - 1, 0].max
     @team_type = params[:type]
     @ID = params[:id]
 
@@ -299,7 +299,7 @@ class TeamsController < ApplicationController
       @teams = Assignment.get_teams_by_id(@ID)
     end
 
-    render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
+    #render partial: 'teams_table_body', locals: { num_of_meeting_cols: @num_of_meeting_cols, team_type: @team_type, teams: @teams }
   end
 
 

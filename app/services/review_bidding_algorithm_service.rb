@@ -16,7 +16,7 @@ class ReviewBiddingAlgorithmService
     matched_topics = run_bidding_algorithm(bidding_data)
     # If the external service fails, use the fallback algorithm
     if matched_topics == false
-      Rails.logger.error "Web service unavailable. Using fallback algorithm."
+      Rails.logger.error 'Web service unavailable. Using fallback algorithm.'
       matched_topics = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
     end
     matched_topics

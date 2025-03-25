@@ -18,6 +18,7 @@ class PopupController < ApplicationController
       @maxscore = questionnaire.max_question_score
       @scores = Answer.where(response_id: @response_id)
       @response = Response.find(@response_id)
+      @submission_deadline = @response.response_map.assignment.find_due_dates('submission').last.due_at
       @total_percentage = @response.average_score
       @sum = @response.aggregate_questionnaire_score
       @total_possible = @response.maximum_score

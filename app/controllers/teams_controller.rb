@@ -268,6 +268,7 @@ class TeamsController < ApplicationController
     @num_of_meeting_cols = session[:num_of_meeting_cols]
     @team_type = params[:type]
     @ID = params[:id]
+
   end
 
   def increase_table_columns
@@ -285,6 +286,7 @@ class TeamsController < ApplicationController
       # get the assignment teams
       @teams = Assignment.get_teams_by_id(@ID)
     end
+
   end
 
   def decrease_table_columns

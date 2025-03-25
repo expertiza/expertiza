@@ -145,7 +145,7 @@ describe ReviewBid do
       end
     end
   end
-  
+
   describe '.fallback_algorithm' do
     let(:assignment_id) { 2085 }
     let(:reviewer_ids) { [1, 2, 3] }
@@ -196,8 +196,8 @@ describe ReviewBid do
     it 'ensures the logging messages are triggered' do
       allow(Rails.logger).to receive(:debug).and_call_original
       expect(Rails.logger).to receive(:debug).with(/Fallback algorithm triggered/)
-      expect(Rails.logger).to receive(:debug).with(/Available topics/)
-      expect(Rails.logger).to receive(:debug).with(/Teams sorted by size/).at_least(:once)
+      expect(Rails.logger).to receive(:debug).with(/Final matched topics after fallback/)
+      expect(Rails.logger).to receive(:debug).with(/Teams sorted by size:/).at_least(:once)
       ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
     end
   end

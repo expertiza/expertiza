@@ -67,6 +67,7 @@ class ReviewBid < ApplicationRecord
                                  .joins('LEFT JOIN teams_users ON teams.id = teams_users.team_id')
                                  .group(:topic_id).count('teams_users.user_id')
       sorted_topics = topic_counts.sort_by { |_, count| -count }.map(&:first)
+      Rails.logger.debug "Teams sorted by size: #{topic_counts.inspect}"
       sorted_topics
     end
 

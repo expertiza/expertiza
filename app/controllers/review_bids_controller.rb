@@ -105,11 +105,7 @@ class ReviewBidsController < ApplicationController
   end
 
   def process_bidding(assignment_id, reviewer_ids)
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    ReviewBiddingAlgorithmService.run_bidding_algorithm(bidding_data)
-  rescue StandardError => e
-    Rails.logger.error "Web service unavailable: #{e.message}"
-    ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
+    ReviewBiddingAlgorithmService.process_bidding(assignment_id, reviewer_ids)
   end
 
   def ensure_valid_topics(matched_topics, reviewer_ids)

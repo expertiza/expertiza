@@ -10,6 +10,18 @@ class ReviewBiddingAlgorithmService
     send_bidding_request(url, bidding_data) # Ensures result is returned
   end
 
+  # Runs the bidding algorithm with the given assignment_id and reviewer_ids
+  def self.process_bidding(assignment_id, reviewer_ids)
+    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
+    matched_topics = run_bidding_algorithm(bidding_data)
+    # If the external service fails, use the fallback algorithm
+    if matched_topics == false
+      Rails.logger.error "Web service unavailable. Using fallback algorithm."
+      matched_topics = ReviewBid.fallback_algorithm(assignment_id, reviewer_ids)
+    end
+    matched_topics
+  end
+
   private_class_method def self.send_bidding_request(url, bidding_data)
     response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json)
     JSON.parse(response.body)

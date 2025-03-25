@@ -16,7 +16,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.4
+          ruby-version: 2.6
           bundler-cache: true
           action_config_path: ".github/config/rubocop_linter_action.yml"
 

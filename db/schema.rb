@@ -572,11 +572,11 @@ ActiveRecord::Schema.define(version: 20240319000001) do
     t.integer "version"
   end
 
-  create_table "question_advices", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "question_advice", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "question_id"
     t.integer "score"
     t.text "advice"
-    t.index ["question_id"], name: "fk_question_question_advices"
+    t.index ["question_id"], name: "fk_question_question_advice"
   end
 
   create_table "question_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -1046,7 +1046,7 @@ ActiveRecord::Schema.define(version: 20240319000001) do
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
-  add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
+  add_foreign_key "question_advice", "questions", name: "fk_question_question_advice"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "review_bids", "assignments"

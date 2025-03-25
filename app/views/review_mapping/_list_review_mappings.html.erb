@@ -111,9 +111,9 @@
                     Review Status: Saved
                 <% end %><br/>
               </div>
-              <%= link_to 'delete', :action => 'delete_reviewer', :id => map.map_id %><br/>
+              <%= link_to "delete", "#", class: "delete-reviewer-btn", id: "reviewer-#{map.map_id}" %><br/>
               <%= link_to 'add metareviewer', :action => 'select_metareviewer', :id => map.map_id %><br/>
-              <%= link_to 'delete all metareviewers', :action => 'delete_all_metareviewers', :id => map.map_id %>
+              <%= link_to 'delete all metareviewers', { action: 'delete_all_metareviewers', id: map.map_id }, method: :post %>
             </div>
           </td>
 
@@ -188,4 +188,53 @@
   :id=>assignment.id
 %>
 |
+
+<script>
+// This script triggers a confirmation popup before submitting a POST request to delete a reviewer by dynamically creating a form.
+jQuery(document).ready(function () {
+    jQuery(".delete-reviewer-btn").click(function (event) {
+        event.preventDefault(); 
+
+        let reviewerId = jQuery(this).attr("id").split("-")[1];
+        let deleteUrl = "/review_mapping/delete_reviewer"; 
+        let csrfToken = jQuery('meta[name="csrf-token"]').attr('content');  
+
+        console.log("Reviewer ID:", reviewerId);
+
+        jQuery.confirm({
+            title: 'Confirm Deletion',
+            content: 'Are you sure you want to delete this reviewer?',
+            buttons: {
+                confirm: function () {
+                    console.log("User confirmed deletion. Submitting form...");
+
+                    let form = jQuery('<form>', {
+                        'method': 'POST',
+                        'action': deleteUrl
+                    });
+
+                    form.append(jQuery('<input>', {
+                        'type': 'hidden',
+                        'name': 'authenticity_token',
+                        'value': csrfToken
+                    }));
+
+                    form.append(jQuery('<input>', {
+                        'type': 'hidden',
+                        'name': 'id', 
+                        'value': reviewerId
+                    }));
+
+                    jQuery('body').append(form);
+                    form.submit();
+                },
+                cancel: function () {
+                    console.log("Deletion canceled.");
+                    jQuery.alert('Deletion canceled.');
+                }
+            }
+        });
+    });
+});
+</script>
 

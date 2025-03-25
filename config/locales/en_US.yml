@@ -160,7 +160,7 @@ en_US:
         late_policty: "New late policty"
 
       calibration:
-        particpant_name: "Participant name"
+        Participant_name: "Participant name"
         action: "Action"
         submitted_item: "Submitted item(s)"
         submit_calibration: "Submit reviews for calibrations"

@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe LotteryController do
   let(:assignment) { create(:assignment, is_intelligent: true, name: 'assignment', directory_path: 'assignment') }
   let(:assignment_2) { create(:assignment, is_intelligent: false, name: 'assignment_2', directory_path: 'assignment_2') }
@@ -25,6 +27,10 @@ describe LotteryController do
   let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
   let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
   let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
+
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:team) { build(:team, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
 
   before :each do
     assignment_team1.save
@@ -90,12 +96,12 @@ describe LotteryController do
       teams = [[student1.id, student2.id], [student3.id]]
       expect(AssignmentTeam.count).to eq(4)
       expect(TeamNode.count).to eq(0)
-      expect(TeamsUser.count).to eq(6)
+      expect(TeamsParticipant.count).to eq(6)
       expect(TeamUserNode.count).to eq(0)
       controller.send(:create_new_teams_for_bidding_response, teams, assignment, user_bidding_info)
       expect(AssignmentTeam.count).to eq(6)
       expect(TeamNode.count).to eq(2)
-      expect(TeamsUser.count).to eq(6)
+      expect(TeamsParticipant.count).to eq(6)
       expect(TeamUserNode.count).to eq(3)
     end
   end
@@ -166,6 +172,70 @@ describe LotteryController do
       number_of_signed_up_teams = SignedUpTeam.count
       controller.send(:assign_available_slots, teams_bidding_info)
       expect(SignedUpTeam.count).to eq(number_of_signed_up_teams + 1)
+    end
+  end
+
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows lottery details' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new lottery' do
+      allow(TeamsParticipant).to receive(:create).with(team_id: 1, participant_id: 1).and_return(team_participant)
+      post :create, params: { lottery: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(lottery_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(Lottery).to receive(:find).with(1).and_return(build(:lottery))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates a lottery' do
+      allow(Lottery).to receive(:find).with(1).and_return(build(:lottery))
+      patch :update, params: { id: 1, lottery: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(lottery_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys a lottery' do
+      allow(Lottery).to receive(:find).with(1).and_return(build(:lottery))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(lotteries_path)
+    end
+  end
+
+  describe 'GET #run_lottery' do
+    it 'runs the lottery' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :run_lottery, params: { id: 1 }
+      expect(response).to redirect_to(lottery_path(1))
     end
   end
 end

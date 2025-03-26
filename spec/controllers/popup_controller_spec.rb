@@ -52,10 +52,6 @@ describe PopupController do
 
   # this can be called from "response_report" by clicking student names from instructor end
   describe '#author_feedback_popup' do
-    let(:due_date) { double('DueDate', due_at: Time.current) }
-    before do
-      allow_any_instance_of(Assignment).to receive(:find_due_dates).with('submission').and_return([due_date])
-    end
     context 'when response_id does not exist' do
       it 'fail to get any info' do; expect(controller.send(:author_feedback_popup)).to be nil; end
     end
@@ -71,10 +67,7 @@ describe PopupController do
         allow(response).to receive(:maximum_score).and_return(19)
         allow(Participant).to receive(:find).with('1').and_return(participant)
         allow(User).to receive(:find).with(participant.user_id).and_return(participant)
-        
-        # Ensure find_due_dates returns a valid due_date object
-        allow_any_instance_of(Assignment).to receive(:find_due_dates).with('submission').and_return([double('DueDate', due_at: Time.current)])
-    
+
         request_params = { response_id: 1, reviewee_id: 1 }
         user_session = { user: ta }
         result = get :author_feedback_popup, params: request_params, session: user_session
@@ -83,7 +76,7 @@ describe PopupController do
         expect(controller.instance_variable_get(:@total_possible)).to eq 19
         expect(controller.instance_variable_get(:@total_percentage)).to eq 16
       end
-    end    
+    end
   end
 
   # this can be called from "response_report" by clicking team names from instructor end.

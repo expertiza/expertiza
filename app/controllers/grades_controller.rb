@@ -1,7 +1,8 @@
 class GradesController < ApplicationController
   helper :file
   helper :submitted_content
-  include ScoreCalculationHelper
+  helper :penalty
+  include PenaltyHelper
   include StudentTaskHelper
   include AssignmentHelper
   include GradesHelper

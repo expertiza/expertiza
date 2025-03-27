@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe SignUpSheetController do
   let(:assignment) { build(:assignment, id: 1, instructor_id: 6, due_dates: [due_date], microtask: true, staggered_deadline: true, directory_path: 'assignment') }
   let(:assignment2) { create(:assignment, id: 2, microtask: false, staggered_deadline: false, private: true, directory_path: 'assignment2') }
@@ -16,6 +18,7 @@ describe SignUpSheetController do
   let(:due_date) { build(:assignment_due_date, deadline_type_id: 1) }
   let(:due_date2) { build(:assignment_due_date, deadline_type_id: 2) }
   let(:bid) { Bid.new(topic_id: 1, priority: 1) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
 
   before(:each) do
     allow(Assignment).to receive(:find).with('1').and_return(assignment)
@@ -38,6 +41,87 @@ describe SignUpSheetController do
     allow(Participant).to receive(:find_by).with(parent_id: 1, user_id: 8).and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
     allow(AssignmentParticipant).to receive(:find).with(1).and_return(participant)
+  end
+
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows sign up sheet details' do
+      allow(SignUpSheet).to receive(:find).with(1).and_return(build(:sign_up_sheet))
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new sign up sheet' do
+      post :create, params: { sign_up_sheet: { assignment_id: 1, topic_id: 1 } }
+      expect(response).to redirect_to(sign_up_sheet_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(SignUpSheet).to receive(:find).with(1).and_return(build(:sign_up_sheet))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates a sign up sheet' do
+      allow(SignUpSheet).to receive(:find).with(1).and_return(build(:sign_up_sheet))
+      patch :update, params: { id: 1, sign_up_sheet: { assignment_id: 1, topic_id: 1 } }
+      expect(response).to redirect_to(sign_up_sheet_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys a sign up sheet' do
+      allow(SignUpSheet).to receive(:find).with(1).and_return(build(:sign_up_sheet))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(sign_up_sheets_path)
+    end
+  end
+
+  describe 'GET #list' do
+    it 'lists sign up sheets' do
+      allow(SignUpSheet).to receive(:all).and_return([build(:sign_up_sheet)])
+      get :list
+      expect(response).to render_template(:list)
+    end
+  end
+
+  describe 'GET #sign_up' do
+    it 'signs up for a topic' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :sign_up, params: { id: 1, topic_id: 1 }
+      expect(response).to redirect_to(sign_up_sheet_path(1))
+    end
+  end
+
+  describe 'GET #delete_signup' do
+    it 'deletes a sign up' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :delete_signup, params: { id: 1, topic_id: 1 }
+      expect(response).to redirect_to(sign_up_sheet_path(1))
+    end
   end
 
   describe '#new' do
@@ -545,7 +629,7 @@ describe SignUpSheetController do
             allow(Team).to receive(:find_team_users).with('1', 8).and_return([team])
             allow(Team).to receive(:find).and_return(team)
             allow(team).to receive(:t_id).and_return(1)
-            allow(TeamsUser).to receive(:team_id).with('1', 8).and_return(1)
+            allow(TeamsParticipant).to receive(:team_id).with('1', 8).and_return(1)
             allow(SignedUpTeam).to receive(:topic_id).with('1', 8).and_return(1)
             allow(SignUpSheet).to receive(:signup_team).and_return(true)
             allow_any_instance_of(SignedUpTeam).to receive(:save).and_return(team)
@@ -565,7 +649,7 @@ describe SignUpSheetController do
             allow(Team).to receive(:find_team_users).with('1', 8).and_return([])
             allow(User).to receive(:find).with(8).and_return(student)
             allow(Assignment).to receive(:find).with(1).and_return(assignment)
-            allow(TeamsUser).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsUser', id: 1))
+            allow(TeamsParticipant).to receive(:create).with(user_id: 8, team_id: 1).and_return(double('TeamsParticipant', id: 1))
             allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('TeamUserNode', id: 1))
             request_params = {
               username: 'no name',
@@ -642,7 +726,7 @@ describe SignUpSheetController do
   describe '#delete_signup_as_instructor' do
     before(:each) do
       allow(Team).to receive(:find).with('1').and_return(team)
-      allow(TeamsUser).to receive(:find_by).with(team_id: 1).and_return(double('TeamsUser', user: student))
+      allow(TeamsParticipant).to receive(:find_by).with(team_id: 1).and_return(double('TeamsParticipant', user: student))
       allow(AssignmentParticipant).to receive(:find_by).with(user_id: 8, parent_id: 1).and_return(participant)
       allow(participant).to receive(:team).and_return(team)
     end
@@ -761,7 +845,7 @@ describe SignUpSheetController do
   describe '#show_team' do
     it 'renders show_team page' do
       allow(SignedUpTeam).to receive(:where).with(topic_id: 1).and_return([signed_up_team])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', user_id: 1)])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([double('TeamsParticipant', user_id: 1)])
       allow(User).to receive(:find).with(1).and_return(student)
       request_params = { assignment_id: 1, id: 1 }
       get :show_team, params: request_params
@@ -771,8 +855,8 @@ describe SignUpSheetController do
 
   describe '#switch_original_topic_to_approved_suggested_topic' do
     it 'redirects to sign_up_sheet#list page' do
-      allow(TeamsUser).to receive(:where).with(user_id: 6).and_return([double('TeamsUser', team_id: 1)])
-      allow(TeamsUser).to receive(:where).with(team_id: 1).and_return([double('TeamsUser', team_id: 1, user_id: 8)])
+      allow(TeamsParticipant).to receive(:where).with(user_id: 6).and_return([double('TeamsParticipant', team_id: 1)])
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([double('TeamsParticipant', team_id: 1, user_id: 8)])
       allow(Team).to receive(:find).with(1).and_return(team)
       team.parent_id = 1
       allow(SignedUpTeam).to receive(:where).with(team_id: 1, is_waitlisted: 0).and_return([signed_up_team])

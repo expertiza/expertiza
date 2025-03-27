@@ -15,7 +15,7 @@ describe 'add assignment team member test' do
       team = AssignmentTeam.first
       user = AssignmentParticipant.first
       visit "/teams/list?id=#{assignment.id}&type=Assignment"
-      visit "/teams_users/new?id=#{team.id}"
+      visit "/teams_participants/new?id=#{team.id}"
       fill_in 'user_name', with: user.name
       click_button 'Add'
       expect(team.participants).to include(user)

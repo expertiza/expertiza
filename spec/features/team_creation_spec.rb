@@ -119,7 +119,7 @@ xdescribe 'Team Creation' do
       click_link 'Your team'
     end
 
-    it 'Student should aceept the invitation sent by the other student and both have topics' do
+    it 'Student should accept the invitation sent by the other student and both have topics' do
       visit '/invitation/accept?inv_id=1&student_id=1&team_id=2'
       visit '/student_teams/view?student_id=1'
       expect(page).to have_content('Team Name: final2_Team1')

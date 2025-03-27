@@ -70,9 +70,20 @@ class CourseTeam < Team
   def add_member(user, _id = nil)
     raise "The user \"#{user.name}\" is already a member of the team, \"#{name}\"" if user?(user)
 
-    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    participant = AssignmentParticipant.find_by(user_id: user.id)
+    return false unless participant
+
+    t_participant = TeamsParticipant.create(participant_id: participant.id, team_id: id)
     parent = TeamNode.find_by(node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_participant.id)
     add_participant(parent_id, user)
+  end
+
+  # E2121 Refractor create_new_team
+  def create_new_team(user_id, signuptopic)
+    t_participant = TeamsParticipant.create(team_id: id, participant_id: user_id)
+    SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
+    parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_participant.id)
   end
 end

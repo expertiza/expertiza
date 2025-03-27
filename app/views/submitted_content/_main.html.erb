@@ -6,7 +6,9 @@
   <% end %>
 <% end %>
 <br/>
-<% if participant.team.nil? %>
+<% if participant.nil? %>
+  <% flash[:error] = 'No participant found for this submission.' %>
+<% elsif participant.team.nil? %>
   <% flash[:warn] = 'Submitting content while not on a team is not supported by Expertiza currently.' %>
 <% elsif participant.team.hyperlinks.try(:length) %>
   <%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant, stage: @stage} %>

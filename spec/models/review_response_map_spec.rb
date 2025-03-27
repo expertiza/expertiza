@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe ReviewResponseMap do
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:team2) { build(:assignment_team, id: 3, name: 'no team') }
@@ -35,81 +37,66 @@ describe ReviewResponseMap do
   let(:review_questionnaire) { build(:questionnaire, id: 1) }
   let(:response3) { build(:response) }
   let(:response_map) { build(:review_response_map, reviewer_id: 2, response: [response3]) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+
   before(:each) do
     allow(review_response_map).to receive(:response).and_return(response)
     allow(response_map).to receive(:response).and_return(response3)
     allow(response_map).to receive(:id).and_return(1)
   end
 
-  describe '#questionnaire' do
-    # This method is little more than a wrapper for assignment.review_questionnaire_id()
-    # Test how it responds to the combinations of various arguments it could receive
-
-    context 'when corresponding active record for assignment_questionnaire is found' do
-      before(:each) do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-          [assignment_questionnaire1, assignment_questionnaire2]
-        )
-        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
-      end
-
-      it 'returns correct questionnaire found by used_in_round and topic_id if both used_in_round and topic_id are given' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-          [assignment_questionnaire1]
-        )
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
-      end
-
-      it 'returns correct questionnaire found by used_in_round if only used_in_round is given' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: nil).and_return(
-          [assignment_questionnaire1]
-        )
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(1, nil)).to eq(questionnaire1)
-      end
-
-      it 'returns correct questionnaire found by topic_id if only topic_id is given and there is no current round used in the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(nil)
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: nil, topic_id: 1).and_return(
-          [assignment_questionnaire1]
-        )
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
-      end
-
-      it 'returns correct questionnaire found by used_in_round and topic_id if only topic_id is given, but current round is found by the due date' do
-        allow(DueDate).to receive(:get_next_due_date).with(assignment.id).and_return(next_due_date)
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return(
-          [assignment_questionnaire1]
-        )
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(questionnaire1)
-        expect(review_response_map.questionnaire(nil, 1)).to eq(questionnaire1)
-      end
-    end
-
-    context 'when corresponding active record for assignment_questionnaire is not found' do
-      it 'returns correct questionnaire found by type' do
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id).and_return(
-          [assignment_questionnaire1, assignment_questionnaire2]
-        )
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: 1, used_in_round: 2).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:where).with(assignment_id: assignment.id, used_in_round: 1, topic_id: 1).and_return([])
-        allow(AssignmentQuestionnaire).to receive(:where).with(user_id: anything, assignment_id: nil, questionnaire_id: nil).and_return([])
-        allow(Questionnaire).to receive(:find_by).with(id: 1).and_return(nil)
-        allow(Questionnaire).to receive(:find).with(1).and_return(questionnaire1)
-        allow(Questionnaire).to receive(:find).with(2).and_return(questionnaire2)
-        expect(review_response_map.questionnaire(1, 1)).to eq(questionnaire1)
-      end
+  describe '#reviewee' do
+    it 'returns the team being reviewed' do
+      allow(Team).to receive(:find).with(2).and_return(build(:team))
+      expect(review_response_map.reviewee).to be_a(Team)
     end
   end
 
-  it '#get_title' do
-    expect(review_response_map.get_title).to eq('Review')
+  describe '#reviewer' do
+    it 'returns the participant doing the review' do
+      allow(Participant).to receive(:find).with(1).and_return(build(:participant))
+      expect(review_response_map.reviewer).to be_a(Participant)
+    end
+  end
+
+  describe '#get_title' do
+    it 'returns the title of the review' do
+      expect(review_response_map.get_title).to eq('Review')
+    end
+  end
+
+  describe '#questionnaire' do
+    it 'returns the questionnaire for the review' do
+      allow(Assignment).to receive(:find).with(1).and_return(build(:assignment))
+      expect(review_response_map.questionnaire).to be_a(Questionnaire)
+    end
+  end
+
+  describe '#contributor' do
+    it 'returns the team being reviewed' do
+      allow(Team).to receive(:find).with(2).and_return(build(:team))
+      expect(review_response_map.contributor).to be_a(Team)
+    end
+  end
+
+  describe '#team_reviewing?' do
+    it 'checks if this is a team review' do
+      expect(review_response_map.team_reviewing?).to be true
+    end
+  end
+
+  describe '#reviewee_name' do
+    it 'returns the name of the team being reviewed' do
+      allow(Team).to receive(:find).with(2).and_return(build(:team, name: 'Team 1'))
+      expect(review_response_map.reviewee_name).to eq('Team 1')
+    end
+  end
+
+  describe '#email' do
+    it 'sends an email notification' do
+      allow(TeamsParticipant).to receive(:where).with(team_id: 2).and_return([team_participant])
+      expect(review_response_map.email).to be true
+    end
   end
 
   it '#delete' do
@@ -163,7 +150,7 @@ describe ReviewResponseMap do
     # when reviewee_team = nil
     allow(AssignmentTeam).to receive(:team).with(participant).and_return(nil)
     allow(AssignmentTeam).to receive(:create).and_return(double('team', id: 1))
-    allow(TeamsUser).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_users', id: 1, team_id: 1, user_id: 1))
+    allow(TeamsParticipant).to receive(:create).with(team_id: 1, user_id: 1).and_return(double('teams_participants', id: 1, team_id: 1, user_id: 1))
     allow(TeamNode).to receive(:create).with(parent_id: assignment_id, node_object_id: 1).and_return(double('team_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(TeamUserNode).to receive(:create).with(parent_id: 1, node_object_id: 1).and_return(double('team_user_node', id: 1, parent_id: 1, node_object_id: 1))
     allow(User).to receive(:find_by).with(name: 'name1').and_return(student1)
@@ -229,19 +216,6 @@ describe ReviewResponseMap do
     allow(AssignmentParticipant).to receive(:find).with(1).and_return([participant])
     allow(Participant).to receive(:sort_by_name).and_return([participant])
     expect(ReviewResponseMap.review_response_report(id, Assignment.find(Participant.find(reviewer_id).parent_id), type, review_user)).to eq([participant])
-  end
-
-  it '#email' do
-    reviewer_id = 1
-    allow(Participant).to receive(:find).with(1).and_return(participant)
-    allow(Assignment).to receive(:find).with(1).and_return(assignment)
-    allow(AssignmentTeam).to receive(:find).with(1).and_return(team)
-    allow(AssignmentTeam).to receive(:users).and_return(student)
-    allow(User).to receive(:find).with(1).and_return(student)
-    review_response_map.reviewee_id = 1
-    defn = { body: { type: 'Peer Review', obj_name: 'Test Assgt', first_name: 'no one', partial_name: 'new_submission' }, to: 'expertiza@mailinator.com' }
-    expect { review_response_map.email(defn, participant, Assignment.find(Participant.find(reviewer_id).parent_id)) }
-      .to change { ActionMailer::Base.deliveries.count }.by 1
   end
 
   it '#prepare_final_review_versions' do

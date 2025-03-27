@@ -25,7 +25,7 @@ describe TeamsController do
       allow(Assignment).to receive(:find).with(any_args).and_return(double('Course'))
       allow(SignedUpTeam).to receive(:where).with(any_args).and_return(signed_up_teams)
       allow(SignedUpTeam).to receive_message_chain(:where, :first).with(any_args).and_return(signed_up_teams.first)
-      allow(TeamsUser).to receive(:where).with(any_args).and_return(nil)
+      allow(TeamsParticipant).to receive(:where).with(any_args).and_return(nil)
       allow(signed_up_teams).to receive(:destroy_all).and_return(true)
       allow(team).to receive(:destroy).and_return(true)
 

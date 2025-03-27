@@ -6,7 +6,7 @@ class CreateQuizQuestionChoices < ActiveRecord::Migration[4.2]
       t.column 'iscorrect', :boolean, default: false # the correctness of this choice to be given to the user
     end
 
-    #    add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
+    #    add_index "question_advice", ["question_id"], :name => "fk_question_question_advice"
   end
 
   def self.down

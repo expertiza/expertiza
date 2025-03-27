@@ -154,7 +154,7 @@ hi_IN:
         late_policty: "नई देरी पालिसी"
 
       calibration:
-        particpant_name: "हिस्सा लेनेवाला का नाम"
+        Participant_name: "हिस्सा लेनेवाला का नाम"
         action: "एक्शन"
         submitted_item: "सबमिट की गई वस्तुएं "
         submit_calibration: "अंशांकन के लिए समीक्षा सबमिट करें"

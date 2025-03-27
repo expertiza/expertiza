@@ -83,7 +83,7 @@ class ExportFileController < ApplicationController
   end
 
   # Export question advice data to CSV file
-  def export_advices
+  def export_advice
     @delim_type = params[:delim_type]
     filename, delimiter = find_delim_filename(@delim_type, params[:other_char])
 

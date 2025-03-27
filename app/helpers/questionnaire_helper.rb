@@ -10,7 +10,7 @@ module QuestionnaireHelper
   CSV_WEIGHT = 3
 
   def self.adjust_advice_size(questionnaire, question)
-    # now we only support question advices for scored questions
+    # now we only support question advice for scored questions
     if question.is_a?(ScoredQuestion)
 
       max = questionnaire.max_question_score
@@ -20,7 +20,7 @@ module QuestionnaireHelper
 
       (questionnaire.min_question_score..questionnaire.max_question_score).each do |i|
         qas = QuestionAdvice.where('question_id = ? AND score = ?', question.id, i)
-        question.question_advices << QuestionAdvice.new(score: i) if qas.first.nil?
+        question.question_advice << QuestionAdvice.new(score: i) if qas.first.nil?
         QuestionAdvice.delete(['question_id = ? AND score = ?', question.id, i]) if qas.size > 1
       end
     end

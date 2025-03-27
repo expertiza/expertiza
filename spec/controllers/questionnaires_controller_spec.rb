@@ -334,8 +334,8 @@ describe QuestionnairesController do
 
     context 'when @questionnaire.assignments and question.answers return empty arrays' do
       it 'deletes all objects related to current questionnaire' do
-        advices = [double('QuestionAdvice')]
-        question = double('Question', answers: [], question_advices: advices)
+        advice = [double('QuestionAdvice')]
+        question = double('Question', answers: [], question_advice: advice)
         questionnaire_node = double('QuestionnaireNode')
         questionnaire1 = double('Questionnaire',
                                 name: 'test questionnaire',
@@ -343,7 +343,7 @@ describe QuestionnairesController do
                                 questions: [question],
                                 questionnaire_node: questionnaire_node)
         allow(Questionnaire).to receive(:find).with('1').and_return(questionnaire1)
-        allow(advices).to receive(:each).with(any_args).and_return(true)
+        allow(advice).to receive(:each).with(any_args).and_return(true)
         allow(question).to receive(:delete).and_return(true)
         allow(questionnaire_node).to receive(:delete).and_return(true)
         allow(questionnaire1).to receive(:delete).and_return(true)

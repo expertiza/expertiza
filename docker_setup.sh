@@ -1,11 +1,33 @@
-apt-get update
-curl -sL https://deb.nodesource.com/setup_14.x | sh -
-apt-get install -y nodejs
-apt-get install -y npm
-apt-get install -y default-mysql-client
+#!/bin/bash
+
+# Update package list
+apt-get update -qq
+
+# Install required system packages
+apt-get install -y \
+    openjdk-11-jdk \
+    curl \
+    default-mysql-client \
+    default-libmysqlclient-dev \
+    build-essential \
+    libssl-dev \
+    xz-utils
+
+# Install Node.js 14 manually
+NODE_VERSION="14.21.0"  # Last supported version for older glibc
+cd /tmp
+curl -O https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz
+tar -xJf node-v${NODE_VERSION}-linux-x64.tar.xz
+rm node-v${NODE_VERSION}-linux-x64.tar.xz
+mv node-v${NODE_VERSION}-linux-x64 /usr/local/lib/nodejs
+ln -s /usr/local/lib/nodejs/bin/node /usr/local/bin/node
+ln -s /usr/local/lib/nodejs/bin/npm /usr/local/bin/npm
+
+sudo chown -R $USER:$GROUP ~/.npm
+sudo chown -R $USER:$GROUP ~/.config
+
+# Install bower
 npm install -g bower
-apt-get install -y openjdk-8-jdk
-export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
-# gem install rjb -v '1.6.4' --source 'https://rubygems.org/'
-apt-get install default-libmysqlclient-dev
+
+# Install Ruby dependencies
 gem install rspec

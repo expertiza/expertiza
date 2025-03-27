@@ -538,9 +538,45 @@ FactoryBot.define do
   end
 
   factory :meta_review_response_map, class: MetareviewResponseMap do
-    review_mapping { ReviewResponseMap.first || association(:review_response_map) }
-    reviewee { AssignmentParticipant.first || association(:participant) }
-    reviewer_id 1
+    reviewed_object_id { create(:review_response_map).id }
+    reviewer { create(:participant) }
+    reviewee_id { ReviewResponseMap.find(reviewed_object_id).reviewer_id }
+    type 'MetareviewResponseMap'
+    calibrate_to 0
+  
+    after(:build) do |map|
+      map.assignment ||= ReviewResponseMap.find(map.reviewed_object_id).assignment
+    end
+  end
+  
+
+  factory :metareview_test_context, class: Hash do
+    skip_create
+  
+    transient do
+      assignment { create(:assignment) }
+      reviewer_user { create(:student) }
+      reviewee_team { create(:assignment_team, assignment: assignment) }
+    end
+  
+    initialize_with do
+      {
+        assignment: assignment,
+        reviewer_user: reviewer_user,
+        review_mapping: create(:review_response_map,
+                              assignment: assignment,
+                              reviewee: reviewee_team,
+                              reviewer: create(:participant,
+                                             assignment: assignment,
+                                             user: reviewer_user))
+      }
+    end
+  end
+
+  factory :duplicate_metareview, class: MetareviewResponseMap do
+    association :reviewed_object, factory: :review_response_map
+    reviewee_id { reviewed_object.reviewer_id }
+    reviewer { create(:participant, assignment: reviewed_object.assignment) }
     type 'MetareviewResponseMap'
     calibrate_to 0
   end
@@ -754,6 +790,15 @@ FactoryBot.define do
     questionnaire { Questionnaire.first || association(:questionnaire) }
     question_type 'Criterion'
     answer_length_threshold 6
+  end
+
+  factory :assignment_participant do
+    association :assignment
+    association :user, factory: :student
+    can_submit { true }
+    can_review { true }
+    can_take_quiz { true }
+    handle { 'handle' }
   end
 
   factory :ta_mapping, class: TaMapping do

@@ -92,4 +92,16 @@ class MetareviewResponseMap < ResponseMap
     defn[:to] = User.find(reviewee_user.user_id).email
     Mailer.sync_message(defn).deliver
   end
+  
+  def self.create_metareview(mapping, reviewer)
+    if exists?(reviewed_object_id: mapping.map_id, reviewer_id: reviewer.id)
+      raise "The metareviewer \"#{reviewer.name}\" is already assigned."
+    end
+  
+    create!(
+      reviewed_object_id: mapping.map_id,
+      reviewer_id: reviewer.id,
+      reviewee_id: mapping.reviewer.id
+    )
+  end
 end

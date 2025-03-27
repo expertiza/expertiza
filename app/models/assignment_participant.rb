@@ -22,6 +22,20 @@ class AssignmentParticipant < Participant
   attr_accessor :avg_vol_per_round
   attr_accessor :overall_avg_vol
 
+  # Nested class to encapsulate selection parameters
+  class SelectionParams
+    attr_reader :team, :iterator, :participants, :participants_hash, :assignment_id, :review_strategy
+
+    def initialize(team:, iterator:, participants:, participants_hash:, assignment_id:, review_strategy:)
+      @team = team
+      @iterator = iterator
+      @participants = participants
+      @participants_hash = participants_hash
+      @assignment_id = assignment_id
+      @review_strategy = review_strategy
+    end
+  end
+
   def dir_path
     assignment.try :directory_path
   end
@@ -206,7 +220,126 @@ class AssignmentParticipant < Participant
     return participant.duty_id if participant
   end
 
+  # Determines if the participant has exceeded the maximum number of outstanding (incomplete) reviews
+  
+  def below_outstanding_reviews_limit?(assignment)
+    total_reviews = ReviewResponseMap.where(
+      reviewer_id: id,
+      reviewed_object_id: assignment.id
+    ).count
+  
+    return true if total_reviews.zero?
+  
+    completed_reviews = Response.joins(:response_map)
+                                .where(response_maps: { reviewer_id: id, reviewed_object_id: assignment.id })
+                                .where(is_submitted: true)
+                                .select("DISTINCT response_maps.id")
+                                .count
+  
+    (total_reviews - completed_reviews) < Assignment.max_outstanding_reviews
+  end
+
   def team_user
     TeamsUser.where(team_id: team.id, user_id: user_id).first if team
+  end
+
+  # Returns an array of participant IDs who need more reviews
+  def self.participants_needing_reviews(participants_hash, review_strategy)
+    participants_hash.select { |_, review_num| review_num < review_strategy.reviews_per_student }
+                    .keys
+  end
+
+  # Returns true if the participant is a member of the given team
+  def in_team?(team_id)
+    TeamsUser.exists?(team_id: team_id, user_id: user_id)
+  end
+
+  # Returns an array of participant indices who have minimum reviews
+  def self.participants_with_min_reviews(participants, participants_hash)
+    min_value = participants_hash.values.min
+    participants.each_with_index.select { |participant, _| participants_hash[participant.id] == min_value }
+                .map(&:last)
+  end
+
+  # Returns a random participant index based on strategy
+  def self.select_random_participant(iterator, participants, participants_hash, team_id)
+    if iterator.zero?
+      rand(0..participants.size - 1)
+    else
+      select_participant_by_min_reviews(participants, participants_hash, team_id)
+    end
+  end
+
+  # Selects participants for a team based on review strategy
+  def self.select_participants_for_team(team, iterator, participants, participants_hash, assignment_id, review_strategy)
+    params = SelectionParams.new(
+      team: team,
+      iterator: iterator,
+      participants: participants,
+      participants_hash: participants_hash,
+      assignment_id: assignment_id,
+      review_strategy: review_strategy
+    )
+    if team.equal? team.class.last
+      select_participants_for_last_team(params)
+    else
+      select_participants_for_regular_team(params)
+    end
+  end
+
+  # Selects participants for a regular team
+  def self.select_participants_for_regular_team(params)
+    selected_participants = []
+    valid_participants_count = ReviewResponseMap.valid_team_participants_count(params.team.id, params.assignment_id)
+    while selected_participants.size < params.review_strategy.reviews_per_team
+      break if selected_participants.size == params.participants.size - valid_participants_count
+      participant_index = select_random_participant(params.iterator, params.participants, params.participants_hash, params.team.id)
+      next unless can_select_participant?(participant_index, params, selected_participants)
+      selected_participants << params.participants[participant_index].id
+      params.participants_hash[params.participants[participant_index].id] += 1
+      remove_completed_participants(params.participants, params.participants_hash, params.review_strategy, participant_index)
+    end
+    selected_participants
+  end
+
+  # Selects participants for the last team
+  def self.select_participants_for_last_team(params)
+    params.participants.select do |participant|
+      if ReviewResponseMap.can_review_team?(participant.user_id, params.team.id) &&
+        params.participants_hash[participant.id] < params.review_strategy.reviews_per_student
+        params.participants_hash[participant.id] += 1
+        true
+      else
+        false
+      end
+    end.map(&:id)
+  end
+
+  # Checks if a participant can be selected for review
+  def self.can_select_participant?(participant_index, params, selected_participants)
+    participant = params.participants[participant_index]
+    return false unless ReviewResponseMap.can_review_team?(participant.user_id, params.team.id)
+    return false if params.participants_hash[participant.id] >= params.review_strategy.reviews_per_student
+    return false if selected_participants.include?(participant.id)
+    true
+  end
+
+  # Removes participants who have completed their required reviews
+  def self.remove_completed_participants(participants, participants_hash, review_strategy, participant_index)
+    participants.each do |participant|
+      if participants_hash[participant.id] == review_strategy.reviews_per_student
+        participants.delete_at(participant_index)
+      end
+    end
+  end
+
+  def self.select_participant_by_min_reviews(participants, participants_hash, team_id)
+    min_review_indices = participants_with_min_reviews(participants, participants_hash)
+    if min_review_indices.empty? ||
+       (min_review_indices.size == 1 && ReviewResponseMap.can_review_team?(participants[min_review_indices[0]].user_id, team_id))
+      rand(0..participants.size - 1)
+    else
+      min_review_indices.sample
+    end
   end
 end

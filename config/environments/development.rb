@@ -2,7 +2,7 @@ Expertiza::Application.configure do
   # Settings specified here will take precedence over those in config/environment.rb
 
   # In the development environment your application's code is reloaded on
-  # every request.  This slows down response time but is perfect for development
+  # every request. This slows down response time but is perfect for development
   # since you don't have to restart the webserver when you make code changes.
   config.cache_classes = false
   # config.serve_static_assets = false
@@ -55,4 +55,19 @@ Expertiza::Application.configure do
     Bullet.console = false
     Bullet.rails_logger = false
   end
+
+  # Email Configuration
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true # Ensure emails are actually sent
+  config.action_mailer.raise_delivery_errors = true # Raise errors if email fails to send
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com', # Replace with your SMTP provider (e.g., Gmail, Outlook, etc.)
+    port: 587,
+    domain: 'ncsu.edu', # Change this to your actual domain
+    authentication: 'plain',
+    enable_starttls_auto: true,
+    user_name: ENV['EMAIL_USERNAME'], # Use environment variables to store credentials
+    password: ENV['EMAIL_PASSWORD']
+  }
+  ### END: Email Configuration ###
 end

@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Date:
+  = @meeting.Date
+%p
+  %b Teamid:
+  = @meeting.TeamID
+
+= link_to 'Edit', edit_meeting_path(@meeting)
+\|
+= link_to 'Back', meetings_path

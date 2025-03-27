@@ -1,5 +1,5 @@
 module GradesHelper
-  include ScoreCalculationHelper
+  include PenaltyHelper
   # Render the title
   def accordion_title(last_topic, new_topic)
     if last_topic.nil?

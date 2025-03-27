@@ -53,24 +53,4 @@ class LatePolicy < ApplicationRecord
       end
     end
   end
-
-  def calculate_penalty(submission_time, due_date)
-    return 0 if submission_time <= due_date
-
-    time_diff = submission_time - due_date
-    penalty_units = case penalty_unit
-                    when 'Minute'
-                      time_diff / 60
-                    when 'Hour'
-                      time_diff / 3600
-                    when 'Day'
-                      time_diff / 86400
-                    else
-                      raise 'Invalid. Penalty unit must be Minute, Hour or Day' 
-                    end
-
-    raise 'Penalty per unit is missing' if penalty_per_unit.nil?
-    penalty = penalty_units * penalty_per_unit
-    [penalty, max_penalty].min.round(2)
-  end 
 end

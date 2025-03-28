@@ -12,7 +12,7 @@
     <%= link_to image_tag('signup.png', :border => 0, :title => 'Sign Up Student', :align => 'middle'), signup_as_instructor_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
 <% end  %>
 
-<% unless topic.description.nil? %>
+<% unless topic.description.blank? %>
     <br/>
     <p style="font-size: 12px"><%= truncate(topic.description.to_s, length: 90, omission: '...') %>
     <% unless topic.link.nil? %>

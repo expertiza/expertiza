@@ -84,12 +84,12 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#copy_assignment_to_course' do
+  describe '#copy_to_course' do
     context 'for given assignment team' do
       it 'copies the assignment team to course team' do
         assignment = team.assignment
         course = assignment.course
-        expect(team.copy_assignment_to_course(course.id)).to eq([])
+        expect(team.copy_to_course(course.id)).to eq([])
       end
     end
   end

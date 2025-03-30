@@ -127,6 +127,14 @@ describe Team do
     end
   end
 
+  describe '#copy_members' do
+    it 'copies members from current team to a new team' do
+      allow(TeamsUser).to receive(:create).with(team_id: 2, user_id: 1).and_return(team_user)
+      allow(Assignment).to receive(:find).with(1).and_return(assignment)
+      expect(team.copy_members(double('Team', id: 2))).to eq([team_user])
+    end
+  end
+
   describe '.randomize_all_by_parent' do
     it 'forms teams and assigns team members automatically' do
       allow(Participant).to receive(:where).with(parent_id: 1, type: 'AssignmentParticipant', can_mentor: [false, nil])

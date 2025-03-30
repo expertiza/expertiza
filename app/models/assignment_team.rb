@@ -16,7 +16,7 @@ class AssignmentTeam < Team
   
   # Returns the ID of the first user in the team (or nil if empty)
   def first_user_id
-    users.first&.id
+    users.first ? users.first.id : nil
   end
   
   # Stores the current user so that we can check them when returning the user_id
@@ -107,23 +107,12 @@ class AssignmentTeam < Team
 
   # REFACTOR END:: functionality of import, export handle_duplicate shifted to team.rb
 
-  # Copy members from self to a new team.
-  def copy(new_team)
-    members = TeamsUser.where(team_id: id)
-    members.each do |member|
-      t_user = TeamsUser.create!(team_id: new_team.id, user_id: member.user_id)
-      # For AssignmentTeam, the parent is an Assignment
-      parent = Assignment.find(parent_id)
-      TeamUserNode.create!(parent_id: parent.id, node_object_id: t_user.id)
-    end
-  end
-
   # Copy the current Assignment team to the CourseTeam
-  def copy_assignment_to_course(course_id)
+  def copy_to_course(course_id)
     new_team = CourseTeam.create_team_and_node(course_id)
     new_team.name = name
     new_team.save
-    copy(new_team)
+    copy_members(new_team)
   end
 
   # Given a user, if they aren't already a participant, make them one
@@ -172,18 +161,7 @@ class AssignmentTeam < Team
   def files(directory)
     # Safety check: if the given path is not a valid directory, return an empty array
     return [] unless File.directory?(directory)
-  
-    # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')
-    # Then iterate over each entry
-    (Dir.entries(directory) - ['.', '..']).flat_map do |entry|
-      # Construct the full path to the current entry (file or folder)
-      path = File.join(directory, entry)
-  
-      # If the entry is a subdirectory, recursively gather its files using the same method
-      # If it's a file, return it in a single-element array
-      # flat_map ensures all nested arrays are flattened into a single array of paths
-      File.directory?(path) ? files(path) : [path]
-    end
+    gather_files(directory)
   end
 
   # Given a participant, find associated AssignmentTeam 
@@ -267,5 +245,21 @@ class AssignmentTeam < Team
     SignedUpTeam.create(topic_id: signuptopic.id, team_id: id, is_waitlisted: 0)
     parent = TeamNode.create(parent_id: signuptopic.assignment_id, node_object_id: id)
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+  end
+
+  private
+  # A helper method to files(directory)
+  def gather_files(directory)
+    # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')
+    # Then iterate over each entry
+    (Dir.entries(directory) - ['.', '..']).flat_map do |entry|
+      # Construct the full path to the current entry (file or folder)
+      path = File.join(directory, entry)
+
+      # If the entry is a subdirectory, recursively gather its files using the same method
+      # If it's a file, return it in a single-element array
+      # flat_map ensures all nested arrays are flattened into a single array of paths
+      File.directory?(path) ? files(path) : [path]
+    end
   end
 end

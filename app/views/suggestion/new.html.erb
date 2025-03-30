@@ -11,7 +11,7 @@
       <tr class="listingRow">
         <td style="text-align:center; max-width: 200px;"><%=h suggestion.title %></td>
         <td align="center"><%=h suggestion.status %></td>
-        <td align="center"><%= link_to 'View', :action => 'student_view', :id => suggestion %>
+        <td align="center"><%= link_to 'View', :action => 'show', :id => suggestion %>
         <%= if suggestion.status == 'Initiated'
           link_to 'Edit', :action => 'student_edit', :id => suggestion 
           end %></td>

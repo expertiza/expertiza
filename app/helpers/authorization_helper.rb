@@ -97,21 +97,14 @@ module AuthorizationHelper
 
   def response_edit_allowed?(map, user_id)
     assignment = map.reviewer.assignment
+
     # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
     if map.is_a? ReviewResponseMap
       reviewee_team = AssignmentTeam.find(map.reviewee_id)
-      return user_logged_in? &&
-             (
-               current_user_has_id?(user_id) ||
-               reviewee_team.is_member?(session[:user]) ||
-               current_user_has_admin_privileges? ||
-               (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
-               (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
-             )
+      return user_logged_in? && review_response_editable_by?(user_id, reviewee_team, assignment)
     end
-    current_user_has_id?(user_id) ||
-      (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
-      (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
+
+    general_response_editable_by?(user_id, assignment)
   end
 
   # Determine if there is a current user
@@ -195,5 +188,21 @@ module AuthorizationHelper
 
   def current_user_and_role_exist?
     user_logged_in? && !session[:user].role.nil?
+  end
+
+  private
+
+  def review_response_editable_by?(user_id, reviewee_team, assignment)
+    current_user_has_id?(user_id) ||
+      reviewee_team.is_member?(session[:user]) ||
+      current_user_has_admin_privileges? ||
+      (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
+      (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
+  end
+
+  def general_response_editable_by?(user_id, assignment)
+    current_user_has_id?(user_id) ||
+      (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
+      (assignment.course && current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))
   end
 end

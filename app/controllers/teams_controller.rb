@@ -88,7 +88,7 @@ class TeamsController < ApplicationController
       undo_link("The team \"#{@team.name}\" has been successfully created.")
       redirect_to action: 'list', id: parent.id
     rescue ActiveRecord::RecordInvalid => e
-      if @team.errors[:name].include?("is already in use.")
+      if @team.errors[:name].include?('is already in use.')
         raise TeamExistsError, "The team name #{@team.name} is already in use."
       else
         flash[:error] = e.message
@@ -110,11 +110,12 @@ class TeamsController < ApplicationController
       redirect_to action: 'list', id: parent.id
     rescue ActiveRecord::RecordInvalid => e
       # Check if the error is due to a duplicate team name
-      if @team.errors[:name].include?("is already in use.")
-        flash[:error] = "The team name #{@team.name} is already in use."
-      else
-        flash[:error] = e.message
-      end
+      flash[:error] = if @team.errors[:name].include?('is already in use.')
+                        "The team name #{@team.name} is already in use."
+                      else
+                        e.message
+                      end
+
       redirect_to action: 'edit', id: @team.id
     end
   end

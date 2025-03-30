@@ -1,4 +1,4 @@
-describe 'MentoredTeam' do
+describe MentoredTeam do
   let(:assignment) { create(:assignment) }
   let(:team) { create(:mentored_team, assignment: assignment, parent_id: assignment.id) }
   let(:user) { create(:student) }
@@ -33,9 +33,7 @@ describe 'MentoredTeam' do
   end
 
   describe '#import_team_members' do
-    before do
-      team
-    end
+    before { team }
 
     context 'when all teammates exist and are not already in the team' do
       it 'calls add_member for each user and assigns mentors' do
@@ -46,24 +44,32 @@ describe 'MentoredTeam' do
         allow(TeamsUser).to receive(:find_by).and_return(nil)
         allow(team).to receive(:add_member).and_return(true)
 
-        row_hash = { teammembers: ['student2064', 'student2065'] }
+        row_hash = { teammembers: %w[student2064 student2065] }
         team.import_team_members(row_hash)
 
         expect(team).to have_received(:add_member).with(user1, team.parent_id)
         expect(team).to have_received(:add_member).with(user2, team.parent_id)
       end
     end
+  end
+
+  describe '#import_team_members' do
+    before { team }
 
     context 'when a teammate does not exist' do
       it 'raises an ImportError with the appropriate message' do
         allow(User).to receive(:find_by).with(name: 'student2069').and_return(nil)
         row_hash = { teammembers: ['student2069'] }
 
-        expect {
+        expect do
           team.import_team_members(row_hash)
-        }.to raise_error(ImportError, /The user 'student2069' was not found/)
+        end.to raise_error(ImportError, /The user 'student2069' was not found/)
       end
     end
+  end
+
+  describe '#import_team_members' do
+    before { team }
 
     context 'when teammate names are blank' do
       it 'skips blank entries without calling add_member' do
@@ -76,16 +82,20 @@ describe 'MentoredTeam' do
 
   describe '#size' do
     before do
-      allow(team).to receive(:users).and_return([mentor, user1, user2])  # 3 users, including mentor
+      # 3 users, including mentor
+      allow(team).to receive(:users).and_return([mentor, user1, user2])
     end
 
     it 'returns the number of users minus one (excluding the mentor)' do
-      expect(team.size).to eq(2)  # 3 users - 1 mentor = 2
+      # 3 users - 1 mentor = 2
+      expect(team.size).to eq(2)
     end
 
     it 'never returns a negative number' do
-      allow(team).to receive(:users).and_return([mentor])  # Only mentor in the team
-      expect(team.size).to eq(0)  # Should be at least 0, not -1
+      # Only mentor in the team
+      allow(team).to receive(:users).and_return([mentor])
+      # Should be at least 0, not -1
+      expect(team.size).to eq(0)
     end
   end
 end

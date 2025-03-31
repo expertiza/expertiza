@@ -111,7 +111,7 @@ describe MentorManagement do
     it 'returns sorted tuples of (mentor ID, # of teams they mentor)' do
       team_count = 3
       r = Random.new(42)
-      team_ids = team_count.times.map do
+      team_ids = Array.new(team_count) do
         random_id = r.rand(1000..10_000)
         FactoryBot.create(:team, id: random_id, parent_id: assignment.id, name: "UniqueTeam_#{random_id}")
         random_id

@@ -25,6 +25,7 @@ class MentoredTeam < AssignmentTeam
 
   # Overrides size to exclude the mentor
   def size
-    [super - 1, 0].max  # Ensures the size never goes negative
+    # Ensures the size never goes negative
+    [super - 1, 0].max
   end
 end

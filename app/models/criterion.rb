@@ -72,7 +72,7 @@ class Criterion < ScoredQuestion
     html += 'if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script>'
     html += '<div id="' + id.to_s + '_myDiv" style="display: none;">'
     # [2015-10-26] Zhewei:
-    # best to order advices high to low, e.g., 5 to 1
+    # best to order advice high to low, e.g., 5 to 1
     # each level used to be a link;
     # clicking on the link caused the dropbox to be filled in with the corresponding number
     question_advices.reverse.each_with_index do |question_advice, index|

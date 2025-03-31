@@ -1,11 +1,11 @@
 class AdviceController < ApplicationController
-  # Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advices based on score and sort it in descending order. Then it checks four conditions for the advices.
-  # 1. If number of advices is not equal to given advices
-  # 2. If the sorted advices is empty
-  # 3. If first advice score of sorted advices is NOT equal to max score
-  # 4. If last advice score of sorted advices is NOT equal to min score
+  # Advice_controller first checks whether current user has TA privileges or not by implementing action_allowed? method. Secondly it sets the number of advice based on score and sort it in descending order. Then it checks four conditions for the advice.
+  # 1. If number of advice is not equal to given advice
+  # 2. If the sorted advice is empty
+  # 3. If first advice score of sorted advice is NOT equal to max score
+  # 4. If last advice score of sorted advice is NOT equal to min score
   # If any of the above condition are True, the edit_advice method calls adjust_advice_size of the QuestionnaireHelper class which adjust the advice sizes accordingly.
-  # In the end, save_advice method is called which updates and saves the changes in the advices and displays the success/failure message.
+  # In the end, save_advice method is called which updates and saves the changes in the advice and displays the success/failure message.
 
   include AuthorizationHelper
   # If current user is TA then only current user can edit and update the advice
@@ -13,8 +13,8 @@ class AdviceController < ApplicationController
     current_user_has_ta_privileges?
   end
 
-  # checks whether the advices for a question in questionnaire have valid attributes
-  # return true if the number of advices and their scores are invalid, else returns false
+  # checks whether the advice for a question in questionnaire have valid attributes
+  # return true if the number of advice and their scores are invalid, else returns false
   def invalid_advice?(sorted_advice, num_advices, question)
     return ((question.question_advices.length != num_advices) ||
     sorted_advice.empty? ||
@@ -27,22 +27,22 @@ class AdviceController < ApplicationController
     # Stores the questionnaire with given id in URL
     @questionnaire = Questionnaire.find(params[:id])
 
-    # For each question in a quentionnaire, this method adjusts the advice size if the advice size is <,> number of advices or
-    # the max or min score of the advices does not correspond to the max or min score of questionnaire respectively.
+    # For each question in a quentionnaire, this method adjusts the advice size if the advice size is <,> number of advice or
+    # the max or min score of the advice does not correspond to the max or min score of questionnaire respectively.
     @questionnaire.questions.each do |question|
-      # if the question is a scored question, store the number of advices corresponding to that question (max_score - min_score), else 0
+      # if the question is a scored question, store the number of advice corresponding to that question (max_score - min_score), else 0
       num_advices = if question.is_a?(ScoredQuestion)
                       @questionnaire.max_question_score - @questionnaire.min_question_score + 1
                     else
                       0
                     end
 
-      # sorting question advices in descending order by score
+      # sorting question advice in descending order by score
       sorted_advice = question.question_advices.sort_by { |x| x.score }.reverse
 
       # Checks the condition for adjusting the advice size
       if invalid_advice?(sorted_advice, num_advices, question)
-        # The number of advices for this question has changed.
+        # The number of advice for this question has changed.
         QuestionnaireHelper.adjust_advice_size(@questionnaire, question)
       end
     end

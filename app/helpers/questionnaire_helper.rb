@@ -10,7 +10,7 @@ module QuestionnaireHelper
   CSV_WEIGHT = 3
 
   def self.adjust_advice_size(questionnaire, question)
-    # now we only support question advices for scored questions
+    # now we only support question advice for scored questions
     if question.is_a?(ScoredQuestion)
 
       max = questionnaire.max_question_score

@@ -61,13 +61,13 @@ describe Team do
   describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do
-        expect(team.is_member?(user)).to be true
+        expect(team.member?(user)).to be true
       end
     end
 
     context 'when users in current team does not include the parameterized user' do
       it 'returns false' do
-        expect(team.is_member?(double('User'))).to be false
+        expect(team.member?(double('User'))).to be false
       end
     end
   end
@@ -110,7 +110,7 @@ describe Team do
     context 'when parameterized user did not join in current team yet' do
       context 'when current team is not full' do
         it 'does not raise an error' do
-          allow_any_instance_of(Team).to receive(:is_member?).with(user).and_return(false)
+          allow_any_instance_of(Team).to receive(:member?).with(user).and_return(false)
           allow_any_instance_of(Team).to receive(:full?).and_return(false)
           allow(TeamsUser).to receive(:create).with(user_id: 1, team_id: 1).and_return(team_user)
           allow(TeamNode).to receive(:find_by).with(node_object_id: 1).and_return(double('TeamNode', id: 1))
@@ -350,19 +350,19 @@ describe Team do
     end
   end
 
-  describe '#has_participant?' do
+  describe '#participant?' do
     context 'when an assignment team has one participant' do
       it 'includes one participant' do
         allow(team).to receive(:users).with(no_args).and_return([user])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user.id, parent_id: team.parent_id).and_return(participant)
-        expect(team.has_participant?(participant)).to eq true
+        expect(team.participant?(participant)).to eq true
       end
     end
 
     context 'when an assignment team has no users' do
       it 'includes no participants' do
         allow(team).to receive(:users).with(no_args).and_return([])
-        expect(team.has_participant?(participant)).to eq false
+        expect(team.participant?(participant)).to eq false
       end
     end
   end

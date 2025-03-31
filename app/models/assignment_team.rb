@@ -7,18 +7,18 @@ class AssignmentTeam < Team
   has_many :review_mappings, class_name: 'ReviewResponseMap', foreign_key: 'reviewee_id'
   has_many :review_response_maps, foreign_key: 'reviewee_id'
   has_many :responses, through: :review_response_maps, foreign_key: 'map_id'
-  
+
   # Returns the ID of the current_user if they are part of the team
   def current_user_id
     return @current_user.id if @current_user && users.include?(@current_user)
     nil
   end
-  
+
   # Returns the ID of the first user in the team (or nil if empty)
   def first_user_id
     users.first ? users.first.id : nil
   end
-  
+
   # Stores the current user so that we can check them when returning the user_id
   def store_current_user(current_user)
     @current_user = current_user
@@ -92,14 +92,14 @@ class AssignmentTeam < Team
     files = files(path) if directory_num
     files
   end
-  
+
   # Delegates CSV-based team creation to the Team.import method, using AssignmentTeam as the context.
   def self.import(row, assignment_id, options)
     raise ImportError, "The assignment with the id \"#{assignment_id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?" unless Assignment.find_by(id: assignment_id)
-  
+
     Team.import(row, assignment_id, options, AssignmentTeam)
   end
-  
+
   # Delegates team export functionality to the Team.export method using AssignmentTeam as the context.
   def self.export(csv, parent_id, options)
     Team.export(csv, parent_id, options, AssignmentTeam)
@@ -164,7 +164,7 @@ class AssignmentTeam < Team
     gather_files(directory)
   end
 
-  # Given a participant, find associated AssignmentTeam 
+  # Given a participant, find associated AssignmentTeam.
   def self.team(participant)
     # return nil if there is no participant
     return nil if participant.nil?
@@ -248,6 +248,7 @@ class AssignmentTeam < Team
   end
 
   private
+
   # A helper method to files(directory)
   def gather_files(directory)
     # Get a list of all entries (files and subdirectories) in the current directory (excluding '.' and '..')

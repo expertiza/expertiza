@@ -190,8 +190,6 @@ module AuthorizationHelper
     user_logged_in? && !session[:user].role.nil?
   end
 
-  private
-
   def review_response_editable_by?(user_id, reviewee_team, assignment)
     current_user_has_id?(user_id) ||
       reviewee_team.is_member?(session[:user]) ||

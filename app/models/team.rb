@@ -322,8 +322,7 @@ class Team < ApplicationRecord
   # Helper: Adds users to the team after ensuring they are not part of another team under the same parent
   def self.assign_users_to_team(team, parent_id, user_ids)
     user_ids.each do |user_id|
-      team_user = TeamsUser.where(user_id: user_id)
-                          .find { |tu| tu.team.parent_id == parent_id }
+      team_user = TeamsUser.where(user_id: user_id).find { |tu| tu.team.parent_id == parent_id }
       team_user.destroy if team_user
       team.add_member(User.find(user_id))
     end
@@ -341,9 +340,4 @@ class Team < ApplicationRecord
   def participant?(participant)
     participants.include?(participant)
   end
-
-  # Get team's full name from legacy codebase that is no longer used
-  # def fullname
-  #   name
-  # end
 end

@@ -96,8 +96,8 @@ class Questionnaire < ApplicationRecord
       advice = QuestionAdvice.where(question_id: question.id)
       next if advice.empty?
 
-      advice.each do |advice|
-        new_advice = advice.dup
+      advice.each do |adv|
+        new_advice = adv.dup
         new_advice.question_id = new_question.id
         new_advice.save!
       end

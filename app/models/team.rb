@@ -1,5 +1,5 @@
 class Team < ApplicationRecord
-  validates :name, uniqueness: { scope: :parent_id, message: "is already in use." }
+  validates :name, uniqueness: { scope: :parent_id, message: 'is already in use.' }
   has_many :teams_users, dependent: :destroy
   has_many :users, through: :teams_users
   has_many :join_team_requests, dependent: :destroy
@@ -19,7 +19,7 @@ class Team < ApplicationRecord
 
   # Fetch the parent entity instance by ID (ex: Course.find(id) for CourseTeam)
   def self.find_parent_entity(id)
-    Object.const_get(self.name.gsub('Team', '')).find(id)
+    Object.const_get(name.gsub('Team', '')).find(id)
   end
 
   # Get the participants of the given team
@@ -63,7 +63,7 @@ class Team < ApplicationRecord
   end
 
   # Check if the user exist
-  def is_member?(user)
+  def member?(user)
     users.include? user
   end
 
@@ -78,7 +78,7 @@ class Team < ApplicationRecord
 
   # Add member to the team, changed to hash by E1776
   def add_member(user)
-    raise "The user #{user.name} is already a member of the team #{name}" if is_member?(user)
+    raise "The user #{user.name} is already a member of the team #{name}" if member?(user)
 
     can_add_member = false
     unless full?
@@ -115,11 +115,32 @@ class Team < ApplicationRecord
   # Start by adding single members to teams that are one member too small.
   # Add two-member teams to teams that two members too small. etc.
   def self.create_random_teams(parent, team_type, min_team_size)
-    participants = Participant.where(parent_id: parent.id, type: parent.class.to_s + 'Participant', can_mentor: [false, nil])
-    participants = participants.sort { rand(-1..1) }
-    users = participants.map { |p| User.find(p.user_id) }.to_a
+    participants = fetch_unmentored_participants(parent)
+    users = extract_users_from_participants(participants)
     # find teams still need team members and users who are not in any team
-    teams = Team.where(parent_id: parent.id, type: parent.class.to_s + 'Team').to_a
+    teams = fetch_incomplete_teams(parent, min_team_size, users)
+    assign_users_to_teams(teams, users, min_team_size)
+    # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
+    team_from_users(min_team_size, parent, team_type, users) unless users.empty?
+  end
+
+  # Helper: Fetches all non-mentor participants for a given parent entity and randomizes them.
+  def self.fetch_unmentored_participants(parent)
+    Participant.where(parent_id: parent.id,
+                      type: parent.class.to_s + 'Participant',
+                      can_mentor: [false, nil])
+               .sort { rand(-1..1) }
+  end
+
+  # Helper: Converts the list of participants into a list of corresponding User objects.
+  def self.extract_users_from_participants(participants)
+    participants.map { |p| User.find(p.user_id) }.to_a
+  end
+
+  # Helper: Retrieves teams needing more members and removes already assigned users from the pool.
+  def self.fetch_incomplete_teams(parent, min_team_size, users)
+    teams = Team.where(parent_id: parent.id,
+                       type: parent.class.to_s + 'Team').to_a
     teams.each do |team|
       TeamsUser.where(team_id: team.id).each do |teams_user|
         users.delete(User.find(teams_user.user_id))
@@ -127,22 +148,24 @@ class Team < ApplicationRecord
     end
     teams.reject! { |team| team.size >= min_team_size }
     # sort teams that still need members by decreasing team size
-    teams.sort_by { |team| team.size }.reverse!
+    teams.sort_by(&:size).reverse
+  end
+
+  # Fills incomplete teams by assigning users from the pool until teams reach the minimum size.
+  def self.assign_users_to_teams(teams, users, min_team_size)
     # insert users who are not in any team to teams still need team members
     teams.each do |team|
       # Calculate how many members this team is missing.
-      member_num_difference = min_team_size - team.size
-      while member_num_difference > 0 && !users.empty?
+      member_diff = min_team_size - team.size
+      while member_diff > 0 && !users.empty?
         # Add the first user from the list to the team.
         team.add_member(users.first)
         # Remove that user from the pool.
         users.shift
-        member_num_difference -= 1
+        member_diff -= 1
       end
       break if users.empty?
     end
-    # If all the existing teams are fill to the min_team_size and we still have more users, create teams for them.
-    team_from_users(min_team_size, parent, team_type, users) unless users.empty?
   end
 
   # Creates teams from a list of users based on minimum team size
@@ -151,16 +174,28 @@ class Team < ApplicationRecord
     num_of_teams = users.length.fdiv(min_team_size).ceil
     next_team_member_index = 0
     (1..num_of_teams).to_a.each do |i|
-      team = Object.const_get(team_type + 'Team').create(name: 'Team_' + i.to_s, parent_id: parent.id)
-      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
-      min_team_size.times do
-        break if next_team_member_index >= users.length
-
-        user = users[next_team_member_index]
-        team.add_member(user)
-        next_team_member_index += 1
-      end
+      team = create_team(team_type, parent, i)
+      next_team_member_index = add_members(team, users, next_team_member_index, min_team_size)
     end
+  end
+
+  # Helper: Creates a team and links it to a TeamNode
+  def self.create_team(team_type, parent, index)
+    Object.const_get(team_type + 'Team').create(name: 'Team_' + index.to_s, parent_id: parent.id).tap do |team|
+      TeamNode.create(parent_id: parent.id, node_object_id: team.id)
+    end
+  end
+
+  # Helper: Adds members to the team starting from current index
+  def self.add_members(team, users, start_index, count)
+    count.times do
+      break if start_index >= users.length
+
+      user = users[start_index]
+      team.add_member(user)
+      start_index += 1
+    end
+    start_index
   end
 
   # Generate the team name
@@ -208,7 +243,7 @@ class Team < ApplicationRecord
     else
       if teamtype == CourseTeam
         name = generate_team_name(Course.find(id).name)
-      elsif teamtype == AssignmentTeam || teamtype == MentoredTeam
+      elsif [AssignmentTeam, MentoredTeam].include?(teamtype)
         name = generate_team_name(Assignment.find(id).name)
       end
     end
@@ -264,23 +299,34 @@ class Team < ApplicationRecord
 
   # Create the team with corresponding tree node
   def self.create_team_and_node(parent_id, user_ids = [])
-
-    parent = find_parent_entity parent_id # current_task will be either a course object or an assignment object.
+    parent = find_parent_entity(parent_id) # current_task will be either a course object or an assignment object.
     team_name = Team.generate_team_name(parent.name)
     team = create(name: team_name, parent_id: parent_id)
-    # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
-    TeamNode.create(parent_id: parent_id, node_object_id: team.id)
-    ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
 
+    create_team_node(parent_id, team.id, team_name)
     # If user IDs are provided, add them to the team.
-    user_ids.each do |user_id|
-      team_user = TeamsUser.where(user_id: user_id)
-                           .find { |tu| tu.team.parent_id == parent_id }
-      team_user.destroy if team_user
-      team.add_member(User.find(user_id))
-    end unless user_ids.empty?
+    unless user_ids.empty?
+      assign_users_to_team(team, parent_id, user_ids)
+    end
 
     team
+  end
+
+  # Helper: Creates a new TeamNode and logs its creation
+  def self.create_team_node(parent_id, team_id, team_name)
+    # new teamnode will have current_task.id as parent_id and team_id as node_object_id.
+    TeamNode.create(parent_id: parent_id, node_object_id: team_id)
+    ExpertizaLogger.info LoggerMessage.new('Model:Team', '', "New TeamNode created with teamname #{team_name}")
+  end
+
+  # Helper: Adds users to the team after ensuring they are not part of another team under the same parent
+  def self.assign_users_to_team(team, parent_id, user_ids)
+    user_ids.each do |user_id|
+      team_user = TeamsUser.where(user_id: user_id)
+                          .find { |tu| tu.team.parent_id == parent_id }
+      team_user.destroy if team_user
+      team.add_member(User.find(user_id))
+    end
   end
 
   # REFACTOR END:: class methods import export moved from course_team & assignment_team to here
@@ -292,7 +338,7 @@ class Team < ApplicationRecord
   end
 
   # Whether a team includes a given participant or not
-  def has_participant?(participant)
+  def participant?(participant)
     participants.include?(participant)
   end
 

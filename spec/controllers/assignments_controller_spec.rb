@@ -167,16 +167,14 @@ describe AssignmentsController do
     context 'when assignment_form is saved successfully' do
       it 'redirects to assignment#edit page' do
         allow(assignment_form).to receive(:assignment).and_return(assignment2)
+        allow(assignment2).to receive(:id).and_return(2)
         allow(Assignment).to receive(:find_by).with(name: 'new test assignment', course_id: 1).and_return(nil)
         allow(Assignment).to receive(:find_by).with(directory_path: 'new_test_assignment', course_id: 1).and_return(nil)
         allow(assignment_form).to receive(:save).and_return(true)
-        allow_any_instance_of(AssignmentsController).to receive(:assignment_by_name_and_course).and_return(assignment2)
         allow(assignment_form).to receive(:create_assignment_node).and_return(double('node'))
         allow(assignment_form).to receive(:update).with(any_args).and_return(true)
-        allow(Assignment).to receive(:find).and_return(assignment2)
-        allow(assignment2).to receive(:id).and_return('2')
-        allow_any_instance_of(AssignmentsController).to receive(:undo_link)
-          .with('Assignment "new test assignment" has been created successfully. ').and_return(true)
+        allow(Assignment).to receive(:find).with(2).and_return(assignment2)
+        allow_any_instance_of(AssignmentsController).to receive(:undo_link).with('Assignment "new test assignment" has been created successfully. ').and_return(true)
         post :create, params: @new_params
         expect(response).to redirect_to('/assignments/2/edit')
       end

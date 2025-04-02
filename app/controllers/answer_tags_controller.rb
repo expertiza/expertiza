@@ -8,6 +8,8 @@ class AnswerTagsController < ApplicationController
     case params[:action]
     when 'index', 'create_edit'
       current_user_has_student_privileges?
+    else
+      false
     end
   end
 

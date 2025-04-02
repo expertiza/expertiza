@@ -52,4 +52,43 @@ describe QuizResponseMap do
       end
     end
   end
+
+  describe '.create_quiz_assignment' do
+    context 'when participant is not found' do
+      it 'raises an error' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(nil)
+        expect {
+          QuizResponseMap.create_quiz_assignment(1, 1, 1)
+        }.to raise_error('Participant not found')
+      end
+    end
+
+    context 'when participant has already taken the quiz' do
+      it 'raises an error' do
+        allow(QuizResponseMap).to receive(:exists?).and_return(true)
+        expect {
+          QuizResponseMap.create_quiz_assignment(1, 1, 1)
+        }.to raise_error('Already taken this quiz')
+      end
+    end
+
+    context 'when quiz assignment is successfully created' do
+      it 'creates a new quiz response map' do
+        allow(AssignmentParticipant).to receive(:find_by).and_return(participant)
+        allow(QuizResponseMap).to receive(:exists?).and_return(false)
+        allow(Questionnaire).to receive(:find).and_return(questionnaire)
+        allow(QuizResponseMap).to receive(:create!).and_return(true)
+        expect(QuizResponseMap.create_quiz_assignment(1, 1, 1)).to be_truthy
+      end
+    end
+  end
+
+  describe '#unique_quiz_assignment' do
+    it 'adds an error if the quiz assignment already exists' do
+      allow(QuizResponseMap).to receive(:exists?).and_return(true)
+      quiz_response_map = QuizResponseMap.new(reviewer_id: 1, reviewed_object_id: 1)
+      quiz_response_map.valid?
+      expect(quiz_response_map.errors[:base]).to include('You have already taken this quiz')
+    end
+  end
 end

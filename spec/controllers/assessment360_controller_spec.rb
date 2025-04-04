@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe Assessment360Controller do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, id: 6) }
@@ -41,6 +43,7 @@ describe Assessment360Controller do
   let(:participant) { build(:participant) }
   let(:scores) {}
   let(:topic) { build(:topic) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
   REDIRECT_PATH = 'http://example.com'.freeze
 
   describe 'checking controller permissions' do
@@ -250,7 +253,7 @@ describe Assessment360Controller do
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         request_params = { course_id: 1 }
@@ -280,7 +283,7 @@ describe Assessment360Controller do
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team_with_grade)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         allow_any_instance_of(Assessment360Controller).to receive(:participant_scores).with(course_participant, {}).and_return(review: { scores: { avg: 90 } })
@@ -370,7 +373,7 @@ describe Assessment360Controller do
         allow(participants_list).to receive(:find_by).with(user_id: course_participant.user_id).and_return(course_participant)
         allow(SignedUpTeam).to receive(:topic_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(SignUpTopic).to receive(:find_by).with(id: 1).and_return(topic)
-        allow(TeamsUser).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
+        allow(TeamsParticipant).to receive(:team_id).with(assignment.id, course_participant.user_id).and_return(1)
         allow(Team).to receive(:find).with(1).and_return(team)
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: course_participant.user_id, parent_id: assignment.id).and_return(course_participant)
         allow_any_instance_of(Assessment360Controller).to receive(:participant_scores).with(course_participant, {}).and_return(review: { scores: { avg: 90 } })
@@ -387,6 +390,60 @@ describe Assessment360Controller do
         expect(returned_peer_review_scores[course_participant.id][1]).to eq(90)
         returned_final_grades = controller.instance_variable_get(:@final_grades)
       end
+    end
+  end
+
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows assessment360 details' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new assessment360' do
+      post :create, params: { assessment360: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(assessment360_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(Assessment360).to receive(:find).with(1).and_return(build(:assessment360))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates an assessment360' do
+      allow(Assessment360).to receive(:find).with(1).and_return(build(:assessment360))
+      patch :update, params: { id: 1, assessment360: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(assessment360_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys an assessment360' do
+      allow(Assessment360).to receive(:find).with(1).and_return(build(:assessment360))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(assessment360s_path)
     end
   end
 end

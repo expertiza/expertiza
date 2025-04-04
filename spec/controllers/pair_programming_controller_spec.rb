@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe PairProgrammingController do
   let(:super_admin) { build(:superadmin, id: 1, role_id: 5) }
   let(:admin) { build(:admin, id: 3) }
@@ -9,6 +11,9 @@ describe PairProgrammingController do
   let(:team_user1) { build(:team_user, id: 1, team: team, user: student1, pair_programming_status: "Z") }
   let(:team_user2) { build(:team_user, id: 2, team: team, user: student2, pair_programming_status: "Z") }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1, pair_programming_request: 0) }
+  
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:participant) { build(:participant, id: 1) }
   
   #load student object with id 21
   before(:each) do
@@ -49,11 +54,11 @@ describe PairProgrammingController do
 
   describe '#send_invitations' do
     it 'sends pair programming invitation to all the team members' do
-      users = allow(TeamsUser).to receive(:where).and_return([team_user1,team_user2])
+      users = allow(TeamsParticipant).to receive(:where).and_return([team_user1,team_user2])
       [users].each do |user|
         allow(user).to receive(:update_attributes).and_return(true)
       end
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       team1 = allow(Team).to receive(:find).and_return(team)
       allow(team1).to receive(:update_attributes).and_return(true)
@@ -68,7 +73,7 @@ describe PairProgrammingController do
 
   describe '#accept' do
     it 'accepts the pair programming request' do
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       user_session = { user: student1 }
       params = {team_id: team.id, user_id: student1.id}
@@ -81,7 +86,7 @@ describe PairProgrammingController do
 
   describe '#decline' do
     it 'declines the pair programming request' do
-      user1 = allow(TeamsUser).to receive(:find_by).and_return(team_user1)
+      user1 = allow(TeamsParticipant).to receive(:find_by).and_return(team_user1)
       allow(user1).to receive(:update_attributes).and_return(true)
       team1 = allow(Team).to receive(:find).and_return(team)
       allow(team1).to receive(:update_attributes).and_return(true)
@@ -94,4 +99,76 @@ describe PairProgrammingController do
     end
   end
 
+  describe 'GET #index' do
+    it 'renders the index template' do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
+  describe 'GET #show' do
+    it 'shows pair programming details' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :show, params: { id: 1 }
+      expect(response).to render_template(:show)
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      get :new
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new pair programming session' do
+      allow(TeamsParticipant).to receive(:create).with(team_id: 1, participant_id: 1).and_return(team_participant)
+      post :create, params: { pair_programming: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(pair_programming_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(PairProgramming).to receive(:find).with(1).and_return(build(:pair_programming))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates a pair programming session' do
+      allow(PairProgramming).to receive(:find).with(1).and_return(build(:pair_programming))
+      patch :update, params: { id: 1, pair_programming: { team_id: 1, participant_id: 1 } }
+      expect(response).to redirect_to(pair_programming_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys a pair programming session' do
+      allow(PairProgramming).to receive(:find).with(1).and_return(build(:pair_programming))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(pair_programmings_path)
+    end
+  end
+
+  describe 'GET #start_session' do
+    it 'starts a pair programming session' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :start_session, params: { id: 1 }
+      expect(response).to redirect_to(pair_programming_path(1))
+    end
+  end
+
+  describe 'GET #end_session' do
+    it 'ends a pair programming session' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :end_session, params: { id: 1 }
+      expect(response).to redirect_to(pair_programming_path(1))
+    end
+  end
 end

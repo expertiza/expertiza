@@ -159,8 +159,8 @@ class QuestionnairesController < ApplicationController
           raise 'There are responses based on this rubric, we suggest you do not delete it.' unless question.answers.empty?
         end
         questions.each do |question|
-          advices = question.question_advices
-          advices.each(&:delete)
+          advice = question.question_advice
+          advice.each(&:delete)
           question.delete
         end
         questionnaire_node = @questionnaire.questionnaire_node

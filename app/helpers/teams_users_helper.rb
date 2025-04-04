@@ -1,2 +1,2 @@
-module TeamsUsersHelper
+module TeamsParticipantsHelper
 end

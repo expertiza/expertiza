@@ -131,7 +131,7 @@ class QuestionsController < ApplicationController
 
       next unless should_delete
 
-      question.question_advices.each(&:destroy)
+      question.question_advice.each(&:destroy)
       # keep track of the deleted questions
       @deleted_questions.push(question)
       question.destroy

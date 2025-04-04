@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe InvitationsController do
   let(:instructor) { build(:instructor, id: 6) }
   let(:student) { build(:student, parent_id: 2, id: 1) }
@@ -10,6 +12,8 @@ describe InvitationsController do
   let(:assignment2) { build(:assignment, id: 2, is_conference_assignment: 0, max_team_size: 100) }
   let(:teamUser) { build(:team_user, id: 3) }
   let(:team) { build(:team, id: 3) }
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+
   describe '#action_allowed?' do
     context 'when current user is student' do
       it 'allows the actions' do
@@ -67,7 +71,7 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(1).and change(User, :count).by(1)
@@ -84,7 +88,7 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)
@@ -99,13 +103,14 @@ describe InvitationsController do
       }
       allow(AssignmentParticipant).to receive(:find).with('1').and_return(participant)
       allow(Assignment).to receive(:find).with(1).and_return(assignment2)
-      allow(TeamsUser).to receive(:find).with('1').and_return(teamUser)
+      allow(TeamsParticipant).to receive(:find).with('1').and_return(teamUser)
       allow(Team).to receive(:find).with('1').and_return(team)
       user_session = { user: student1 }
       expect { post :create, params: request_params, session: user_session }.to change(Invitation, :count).by(0).and change(User, :count).by(0)
       expect(flash[:error]).to eq 'The user "testuser@gmail.com" does not exist. Please make sure the name entered is correct.'
     end
   end
+
   describe '#create' do
     it 'creates a new Invitation object' do
       expect { create(:invitation) }.to change(Invitation, :count).by(1)
@@ -124,7 +129,7 @@ describe InvitationsController do
   end
 
   describe '#decline' do
-    it ' declines the invite' do
+    it 'declines the invite' do
       allow(Invitation).to receive(:find).with('1').and_return(invitation)
       allow(Participant).to receive(:find).with('1').and_return(student)
       request_params = { student_id: student.id, inv_id: 1 }
@@ -142,6 +147,65 @@ describe InvitationsController do
       user_session = { user: instructor }
       get :cancel, params: request_params, session: user_session
       expect(response).to redirect_to('/student_teams/view?student_id=1')
+    end
+  end
+
+  describe 'GET #new' do
+    it 'renders the new template' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      get :new, params: { team_id: 1 }
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe 'POST #create' do
+    it 'creates a new invitation' do
+      allow(Team).to receive(:find).with(1).and_return(team)
+      allow(TeamsParticipant).to receive(:where).with(team_id: 1).and_return([team_participant])
+      post :create, params: { invitation: { team_id: 1, to_id: 1 } }
+      expect(response).to redirect_to(team_path(1))
+    end
+  end
+
+  describe 'GET #edit' do
+    it 'renders the edit template' do
+      allow(Invitation).to receive(:find).with(1).and_return(build(:invitation))
+      get :edit, params: { id: 1 }
+      expect(response).to render_template(:edit)
+    end
+  end
+
+  describe 'PATCH #update' do
+    it 'updates an invitation' do
+      allow(Invitation).to receive(:find).with(1).and_return(build(:invitation))
+      patch :update, params: { id: 1, invitation: { team_id: 1, to_id: 1 } }
+      expect(response).to redirect_to(team_path(1))
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    it 'destroys an invitation' do
+      allow(Invitation).to receive(:find).with(1).and_return(build(:invitation))
+      delete :destroy, params: { id: 1 }
+      expect(response).to redirect_to(team_path(1))
+    end
+  end
+
+  describe 'GET #accept' do
+    it 'accepts an invitation' do
+      allow(Invitation).to receive(:find).with(1).and_return(build(:invitation))
+      allow(TeamsParticipant).to receive(:create).with(team_id: 1, participant_id: 1).and_return(team_participant)
+      get :accept, params: { id: 1 }
+      expect(response).to redirect_to(team_path(1))
+    end
+  end
+
+  describe 'GET #decline' do
+    it 'declines an invitation' do
+      allow(Invitation).to receive(:find).with(1).and_return(build(:invitation))
+      get :decline, params: { id: 1 }
+      expect(response).to redirect_to(team_path(1))
     end
   end
 end

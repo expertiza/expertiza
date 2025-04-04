@@ -68,7 +68,7 @@ class MailWorker
   end
 
   def drop_one_member_topics
-    teams = TeamsUser.all.group(:team_id).count(:team_id)
+    teams = TeamsParticipant.all.group(:team_id).count(:team_id)
     teams.keys.each do |team_id|
       if teams[team_id] == 1
         topic_to_drop = SignedUpTeam.where(team_id: team_id).first

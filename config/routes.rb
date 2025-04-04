@@ -130,7 +130,7 @@ Expertiza::Application.routes.draw do
       get :export
       post :export
       post :exportdetails
-      post :export_advices
+      post :export_advice
       put :exporttags
       post :exporttags
     end
@@ -545,12 +545,11 @@ Expertiza::Application.routes.draw do
     end
   end
 
-  resources :teams_users, only: %i[new create update] do
+  resources :teams_participants, only: %i[new create update] do
     collection do
-      post :list
-      post :update_duties
+      get :list
       get :delete
-      post :delete_selected
+      get :delete_selected
     end
   end
   resources :popup do

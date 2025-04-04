@@ -104,7 +104,8 @@ class AssignmentParticipant < Participant
   end
 
   def team
-    AssignmentTeam.team(self)
+    team_participant = TeamsParticipant.find_by(participant_id: id)
+    team_participant&.team
   end
 
   # provide import functionality for Assignment Participants
@@ -177,8 +178,10 @@ class AssignmentParticipant < Participant
     end
 
     response_map = ResponseMap.find(response_map_id)
-    first_user_id = TeamsUser.find_by(team_id: response_map.reviewee_id).user_id
-    participant = Participant.find_by(parent_id: response_map.reviewed_object_id, user_id: first_user_id)
+    team_participant = TeamsParticipant.find_by(team_id: response_map.reviewee_id)
+    return if team_participant.nil?
+
+    participant = AssignmentParticipant.find_by(parent_id: response_map.reviewed_object_id, user_id: team_participant.participant.user_id)
     return if participant.nil?
 
     assignment.path + '/' + participant.team.directory_num.to_s + '_review' + '/' + response_map_id.to_s
@@ -207,6 +210,7 @@ class AssignmentParticipant < Participant
   end
 
   def team_user
-    TeamsUser.where(team_id: team.id, user_id: user_id).first if team
+    team_participant = TeamsParticipant.find_by(participant_id: id)
+    team_participant&.team
   end
 end

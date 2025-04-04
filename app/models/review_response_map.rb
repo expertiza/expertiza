@@ -55,7 +55,7 @@ class ReviewResponseMap < ResponseMap
     if reviewee_team.nil? # lazy team creation: if the reviewee does not have team, create one.
       reviewee_team = AssignmentTeam.create(name: 'Team' + '_' + rand(1000).to_s,
                                             parent_id: assignment_id, type: 'AssignmentTeam')
-      t_user = TeamsUser.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
+      t_user = TeamsParticipant.create(team_id: reviewee_team.id, user_id: reviewee_user.id)
       team_node = TeamNode.create(parent_id: assignment_id, node_object_id: reviewee_team.id)
       TeamUserNode.create(parent_id: team_node.id, node_object_id: t_user.id)
     end
@@ -234,5 +234,15 @@ class ReviewResponseMap < ResponseMap
         response_ids: response_ids
       }
     end
+  end
+
+  def self.create_team_review_mapping(reviewee_team, reviewee_user, reviewer, assignment)
+    # check if the team has been reviewed by this reviewer
+    existing_mapping = ReviewResponseMap.where(reviewee_id: reviewee_team.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id).first
+    return existing_mapping if existing_mapping
+
+    # create a new mapping
+    t_participant = TeamsParticipant.create(team_id: reviewee_team.id, participant_id: reviewee_user.id)
+    ReviewResponseMap.create(reviewee_id: reviewee_team.id, reviewer_id: reviewer.id, reviewed_object_id: assignment.id, team_reviewing_enabled: assignment.team_reviewing_enabled)
   end
 end

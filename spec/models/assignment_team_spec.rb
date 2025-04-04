@@ -2,10 +2,17 @@ describe 'AssignmentTeam' do
   let(:team_without_submitted_hyperlinks) { build(:assignment_team, submitted_hyperlinks: '') }
   let(:team) { build(:assignment_team, id: 1, parent_id: 1) }
   let(:assignment) { build(:assignment, id: 1) }
+  let(:assignment2) { build(:assignment, id: 2, name: 'no assgt 2') }
+  let(:assignment3) { create(:assignment, name: 'no assgt 3', directory_path: 'd_path3') }
+  let(:assignment4) { create(:assignment, name: 'no assgt 4', directory_path: 'd_path4', ) }
   let(:participant1) { build(:participant, id: 1) }
   let(:participant2) { build(:participant, id: 2) }
   let(:user1) { build(:student, id: 2) }
   let(:user2) { build(:student, id: 3) }
+  let(:user4) { create(:student, name: 'noname', fullname: 'noone') }
+  let(:participant3) { build(:participant, user: user4) }
+  let(:team2) { create(:assignment_team, assignment: assignment3, name: 'no team', users: [user4]) }
+  let(:team_user2) { create(:team_user, user: user4, team: team2) }
   let(:review_response_map) { build(:review_response_map, reviewed_object_id: 1, reviewer_id: 1, reviewee_id: 1) }
   let(:topic) { build(:topic, id: 1, topic_name: 'New Topic') }
   let(:signedupteam) { build(:signed_up_team) }
@@ -380,6 +387,21 @@ describe 'AssignmentTeam' do
       expect(@team.users).to include @student
       new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
       expect(@team.users).to_not include @student
+    end
+  end
+
+  # Checks if the team is copied on to an assignment by verifying if the team users have been copied.
+  describe '#copy_to_assignment' do
+    it 'should copy team to an assignment' do
+      allow(TeamsUser).to receive(:create).and_call_original
+
+      allow(Participant).to receive(:where).with(parent_id: assignment4.id, user_id: user4.id).and_call_original
+      allow(Participant).to receive(:where).with(parent_id: assignment3.id, user_id: user4.id).and_return([participant3])
+
+      new_team = team2.copy_to_another_assignment(assignment4)
+
+      expect(new_team.parent_id).to eq(assignment4.id)
+      expect(new_team.teams_users.size).to eq(team2.teams_users.size)
     end
   end
 end

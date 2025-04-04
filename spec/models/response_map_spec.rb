@@ -2,14 +2,19 @@ describe ResponseMap do
   let(:team) { build(:assignment_team, id: 1, name: 'team no name', assignment: assignment, users: [student], parent_id: 1) }
   let(:team1) { build(:assignment_team, id: 2, name: 'team has name', assignment: assignment, users: [student1]) }
   let(:team2) { build(:assignment_team, id: 3, name: 'team has a name', assignment: assignment, users: [student2]) }
+  let(:team3) { build(:assignment_team, id: 4, name: 'team has a name 3', assignment: assignment1, users: [student3]) }
+  let(:instructor) { build(:instructor, id: 6) }
   let(:participant) { build(:participant, id: 1, parent_id: 1, user: student) }
   let(:participant1) { build(:participant, id: 2, parent_id: 2, user: student1) }
   let(:participant2) { build(:participant, id: 3, parent_id: 3, user: student2) }
+  let(:participant3) { build(:participant, id: 4, parent_id: 4, user: student3) }
+  let(:participant6) { build(:participant, id: 5, parent_id: 4, user: instructor) }
   let(:student) { build(:student, id: 1, name: 'name', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student1) { build(:student, id: 2, name: 'name1', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:student2) { build(:student, id: 3, name: 'name2', fullname: 'no one', email: 'expertiza@mailinator.com') }
+  let(:student3) { build(:student, id: 4, name: 'name3', fullname: 'no one', email: 'expertiza@mailinator.com') }
   let(:assignment) { build(:assignment, id: 1, name: 'Test Assgt', rounds_of_reviews: 2) }
-  let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt2', rounds_of_reviews: 2) }
+  let(:assignment1) { build(:assignment, id: 2, name: 'Test Assgt2', rounds_of_reviews: 2, instructor: instructor) }
 
   let(:review_response_map) { build(:review_response_map, id: 1, assignment: assignment, reviewer: participant, reviewee: team) }
   let(:review_response_map1) { build(:review_response_map, id: 2, assignment: assignment, reviewer: participant1, reviewee: team) }
@@ -26,6 +31,8 @@ describe ResponseMap do
   let(:response3) { build(:response, id: 4, map_id: 4, round: 1, response_map: teammate_review_response_map1, is_submitted: false) }
   let(:response4) { build(:response, id: 5, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: true) }
   let(:response5) { build(:response, id: 6, map_id: 5, round: 1, response_map: review_response_map2, is_submitted: false) }
+
+  let(:submission_record) { build(:submission_record, assignment_id: 1, team_id: 1) }
 
   before(:each) do
     allow(review_response_map).to receive(:response).and_return([response])
@@ -117,6 +124,23 @@ describe ResponseMap do
         allow(AssignmentTeam).to receive(:find).with(review_response_map.reviewee_id).and_return(team)
         expect(review_response_map.find_team_member).to eq(team)
       end
+    end
+  end
+
+  describe '#copy_to_assignment' do
+    it 'copies response_map to an assignment with all associated submission records, responses and answers' do
+      allow(Response).to receive(:where).with(map_id: 1).and_return([response])
+      allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment.id, team_id: team.id).and_return([submission_record])
+      allow(SubmissionRecord).to receive(:where).with(assignment_id: assignment1.id, team_id: team3.id).and_call_original
+
+      new_review_response_map = review_response_map.copy_to_another_assignment(assignment1, team3, participant6)
+
+      expect(new_review_response_map.reviewed_object_id).to eq(assignment1.id)
+      expect(new_review_response_map.reviewer_id).to eq(participant6.id)
+      expect(new_review_response_map.reviewee_id).to eq(team3.id)
+
+      expect(SubmissionRecord.where(assignment_id: assignment1.id, team_id: team3.id).size).to eq(SubmissionRecord.where(assignment_id: assignment.id, team_id: team.id).size)
+      expect(new_review_response_map.response_ids.size).to eq(review_response_map.response_ids.size)
     end
   end
 end

@@ -249,6 +249,23 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
+  # Creates a duplicate Response object, associates it to a specified ResponseMap, copies all associated Answer
+  # objects to the new Response object.
+  # Used while copying calibration submissions.
+  def copy_to_another_response_map(response_map)
+    new_response = dup
+    new_response.map_id = response_map.id
+    new_response.save
+
+    answers = Answer.where(response_id: id)
+
+    answers.each do |answer|
+      answer.copy_to_response(new_response)
+    end
+
+    new_response
+  end
+
   private
 
   def construct_instructor_html(identifier, self_id, count)

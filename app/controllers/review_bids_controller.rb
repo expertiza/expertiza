@@ -26,16 +26,13 @@ class ReviewBidsController < ApplicationController
   def index
     @participant = AssignmentParticipant.find(params[:id])
     return unless current_user_id?(@participant.user_id)
-
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-
     # Finding how many reviews have been completed
     @num_reviews_completed = 0
     @review_mappings.each do |map|
       @num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
     end
-
     # render view for completing reviews after review bidding has been completed
     render 'sign_up_sheet/review_bids_others_work'
   end
@@ -63,7 +60,6 @@ class ReviewBidsController < ApplicationController
     ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
       @assigned_review_maps << review_map
     end
-
     # explicitly render view since it's in the sign up sheet views
     render 'sign_up_sheet/review_bids_show'
   end
@@ -92,30 +88,29 @@ class ReviewBidsController < ApplicationController
     redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
   end
 
-  # assign bidding topics to reviewers
   def assign_bidding
-    # sets parameters used for running bidding algorithm
     assignment_id = params[:assignment_id].to_i
-    # list of reviewer id's from a specific assignment
-    reviewer_ids = AssignmentParticipant.where(parent_id: assignment_id).ids
-    bidding_data = ReviewBid.bidding_data(assignment_id, reviewer_ids)
-    matched_topics = run_bidding_algorithm(bidding_data)
+    reviewer_ids = fetch_reviewer_ids(assignment_id)
+    matched_topics = process_bidding(assignment_id, reviewer_ids)
+    ensure_valid_topics(matched_topics, reviewer_ids)
     ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false) # turns off bidding for students
+    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
     redirect_back fallback_location: root_path
   end
 
-  # call webserver for running assigning algorithm
-  # passing webserver: student_ids, topic_ids, student_preferences, time_stamps
-  # webserver returns:
-  # returns matched assignments as json body
-  def run_bidding_algorithm(bidding_data)
-    # begin
-    url = 'http://app-csc517.herokuapp.com/match_topics' # hard coding for the time being
-    response = RestClient.post url, bidding_data.to_json, content_type: 'application/json', accept: :json
-    JSON.parse(response.body)
-  rescue StandardError
-    false
-    # end
+  private
+
+  def fetch_reviewer_ids(assignment_id)
+    AssignmentParticipant.where(parent_id: assignment_id).ids
+  end
+
+  def process_bidding(assignment_id, reviewer_ids)
+    ReviewBiddingAlgorithmService.process_bidding(assignment_id, reviewer_ids)
+  end
+
+  def ensure_valid_topics(matched_topics, reviewer_ids)
+    matched_topics ||= {}
+    reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
+    Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20240319000001) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -572,11 +572,11 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "version"
   end
 
-  create_table "question_advices", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "question_advice", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "question_id"
     t.integer "score"
     t.text "advice"
-    t.index ["question_id"], name: "fk_question_question_advices"
+    t.index ["question_id"], name: "fk_question_question_advice"
   end
 
   create_table "question_types", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -937,16 +937,14 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "pair_programming_request", limit: 1
   end
 
-  create_table "teams_users", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.integer "team_id"
-    t.integer "user_id"
-    t.integer "duty_id"
-    t.string "pair_programming_status", limit: 1
-    t.integer "participant_id"
-    t.index ["duty_id"], name: "index_teams_users_on_duty_id"
-    t.index ["participant_id"], name: "fk_rails_7192605c92"
-    t.index ["team_id"], name: "fk_users_teams"
-    t.index ["user_id"], name: "fk_teams_users"
+  create_table "teams_participants", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "team_id", null: false
+    t.integer "participant_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["participant_id"], name: "index_teams_participants_on_participant_id"
+    t.index ["team_id", "participant_id"], name: "index_teams_participants_on_team_id_and_participant_id", unique: true
+    t.index ["team_id"], name: "index_teams_participants_on_team_id"
   end
 
   create_table "track_notifications", id: :integer, force: :cascade, options: "ENGINE=MyISAM DEFAULT CHARSET=latin1" do |t|
@@ -1048,7 +1046,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "participants", "users", name: "fk_participant_users"
   add_foreign_key "plagiarism_checker_assignment_submissions", "assignments"
   add_foreign_key "plagiarism_checker_comparisons", "plagiarism_checker_assignment_submissions"
-  add_foreign_key "question_advices", "questions", name: "fk_question_question_advices"
+  add_foreign_key "question_advice", "questions", name: "fk_question_question_advice"
   add_foreign_key "questions", "questionnaires", name: "fk_question_questionnaires"
   add_foreign_key "resubmission_times", "participants", name: "fk_resubmission_times_participants"
   add_foreign_key "review_bids", "assignments"
@@ -1078,8 +1076,6 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "tag_prompt_deployments", "assignments"
   add_foreign_key "tag_prompt_deployments", "questionnaires"
   add_foreign_key "tag_prompt_deployments", "tag_prompts"
-  add_foreign_key "teams_users", "duties"
-  add_foreign_key "teams_users", "participants"
-  add_foreign_key "teams_users", "teams", name: "fk_users_teams"
-  add_foreign_key "teams_users", "users", name: "fk_teams_users"
+  add_foreign_key "teams_participants", "participants"
+  add_foreign_key "teams_participants", "teams"
 end

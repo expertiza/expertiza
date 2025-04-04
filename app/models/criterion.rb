@@ -48,13 +48,13 @@ class Criterion < ScoredQuestion
   # Display for the students when they are filling the questionnaire
   def complete(count, answer = nil, questionnaire_min, questionnaire_max, dropdown_or_scale)
     html = '<div><label for="responses_' + count.to_s + '">' + txt + '</label></div>'
-    question_advices = QuestionAdvice.where(question_id: id).sort_by(&:id)
+    question_advice = QuestionAdvice.where(question_id: id).sort_by(&:id)
     advice_total_length = 0
-    question_advices.each do |question_advice|
+    question_advice.each do |question_advice|
       advice_total_length += question_advice.advice.length if question_advice.advice && question_advice.advice != ''
     end
     # show advice given for different questions
-    html += advices_criterion_question(count, question_advices) if !question_advices.empty? && (advice_total_length > 0)
+    html += advice_criterion_question(count, question_advice) if !question_advice.empty? && (advice_total_length > 0)
     # dropdown options to rate a project based on the question
     html += dropdown_criterion_question(count, answer, questionnaire_min, questionnaire_max) if dropdown_or_scale == 'dropdown'
     # scale options to rate a project based on the question
@@ -63,7 +63,7 @@ class Criterion < ScoredQuestion
   end
 
   # show advice for each criterion question
-  def advices_criterion_question(count, question_advices)
+  def advice_criterion_question(count, question_advice)
     html = '<a id="showAdvice_' + id.to_s + '" onclick="showAdvice(' + id.to_s + ')">Show advice</a><script>'
     html += 'function showAdvice(i){var element = document.getElementById("showAdvice_" + i.toString());'
     html += 'var show = element.innerHTML == "Hide advice";'
@@ -72,10 +72,10 @@ class Criterion < ScoredQuestion
     html += 'if (elem.style.display == "none") {elem.style.display = "";} else {elem.style.display = "none";}}</script>'
     html += '<div id="' + id.to_s + '_myDiv" style="display: none;">'
     # [2015-10-26] Zhewei:
-    # best to order advices high to low, e.g., 5 to 1
+    # best to order advice high to low, e.g., 5 to 1
     # each level used to be a link;
     # clicking on the link caused the dropbox to be filled in with the corresponding number
-    question_advices.reverse.each_with_index do |question_advice, index|
+    question_advice.reverse.each_with_index do |question_advice, index|
       html += '<a id="changeScore_>' + id.to_s + '" onclick="changeScore(' + count.to_s + ',' + index.to_s + ')">'
       html += (questionnaire.max_question_score - index).to_s + ' - ' + question_advice.advice + '</a><br/><script>'
       html += 'function changeScore(i, j) {var elem = jQuery("#responses_" + i.toString() + "_score");'

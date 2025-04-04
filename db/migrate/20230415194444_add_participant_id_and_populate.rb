@@ -1,11 +1,11 @@
 class AddParticipantIdAndPopulate < ActiveRecord::Migration[5.1]
 
   def up
-    add_column :teams_users, :participant_id, :integer, limit: 4, index: true
-    add_foreign_key :teams_users, :participants
-    # firstly, fetch all TeamsUser rows
-    teams_participants = TeamsUser.all
-    # for each TeamsUser row
+    add_column :teams_participants, :participant_id, :integer, limit: 4, index: true
+    add_foreign_key :teams_participants, :participants
+    # firstly, fetch all TeamsParticipant rows
+    teams_participants = TeamsParticipant.all
+    # for each TeamsParticipant row
     teams_participants.each do |team_participant|
       # if team_id is not nil
       unless team_participant.team_id.nil?
@@ -21,7 +21,7 @@ class AddParticipantIdAndPopulate < ActiveRecord::Migration[5.1]
             participant = Participant.create(user_id: team_participant["user_id"], parent_id: team["parent_id"])
             participant.save
           end
-          # assign the participant_id to the TeamsUser row
+          # assign the participant_id to the TeamsParticipant row
           # here, we know for sure that participant_id is defined as we first fetch it
           # and if it's not found, we create it
           team_participant.participant_id = participant.id
@@ -32,9 +32,9 @@ class AddParticipantIdAndPopulate < ActiveRecord::Migration[5.1]
   end
 
   def down
-    remove foreign key constraint of participant_id added to the teams_users table
-    remove the column participant_id added to the teams_users table
-    remove_foreign_key :teams_users, :participant_id
-    remove_column :teams_users, :participant_id
+    remove foreign key constraint of participant_id added to the teams_participants table
+    remove the column participant_id added to the teams_participants table
+    remove_foreign_key :teams_participants, :participant_id
+    remove_column :teams_participants, :participant_id
   end
 end

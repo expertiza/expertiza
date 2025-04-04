@@ -38,8 +38,8 @@
 <% end %>
 
 <% if @model == 'Question' %>
-  <h2>Export Advices</h2>
-  <%= form_tag({:controller => 'export_file', :action => 'export_advices'}, {:method => 'post', :multipart => true, :name => 'export_advices'}) do %>
+  <h2>Export advice</h2>
+  <%= form_tag({:controller => 'export_file', :action => 'export_advice'}, {:method => 'post', :multipart => true, :name => 'export_advice'}) do %>
     <table>
       <tr>
         <td valign='Top'>Delimiter:</td>
@@ -55,7 +55,7 @@
     <br/>
     <%= hidden_field_tag('model', @model) %>
     <%= hidden_field_tag('id', @id) %>
-    <input type='submit' value='Export Advices' onclick='{export_advices.submit();}'/>
+    <input type='submit' value='Export advice' onclick='{export_advice.submit();}'/>
     <br/><br/>
   <% end %>
 <% else %>

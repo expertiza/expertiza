@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 describe UsersController do
   let(:admin) { build(:admin, id: 3) }
   let(:super_admin) { build(:superadmin) }
@@ -23,6 +25,10 @@ describe UsersController do
   before(:each) do
     stub_current_user(instructor, instructor.role.name, instructor.role)
   end
+
+  let(:team_participant) { build(:teams_participant, id: 1, team_id: 1, participant_id: 1) }
+  let(:team) { build(:team, id: 1) }
+  let(:participant) { build(:participant, id: 1) }
 
   context '#index' do
     it 'redirects if user is student' do
@@ -336,7 +342,7 @@ describe UsersController do
     it 'check if user was successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -346,7 +352,7 @@ describe UsersController do
     it 'check if user was not successfully destroyed' do
       allow(User).to receive(:find).with(any_args).and_return(nil)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -356,7 +362,7 @@ describe UsersController do
     it 'check if successful destroy leads to redirect' do
       allow(User).to receive(:find).with(any_args).and_return(student1)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy
@@ -366,7 +372,7 @@ describe UsersController do
     it 'check if error during destroy leads to redirect' do
       allow(User).to receive(:find).with(any_args).and_return(nil)
       allow(AssignmentParticipant).to receive(:delete).with(any_args).and_return(true)
-      allow(TeamsUser).to receive(:delete).with(any_args).and_return(true)
+      allow(TeamsParticipant).to receive(:delete).with(any_args).and_return(true)
       allow(AssignmentQuestionnaire).to receive(:destroy).with(any_args).and_return(true)
       allow(User).to receive(:destroy).with(any_args).and_return(true)
       post :destroy

@@ -107,8 +107,9 @@ class StudentTask
 
   def self.teamed_students(user, ip_address = nil)
     students_teamed = {}
-    user.teams.each do |team|
-      next unless team.is_a?(AssignmentTeam)
+    user.participants.each do |participant|
+      team = participant.team
+      next unless team && team.is_a?(AssignmentTeam)
       # Teammates in calibration assignment should not be counted in teaming requirement.
       next if Assignment.find_by(id: team.parent_id).is_calibrated
 

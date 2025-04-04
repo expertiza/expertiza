@@ -3,7 +3,7 @@ class MentorManagement
   #
   # 1) Find all assignment participants for the
   #    assignment with id [assignment_id] whose
-  #    duty is the same as [Particpant#DUTY_MENTOR].
+  #    duty is the same as [Participant#DUTY_MENTOR].
   # 2) Count the number of teams those participants
   #    are a part of, acting as a proxy for the
   #    number of teams they mentor.
@@ -33,7 +33,7 @@ class MentorManagement
   #   1.) An invited student user accepts and successfully added to a team from
   #       app/models/invitation.rb
   #   2.) A student user is successfully added to the team manually from
-  #       app/controllers/teams_users_controller.rb.
+  #       app/controllers/teams_participants_controller.rb.
   #
   # This method will determine if a mentor needs to be assigned, if so,
   # selects one, and adds the mentor to the team if:
@@ -127,7 +127,7 @@ class MentorManagement
     team_counts = {}
     mentor_ids.each { |id| team_counts[id] = 0 }
     #E2351 removed (:team_id) after .count to fix balancing algorithm
-    team_counts.update(TeamsUser
+    team_counts.update(TeamsParticipant
     .joins(:team)
     .where(teams: { parent_id: assignment_id })
     .where(user_id: mentor_ids)

@@ -102,12 +102,16 @@ jobs:
           echo "Checking coverage directory..."
           ls -lah coverage/
 
+      - name: Setup Code Climate test-reporter
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+
       - name: Merge Valid Coverage Files
         run: |
           valid_files=()
           # Loop through each formatted coverage file
           for file in coverage/codeclimate.*.json; do
-            # Validate using jq; if valid, add to list
             if jq empty "$file" 2>/dev/null; then
               valid_files+=("$file")
             else

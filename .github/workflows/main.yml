@@ -65,7 +65,14 @@ jobs:
           RAILS_ENV: test
       
       - name: Format code coverage report
-        run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json" coverage/.resultset.json
+        run: |
+          # Check if the coverage file exists and is nonempty
+          if [ -s coverage/.resultset.json ]; then
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json" coverage/.resultset.json
+          else
+            echo "No coverage data for ${{ matrix.folder }}. Creating empty coverage file."
+            echo "{}" > "coverage/codeclimate.${{ matrix.folder }}.json"
+          fi
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
@@ -90,19 +97,38 @@ jobs:
       - name: Move coverage files after download
         run: mv coverage/code-coverage-artifacts/* coverage/ || echo "No extra files to move"
 
-      - name: Debuging coverage files
+      - name: Debugging coverage files
         run: |
           echo "Checking coverage directory..."
           ls -lah coverage/
-          
+
+      - name: Merge Valid Coverage Files
+        run: |
+          valid_files=()
+          # Loop through each formatted coverage file
+          for file in coverage/codeclimate.*.json; do
+            # Validate using jq; if valid, add to list
+            if jq empty "$file" 2>/dev/null; then
+              valid_files+=("$file")
+            else
+              echo "Skipping invalid JSON file: $file"
+            fi
+          done
+          if [ ${#valid_files[@]} -eq 0 ]; then
+            echo "No valid coverage files found."
+            exit 1
+          fi
+          # Merge only valid coverage files
+          ./cc-test-reporter sum-coverage "${valid_files[@]}" -o coverage/coverage.json
+
       - name: Upload code coverage report
         run: |
           export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
-          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -o coverage/coverage.json
           export CC_TEST_REPORTER_COVERAGE_FILE=coverage/coverage.json
           ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
+  
   
   # Deploy the latest version of Expertiza development branch to the development server 
   # when changes are pushed to the development branch

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20250314162242) do
+ActiveRecord::Schema.define(version: 20250301220548) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -482,15 +482,8 @@ ActiveRecord::Schema.define(version: 20250314162242) do
   end
 
   create_table "meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
-    t.datetime "meeting_date"
-    t.string "team_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "mentor_meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.date "meeting_date"
     t.integer "team_id"
-    t.datetime "meeting_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

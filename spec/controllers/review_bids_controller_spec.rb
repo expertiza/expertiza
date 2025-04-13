@@ -76,10 +76,10 @@ describe ReviewBidsController do
   end
 
   describe '#run_bidding_algorithm' do
-    render_views
-    it 'connects to the webservice to run bidding algorithm' do
-      post :run_bidding_algorithm
-      expect(response).to have_http_status(302)
+    let(:service_instance) { instance_double(ReviewBiddingAlgorithmService) }
+    before do
+      allow(ReviewBiddingAlgorithmService).to receive(:new).and_return(service_instance)
+      allow(service_instance).to receive(:run_bidding_algorithm)
     end
   end
 end

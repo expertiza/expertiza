@@ -38,8 +38,13 @@
 <% if current_user_has_instructor_privileges? %>
   <td><input type="checkbox" class="topic-checkbox" name="selected_topics[]" value="<%= topic.id %>"></td>
 <% end %>
+
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
+
+//Mentor goes in here
+<td></td>
+
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>
   <% if @assignment.microtask? %>

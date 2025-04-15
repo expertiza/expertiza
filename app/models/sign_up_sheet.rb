@@ -8,10 +8,41 @@ class SignUpSheet < ApplicationRecord
       team = AssignmentTeam.create_team_with_users(assignment_id, [user_id])
       team_id = team.id
     end
+
     # Confirm the signup topic if a topic ID is provided
     @signup_topic = SignUpTopic.find_by(id: topic_id)
     unless @signup_topic.nil?
       confirmation_status = @signup_topic.sign_team_up(team_id)
+
+      # Add the mentor_id from the signup topic as a member of the team
+      if @signup_topic.mentor_id
+        Rails.logger.debug "Mentor ID found: #{@signup_topic.mentor_id}"
+        mentor = User.find_by(id: @signup_topic.mentor_id) # Find the mentor user
+
+        Rails.logger.debug "Mentor User: #{mentor.inspect}"
+        if mentor
+          team = AssignmentTeam.find(team_id) # Find the team by its ID
+          Rails.logger.debug "Assignment Team: #{team.inspect}"
+
+          participant = AssignmentParticipant.find_by(parent_id: assignment_id, user_id: mentor.id)
+
+          unless participant
+            participant = AssignmentParticipant.create(handle: mentor.handle, parent_id: assignment_id, user_id: mentor.id, can_mentor: 1)
+          end
+
+          if participant.persisted?
+            Rails.logger.debug "Participant created successfully with ID: #{participant.id}"
+            #  Further code to execute upon successful creation
+          else
+            Rails.logger.error "Failed to create participant. Errors: #{participant.errors.full_messages}"
+            #  Handle the error, e.g., display a message to the user
+          end
+
+          result = team.add_mentor(mentor, team.parent_id)
+          Rails.logger.debug "Add member to team result: #{result}"
+
+        end
+      end
     end
     # Log the signup topic save status
     ExpertizaLogger.info "The signup topic save status:#{confirmation_status} for assignment #{assignment_id} by #{user_id}"

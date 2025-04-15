@@ -97,6 +97,17 @@ class Team < ApplicationRecord
     can_add_member
   end
 
+  #adding a mentor does not need to check whether the team is full or not
+  def add_mentor(user, _assignment_id = nil)
+    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+
+    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    add_participant(parent_id, user)
+    true
+  end
+
   def send_team_addition_email(user, assignment_id)
     assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
 

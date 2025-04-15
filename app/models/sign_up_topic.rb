@@ -4,6 +4,7 @@ class SignUpTopic < ApplicationRecord
   has_many :due_dates, class_name: 'TopicDueDate', foreign_key: 'parent_id', dependent: :destroy
   has_many :bids, foreign_key: 'topic_id', dependent: :destroy
   has_many :assignment_questionnaires, class_name: 'AssignmentQuestionnaire', foreign_key: 'topic_id', dependent: :destroy
+  has_one :mentor, class_name: 'User', foreign_key: 'user_id' #this will allow the single user assigned specifically to the signup topic to be accessed by using .mentor instead of .user
   belongs_to :assignment
 
   has_paper_trail

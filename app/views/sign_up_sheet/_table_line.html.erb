@@ -42,8 +42,10 @@
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
-//Mentor goes in here
-<td></td>
+<td>
+  <% mentor = MentorManagement.mentors_for_assignment(@assignment.id) %>
+  <%= mentor ? mentor.name : "No Mentor Assigned" %>
+</td>
 
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>

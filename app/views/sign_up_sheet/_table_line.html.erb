@@ -42,8 +42,9 @@
 <td id='topic_id'><%= topic.topic_identifier %></td>
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
+<!--This also needs to check the specific signup topic that this row is displaying-->
 <td>
-  <% mentor = MentorManagement.mentors_for_assignment(@assignment.id) %>
+  <% mentor =  User.find_by(id: topic.mentor_id) %>
   <%= mentor ? mentor.name : "No Mentor Assigned" %>
 </td>
 

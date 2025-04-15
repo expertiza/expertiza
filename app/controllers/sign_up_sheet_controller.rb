@@ -160,17 +160,6 @@ class SignUpSheetController < ApplicationController
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
   end
 
-
-  def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
-    @assignment = Assignment.find(params[:id])
-  end
-
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
   # staggered means that different topics can have different deadlines.
   def redirect_to_sign_up(assignment_id)
@@ -465,6 +454,17 @@ class SignUpSheetController < ApplicationController
     else
       render action: 'new', id: params[:id]
     end
+  end
+
+  def set_values_for_new_topic
+    @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
+    @sign_up_topic.topic_name = params[:topic][:topic_name]
+    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
+    @sign_up_topic.category = params[:topic][:category]
+    @sign_up_topic.assignment_id = params[:id]
+    @sign_up_topic.mentor_id = params[:topic][:mentor_id]
+    @assignment = Assignment.find(params[:id])
   end
 
   def update_existing_topic(topic)

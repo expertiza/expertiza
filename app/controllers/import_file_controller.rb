@@ -129,6 +129,16 @@ class ImportFileController < ApplicationController
       begin
         @header_integrated_body.each do |row_hash|
           session[:assignment_id] = params[:id]
+
+          # NEW: Remove BOM from all string values in row_hash
+          row_hash.transform_values! do |value|
+            if value.is_a?(String)
+                # Remove UTF-8 BOM and any leading/trailing whitespace
+              value.sub("\xEF\xBB\xBF", '').strip
+            else
+              value
+            end
+          end
           Object.const_get(params[:model]).import(row_hash, session, params[:id])
         end
       rescue StandardError

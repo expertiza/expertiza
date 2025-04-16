@@ -29,7 +29,7 @@ class ImportFileController < ApplicationController
       @optional_count += 1 if params[:category] == 'true'
       @optional_count += 1 if params[:description] == 'true'
       @optional_count += 1 if params[:link] == 'true'
-      @optional_count += 1 if params[:mentor] == 'true'
+      @optional_count += 1 if params[:mentor_id] == 'true'
     else
       @optional_count = 0
     end

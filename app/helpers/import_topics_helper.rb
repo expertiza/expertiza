@@ -9,6 +9,7 @@ module ImportTopicsHelper
     attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
     attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
     attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
+    attributes['mentor_id'] = row_hash[:mentor_id].strip unless row_hash[:mentor_id].nil?
     attributes
   end
 
@@ -35,8 +36,11 @@ module ImportTopicsHelper
   # end
 
   def self.create_new_sign_up_topic(attributes, session)
+    Rails.logger.debug "CREATE NEW SIGNUP TOPIC HELPER FUNCTION USED"
+
     sign_up_topic = SignUpTopic.new(attributes)
     sign_up_topic.assignment_id = session[:assignment_id]
+    sign_up_topic.mentor_id =
     sign_up_topic.save
     # sign_up_topic
   end

@@ -11,6 +11,7 @@ class SignUpSheet < ApplicationRecord
 
     # Confirm the signup topic if a topic ID is provided
     @signup_topic = SignUpTopic.find_by(id: topic_id)
+    Rails.logger.debug "Signup Topic: #{@signup_topic}"
     unless @signup_topic.nil?
       confirmation_status = @signup_topic.sign_team_up(team_id)
 

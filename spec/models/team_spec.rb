@@ -355,3 +355,39 @@ describe Team do
     end
   end
 end
+
+
+describe '#add_mentor' do
+  let(:team) { create(:assignment_team, id: 1) } # Add team definition
+  let(:mentor) { create(:test_user, id: 4) } # Create mentor user
+
+  context 'when mentor exists in team' do
+    before { allow(team).to receive(:user?).with(mentor).and_return(true) }
+
+    it 'raises error' do
+      expect { team.add_mentor(mentor) }.to raise_error(/already a member/)
+    end
+  end
+
+  context 'when mentor is not in the team' do
+    let(:mentor) { build(:test_user, id: 4) }
+
+    before do
+      allow(team).to receive(:user?).with(mentor).and_return(false)
+      # Use dynamic IDs from mentor/team
+      allow(TeamsUser).to receive(:create)
+                            .with(user_id: mentor.id, team_id: team.id) # <-- Key fix
+                            .and_return(double(id: 2))
+      allow(TeamNode).to receive(:find_by)
+                           .with(node_object_id: team.id)
+                           .and_return(double(id: 1))
+      # Keep other mocks
+    end
+
+    it 'creates TeamsUser with mentor ID' do
+      team.add_mentor(mentor)
+      expect(TeamsUser).to have_received(:create)
+                             .with(user_id: 4, team_id: 1) # <-- Verification
+    end
+  end
+end

@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< Updated upstream
 ActiveRecord::Schema.define(version: 20250415151755) do
-=======
-ActiveRecord::Schema.define(version: 20231203230237) do
->>>>>>> Stashed changes
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -485,14 +481,13 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.string "name", default: "", null: false
   end
 
-<<<<<<< Updated upstream
   create_table "meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.date "meeting_date"
     t.integer "team_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-=======
->>>>>>> Stashed changes
   create_table "menu_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "parent_id"
     t.string "name", default: "", null: false

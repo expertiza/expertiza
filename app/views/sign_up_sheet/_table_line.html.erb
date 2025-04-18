@@ -45,7 +45,7 @@
 <!--This also needs to check the specific signup topic that this row is displaying-->
 <td>
   <% mentor =  User.find_by(id: topic.mentor_id) %>
-  <%= mentor ? mentor.name : "No Mentor Assigned" %>
+  <%= mentor ? mentor.name : "--" %>
 </td>
 
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].

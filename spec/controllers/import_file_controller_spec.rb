@@ -1,21 +1,6 @@
 # frozen_string_literal: true
 
 require 'minitest/autorun'
-# test/controllers/import_file_controller_test.rb
-#require 'test_helper'
-
-describe 'ImportFileControllerSpec' do
-  before do
-    # Do nothing
-  end
-
-  after do
-    # Do nothing
-  end
-end
-
-
-# spec/controllers/import_file_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe ImportFileController, type: :controller do
@@ -59,6 +44,88 @@ RSpec.describe ImportFileController, type: :controller do
     end
   end
 end
+
+RSpec.describe ImportFileController, type: :controller do
+  let(:session) { { user: double('user', name: 'Test User', id: 1), assignment_id: 1 } }
+
+  before do
+    allow(controller).to receive(:current_user_has_ta_privileges?).and_return(true)
+    # Stub SignUpTopic.import to do nothing
+    allow(SignUpTopic).to receive(:import)
+  end
+
+  describe '#import_from_hash_with_headers' do
+    context 'with only mentor_id as optional parameter' do
+      let(:params) do
+        {
+          id: 1,
+          model: 'SignUpTopic',
+          has_header: 'true',
+          optional_count: '4',  # Enabled all optional fields
+          mentor_id: 'true',
+          # Required header mappings
+          select1: 'topic_identifier',
+          select2: 'topic_name',
+          select3: 'max_choosers',
+          select4: 'mentor_id',
+          # Simulated CSV data with mentor_id column
+          contents_hash: {
+            header: ['topic_identifier', 'topic_name', 'max_choosers', 'category', 'description', 'link', 'mentor_id'],
+            body: [['T1', 'Sample Topic', '3', 'cat', 'desc', 'example.com', 'mentor123']]
+          }.to_json
+        }
+
+      end
+
+      it 'returns empty errors array' do
+        errors = controller.send(:import_from_hash, session, params)
+        expect(errors).to eq([])
+      end
+    end
+  end
+end
+
+RSpec.describe ImportFileController, type: :controller do
+  let(:session) { { user: double('user', name: 'Test User', id: 1), assignment_id: 1 } }
+
+  before do
+    allow(controller).to receive(:current_user_has_ta_privileges?).and_return(true)
+    # Stub SignUpTopic.import to do nothing
+    allow(SignUpTopic).to receive(:import)
+  end
+
+  describe '#import_from_hash_without_headers' do
+    context 'with only mentor_id as optional parameter' do
+      let(:params) do
+        {
+          id: 1,
+          model: 'SignUpTopic',
+          has_header: 'false',
+          optional_count: '4',  # Enabled all optional fields
+          mentor_id: 'true',
+          # Required header mappings
+          select1: 'topic_identifier',
+          select2: 'topic_name',
+          select3: 'max_choosers',
+          select4: 'mentor_id',
+          # Simulated CSV data with mentor_id column
+          contents_hash: {
+            header: ['topic_identifier', 'topic_name', 'max_choosers', 'category', 'description', 'link', 'mentor_id'],
+            body: [['T1', 'Sample Topic', '3', 'cat', 'desc', 'example.com', 'mentor123']]
+          }.to_json
+        }
+
+      end
+
+      it 'returns empty errors array' do
+        errors = controller.send(:import_from_hash, session, params)
+        expect(errors).to eq([])
+      end
+    end
+  end
+end
+
+
 
 
 

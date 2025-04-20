@@ -209,6 +209,22 @@ class AssignmentsController < ApplicationController
     render partial: 'shared/flash_messages'
   end
 
+  def unassign_mentor
+    mentor_id = params[:mentor_id]
+    topic_id = params[:topic_id]
+
+    topic = SignUpTopic.find_by(id: topic_id)
+
+    if topic && topic.mentor_id.to_s == mentor_id.to_s
+      topic.update(mentor_id: nil)
+      flash[:notice] = "Mentor successfully unassigned."
+    else
+      flash[:alert] = "Mentor could not be unassigned."
+    end
+
+    redirect_to edit_assignment_path(params[:id])
+  end
+
   private
 
   # check whether rubrics are set before save assignment

@@ -391,3 +391,43 @@ describe '#add_mentor' do
     end
   end
 end
+
+
+describe '#remove_mentor' do
+  let(:team) { build(:assignment_team, id: 1) }
+  let(:mentor) { build(:test_user, id: 4) }
+
+  context 'when mentor is not a member of the team' do
+    before { allow(team).to receive(:user?).with(mentor).and_return(false) }
+
+    it 'raises an error' do
+      expect { team.remove_mentor(mentor) }.to raise_error(/not a member/)
+    end
+  end
+
+  context 'when mentor is a member of the team' do
+    let(:teams_user) { double('TeamsUser', id: 2) }
+    let(:team_user_node) { double('TeamUserNode') }
+
+    before do
+      allow(team).to receive(:user?).with(mentor).and_return(true)
+      allow(TeamsUser).to receive(:find_by).with(user_id: mentor.id, team_id: team.id).and_return(teams_user)
+      allow(TeamUserNode).to receive(:find_by).with(node_object_id: teams_user.id).and_return(team_user_node)
+      allow(team_user_node).to receive(:destroy)
+      allow(teams_user).to receive(:destroy)
+      allow(team).to receive(:remove_participant).with(mentor)
+      allow(MentorManagement).to receive(:notify_team_of_mentor_unassignment)
+      allow(MentorManagement).to receive(:notify_mentor_of_unassignment)
+    end
+
+    it 'removes the mentor from the team and sends notifications' do
+      expect(MentorManagement).to receive(:notify_team_of_mentor_unassignment).with(mentor, team)
+      expect(MentorManagement).to receive(:notify_mentor_of_unassignment).with(mentor, team)
+      expect(team.remove_mentor(mentor)).to be true
+      expect(TeamsUser).to have_received(:find_by).with(user_id: mentor.id, team_id: team.id)
+      expect(team_user_node).to have_received(:destroy)
+      expect(teams_user).to have_received(:destroy)
+      expect(team).to have_received(:remove_participant).with(mentor)
+    end
+  end
+end

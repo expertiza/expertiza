@@ -1,3 +1,4 @@
+require 'rails_helper'
 describe AssignmentsController do
   let(:assignment) do
     build(:assignment, id: 1, name: 'test assignment', instructor_id: 6, staggered_deadline: true, directory_path: 'test_assignment',
@@ -446,4 +447,47 @@ describe AssignmentsController do
       end
     end
   end
+  end
+
+RSpec.describe AssignmentsController, type: :controller do
+  describe 'GET #unassign_mentor' do
+    let(:assignment) { double('Assignment', id: 1) }
+    let(:mentor_id) { 42 }
+    let(:topic_id) { 101 }
+    let(:topic) { double('SignUpTopic', id: topic_id, mentor_id: mentor_id) }
+    let(:role) { double('Role', name: 'Instructor', super_admin?: false) }
+    let(:user) { double('User', id: 1, name: 'Instructor', role: role, timezonepref: 'UTC', locale: 'en_US') }
+
+    before do
+      allow(controller).to receive(:current_user_has_ta_privileges?).and_return(true)
+      allow(user).to receive(:timezonepref).and_return('UTC')
+      allow(user).to receive(:locale).and_return('en_US')
+      allow(role).to receive(:super_admin?).and_return(false)
+      allow(controller).to receive(:current_user).and_return(user)
+      allow(SignUpTopic).to receive(:find_by).with(id: topic_id.to_s).and_return(topic)
+      allow(controller).to receive(:edit_assignment_path).and_return("/assignments/#{assignment.id}/edit")
+    end
+
+    it 'removes the mentor from the topic' do
+      # Expect the update to be called with mentor_id: nil
+      expect(topic).to receive(:update).with(mentor_id: nil)
+
+      get :unassign_mentor, params: {
+        id: assignment.id,
+        mentor_id: mentor_id.to_s,
+        topic_id: topic_id.to_s
+      }
+    end
+  end
 end
+
+
+
+
+
+
+
+
+
+
+

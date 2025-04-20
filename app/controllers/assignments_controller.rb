@@ -216,7 +216,7 @@ class AssignmentsController < ApplicationController
     topic = SignUpTopic.find_by(id: topic_id)
 
     if topic && topic.mentor_id.to_s == mentor_id.to_s
-      topic.update(mentor_id: nil)
+      topic.update(mentor_id: nil) #remove the mentor assignment from the topic
       flash[:notice] = "Mentor successfully unassigned."
     else
       flash[:alert] = "Mentor could not be unassigned."

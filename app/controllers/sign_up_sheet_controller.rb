@@ -109,7 +109,23 @@ class SignUpSheetController < ApplicationController
   # This deletes all topics for the given assignment
   def delete_all_topics_for_assignment
     topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    topics.each(&:destroy)
+
+    topics.each do |topic|
+      mentor_id = topic.mentor_id
+      assignment_id = topic.assignment_id
+
+      # Unassign mentor from topic
+      topic.update(mentor_id: nil)
+
+      # Unassign mentor from teams under this assignment with this topic
+      if mentor_id
+        teams = Team.where(parent_id: assignment_id, topic_id: topic.id)
+        teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
+      end
+
+      topic.destroy
+    end
+
     flash[:success] = 'All topics have been deleted successfully.'
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
@@ -117,16 +133,34 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+
   # This deletes all selected topics for the given assignment
   def delete_all_selected_topics
     load_all_selected_topics
-    @stopics.each(&:destroy)
+
+    @stopics.each do |topic|
+      mentor_id = topic.mentor_id
+      assignment_id = topic.assignment_id
+
+      # Unassign mentor from topic
+      topic.update(mentor_id: nil)
+
+      # Unassign mentor from teams under this assignment with this topic
+      if mentor_id
+        teams = Team.where(parent_id: assignment_id, topic_id: topic.id)
+        teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
+      end
+
+      topic.destroy
+    end
+
     flash[:success] = 'All selected topics have been deleted successfully.'
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2' }
       format.js {}
     end
   end
+
 
   # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
   def load_all_selected_topics

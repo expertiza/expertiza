@@ -107,6 +107,21 @@ class Team < ApplicationRecord
     true
   end
 
+  def remove_mentor(user)
+    raise "The user #{user.name} is not a member of the team #{name}" unless user?(user)
+
+    # Remove user from the team
+    remove_user(user)
+
+    # Notify team and mentor about the unassignment
+    MentorManagement.notify_team_of_mentor_unassignment(user, self)
+    MentorManagement.notify_mentor_of_unassignment(user, self)
+    true
+  end
+
+
+
+
   def send_team_addition_email(user, assignment_id)
     assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
 
@@ -345,6 +360,12 @@ class Team < ApplicationRecord
     end
   end
 
+  def remove_participant_by_user_id(user_id)
+    user = User.find_by(id: user_id)
+    remove_user(user) if user
+  end
+
+
   def self.find_team_users(assignment_id, user_id)
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')
@@ -360,4 +381,22 @@ class Team < ApplicationRecord
     TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
     add_participant(parent.id, user)
   end
+
+  def remove_user(user)
+    # Find the TeamsUser record and destroy it
+    t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
+    # Find and destroy the TeamUserNode associated with the TeamsUser
+    team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
+    team_user_node&.destroy
+    # Destroy the TeamsUser record
+    t_user.destroy
+    # Remove the participant from the assignment
+    remove_participant(user)
+  end
+
+  def remove_participant(user)
+    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+    participant&.destroy
+  end
+
 end

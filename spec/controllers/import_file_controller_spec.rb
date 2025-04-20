@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 require 'minitest/autorun'
 # test/controllers/import_file_controller_test.rb

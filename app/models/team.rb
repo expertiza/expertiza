@@ -77,36 +77,50 @@ class Team < ApplicationRecord
     curr_team_size >= max_team_members
   end
 
-  # Add member to the team, changed to hash by E1776
+  # Add member to the team if not full. Logs and sends email.
+  # Returns true on success, false if team is full.
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
 
-    can_add_member = false
-    unless full?
-      can_add_member = true
-      t_user = TeamsUser.create(user_id: user.id, team_id: id)
-      parent = TeamNode.find_by(node_object_id: id)
-      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      add_participant(parent_id, user)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
-
-      #Seperated the function for easier readability
-      send_team_addition_email(user, _assignment_id)
-
+    if full?
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Cannot add member to team #{id}, team is full.")
+      return false
     end
-    can_add_member
-  end
 
-  #adding a mentor does not need to check whether the team is full or not
-  def add_mentor(user, _assignment_id = nil)
-    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+    # Add user record, node, and participant link
+    add_user(user)
 
-    t_user = TeamsUser.create(user_id: user.id, team_id: id)
-    parent = TeamNode.find_by(node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-    add_participant(parent_id, user)
+    ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+    send_team_addition_email(user, _assignment_id)
+
     true
   end
+
+  # Add a user as a mentor to the team, ignoring team capacity.
+  # Returns true on success.
+  def add_mentor(user)
+    raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
+    # Add user record, node, and participant link
+    add_user(user)
+    MentorManagement.notify_team_of_mentor_assignment(user, self)
+    MentorManagement.notify_mentor_of_assignment(user, self)
+    true
+  end
+
+  def remove_mentor(user)
+    raise "The user #{user.name} is not a member of the team #{name}" unless user?(user)
+
+    # Remove user from the team
+    remove_user(user)
+
+    # Notify team and mentor about the unassignment
+    MentorManagement.notify_team_of_mentor_unassignment(user, self)
+    MentorManagement.notify_mentor_of_unassignment(user, self)
+    true
+  end
+
+
+
 
   def send_team_addition_email(user, assignment_id)
     assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
@@ -346,9 +360,43 @@ class Team < ApplicationRecord
     end
   end
 
+  def remove_participant_by_user_id(user_id)
+    user = User.find_by(id: user_id)
+    remove_user(user) if user
+  end
+
+
   def self.find_team_users(assignment_id, user_id)
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')
              .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
   end
+
+  private
+  # Common logic to add a user to the team's structure (TeamsUser, TeamUserNode, Participant).
+  def add_user(user)
+    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
+    # Consider adding error handling if parent is not found.
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    add_participant(parent.id, user)
+  end
+
+  def remove_user(user)
+    # Find the TeamsUser record and destroy it
+    t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
+    # Find and destroy the TeamUserNode associated with the TeamsUser
+    team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
+    team_user_node&.destroy
+    # Destroy the TeamsUser record
+    t_user.destroy
+    # Remove the participant from the assignment
+    remove_participant(user)
+  end
+
+  def remove_participant(user)
+    participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
+    participant&.destroy
+  end
+
 end

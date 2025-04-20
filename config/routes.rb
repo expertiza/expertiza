@@ -68,6 +68,10 @@ Expertiza::Application.routes.draw do
       patch :edit
       post :delete
     end
+
+    member do
+      get :unassign_mentor
+    end
   end
 
   resources :assignment_questionnaire do

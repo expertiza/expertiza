@@ -62,6 +62,11 @@ module SignUpSheetHelper
       chooser_present = false
       participants.each do |participant|
         next unless topic.id == participant.topic_id
+
+        Rails.logger.debug "DEBUG: Participant object class: #{participant.class}"
+        # For more detail, you could log the object's inspection:
+        Rails.logger.debug "DEBUG: Participant object inspect: #{participant.inspect}"
+
         if participant.team.teams_users.size == 0
           participant.team.destroy
           participant.destroy

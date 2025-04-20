@@ -18,6 +18,7 @@ class SignedUpTeam < ApplicationRecord
                               .select('users.name as u_name, teams.name as team_name')
                               .where('teams.id = ?', participant.team_id)
 
+
       team_name_added = false
       names = '(missing team)'
 

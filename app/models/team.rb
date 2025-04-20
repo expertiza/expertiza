@@ -77,34 +77,33 @@ class Team < ApplicationRecord
     curr_team_size >= max_team_members
   end
 
-  # Add member to the team, changed to hash by E1776
+  # Add member to the team if not full. Logs and sends email.
+  # Returns true on success, false if team is full.
   def add_member(user, _assignment_id = nil)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
 
-    can_add_member = false
-    unless full?
-      can_add_member = true
-      t_user = TeamsUser.create(user_id: user.id, team_id: id)
-      parent = TeamNode.find_by(node_object_id: id)
-      TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-      add_participant(parent_id, user)
-      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
-
-      #Seperated the function for easier readability
-      send_team_addition_email(user, _assignment_id)
-
+    if full?
+      ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Cannot add member to team #{id}, team is full.")
+      return false
     end
-    can_add_member
+
+    # Add user record, node, and participant link
+    add_user(user)
+
+    ExpertizaLogger.info LoggerMessage.new('Model:Team', user.name, "Added member to the team #{id}")
+    send_team_addition_email(user, _assignment_id)
+
+    true
   end
 
-  #adding a mentor does not need to check whether the team is full or not
-  def add_mentor(user, _assignment_id = nil)
+  # Add a user as a mentor to the team, ignoring team capacity.
+  # Returns true on success.
+  def add_mentor(user)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
-
-    t_user = TeamsUser.create(user_id: user.id, team_id: id)
-    parent = TeamNode.find_by(node_object_id: id)
-    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
-    add_participant(parent_id, user)
+    # Add user record, node, and participant link
+    add_user(user)
+    MentorManagement.notify_team_of_mentor_assignment(user, self)
+    MentorManagement.notify_mentor_of_assignment(user, self)
     true
   end
 
@@ -369,5 +368,15 @@ class Team < ApplicationRecord
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')
              .where('teams.parent_id = ? and teams_users.user_id = ?', assignment_id, user_id)
+  end
+
+  private
+  # Common logic to add a user to the team's structure (TeamsUser, TeamUserNode, Participant).
+  def add_user(user)
+    t_user = TeamsUser.create(user_id: user.id, team_id: id)
+    parent = TeamNode.find_by(node_object_id: id)
+    # Consider adding error handling if parent is not found.
+    TeamUserNode.create(parent_id: parent.id, node_object_id: t_user.id)
+    add_participant(parent.id, user)
   end
 end

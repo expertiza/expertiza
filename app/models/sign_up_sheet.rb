@@ -12,36 +12,42 @@ class SignUpSheet < ApplicationRecord
     # Confirm the signup topic if a topic ID is provided
     @signup_topic = SignUpTopic.find_by(id: topic_id)
     Rails.logger.debug "Signup Topic: #{@signup_topic}"
+    confirmation_status = false
     unless @signup_topic.nil?
       confirmation_status = @signup_topic.sign_team_up(team_id)
 
-      # Add the mentor_id from the signup topic as a member of the team
-      if @signup_topic.mentor_id
-        Rails.logger.debug "Mentor ID found: #{@signup_topic.mentor_id}"
-        mentor = User.find_by(id: @signup_topic.mentor_id) # Find the mentor user
+      # Check if the team is waitlisted for the topic
+      signed_up_team = SignedUpTeam.find_by(topic_id: topic_id, team_id: team_id)
+      if signed_up_team && signed_up_team.is_waitlisted
+        Rails.logger.debug "Team #{team_id} is waitlisted for topic #{topic_id}. Skipping mentor assignment."
+      else
+        # Add the mentor_id from the signup topic as a member of the team
+        if @signup_topic.mentor_id
+          Rails.logger.debug "Mentor ID found: #{@signup_topic.mentor_id}"
+          mentor = User.find_by(id: @signup_topic.mentor_id) # Find the mentor user
 
-        Rails.logger.debug "Mentor User: #{mentor.inspect}"
-        if mentor
-          team = AssignmentTeam.find(team_id) # Find the team by its ID
-          Rails.logger.debug "Assignment Team: #{team.inspect}"
+          Rails.logger.debug "Mentor User: #{mentor.inspect}"
+          if mentor
+            team = AssignmentTeam.find(team_id) # Find the team by its ID
+            Rails.logger.debug "Assignment Team: #{team.inspect}"
 
-          participant = AssignmentParticipant.find_by(parent_id: assignment_id, user_id: mentor.id)
+            participant = AssignmentParticipant.find_by(parent_id: assignment_id, user_id: mentor.id)
 
-          unless participant
-            participant = AssignmentParticipant.create(handle: mentor.handle, parent_id: assignment_id, user_id: mentor.id, can_mentor: 1)
+            unless participant
+              participant = AssignmentParticipant.create(handle: mentor.handle, parent_id: assignment_id, user_id: mentor.id, can_mentor: 1)
+            end
+
+            if participant.persisted?
+              Rails.logger.debug "Participant created successfully with ID: #{participant.id}"
+              # Further code to execute upon successful creation
+            else
+              Rails.logger.error "Failed to create participant. Errors: #{participant.errors.full_messages}"
+              # Handle the error, e.g., display a message to the user
+            end
+
+            result = team.add_mentor(mentor, team.parent_id)
+            Rails.logger.debug "Add member to team result: #{result}"
           end
-
-          if participant.persisted?
-            Rails.logger.debug "Participant created successfully with ID: #{participant.id}"
-            #  Further code to execute upon successful creation
-          else
-            Rails.logger.error "Failed to create participant. Errors: #{participant.errors.full_messages}"
-            #  Handle the error, e.g., display a message to the user
-          end
-
-          result = team.add_mentor(mentor, team.parent_id)
-          Rails.logger.debug "Add member to team result: #{result}"
-
         end
       end
     end

@@ -346,6 +346,25 @@ class Team < ApplicationRecord
     end
   end
 
+  def remove_participant_by_user_id(user_id)
+    teams_user = TeamsUser.find_by(team_id: id, user_id: user_id)
+    return false unless teams_user
+
+    # Remove associated TeamUserNode if it exists
+    team_user_node = TeamUserNode.find_by(node_object_id: teams_user.id)
+    team_user_node.destroy if team_user_node
+
+    # Destroy the TeamsUser record
+    teams_user.destroy
+
+    # Remove the Participant if it exists and matches this team's parent (usually assignment)
+    participant = Participant.find_by(user_id: user_id, parent_id: parent_id)
+    participant.destroy if participant
+
+    true
+  end
+
+
   def self.find_team_users(assignment_id, user_id)
     TeamsUser.joins('INNER JOIN teams ON teams_users.team_id = teams.id')
              .select('teams.id as t_id')

@@ -212,18 +212,29 @@ class AssignmentsController < ApplicationController
   def unassign_mentor
     mentor_id = params[:mentor_id]
     topic_id = params[:topic_id]
-
+    assignment = Assignment.find(params[:id])
     topic = SignUpTopic.find_by(id: topic_id)
 
     if topic && topic.mentor_id.to_s == mentor_id.to_s
+      # Unassign mentor from the topic
       topic.update(mentor_id: nil)
-      flash[:notice] = "Mentor successfully unassigned."
+
+      # Unassign mentor from any teams under this assignment that chose this topic
+      teams = Team.where(parent_id: assignment.id)
+      teams.each do |team|
+        if team.topic_id == topic.id
+          team.remove_participant_by_user_id(mentor_id)
+        end
+      end
+
+      flash[:notice] = "Mentor successfully unassigned from topic and team."
     else
       flash[:alert] = "Mentor could not be unassigned."
     end
 
-    redirect_to edit_assignment_path(params[:id])
+    redirect_to edit_assignment_path(assignment)
   end
+
 
   private
 

@@ -1,5 +1,6 @@
 class TeamsController < ApplicationController
   include AuthorizationHelper
+  helper_method :ordinalize
 
   autocomplete :user, :name
 
@@ -48,6 +49,42 @@ class TeamsController < ApplicationController
 
   # Displays list of teams for a parent object(either assignment/course)
   def list
+    # Fetch all meetings and courses for the dropdown
+    @meetings = Meeting.all
+    @team_type = params[:type]
+    @ID = params[:id]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
+    else
+      #if the type is not course, it is assignment
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
+    end
+
+    if @teams.count() > 0
+      if session[:num_of_meeting_cols].nil?
+        session[:num_of_meeting_cols] = [@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min
+      else
+        # ensure that the session value is not smaller than any new calculation.
+        session[:num_of_meeting_cols] = [[@teams.map { |team| Meeting.where(team_id: team.id).count }.max + 1, 5].min, session[:num_of_meeting_cols]].max
+      end
+      @num_of_meeting_cols = session[:num_of_meeting_cols]
+    else
+      @num_of_meeting_cols = session[:num_of_meeting_cols] || 1 # Use session value or default to 1
+    end
+
+    if request.xhr? # Check if it's an AJAX request
+      render partial: 'teams_table_body', locals: { teams: @teams }
+    else
+      respond_to do |format|
+        format.html # Render the full page normally for non-AJAX requests
+      end
+    end
+
+    #original code starts here
     init_team_type(params[:type])
     @assignment = Assignment.find_by(id: params[:id]) if session[:team_type] == Team.allowed_types[0]
     unless @assignment.nil?
@@ -57,10 +94,12 @@ class TeamsController < ApplicationController
         @model = AssignmentTeam
       end
     end
+
     @is_valid_assignment = (session[:team_type] == Team.allowed_types[0]) && @assignment.max_team_size > 1
     begin
       @root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
       @child_nodes = @root_node.get_teams
+
     rescue StandardError
       flash[:error] = $ERROR_INFO
     end
@@ -111,6 +150,12 @@ class TeamsController < ApplicationController
     @team = Team.find(params[:id])
   end
 
+  def edit_meetings
+    # Fetch meetings associated with the team. Assuming a Team has_many Meetings association.
+    @meetings = @team.meetings if @team.respond_to?(:meetings)
+    @meetings ||= [] # Ensure @meetings is always an array, even if team or meetings association doesn't exist yet.
+  end
+
   # Deleting all teams associated with a given parent object
   def delete_all
     root_node = Object.const_get(session[:team_type] + 'Node').find_by(node_object_id: params[:id])
@@ -132,18 +177,18 @@ class TeamsController < ApplicationController
       unless @signed_up_team.nil?
         # If a topic is assigned to this team and there is only one signed up team record, and it's not waitlisted.
         if @signed_up_team.count == 1 && !@signed_up_team.first.is_waitlisted  # if a topic is assigned to this team
-            # Fetch the SignUpTopic object associated with the single signed up team.
-            @signed_topic = SignUpTopic.find_by(id: @signed_up_team.first.topic_id)
-            unless @signed_topic.nil?
-              # Call the instance method `reassign_topic` of SignUpTopic to reassign the topic.
-              @signed_topic.reassign_topic(@signed_up_team.first.team_id)
-            end
+          # Fetch the SignUpTopic object associated with the single signed up team.
+          @signed_topic = SignUpTopic.find_by(id: @signed_up_team.first.topic_id)
+          unless @signed_topic.nil?
+            # Call the instance method `reassign_topic` of SignUpTopic to reassign the topic.
+            @signed_topic.reassign_topic(@signed_up_team.first.team_id)
+          end
         else
           # Drop all waitlists in SignedUpTeam for the specified team ID.
           SignedUpTeam.drop_off_waitlists(params[:id])
         end
       end
-     # @sign_up_team.destroy_all if @sign_up_team
+      # @sign_up_team.destroy_all if @sign_up_team
       @teams_users.destroy_all if @teams_users
       @team.destroy if @team
       undo_link("The team \"#{@team.name}\" has been successfully deleted.")
@@ -210,4 +255,67 @@ class TeamsController < ApplicationController
       flash[:note] = teams.length.to_s + ' teams were successfully copied to "' + assignment.name + '"'
     end
   end
+
+  def increase_table_headers
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) + 1, 5].min
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
+    @team_type = params[:type]
+    @ID = params[:id]
+  end
+
+  def decrease_table_headers
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) - 1, 1].max # Ensure minimum is 1
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
+    @team_type = params[:type]
+    @ID = params[:id]
+
+  end
+
+  def increase_table_columns
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) + 1, 5].min
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
+    @team_type = params[:type]
+    @ID = params[:id]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
+    else
+      #if the type is not course, it is assignment
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
+    end
+
+  end
+
+  def decrease_table_columns
+    session[:num_of_meeting_cols] = [(session[:num_of_meeting_cols] || 1) - 1, 1].max # Ensure minimum is 1
+    @num_of_meeting_cols = session[:num_of_meeting_cols]
+    @team_type = params[:type]
+    @ID = params[:id]
+
+    # If a course is selected, fetch its associated teams
+    if @team_type == "Course"
+      #get the course teams
+      @teams = Course.get_teams_by_id(@ID)
+    else
+      #if the type is not course, it is assignment
+      # get the assignment teams
+      @teams = Assignment.get_teams_by_id(@ID)
+    end
+  end
+
+
+  private
+
+  def ordinalize(n)
+    case n
+    when 1 then "#{n}st"
+    when 2 then "#{n}nd"
+    when 3 then "#{n}rd"
+    else "#{n}th"
+    end
+  end
+
 end

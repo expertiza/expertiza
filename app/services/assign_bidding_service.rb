@@ -1,6 +1,5 @@
 # Service for assigning bidding, which is used in review_bids_controller to help remove bloat from methods
 class AssignBiddingService
-
   attr_reader :result
 
   Result = Struct.new(:success?, :error_message)

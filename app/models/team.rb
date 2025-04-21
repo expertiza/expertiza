@@ -119,7 +119,26 @@ class Team < ApplicationRecord
     true
   end
 
+  # Unassigns the mentor if the team has no participants (size <= 1 or nil)
+  def unassign_mentor_if_empty
+    # Check if team has no participants (size <= 1 includes mentor-only teams)
+    team_size = Team.size(id)
+    return unless team_size.nil? || team_size == 0 #Mentors are disregarded from the team size per the teams.size function
 
+    # Find the topic associated with the team
+    signed_up_team = SignedUpTeam.find_by(team_id: id)
+    return unless signed_up_team
+
+    topic_id = signed_up_team.topic_id
+    mentor = SignUpSheet.find_mentor_for_topic(topic_id)
+    return unless mentor
+
+    teams_user = TeamsUser.find_by(team_id: id, user_id: mentor.id)
+    if teams_user
+      teams_user.destroy
+      ExpertizaLogger.info "Mentor #{mentor.name} unassigned from empty team #{id} for topic #{topic_id}"
+    end
+  end
 
 
   def send_team_addition_email(user, assignment_id)

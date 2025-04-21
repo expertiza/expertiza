@@ -45,7 +45,7 @@ class SignUpSheet < ApplicationRecord
               # Handle the error, e.g., display a message to the user
             end
 
-            result = team.add_mentor(mentor, team.parent_id)
+            result = team.add_mentor(mentor)
             Rails.logger.debug "Add member to team result: #{result}"
           end
         end
@@ -86,6 +86,13 @@ class SignUpSheet < ApplicationRecord
                 .where('teams.advertise_for_partner = 1 and signed_up_teams.topic_id = ?', topic_id).to_a
     teams.reject!(&:full?)
     teams.any?
+  end
+
+  def self.find_mentor_for_topic(topic_id)
+    topic = SignUpTopic.find_by(id: topic_id)
+    return nil unless topic&.mentor_id
+
+    User.find_by(id: topic.mentor_id)
   end
 
   class << self

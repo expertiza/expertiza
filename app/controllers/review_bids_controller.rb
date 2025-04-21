@@ -13,40 +13,29 @@ class ReviewBidsController < ApplicationController
     'Student'
   ]
 
-  PRIVILEGED_ROLES = [
-    'Instructor',
-    'Teaching Assistant',
-    'Administrator',
-    'Super-Administrator'
-  ]
+  PRIVILEGED_ROLES = ALLOWED_ROLES - ['Student']
+
+  before_action :set_participant, only: [:index, :show, :set_priority, :assign_bidding]
+  before_action :set_assignment, only: [:index, :show, :set_priority, :assign_bidding]
+  before_action :authorize_participant, only: [:index, :show, :set_priority, :assign_bidding]
 
   # action allowed function checks the action allowed based on the user working
   def action_allowed?
     return false unless ALLOWED_ROLES.include?(current_role_name)
 
     case params[:action]
+    # If the action is list we need a further check
+    when 'list'
+      are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
     when 'show', 'set_priority', 'index'
-      if params[:action] == 'list'
-        return are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
-      end
-      return true
+       true
     else
-      return PRIVILEGED_ROLES.include?(current_role_name)
+      PRIVILEGED_ROLES.include?(current_role_name)
     end
   end
 
   # provides variables for reviewing page located at views/review_bids/others_work.html.erb
   def index
-    @participant = AssignmentParticipant.find(params[:id])
-    if @participant.nil?
-      flash[:error] = "Participant not found"
-      return
-    end
-    if !current_user_id?(@participant.user_id)
-      flash[:error] = "Unauthorized to view page."
-      return
-    end
-    @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
     @completed_reviews_count = CompletedReviewCounterService.count_reviews(@review_mappings)
     render 'sign_up_sheet/review_bids_others_work'
@@ -54,8 +43,6 @@ class ReviewBidsController < ApplicationController
 
   # provides variables for review bidding page
   def show
-    @participant = AssignmentParticipant.find(params[:id].to_i)
-    @assignment = @participant.assignment
     @sign_up_topics = SignUpTopic.where(assignment_id: @assignment.id, private_to: nil)
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
@@ -77,16 +64,15 @@ class ReviewBidsController < ApplicationController
 
   # function that assigns and updates priorities for review bids
   def set_priority
-    participant_id = params[:id].to_i
-    selected_topic_ids = params[:topic]&.map(&:to_i) || []
+    selected_topic_ids = Array(params[:topic]).map(&:to_i)
+    bids = ReviewBid.where(participant_id: @participant.id)
+    assignment_id = @assignment.id
 
-    if selected_topic_ids.empty?
-      ReviewBid.where(participant_id: participant_id).destroy_all
-      redirect_to action: 'show', id: participant_id and return
-    end
-    assignment_id = SignUpTopic.find(selected_topic_ids.first).assignment_id
-    existing_topic_ids = ReviewBid.where(participant_id: participant_id).pluck(:signuptopic_id)
-    removed_topic_ids = existing_topic_ids - selected_topic_ids
+    return delete_all_bids_and_redirect(bids) if selected_topic_ids.empty?
+
+    existing_topic_ids = bids.pluck(:signuptopic_id)
+    to_remove_ids = existing_topic_ids - selected_topic_ids
+    ReviewResponseMap.where(reviewed_object_id: assignment_id).delete_all
     BidsPriorityService.process_bids(assignment_id, participant_id, selected_topic_ids, removed_topic_ids)
     redirect_to action: 'show', assignment_id: assignment_id, id: participant_id
   end
@@ -100,5 +86,28 @@ class ReviewBidsController < ApplicationController
     end
     flash[:notice] = 'Bidding assignments updated.'
     redirect_back fallback_location: root_path
+  end
+
+
+
+  private
+
+  def set_participant
+    @participant = AssignmentParticipant.find_by(id: params[:id])
+    redirect_to(root_path, alert: "Participant not found") unless @participant
+
+  def set_assignment
+    @assignment = @participant.assignment
+  end
+
+  def authorize_participant
+    redirect_to(root_path, alert: "Unauthorized to view page") unless current_user_id?(@participant.user_id)
+  end
+
+  def delete_all_bids_and_redirect(bids)
+    bids.delete_all
+    redirect_to action: :show,
+                assignment_id: params[:assignment_id],
+                id: params[:id]
   end
 end

@@ -71,6 +71,7 @@ Expertiza::Application.routes.draw do
 
     member do
       get :unassign_mentor
+      get :assign_mentor
     end
   end
 
@@ -428,9 +429,12 @@ Expertiza::Application.routes.draw do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      get :assign_mentor_to_topic
       get :delete_signup_as_instructor
+      get :update_existing_topic
       post :delete_all_topics_for_assignment
       post :signup_as_instructor_action
+      post :assign_mentor_to_topic_action
       post :set_priority
       post :save_topic_deadlines
       post :delete_all_selected_topics

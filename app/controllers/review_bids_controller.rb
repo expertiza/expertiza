@@ -4,30 +4,34 @@ class ReviewBidsController < ApplicationController
   require 'net/http'
   require 'rest_client'
 
-  # action allowed function checks the action allowed based on the user working
-  def action_allowed?
-    ALLOWED_ROLES = ['Instructor', # This list is for show, set_priority, and index
+  # Constants for role checking
+  ALLOWED_ROLES = [
+    'Instructor',        # This list is for show, set_priority, and index
     'Teaching Assistant',
     'Administrator',
     'Super-Administrator',
-    'Student']
-    PRIVILEGED_ROLES = ['Instructor',
+    'Student'
+  ]
+
+  PRIVILEGED_ROLES = [
+    'Instructor',
     'Teaching Assistant',
     'Administrator',
-    'Super-Administrator']
-    if not ALLOWED_ROLES.include?(current_role_name)
-      return false
+    'Super-Administrator'
+  ]
+
+  # action allowed function checks the action allowed based on the user working
+  def action_allowed?
+    return false unless ALLOWED_ROLES.include?(current_role_name)
+
     case params[:action]
     when 'show', 'set_priority', 'index'
-      # If the action is to list then we need a further check
       if params[:action] == 'list'
         return are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
       end
-      # Anything else we return true
       return true
     else
-      # For any other action allow the privileged roles
-      PRIVILEGED_ROLES.include?(current_role_name)
+      return PRIVILEGED_ROLES.include?(current_role_name)
     end
   end
 
@@ -36,15 +40,15 @@ class ReviewBidsController < ApplicationController
     @participant = AssignmentParticipant.find(params[:id])
     if @participant.nil?
       flash[:error] = "Participant not found"
-      return 
+      return
+    end
     if !current_user_id?(@participant.user_id)
       flash[:error] = "Unauthorized to view page."
       return
+    end
     @assignment = @participant.assignment
     @review_mappings = ReviewResponseMap.where(reviewer_id: @participant.id)
-    # Finding how many reviews have been completed
     @completed_reviews_count = CompletedReviewCounterService.count_reviews(@review_mappings)
-    # render view for completing reviews after review bidding has been completed
     render 'sign_up_sheet/review_bids_others_work'
   end
 
@@ -56,7 +60,7 @@ class ReviewBidsController < ApplicationController
     my_topic = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id)
     @sign_up_topics -= SignUpTopic.where(assignment_id: @assignment.id, id: my_topic)
     @num_participants = AssignmentParticipant.where(parent_id: @assignment.id).count
-    @selected_topics = nil # this is used to list the topics assigned to review. (ie select == assigned i believe)
+    @selected_topics = nil
     @bids = ReviewBid.where(participant_id: @participant, assignment_id: @assignment.id)
     signed_up_topics = []
     @bids.each do |bid|
@@ -67,51 +71,40 @@ class ReviewBidsController < ApplicationController
     @sign_up_topics -= signed_up_topics
     @bids = signed_up_topics
     @num_of_topics = @sign_up_topics.size
-    @assigned_review_maps = []
-    ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id).each do |review_map|
-      @assigned_review_maps << review_map
-    end
-    # explicitly render view since it's in the sign up sheet views
+    @assigned_review_maps = ReviewResponseMap.where(reviewed_object_id: @assignment.id, reviewer_id: @participant.id)
     render 'sign_up_sheet/review_bids_show'
   end
 
   # function that assigns and updates priorities for review bids
   def set_priority
-    if params[:topic].nil?
-      ReviewBid.where(participant_id: params[:id]).destroy_all
-    else
-      assignment_id = SignUpTopic.find(params[:topic].first).assignment.id
-      @bids = ReviewBid.where(participant_id: params[:id])
-      signed_up_topics = ReviewBid.where(participant_id: params[:id]).map(&:signuptopic_id)
-      signed_up_topics -= params[:topic].map(&:to_i)
-      ReviewBidPriorityService.process_bids(assignment_id, signed_up_topics)
+    participant_id = params[:id].to_i
+    selected_topic_ids = params[:topic]&.map(&:to_i) || []
+
+    if selected_topic_ids.empty?
+      ReviewBid.where(participant_id: participant_id).destroy_all
+      redirect_to action: 'show', id: participant_id and return
     end
-    redirect_to action: 'show', assignment_id: params[:assignment_id], id: params[:id]
+    assignment_id = SignUpTopic.find(selected_topic_ids.first).assignment_id
+    existing_topic_ids = ReviewBid.where(participant_id: participant_id).pluck(:signuptopic_id)
+    removed_topic_ids = existing_topic_ids - selected_topic_ids
+    BidsPriorityService.process_bids(assignment_id, participant_id, selected_topic_ids, removed_topic_ids)
+    redirect_to action: 'show', assignment_id: assignment_id, id: participant_id
   end
 
+  # refactored bidding assignment using AssignBiddingService
   def assign_bidding
-    assignment_id = params[:assignment_id].to_i
-    reviewer_ids = fetch_reviewer_ids(assignment_id)
-    matched_topics = process_bidding(assignment_id, reviewer_ids)
-    ensure_valid_topics(matched_topics, reviewer_ids)
-    ReviewBid.assign_review_topics(assignment_id, reviewer_ids, matched_topics)
-    Assignment.find(assignment_id).update(can_choose_topic_to_review: false)
+    @participant = AssignmentParticipant.find(params[:id])
+    if @participant.nil?
+      redirect_back fallback_location: root_path, alert: "Participant not found"
+      return
+    end
+    result = AssignBiddingService.call(@participant)
+    unless result.success?
+      redirect_back fallback_location: root_path,
+                    alert: "Could not assign bids: #{result.error_message}"
+      return
+    end
+    flash[:notice] = 'Bidding assignments updated.'
     redirect_back fallback_location: root_path
-  end
-
-  private
-
-  def fetch_reviewer_ids(assignment_id)
-    AssignmentParticipant.where(parent_id: assignment_id).ids
-  end
-
-  def process_bidding(assignment_id, reviewer_ids)
-    BidsAlgorithmService.process_bidding(assignment_id, reviewer_ids)
-  end
-
-  def ensure_valid_topics(matched_topics, reviewer_ids)
-    matched_topics ||= {}
-    reviewer_ids.each { |reviewer_id| matched_topics[reviewer_id.to_s] ||= [] }
-    Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
   end
 end

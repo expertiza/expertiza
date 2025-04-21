@@ -17,12 +17,37 @@ class ReviewBid < ApplicationRecord
     end
 
     def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
+      # Remove previous mappings
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
+      assignment = Assignment.find(assignment_id)
       reviewer_ids.each do |reviewer_id|
+        reviewer = AssignmentParticipant.find_by(id: reviewer_id)
+        next unless reviewer
+        reviewer_user_id = reviewer.user_id
+        reviewer_team_id = TeamsUser.where(user_id: reviewer_user_id, team_id: Team.where(parent_id: assignment_id)).pluck(:team_id).first
         topics_to_assign = matched_topics[reviewer_id.to_s] || []
-        Rails.logger.debug "Assigning topics to reviewer #{reviewer_id}: #{topics_to_assign.inspect}"
-        topics_to_assign.each do |topic|
-          assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+        Rails.logger.debug "Assigning topics to reviewer #{reviewer_id} (user #{reviewer_user_id}): #{topics_to_assign.inspect}"
+        topics_to_assign.each do |topic_id|
+          team_to_review = SignedUpTeam.find_by(topic_id: topic_id)&.team_id
+          Rails.logger.debug "team_to_review: #{team_to_review.inspect} for topic #{topic_id}"
+          next if team_to_review.nil?
+          next if team_to_review == reviewer_team_id
+          existing_map = ReviewResponseMap.find_by(
+            reviewed_object_id: assignment_id,
+            reviewer_id: reviewer_id,
+            reviewee_id: team_to_review
+          )
+          unless existing_map
+            ReviewResponseMap.create!(
+              reviewed_object_id: assignment_id,
+              reviewer_id: reviewer_id,
+              reviewee_id: team_to_review,
+              type: 'ReviewResponseMap'
+            )
+            Rails.logger.debug "Created ReviewResponseMap for reviewer #{reviewer_id} and team #{team_to_review}"
+          else
+            Rails.logger.debug "Skipping duplicate map for reviewer #{reviewer_id} and team #{team_to_review}"
+          end
         end
       end
     end

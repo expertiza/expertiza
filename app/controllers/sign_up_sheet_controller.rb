@@ -490,8 +490,12 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.category = params[:topic][:category]
     @sign_up_topic.assignment_id = params[:id]
 
+    mentor_user = User.find_by(name: params[:topic][:mentor_username])
+
     # Find the user by name
-    @sign_up_topic.mentor_id = User.find_by(name: params[:topic][:mentor_username]).id
+    if mentor_user != nil
+      @sign_up_topic.mentor_id = mentor_user.id
+    end
 
     @assignment = Assignment.find(params[:id])
   end

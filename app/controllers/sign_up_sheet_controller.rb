@@ -316,6 +316,19 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop a student after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
+
+      mentor_user = nil
+
+      team.users.each do |user|
+        if MentorManagement.user_a_mentor?(user)
+          mentor_user = user;
+        end
+      end
+
+      if mentor_user != nil
+        team.remove_mentor(mentor_user)
+      end
+
       delete_signup_for_topic(params[:topic_id], team.id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)

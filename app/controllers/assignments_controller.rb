@@ -220,11 +220,10 @@ class AssignmentsController < ApplicationController
       topic.update(mentor_id: nil)
 
       # Unassign mentor from any teams under this assignment that chose this topic
-      teams = Team.where(parent_id: assignment.id)
-      teams.each do |team|
-        if team.topic_id == topic.id
-          team.remove_participant_by_user_id(mentor_id)
-        end
+      signed_up_teams = SignedUpTeam.where(topic_id: topic.id)
+      signed_up_teams.each do |signed_up_team|
+        team = Team.find(signed_up_team.team_id)
+        team.remove_participant_by_user_id(mentor_id)
       end
 
       flash[:notice] = "Mentor successfully unassigned from topic and team."

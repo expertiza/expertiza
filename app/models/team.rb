@@ -102,8 +102,29 @@ class Team < ApplicationRecord
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
     # Add user record, node, and participant link
     add_user(user)
-    MentorManagement.notify_team_of_mentor_assignment(user, self)
-    MentorManagement.notify_mentor_of_assignment(user, self)
+
+    begin
+      MentorManagement.notify_team_of_mentor_assignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying team of mentor assignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying team of mentor assignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
+    begin
+      MentorManagement.notify_mentor_of_assignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying mentor of assignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying mentor of assignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
     true
   end
 
@@ -114,8 +135,27 @@ class Team < ApplicationRecord
     remove_user(user)
 
     # Notify team and mentor about the unassignment
-    MentorManagement.notify_team_of_mentor_unassignment(user, self)
-    MentorManagement.notify_mentor_of_unassignment(user, self)
+    begin
+      MentorManagement.notify_team_of_mentor_unassignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying team of mentor unassignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying team of mentor unassignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
+    begin
+      MentorManagement.notify_mentor_of_unassignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying mentor of unassignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying mentor of unassignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
     true
   end
 
@@ -384,8 +424,6 @@ class Team < ApplicationRecord
 
   def remove_user(user)
     # Find the TeamsUser record and destroy it
-
-    Rails.logger.debug "DEBUG: REMOVE USER: #{user.inspect}"
     
     if user
       t_user = TeamsUser.find_by(user_id: user.id, team_id: id)

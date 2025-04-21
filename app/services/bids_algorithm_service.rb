@@ -26,12 +26,12 @@ class BidsAlgorithmService
   end
 
   private_class_method def self.send_bidding_request(url, bidding_data)
-    # Send request to the bidding service with a 10s timeout 
+    # Send request to the bidding service with a 10s timeout
     response = RestClient.post(url, bidding_data.to_json, content_type: 'application/json', accept: :json, timeout: 10)
     parsed_json = JSON.parse(response.body)
     { success: true, data: parsed_json, error: nil}
   rescue StandardError => e
-    Rails.logger.error "Error in run_bidding_algorithm: #{e.message}"
-    { success: false, data: nil, error: e.message}
+    Rails.logger.error "Error in run_bidding_algorithm: #{ e.message }"
+    { success: false, data: nil, error: e.message }
   end
 end

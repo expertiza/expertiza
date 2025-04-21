@@ -5,9 +5,9 @@ class CompletedReviewCounterServic
   # @param bidding_data [Hash] The data required for the bidding algorithm
   # @return [Hash, false] The matched assignments as a JSON object, or false if an error occurs
   def self.count_reviews(reviews)
-    
     reviews.each do |map|
       num_reviews_completed += 1 if !map.response.empty? && map.response.last.is_submitted
-    
     num_reviews_completed
+    end
+  end
 end

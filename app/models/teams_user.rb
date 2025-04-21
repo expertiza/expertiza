@@ -5,6 +5,8 @@ class TeamsUser < ApplicationRecord
   has_paper_trail
   # attr_accessible :user_id, :team_id # unnecessary protected attributes
 
+  after_destroy :unassign_mentor_if_team_empty
+
   def name(ip_address = nil)
     name = user.name(ip_address)
 
@@ -72,5 +74,11 @@ class TeamsUser < ApplicationRecord
       end
     end
     team_id
+  end
+
+  private
+
+  def unassign_mentor_if_team_empty
+    team.unassign_mentor_if_empty
   end
 end

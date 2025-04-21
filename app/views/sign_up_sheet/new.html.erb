@@ -16,7 +16,7 @@
 	$(document).ready(function () {
 	    loadTime = 1;
 	});
-	function showZeroSlotWarning(){
+	function validateTopicCreation(){
 		let message = ''; // Start with an empty message
 
 		if (loadTime == 1) {
@@ -24,11 +24,6 @@
 				message = 'If you create a topic with 0 slots, students cannot assign this topic.';
 			}
 
-			if ($('#topic_mentor_id').length > 0 && $('#topic_mentor_id').val() !== "") {
-				if (!/^\d+$/.test($('#topic_mentor_id').val())) {
-					message = 'Invalid Mentor ID. Please enter a valid id.';
-				}
-			}
 			if (message !== '') {
 				$('#createTopic').attr('confirm', message);
 			}

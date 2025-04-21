@@ -45,7 +45,7 @@ class SignUpSheet < ApplicationRecord
               # Handle the error, e.g., display a message to the user
             end
 
-            result = team.add_mentor(mentor, team.parent_id)
+            result = team.add_mentor(mentor)
             Rails.logger.debug "Add member to team result: #{result}"
           end
         end

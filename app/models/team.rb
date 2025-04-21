@@ -120,8 +120,6 @@ class Team < ApplicationRecord
   end
 
 
-
-
   def send_team_addition_email(user, assignment_id)
     assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
 
@@ -362,7 +360,9 @@ class Team < ApplicationRecord
 
   def remove_participant_by_user_id(user_id)
     user = User.find_by(id: user_id)
-    remove_user(user) if user
+    if user
+      remove_user(user)
+    end
   end
 
 
@@ -384,14 +384,22 @@ class Team < ApplicationRecord
 
   def remove_user(user)
     # Find the TeamsUser record and destroy it
-    t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
-    # Find and destroy the TeamUserNode associated with the TeamsUser
-    team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
-    team_user_node&.destroy
-    # Destroy the TeamsUser record
-    t_user.destroy
-    # Remove the participant from the assignment
-    remove_participant(user)
+
+    Rails.logger.debug "DEBUG: REMOVE USER: #{user.inspect}"
+    
+    if user
+      t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
+
+      if t_user
+        # Find and destroy the TeamUserNode associated with the TeamsUser
+        team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
+        team_user_node&.destroy
+        # Destroy the TeamsUser record
+        t_user.destroy
+        # Remove the participant from the assignment
+        remove_participant(user)
+      end
+    end
   end
 
   def remove_participant(user)

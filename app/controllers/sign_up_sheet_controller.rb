@@ -114,12 +114,9 @@ class SignUpSheetController < ApplicationController
       mentor_id = topic.mentor_id
       assignment_id = topic.assignment_id
 
-      # Unassign mentor from topic
-      topic.update(mentor_id: nil)
-
       # Unassign mentor from teams under this assignment with this topic
       if mentor_id
-        teams = Team.where(parent_id: assignment_id, topic_id: topic.id)
+        teams = Team.where(parent_id: assignment_id)
         teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
       end
 
@@ -133,7 +130,6 @@ class SignUpSheetController < ApplicationController
     end
   end
 
-
   # This deletes all selected topics for the given assignment
   def delete_all_selected_topics
     load_all_selected_topics
@@ -141,9 +137,6 @@ class SignUpSheetController < ApplicationController
     @stopics.each do |topic|
       mentor_id = topic.mentor_id
       assignment_id = topic.assignment_id
-
-      # Unassign mentor from topic
-      topic.update(mentor_id: nil)
 
       # Unassign mentor from teams under this assignment with this topic
       if mentor_id
@@ -160,7 +153,6 @@ class SignUpSheetController < ApplicationController
       format.js {}
     end
   end
-
 
   # This loads all selected topics based on all the topic identifiers selected for that assignment into stopics variable
   def load_all_selected_topics
@@ -497,7 +489,10 @@ class SignUpSheetController < ApplicationController
     @sign_up_topic.max_choosers = params[:topic][:max_choosers]
     @sign_up_topic.category = params[:topic][:category]
     @sign_up_topic.assignment_id = params[:id]
-    @sign_up_topic.mentor_id = params[:topic][:mentor_id]
+
+    # Find the user by name
+    @sign_up_topic.mentor_id = User.find_by(name: params[:topic][:mentor_username]).id
+
     @assignment = Assignment.find(params[:id])
   end
 

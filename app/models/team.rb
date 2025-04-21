@@ -102,8 +102,29 @@ class Team < ApplicationRecord
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
     # Add user record, node, and participant link
     add_user(user)
-    MentorManagement.notify_team_of_mentor_assignment(user, self)
-    MentorManagement.notify_mentor_of_assignment(user, self)
+
+    begin
+      MentorManagement.notify_team_of_mentor_assignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying team of mentor assignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying team of mentor assignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
+    begin
+      MentorManagement.notify_mentor_of_assignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying mentor of assignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying mentor of assignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
     true
   end
 
@@ -114,8 +135,27 @@ class Team < ApplicationRecord
     remove_user(user)
 
     # Notify team and mentor about the unassignment
-    MentorManagement.notify_team_of_mentor_unassignment(user, self)
-    MentorManagement.notify_mentor_of_unassignment(user, self)
+    begin
+      MentorManagement.notify_team_of_mentor_unassignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying team of mentor unassignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying team of mentor unassignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
+
+    begin
+      MentorManagement.notify_mentor_of_unassignment(user, self)
+    rescue Net::SMTPAuthenticationError => e
+      Rails.logger.error "SMTP Authentication Error while notifying mentor of unassignment: #{e.message}"
+      # Optionally, you could log a message to the user or set a flag
+      # indicating the notification failed.
+    rescue StandardError => e
+      Rails.logger.error "An error occurred while notifying mentor of unassignment: #{e.message}"
+      # Handle other potential errors during email sending
+    end
     true
   end
 
@@ -139,7 +179,6 @@ class Team < ApplicationRecord
       ExpertizaLogger.info "Mentor #{mentor.name} unassigned from empty team #{id} for topic #{topic_id}"
     end
   end
-
 
   def send_team_addition_email(user, assignment_id)
     assignment_name = assignment_id ? Assignment.find(assignment_id).name.to_s : ''
@@ -381,7 +420,9 @@ class Team < ApplicationRecord
 
   def remove_participant_by_user_id(user_id)
     user = User.find_by(id: user_id)
-    remove_user(user) if user
+    if user
+      remove_user(user)
+    end
   end
 
 
@@ -403,14 +444,20 @@ class Team < ApplicationRecord
 
   def remove_user(user)
     # Find the TeamsUser record and destroy it
-    t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
-    # Find and destroy the TeamUserNode associated with the TeamsUser
-    team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
-    team_user_node&.destroy
-    # Destroy the TeamsUser record
-    t_user.destroy
-    # Remove the participant from the assignment
-    remove_participant(user)
+    
+    if user
+      t_user = TeamsUser.find_by(user_id: user.id, team_id: id)
+
+      if t_user
+        # Find and destroy the TeamUserNode associated with the TeamsUser
+        team_user_node = TeamUserNode.find_by(node_object_id: t_user.id)
+        team_user_node&.destroy
+        # Destroy the TeamsUser record
+        t_user.destroy
+        # Remove the participant from the assignment
+        remove_participant(user)
+      end
+    end
   end
 
   def remove_participant(user)

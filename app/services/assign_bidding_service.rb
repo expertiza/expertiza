@@ -1,4 +1,8 @@
+# Service for assigning bidding, which is used in review_bids_controller to help remove bloat from methods
 class AssignBiddingService
+
+  attr_reader :result
+
   Result = Struct.new(:success?, :error_message)
 
   def self.call_by_assignment(assignment_id)
@@ -20,12 +24,8 @@ class AssignBiddingService
       ReviewBid.assign_review_topics(@assignment_id, reviewer_ids, matched_topics)
       @assignment.update!(can_choose_topic_to_review: false)
     end
-  rescue => e
+  rescue StandardError => e
     @result = Result.new(false, e.message)
-  end
-
-  def result
-    @result
   end
 
   private

@@ -147,7 +147,7 @@ class SignUpSheetController < ApplicationController
 
       # Unassign mentor from teams under this assignment with this topic
       if mentor_id
-        teams = Team.where(parent_id: assignment_id, topic_id: topic.id)
+        teams = Team.where(parent_id: assignment_id)
         teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
       end
 

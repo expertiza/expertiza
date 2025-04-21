@@ -47,7 +47,9 @@
   <% mentor = User.find_by(id: topic.mentor_id) %>
   <% if mentor %>
     <%= mentor.name %>
-    <%= link_to 'Unassign', unassign_mentor_assignment_path(@assignment.id, mentor_id: mentor.id, topic_id: topic.id), class: 'btn btn-sm btn-danger', data: { turbo: false } %>
+    <%= link_to unassign_mentor_assignment_path(@assignment.id, mentor_id: mentor.id, topic_id: topic.id), data: { turbo: false } do %>
+      <%= image_tag 'delete_icon.png', alt: 'Unassign Mentor', title: 'Unassign Mentor', size: '16x16' %>
+    <% end %>
   <% else %>
     No Mentor Assigned
   <% end %>

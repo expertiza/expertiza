@@ -52,6 +52,7 @@
     <% end %>
   <% else %>
     --
+    <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :border => 0, :title => 'Assign Mentor', :align => 'middle'), assign_mentor_to_topic_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
   <% end %>
 </td>
 

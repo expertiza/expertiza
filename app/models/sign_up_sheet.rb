@@ -88,6 +88,13 @@ class SignUpSheet < ApplicationRecord
     teams.any?
   end
 
+  def self.find_mentor_for_topic(topic_id)
+    topic = SignUpTopic.find_by(id: topic_id)
+    return nil unless topic&.mentor_id
+
+    User.find_by(id: topic.mentor_id)
+  end
+
   class << self
     private
 

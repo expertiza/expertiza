@@ -91,14 +91,8 @@ class ReviewBidsController < ApplicationController
     redirect_to action: 'show', assignment_id: assignment_id, id: participant_id
   end
 
-  # refactored bidding assignment using AssignBiddingService
   def assign_bidding
-    @participant = AssignmentParticipant.find(params[:id])
-    if @participant.nil?
-      redirect_back fallback_location: root_path, alert: "Participant not found"
-      return
-    end
-    result = AssignBiddingService.call(@participant)
+    result = AssignBiddingService.call_by_assignment(params[:assignment_id])
     unless result.success?
       redirect_back fallback_location: root_path,
                     alert: "Could not assign bids: #{result.error_message}"

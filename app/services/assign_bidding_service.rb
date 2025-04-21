@@ -1,28 +1,23 @@
 class AssignBiddingService
     Result = Struct.new(:success?, :error_message)
   
-    def self.call(participant)
-      new(participant).tap(&:run).result
+    def self.call_by_assignment(assignment_id)
+      new(assignment_id).tap(&:run).result
     end
   
-    def initialize(participant)
-      @participant = participant
-      @assignment  = participant.assignment
-      @result      = Result.new(true, nil)
+    def initialize(assignment_id)
+      @assignment_id = assignment_id
+      @assignment = Assignment.find(assignment_id)
+      @result = Result.new(true, nil)
     end
   
     # Manages the bidding assignment process
     def run
       ActiveRecord::Base.transaction do
-        reviewer_ids   = fetch_reviewer_ids
+        reviewer_ids = fetch_reviewer_ids
         matched_topics = process_bidding(reviewer_ids)
         ensure_valid_topics(matched_topics, reviewer_ids)
-        ReviewBid.assign_review_topics(
-          @assignment.id,
-          reviewer_ids,
-          matched_topics
-        )
-  
+        ReviewBid.assign_review_topics(@assignment_id, reviewer_ids, matched_topics)
         @assignment.update!(can_choose_topic_to_review: false)
       end
     rescue => e
@@ -37,20 +32,18 @@ class AssignBiddingService
   
     # Fetch all reviewer participant IDs for this assignment
     def fetch_reviewer_ids
-      AssignmentParticipant
-        .where(assignment_id: @assignment.id)
-        .pluck(:id)
+      AssignmentParticipant.where(parent_id: @assignment_id).pluck(:id)
     end
   
     # Runs the bidding algorithm using the external web service
     # Falls back to the built-in algorithm if the service fails
     def process_bidding(reviewer_ids)
-      response = BidsAlgorithmService.process_bidding(@assignment.id, reviewer_ids)
+      response = BidsAlgorithmService.process_bidding(@assignment_id, reviewer_ids)
       if response[:success]
         response[:data]
       else
         Rails.logger.error("Bidding webservice failed: #{response[:error]}. Using fallback algorithm.")
-        ReviewBid.fallback_algorithm(@assignment.id, reviewer_ids)
+        ReviewBid.fallback_algorithm(@assignment_id, reviewer_ids)
       end
     end
   
@@ -61,24 +54,8 @@ class AssignBiddingService
         topics = matched_topics[rev_id.to_s]
         topics.is_a?(Array) && topics.any?
       end
-  
       return if missing.empty?
-  
       raise "Invalid topic assignments: no topics for reviewers: #{missing.join(', ')}"
     end
-  end
-  
-  # Controller method (ReviewBidsController)
-  def assign_bidding
-    result = AssignBiddingService.call(@participant)
-  
-    unless result.success?
-      redirect_back fallback_location: root_path,
-                    alert: "Could not assign bids: #{result.error_message}"
-      return
-    end
-  
-    flash[:notice] = 'Bidding assignments updated.'
-    redirect_back fallback_location: root_path
   end
   

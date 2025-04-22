@@ -6,20 +6,20 @@ class ReviewBidsController < ApplicationController
 
   # Constants for role checking
   ALLOWED_ROLES = [
-    'Instructor',        # This list is for show, set_priority, and index
+    'Instructor',
     'Teaching Assistant',
     'Administrator',
     'Super-Administrator',
     'Student'
-  ]
+  ].freeze
 
-  PRIVILEGED_ROLES = ALLOWED_ROLES - ['Student']
-
-  before_action :set_participant, only: [:index, :show, :set_priority, :assign_bidding]
-  before_action :set_assignment, only: [:index, :show, :set_priority, :assign_bidding]
-  before_action :authorize_participant, only: [:index, :show, :set_priority, :assign_bidding]
-
+  PRIVILEGED_ROLES = ALLOWED_ROLES - ['Student'].freeze
   # action allowed function checks the action allowed based on the user working
+  before_action :set_participant, only: [:index, :show, :set_priority]
+  before_action :set_assignment, only: [:index, :show, :set_priority]
+  before_action :authorize_participant, only: [:index, :show, :set_priority]
+  skip_before_action :set_participant, :authorize_participant, only: [:assign_bidding]
+
   def action_allowed?
     return false unless ALLOWED_ROLES.include?(current_role_name)
 
@@ -28,7 +28,7 @@ class ReviewBidsController < ApplicationController
     when 'list'
       are_needed_authorizations_present?(params[:id], 'participant', 'reader', 'submitter', 'reviewer')
     when 'show', 'set_priority', 'index'
-       true
+      true
     else
       PRIVILEGED_ROLES.include?(current_role_name)
     end
@@ -78,17 +78,19 @@ class ReviewBidsController < ApplicationController
   end
 
   def assign_bidding
-    result = AssignBiddingService.call_by_assignment(params[:assignment_id])
-    unless result.success?
-      redirect_back fallback_location: root_path,
-                    alert: "Could not assign bids: #{result.error_message}"
+    unless PRIVILEGED_ROLES.include?(current_role_name)
+      redirect_to(root_path, alert: "Unauthorized to perform this action")
       return
     end
-    flash[:notice] = 'Bidding assignments updated.'
+
+    result = AssignBiddingService.call_by_assignment(params[:assignment_id])
+    if result.success?
+      flash[:notice] = 'Bidding assignments updated.'
+    else
+      flash[:alert] = "Could not assign bids: #{result.error_message}"
+    end
     redirect_back fallback_location: root_path
   end
-
-
 
   private
 

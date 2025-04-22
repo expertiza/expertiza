@@ -67,14 +67,26 @@ class ReviewBidsController < ApplicationController
     selected_topic_ids = Array(params[:topic]).map(&:to_i)
     bids = ReviewBid.where(participant_id: @participant.id)
     assignment_id = @assignment.id
-
     return delete_all_bids_and_redirect(bids) if selected_topic_ids.empty?
-
     existing_topic_ids = bids.pluck(:signuptopic_id)
     to_remove_ids = existing_topic_ids - selected_topic_ids
-    ReviewResponseMap.where(reviewed_object_id: assignment_id).delete_all
-    BidsPriorityService.process_bids(assignment_id, participant_id, selected_topic_ids, removed_topic_ids)
-    redirect_to action: 'show', assignment_id: assignment_id, id: participant_id
+    # Remove bids for topics that were unselected
+    bids.where(signuptopic_id: to_remove_ids).delete_all unless to_remove_ids.empty?
+    # Process the new bids
+    result = BidsPriorityService.process_bids(
+      assignment_id, 
+      @participant.id, 
+      selected_topic_ids, 
+      to_remove_ids
+    )
+    if result.success?
+      flash[:notice] = 'Bid priorities updated successfully.'
+    else
+      flash[:error] = 'Failed to update bid priorities.'
+    end
+    redirect_to action: 'show', 
+                assignment_id: assignment_id, 
+                id: @participant.id
   end
 
   def assign_bidding

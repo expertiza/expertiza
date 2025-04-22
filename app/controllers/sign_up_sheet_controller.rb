@@ -300,23 +300,15 @@ class SignUpSheetController < ApplicationController
         # Directly update only the mentor_id
         if topic.update(mentor_id: user.id)
 
-          participant = topic.participants.first
+          team = SignUpTopic.find(topic.id).teams.first
 
-          #check if there is a team that has topic already
-          if participant != nil
-            Rails.logger.debug "Participant found: #{participant.inspect}"
-            team_user = TeamsUser.find_by(participant_id: participant.id)
-            team = Team.find_by(id: team_user.team_id)
-            if team != nil
-              Rails.logger.debug "Team found: #{team.inspect}"
-              #assign the mentor to that team
-              team.add_mentor(user)
-              Rails.logger.debug "Mentor added to team: #{team.inspect}"
-            else
-              Rails.logger.debug "No team found for participant ID: #{participant.id}"
-            end
+          if team != nil
+            Rails.logger.debug "Team found: #{team.inspect}"
+            #assign the mentor to that team
+            team.add_mentor(user)
+            Rails.logger.debug "Mentor added to team: #{team.inspect}"
           else
-            Rails.logger.debug "No participant found for topic: #{topic.description}"
+            Rails.logger.debug "No team found for topic ID: #{topic.id}"
           end
 
 
@@ -373,6 +365,7 @@ class SignUpSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
       flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)

@@ -12,7 +12,7 @@ describe BidsAlgorithmService do
 
   before do
     allow(Rails.application).to receive(:config_for).with(:webservices)
-                                                    .and_return('review_bidding_webservice_url' => webservice_url)
+  .and_return('review_bidding_webservice_url' => webservice_url)
     allow(ReviewBid).to receive(:bidding_data).with(assignment_id, reviewer_ids)
                                               .and_return(bidding_data)
   end
@@ -22,7 +22,7 @@ describe BidsAlgorithmService do
       before do
         allow(RestClient).to receive(:post)
           .with(webservice_url, bidding_data.to_json, content_type: 'application/json', accept: :json, timeout: 10)
-          .and_return(double(body: response_data.to_json))
+  .and_return(double(body: response_data.to_json))
       end
 
       it 'returns success true and parsed data' do
@@ -68,8 +68,8 @@ describe BidsAlgorithmService do
       before do
         allow(service).to receive(:run_bidding_algorithm).with(bidding_data).and_return(false)
         allow(ReviewBid).to receive(:fallback_algorithm)
-                            .with(assignment_id, reviewer_ids)
-                            .and_return(fallback_result)
+  .with(assignment_id, reviewer_ids)
+  .and_return(fallback_result)
         allow(Rails.logger).to receive(:error)
       end
   

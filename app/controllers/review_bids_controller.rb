@@ -79,7 +79,7 @@ class ReviewBidsController < ApplicationController
 
   def assign_bidding
     unless PRIVILEGED_ROLES.include?(current_role_name)
-      redirect_to(root_path, alert: "Unauthorized to perform this action")
+      redirect_to(root_path, alert: 'Unauthorized to perform this action')
       return
     end
 
@@ -96,7 +96,7 @@ class ReviewBidsController < ApplicationController
 
   def set_participant
     @participant = AssignmentParticipant.find_by(id: params[:id])
-    redirect_to(root_path, alert: "Participant not found") unless @participant
+    redirect_to(root_path, alert: 'Participant not found') unless @participant
   end
 
   def set_assignment
@@ -104,7 +104,7 @@ class ReviewBidsController < ApplicationController
   end
 
   def authorize_participant
-    redirect_to(root_path, alert: "Unauthorized to view page") unless current_user_id?(@participant.user_id)
+    redirect_to(root_path, alert: 'Unauthorized to view page') unless current_user_id?(@participant.user_id)
   end
 
   def delete_all_bids_and_redirect(bids)

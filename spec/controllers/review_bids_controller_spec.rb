@@ -25,26 +25,26 @@ describe ReviewBidsController do
 
       it 'does allow Instructors, Teaching Assistants, Administrators to run review bidding algorithm' do
         controller.params = { action: 'assign_bidding' }
-        
+
         allow(controller).to receive(:current_user).and_return(instructor)
         expect(controller.action_allowed?).to be true
-        
+
         allow(controller).to receive(:current_user).and_return(teaching_assistant)
         expect(controller.action_allowed?).to be true
-        
+
         allow(controller).to receive(:current_user).and_return(admin)
         expect(controller.action_allowed?).to be true
       end
 
       it 'does allow Students to access show, index, set_priority' do
         allow(controller).to receive(:current_user).and_return(student)
-        
+
         controller.params = { action: 'show' }
         expect(controller.action_allowed?).to be true
-        
+
         controller.params = { action: 'index' }
         expect(controller.action_allowed?).to be true
-        
+
         controller.params = { action: 'set_priority' }
         expect(controller.action_allowed?).to be true
       end
@@ -83,11 +83,11 @@ describe ReviewBidsController do
 
   describe '#set_priority' do
     render_views
-  
+
     before do
       allow(ReviewResponseMap).to receive(:where).and_return([])
     end
-  
+
     context 'when updating bids' do
       let(:selected_topic_ids) { [1, 2, 3] }
       let(:existing_bids) do
@@ -97,27 +97,27 @@ describe ReviewBidsController do
           double('Bid', signuptopic_id: 5)
         ]
       end
-  
+
       before do
         allow(ReviewBid).to receive(:where).and_return(existing_bids)
       end
-  
+
       it 'redirects to root path after successful update' do
-        get :set_priority, params: { 
-          topic: selected_topic_ids, 
+        get :set_priority, params: {
+          topic: selected_topic_ids,
           assignment_id: assignment.id, 
-          id: participant.id 
+          id: participant.id
         }
         expect(response).to redirect_to(root_path)
       end
     end
-  
+
     context 'when no topics are selected' do
       it 'redirects to root path' do
-        get :set_priority, params: { 
-          topic: [], 
-          assignment_id: assignment.id, 
-          id: participant.id 
+        get :set_priority, params: {
+          topic: [],
+          assignment_id: assignment.id,
+          id: participant.id
         }
         expect(response).to redirect_to(root_path)
       end

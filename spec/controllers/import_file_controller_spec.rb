@@ -125,6 +125,42 @@ RSpec.describe ImportFileController, type: :controller do
 end
 
 
+RSpec.describe ImportFileController, type: :controller do
+  let(:session) { { user: double('user', name: 'Test User', id: 1), assignment_id: 1 } }
+
+  before do
+    allow(controller).to receive(:current_user_has_ta_privileges?).and_return(true)
+    # Stub SignUpTopic.import to do nothing
+    allow(SignUpTopic).to receive(:import)
+  end
+
+  describe '#import_from_hash_without_headers' do
+    context 'missing content' do
+      let(:params) do
+        {
+          id: 1,
+          model: 'SignUpTopic',
+          has_header: 'false',
+          optional_count: '4',  # Enabled all optional fields
+          mentor_id: 'true',
+          # Required header mappings
+          select1: 'topic_identifier',
+          select2: 'topic_name',
+          select3: 'max_choosers',
+          select4: 'mentor_id'
+        }
+
+      end
+
+      it 'raises a TypeError for missing contents_hash' do
+        expect {
+          controller.send(:import_from_hash, session, params)
+        }.to raise_error(TypeError, /no implicit conversion of nil into String/)
+      end
+    end
+  end
+end
+
 
 
 

@@ -376,7 +376,7 @@ describe '#add_mentor' do
       allow(team).to receive(:user?).with(mentor).and_return(false)
       # Use dynamic IDs from mentor/team
       allow(TeamsUser).to receive(:create)
-                            .with(user_id: mentor.id, team_id: team.id) # <-- Key fix
+                            .with(user_id: mentor.id, team_id: team.id)
                             .and_return(double(id: 2))
       allow(TeamNode).to receive(:find_by)
                            .with(node_object_id: team.id)

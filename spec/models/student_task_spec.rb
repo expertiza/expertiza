@@ -10,12 +10,12 @@ describe StudentTask do
   let(:assignment2) { build(:assignment, name: 'assignment2', directory_path: 'assignment2') }
   let(:team) { create(:assignment_team, id: 1, name: 'team 1', parent_id: assignment.id, users: [user, user2]) }
   let(:team2) { create(:assignment_team, id: 2, name: 'team 2', parent_id: assignment2.id, users: [user3]) }
-  let(:team_user) { create(:team_user, id: 3, team_id: team.id, user_id: user.id) }
-  let(:team_user2) { create(:team_user, id: 4, team_id: team.id, user_id: user2.id) }
-  let(:team2_user3) { create(:team_user, id: 5, team_id: team2.id, user_id: user3.id) }
+  let(:team_participant) { create(:team_participant, id: 3, team_id: team.id, user_id: user.id) }
+  let(:team_participant2) { create(:team_participant, id: 4, team_id: team.id, user_id: user2.id) }
+  let(:team2_user3) { create(:team_participant, id: 5, team_id: team2.id, user_id: user3.id) }
   let(:course_team) { create(:course_team, id: 3, name: 'course team 1', parent_id: course.id) }
-  let(:cource_team_user) { create(:team_user, id: 6, team_id: course_team.id, user_id: user.id) }
-  let(:cource_team_user2) { create(:team_user, id: 7, team_id: course_team.id, user_id: user2.id) }
+  let(:cource_team_participant) { create(:team_participant, id: 6, team_id: course_team.id, user_id: user.id) }
+  let(:cource_team_participant2) { create(:team_participant, id: 7, team_id: course_team.id, user_id: user2.id) }
   let(:topic) { build(:topic) }
   let(:topic2) { create(:topic, topic_name: 'TestReview') }
   let(:topic3) { create(:topic) }

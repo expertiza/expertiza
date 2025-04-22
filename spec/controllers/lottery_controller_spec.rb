@@ -19,12 +19,12 @@ describe LotteryController do
   let(:assignment_team3) { create(:assignment_team, parent_id: assignment.id) }
   let(:assignment_team4) { create(:assignment_team, parent_id: assignment.id) }
 
-  let(:team_user1) { create(:team_user, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
-  let(:team_user2) { create(:team_user, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
-  let(:team_user3) { create(:team_user, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
-  let(:team_user4) { create(:team_user, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
-  let(:team_user5) { create(:team_user, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
-  let(:team_user6) { create(:team_user, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
+  let(:team_participant1) { create(:team_participant, team_id: assignment_team1.id, user_id: student1.id, id: 1) }
+  let(:team_participant2) { create(:team_participant, team_id: assignment_team1.id, user_id: student2.id, id: 2) }
+  let(:team_participant3) { create(:team_participant, team_id: assignment_team1.id, user_id: student3.id, id: 3) }
+  let(:team_participant4) { create(:team_participant, team_id: assignment_team2.id, user_id: student4.id, id: 4) }
+  let(:team_participant5) { create(:team_participant, team_id: assignment_team3.id, user_id: student5.id, id: 5) }
+  let(:team_participant6) { create(:team_participant, team_id: assignment_team4.id, user_id: student6.id, id: 6) }
 
   before :each do
     assignment_team1.save
@@ -32,12 +32,12 @@ describe LotteryController do
     assignment_team3.save
     assignment_team4.save
 
-    team_user1.save
-    team_user2.save
-    team_user3.save
-    team_user4.save
-    team_user5.save
-    team_user6.save
+    team_participant1.save
+    team_participant2.save
+    team_participant3.save
+    team_participant4.save
+    team_participant5.save
+    team_participant6.save
 
     topic1.save
     topic2.save

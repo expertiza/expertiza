@@ -219,7 +219,7 @@ class SignUpSheetController < ApplicationController
       # Find whether the user has signed up for any topics; if so the user won't be able to
       # sign up again unless the former was a waitlisted topic
       # if team assignment, then team id needs to be passed as parameter else the user's id
-      users_team = Team.find_team_users(@assignment.id, session[:user].id)
+      users_team = Team.find_team_participants(@assignment.id, session[:user].id)
       @selected_topics = if users_team.empty?
                            nil
                          else
@@ -279,7 +279,7 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop your topic after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Dropping topic for ended work: ' + params[:topic_id].to_s)
     else
-      users_team = Team.find_team_users(assignment.id, session[:user].id)
+      users_team = Team.find_team_participants(assignment.id, session[:user].id)
       delete_signup_for_topic(params[:topic_id], users_team[0].t_id)
       flash[:success] = 'You have successfully dropped your topic!'
       ExpertizaLogger.info LoggerMessage.new(controller_name, session[:user].id, 'Student has dropped the topic: ' + params[:topic_id].to_s)
@@ -291,7 +291,7 @@ class SignUpSheetController < ApplicationController
     # find participant using assignment using team and topic ids
     team = Team.find(params[:id])
     assignment = Assignment.find(team.parent_id)
-    user = TeamsUser.find_by(team_id: team.id).user
+    user = TeamsParticipant.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
@@ -413,7 +413,7 @@ class SignUpSheetController < ApplicationController
       end
       @results.each do |result|
         @team_members = ''
-        TeamsUser.where(team_id: result[:team_id]).each do |teamuser|
+        TeamsParticipant.where(team_id: result[:team_id]).each do |teamuser|
           @team_members += User.find(teamuser.user_id).name + ' '
         end
       end
@@ -423,7 +423,7 @@ class SignUpSheetController < ApplicationController
 
   def switch_original_topic_to_approved_suggested_topic
     assignment = AssignmentParticipant.find(params[:id]).assignment
-    team_id = TeamsUser.team_id(assignment.id, session[:user].id)
+    team_id = TeamsParticipant.team_id(assignment.id, session[:user].id)
 
     # Tmp variable to store topic id before change
     original_topic_id = SignedUpTeam.topic_id(assignment.id.to_i, session[:user].id)
@@ -443,7 +443,7 @@ class SignUpSheetController < ApplicationController
     # check the waitlist of original topic. Let the first waitlisted team hold the topic, if exists.
     waitlisted_teams = SignedUpTeam.where(topic_id: original_topic_id, is_waitlisted: 1)
     if waitlisted_teams.present?
-      waitlisted_first_team_first_user_id = TeamsUser.where(team_id: waitlisted_teams.first.team_id).first.user_id
+      waitlisted_first_team_first_user_id = TeamsParticipant.where(team_id: waitlisted_teams.first.team_id).first.user_id
       SignUpSheet.signup_team(assignment.id, waitlisted_first_team_first_user_id, original_topic_id)
     end
     redirect_to action: 'list', id: params[:id]

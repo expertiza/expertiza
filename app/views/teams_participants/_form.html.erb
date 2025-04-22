@@ -1,0 +1,15 @@
+<%= form_with scope: :teams_participant,
+              url:   team_teams_participants_path(@team),
+              local: true do |f| %>
+
+  <%= f.hidden_field :team_id, value: @team.id %>
+
+  <div class="field">
+    <%= f.label :user_name, 'Enter user login' %><br/>
+    <%= f.text_field :user_name, size: 41, autocomplete: 'off' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Add' %>
+  </div>
+<% end %>

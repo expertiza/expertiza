@@ -32,12 +32,12 @@ class PopupController < ApplicationController
   end
 
   # this can be called from "response_report" by clicking team names from instructor end.
-  def team_users_popup
+  def team_participants_popup
     @ip = session[:ip]
     @sum = 0
     @team = Team.find(params[:id])
     @assignment = Assignment.find(@team.parent_id)
-    @team_users = TeamsUser.where(team_id: params[:id])
+    @team_participants = TeamsParticipant.where(team_id: params[:id])
 
     # id2 is a response_map id
     unless params[:id2].nil?

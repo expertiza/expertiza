@@ -49,7 +49,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     participant_id = participant_student.first.id
     parent_id = participant_student.first.parent_id
     team_student = Team.where(parent_id: parent_id)
-    team_user = create(:team_user, user_id: user_id)
+    team_participant = create(:team_participant, user_id: user_id)
 
     visit("/assignments/list_submissions?id=#{assignment_test.id}")
     expect(page).to have_content('student6666')
@@ -122,7 +122,7 @@ describe "check 'Begin review' showing up before due date and 'Assign grade' aft
     participant_id = participant_student.first.id
     parent_id = participant_student.first.parent_id
     team_student = Team.where(parent_id: parent_id)
-    team_user = create(:team_user, user_id: user_id)
+    team_participant = create(:team_participant, user_id: user_id)
 
     visit("/assignments/list_submissions?id=#{assignment_test.id}")
     expect(page).to have_content('https://www.expertiza.ncsu.edu')

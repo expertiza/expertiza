@@ -1,7 +1,7 @@
 class CreateTeamUserNodes < ActiveRecord::Migration[4.2]
   def self.up
     begin
-      remove_column :teams_users, :assignment_id
+      remove_column :teams_participants, :assignment_id
     rescue StandardError
     end
 
@@ -18,6 +18,6 @@ class CreateTeamUserNodes < ActiveRecord::Migration[4.2]
     teamsusers = TeamsUser.all
     teamsusers.each(&:destroy)
 
-    add_column :teams_users, :assignment_id, :integer
+    add_column :teams_participants, :assignment_id, :integer
   end
 end

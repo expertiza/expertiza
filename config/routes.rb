@@ -1,3 +1,5 @@
+# config/routes.rb
+
 Expertiza::Application.routes.draw do
   get 'lti/launch'
   post 'lti/launch' => 'lti#launch'
@@ -144,6 +146,7 @@ Expertiza::Application.routes.draw do
       post :exporttags
     end
   end
+
   resources :grades, only: %i[edit update] do
     collection do
       get :view
@@ -237,8 +240,6 @@ Expertiza::Application.routes.draw do
       get :change_handle
       get :inherit
       get :bequeath_all
-      get :inherit
-      get :bequeath_all
       post :update_authorizations
       post :change_handle
       get :view_copyright_grants
@@ -303,21 +304,20 @@ Expertiza::Application.routes.draw do
       get :view
       post :update
       post :update_quiz
-      post :update
       post :create
       post :create_quiz_questionnaire
     end
   end
 
   resources :author_feedback_questionnaires, controller: :questionnaires
-  resources :review_questionnaires, controller: :questionnaires
-  resources :metareview_questionnaires, controller: :questionnaires
-  resources :teammate_review_questionnaires, controller: :questionnaires
-  resources :survey_questionnaires, controller: :questionnaires
-  resources :assignment_survey_questionnaires, controller: :questionnaires
-  resources :global_survey_questionnaires, controller: :questionnaires
-  resources :course_survey_questionnaires, controller: :questionnaires
-  resources :bookmark_rating_questionnaires, controller: :questionnaires
+  resources :review_questionnaires,           controller: :questionnaires
+  resources :metareview_questionnaires,       controller: :questionnaires
+  resources :teammate_review_questionnaires,  controller: :questionnaires
+  resources :survey_questionnaires,           controller: :questionnaires
+  resources :assignment_survey_questionnaires,controller: :questionnaires
+  resources :global_survey_questionnaires,    controller: :questionnaires
+  resources :course_survey_questionnaires,    controller: :questionnaires
+  resources :bookmark_rating_questionnaires,  controller: :questionnaires
 
   resources :questions do
     collection do
@@ -330,30 +330,30 @@ Expertiza::Application.routes.draw do
   resources :reports, only: [] do
     collection do
       post :response_report
-      get :response_report
+      get  :response_report
     end
   end
 
   resources :reputation_web_service, only: [] do
     collection do
-      get :client
+      get  :client
       post :send_post_request
     end
   end
 
   resources :response, only: %i[new create edit update] do
     collection do
-      get :new_feedback
-      get :view
-      get :remove_hyperlink
-      get :save
-      get :redirect
-      get :show_calibration_results_for_student
+      get  :new_feedback
+      get  :view
+      get  :remove_hyperlink
+      get  :save
+      get  :redirect
+      get  :show_calibration_results_for_student
       post :custom_create
-      get :json
+      get  :json
       post :send_email
-      get :author
-      get :run_get_notification
+      get  :author
+      get  :run_get_notification
       post :edit
       post :delete
     end
@@ -365,19 +365,19 @@ Expertiza::Application.routes.draw do
       post :set_priority
       post :index
       post :run_bidding_algorithm
-      get :show
+      get  :show
     end
   end
 
   resources :review_mapping, only: [] do
     collection do
-      get :add_calibration
-      get :list_mappings
-      get :unsubmit_review
+      get  :add_calibration
+      get  :list_mappings
+      get  :unsubmit_review
       post :add_reviewer
-      get :select_reviewer
+      get  :select_reviewer
       post :add_metareviewer
-      get :select_metareviewer
+      get  :select_metareviewer
       post :add_user_to_assignment
       post :assign_metareviewer_dynamically
       post :automatic_review_mapping
@@ -396,7 +396,7 @@ Expertiza::Application.routes.draw do
 
   resources :roles do
     collection do
-      get :list
+      get  :list
       post ':id', action: :update
       post :update
       post :destroy
@@ -442,9 +442,9 @@ Expertiza::Application.routes.draw do
     collection do
       post :student_quizzes
       post :record_response
-      get :finished_quiz
-      get :take_quiz
-      get :review_questions
+      get  :finished_quiz
+      get  :take_quiz
+      get  :review_questions
     end
   end
 
@@ -456,13 +456,12 @@ Expertiza::Application.routes.draw do
 
   resources :student_task, only: [] do
     collection do
-      get :list
-      get :view
-      put :publishing_rights_update
-      get :email_reviewers
-      post :send_email
-      # added a new route for updating publishing rights
-      get '/*other', to: redirect('/student_task/list')
+      get   :list
+      get   :view
+      put   :publishing_rights_update
+      get   :email_reviewers
+      post  :send_email
+      get   '/*other', to: redirect('/student_task/list')
     end
   end
 
@@ -481,7 +480,6 @@ Expertiza::Application.routes.draw do
   resources :student_teams, only: %i[create edit update] do
     collection do
       get :view
-      #E2351 Added a new route for mentors to view all their teams
       get :mentor
       get :remove_participant
       get :auto_complete_for_user_name
@@ -493,16 +491,16 @@ Expertiza::Application.routes.draw do
 
   resources :submitted_content, only: [:edit] do
     collection do
-      get :download
-      get :folder_action
-      get :remove_hyperlink
+      get  :download
+      get  :folder_action
+      get  :remove_hyperlink
       post :remove_hyperlink
-      get :submit_file
+      get  :submit_file
       post :submit_file
       post :folder_action
       post :submit_hyperlink
-      get :submit_hyperlink
-      get :view
+      get  :submit_hyperlink
+      get  :view
     end
   end
 
@@ -510,13 +508,13 @@ Expertiza::Application.routes.draw do
 
   resources :suggestion, only: %i[show new create] do
     collection do
-      get :list
+      get  :list
       post :submit
       post :student_submit
       post :update_suggestion
-      get :student_edit
-      get :add_comment
-      get :student_view
+      get  :student_edit
+      get  :add_comment
+      get  :student_view
     end
   end
 
@@ -536,27 +534,28 @@ Expertiza::Application.routes.draw do
 
   resources :teams, only: %i[new create edit update] do
     collection do
-      get :list
+      get  :list
       post :create_teams
       post :inherit
-      get :delete
-      get :delete_all
-      get :bequeath_all
+      get  :delete
+      get  :delete_all
+      get  :bequeath_all
+    end
+
+    # nested members
+    resources :teams_participants, only: %i[index new create] do
+      delete :delete_selected, on: :collection
     end
   end
 
-  resources :teams_users, only: %i[new create update] do
-    collection do
-      post :list
-      post :update_duties
-      get :delete
-      post :delete_selected
-    end
-  end
+  # standalone destroy
+  resources :teams_participants, only: %i[destroy]
+  # ──────────────────────────────────────────────────────────────────────────────
+
   resources :popup do
     collection do
       get :reviewer_details_popup
-      get :team_users_popup
+      get :team_participants_popup
       get :view_review_scores_popup
       get :self_review_popup
       get :author_feedback_popup
@@ -569,54 +568,54 @@ Expertiza::Application.routes.draw do
   resources :tree_display, only: [] do
     collection do
       post :list
-      get :get_folder_contents
+      get  :get_folder_contents
       post :get_sub_folder_contents
-      get :session_last_open_tab
-      get :set_session_last_open_tab
-      get :goto_courses
-      get :goto_assignments
-      get :goto_questionnaires
-      get :goto_review_rubrics
-      get :goto_metareview_rubrics
-      get :goto_teammatereview_rubrics
-      get :goto_author_feedbacks
-      get :goto_global_survey
-      get :goto_surveys
-      get :goto_course_surveys
-      get :goto_bookmarkrating_rubrics
-      get :list
-      get :drill
-      get :confirm
+      get  :session_last_open_tab
+      get  :set_session_last_open_tab
+      get  :goto_courses
+      get  :goto_assignments
+      get  :goto_questionnaires
+      get  :goto_review_rubrics
+      get  :goto_metareview_rubrics
+      get  :goto_teammatereview_rubrics
+      get  :goto_author_feedbacks
+      get  :goto_global_survey
+      get  :goto_surveys
+      get  :goto_course_surveys
+      get  :goto_bookmarkrating_rubrics
+      get  :list
+      get  :drill
+      get  :confirm
     end
   end
 
   resources :users, constraints: { id: /\d+/ } do
     collection do
-      get :list
-      post :list
-      post ':id', action: :update
-      post :show_if_authorized
-      get :auto_complete_for_user_name
-      get :set_anonymized_view
-      get :keys
+      get    :list
+      post   :list
+      post   ':id', action: :update
+      post   :show_if_authorized
+      get    :auto_complete_for_user_name
+      get    :set_anonymized_view
+      get    :keys
       delete :destroy
-      get :edit
-      get :show
+      get    :edit
+      get    :show
     end
   end
 
   resources :account_request, constraints: { id: /\d+/ } do
     collection do
-      get :list
-      post :list
-      post :list_pending_requested
-      post :list_pending_requested_finalized
-      post ':id', action: :update
-      get :auto_complete_for_user_name
-      get :set_anonymized_view
-      get :keys
-      post :create_requested_user_record
-      post :create_approved_user
+      get    :list
+      post   :list
+      post   :list_pending_requested
+      post   :list_pending_requested_finalized
+      post   ':id', action: :update
+      get    :auto_complete_for_user_name
+      get    :set_anonymized_view
+      get    :keys
+      post   :create_requested_user_record
+      post   :create_approved_user
     end
   end
 
@@ -639,33 +638,32 @@ Expertiza::Application.routes.draw do
   resources :badges do
     collection do
       post :create
-      get :redirect_to_assignment
-      get :new
+      get  :redirect_to_assignment
+      get  :new
     end
   end
 
   resources :conference
   root to: 'content_pages#view', page_name: 'home'
-  post :login, to: 'auth#login'
+  post :login,  to: 'auth#login'
   post :logout, to: 'auth#logout'
-  get 'auth/failure', to: 'content_pages#view'
-  get '/auth/*path', to: redirect('/')
-  get '/menu/*name', controller: :menu_items, action: :link
-  get ':page_name', controller: :content_pages, action: :view, method: :get
+  get  'auth/failure', to: 'content_pages#view'
+  get  '/auth/*path', to: redirect('/')
+  get  '/menu/*name', controller: :menu_items, action: :link
+  get  ':page_name',        controller: :content_pages, action: :view, method: :get
   post 'impersonate/impersonate', to: 'impersonate#impersonate'
   post '/plagiarism_checker_results/:id' => 'plagiarism_checker_comparison#save_results'
-  get 'instructions/home'
-  get 'response/', to: 'response#saving'
-  # get ':controller/service.wsdl', action: 'wsdl'
-  get 'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
-  # get ':controller(/:action(/:id))(.:format)'
+  get  'instructions/home'
+  get  'response/', to: 'response#saving'
+  get  'password_edit/check_reset_url', controller: :password_retrieval, action: :check_reset_url
+
   unless Rails.env.development?
-    match '*path' => 'content_pages#view', :via => %i[get post]
+    match '*path' => 'content_pages#view', via: %i[get post]
   end
-  post '/response_toggle_permission/:id' => 'response#toggle_permission'
-  post '/sample_reviews/map/:id' => 'sample_reviews#map_to_assignment'
-  post '/sample_reviews/unmap/:id' => 'sample_reviews#unmap_from_assignment'
+
+  post '/response_toggle_permission/:id'        => 'response#toggle_permission'
+  post '/sample_reviews/map/:id'                => 'sample_reviews#map_to_assignment'
+  post '/sample_reviews/unmap/:id'              => 'sample_reviews#unmap_from_assignment'
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
-  get 'student_view/flip_view', controller: :student_view, action: :flip_view
-  # updated route and added specific controller action upon accessing this route
+  get  'student_view/flip_view', controller: :student_view, action: :flip_view
 end

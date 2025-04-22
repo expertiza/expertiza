@@ -1,0 +1,38 @@
+<h1>Team Members for <%= @assignment.name %></h1>
+<h3>Team Name: <%= @team.name(session[:ip]) %></h3>
+
+<%
+  column_definitions = []
+  column_definitions << {
+    name:   'Team Member',
+    type:   'fetch',
+    model:  'User',
+    field:  'name',
+    column: 'user_id'      # now works, because TeamsParticipant delegates user_id
+  }
+  column_definitions << {
+    name:       'Remove from Team',
+    action:     'destroy',
+    controller: 'teams_participants'
+  }
+
+  delete_options = {
+    enabled:    true,
+    controller: 'teams_participants'
+  }
+%>
+
+<%= render partial: 'shared_scripts/selectTable',
+           locals: {
+             column_definitions: column_definitions,
+             delete_options:     delete_options,
+             elements:           @teams_participants
+           } %>
+
+<br/>
+
+<%= link_to 'New Team Member',
+            new_team_teams_participant_path(@team) %>
+|
+<%= link_to 'Back',
+            course_teams_path(@team.parent_id) %>

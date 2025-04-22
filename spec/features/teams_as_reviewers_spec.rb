@@ -20,7 +20,7 @@ describe 'teams as reviewers' do
         instance_variable_set('@team' + (i / 3 + 1).to_s, create(:assignment_team, name: 'team' + i.to_s))
         @team = instance_variable_get('@team' + (i / 3 + 1).to_s)
       end
-      create :team_user, user: student, team: @team
+      create :team_participant, user: student, team: @team
     end
 
     @assignment.team_reviewing_enabled = true

@@ -3,8 +3,8 @@ require './spec/support/teams_shared.rb'
 describe AdvertiseForPartnerController do
   # Including the stubbed objects from the teams_shared.rb file
   include_context 'object initializations'
-  let(:team1user1) { build_stubbed(:team_user, id: 1, team: team1, user: student1) }
-  let(:team1user2) { build_stubbed(:team_user, id: 2, team: team1, user: student2) }
+  let(:team1user1) { build_stubbed(:team_participant, id: 1, team: team1, user: student1) }
+  let(:team1user2) { build_stubbed(:team_participant, id: 2, team: team1, user: student2) }
   let(:participant) { build(:participant,  id: 1) }
   # Performs authorization check for user
   describe 'action allowed method' do

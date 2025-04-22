@@ -2,7 +2,7 @@ class SignUpSheet < ApplicationRecord
   # Team lazy initialization method [zhewei, 06/27/2015]
   def self.signup_team(assignment_id, user_id, topic_id = nil)
     # Find the team ID for the given assignment and user
-    team_id = Team.find_team_users(assignment_id, user_id)&.first&.t_id
+    team_id = Team.find_team_participants(assignment_id, user_id)&.first&.t_id
     # If the team doesn't exist, create a new team and assign the team ID
     if team_id.nil?
       team = AssignmentTeam.create_team_with_users(assignment_id, [user_id])

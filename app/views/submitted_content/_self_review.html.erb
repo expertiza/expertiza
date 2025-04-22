@@ -68,8 +68,8 @@
                      :reviewer_id => @participant.id,
                      :reviewer_userid => @participant.user_id do %>
             <td>&nbsp;&nbsp;</td>
-            <% @team_id = TeamsUser.find_by_sql(['SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?', @assignment.id, @participant.user_id]) %>
-            <% @count_users = TeamsUser.find_by_sql(['SELECT count(*) as users FROM teams_users WHERE team_id = ?', @team_id[0].t_id]) %>
+            <% @team_id = TeamsParticipant.find_by_sql(['SELECT t.id as t_id FROM teams_participants u, teams t WHERE u.team_id = t.id and t.parent_id = ? and user_id = ?', @assignment.id, @participant.user_id]) %>
+            <% @count_users = TeamsParticipant.find_by_sql(['SELECT count(*) as users FROM teams_participants WHERE team_id = ?', @team_id[0].t_id]) %>
             <!--if condition belows is used to modify button name based on whether there are one or participants in the team for a given assignment-->
             <% if @count_users[0].users > 1 %>
                 <% reviewType = 'our' %>

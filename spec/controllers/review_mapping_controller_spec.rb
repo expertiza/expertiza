@@ -70,7 +70,7 @@ describe ReviewMappingController do
       }
     end
 
-    context 'when team_user does not exist' do
+    context 'when team_participant does not exist' do
       it 'shows an error message and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(true)
         post :add_reviewer, params: @params
@@ -78,7 +78,7 @@ describe ReviewMappingController do
       end
     end
 
-    context 'when team_user exists and get_reviewer method returns a reviewer' do
+    context 'when team_participant exists and get_reviewer method returns a reviewer' do
       it 'creates a whole bunch of objects and redirects to review_mapping#list_mappings page' do
         allow(TeamsUser).to receive(:exists?).with(team_id: '1', user_id: 1).and_return(false)
         allow(SignUpSheet).to receive(:signup_team).with(1, 1, '1').and_return(true)
@@ -622,7 +622,7 @@ describe ReviewMappingController do
         allow(TeamsUser).to receive(:team_id).with(1, 2).and_return(true)
         allow(TeamsUser).to receive(:team_id).with(1, 3).and_return(false)
         allow(AssignmentTeam).to receive(:create_team_and_node).with(1).and_return(double('AssignmentTeam', id: 1))
-        allow(ApplicationController).to receive_message_chain(:helpers, :create_team_users).with(no_args).with(user, 1).and_return(true)
+        allow(ApplicationController).to receive_message_chain(:helpers, :create_team_participants).with(no_args).with(user, 1).and_return(true)
         request_params = {
           id: 1,
           max_team_size: 1,

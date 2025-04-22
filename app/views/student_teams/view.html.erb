@@ -20,7 +20,7 @@
       %></button>
     <% else %>
       <% button_enabled = false %>
-      <% users = TeamsUser.where(team_id: @student.team.id) %>
+      <% users = TeamsParticipant.where(team_id: @student.team.id) %>
       <% pair_programming_team_status = true %>
       <% users.each do |user| %>
         <% if user.pair_programming_status == "W" or user.pair_programming_status.nil? %>
@@ -64,14 +64,14 @@
         <td><%= member.user.name(session[:ip]) %></td>
         <td><%= member.user.fullname(session[:ip]) %></td>
         <%if @student.assignment.duty_based_assignment? %>
-            <% team_user = member.team_user %>
+            <% team_participant = member.team_participant %>
               <!-- Gets duty of member if the assignment is duty based and member has a duty -->
-            <%unless team_user.duty_id.nil?%>
-               <td><%= Duty.find(team_user.duty_id).name %></td>
+            <%unless team_participant.duty_id.nil?%>
+               <td><%= Duty.find(team_participant.duty_id).name %></td>
             <%else%>
                 <td>
                   <%if  member.user.id == session[:user].id%>
-                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
+                      <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_participant_id => team_participant.id}%>
                   <%else%>
                       Not Selected
                   <%end%>
@@ -89,7 +89,7 @@
         <% end %>
         <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
         <% if @teammate_review_allowed &&
-          ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
+          ((@student.assignment.duty_based_assignment? && !team_participant.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
           <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
             <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
             if map.nil?
@@ -144,7 +144,7 @@
               <td><%= member.user.name(session[:ip]) %></td>
               <td><%= member.user.fullname(session[:ip]) %></td>
               <td><%= member.user.email(session[:ip]) %></td>
-              <% status = TeamsUser.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
+              <% status = TeamsParticipant.find_by(user_id: member.user.id, team_id: member.team.id).pair_programming_status %>
               <% if (status == "W" || status.nil?) and current_user.id != member.user.id %>
                 <td>Request Pending</td>
               <% elsif  (status == "W" || status.nil? ) and current_user.id == member.user.id%>
@@ -173,7 +173,7 @@
 <!--render partial for join team request-->
     <%= render :partial => 'join_team_requests/list_received',
     :locals =>{:team_id=>@student.team.id,
-               :teams_user_id=>params[:student_id],
+               :teams_participant_id=>params[:student_id],
                :assignment_id => @student.assignment.id} unless @student.team.nil? %>
     <% if @send_invs && @send_invs.any? %>
     <br/><br/>
@@ -268,9 +268,9 @@
               <tr>
                 <td><%= inv.from_user.name(session[:ip]) %></td>
                 <td>
-                  <% teams_users = TeamsUser.where(['user_id = ?', inv.from_id]) %>
-                  <% teams_users.each do |teams_user| %>
-                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_user.team_id, @student.assignment.id]).first %>
+                  <% teams_participants = TeamsParticipant.where(['user_id = ?', inv.from_id]) %>
+                  <% teams_participants.each do |teams_participant| %>
+                      <% current_team = Team.where(['id = ? and parent_id = ?', teams_participant.team_id, @student.assignment.id]).first %>
                       <%= Team.find(current_team.id).name unless current_team.nil?%>
                   <% end %>
                 </td>
@@ -321,7 +321,7 @@
 <br/>
 <!--display a list of sent join-team requests-->
 <%= render :partial => 'join_team_requests/list_sent',
-           :locals =>{:teams_user_id=>params[:student_id],
+           :locals =>{:teams_participant_id=>params[:student_id],
                       :assignment_id => @student.assignment.id
            } %>
 <br>

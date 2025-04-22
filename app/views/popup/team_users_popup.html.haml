@@ -2,10 +2,10 @@
   %h3
     Reviews of the #{@team.name}
   %table{:width => "100%"}
-    - if @team_users.empty?
+    - if @team_participants.empty?
       %tr No team members
     - else
-      - @team_users.each do |t|
+      - @team_participants.each do |t|
         %tr
           %td
             \- #{User.find(t.user_id).fullname(@ip)}

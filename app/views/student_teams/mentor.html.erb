@@ -34,14 +34,14 @@
               <td><%= member.user.name(session[:ip]) %></td>
               <td><%= member.user.fullname(session[:ip]) %></td>
               <%if @student.assignment.duty_based_assignment? %>
-                  <% team_user = member.team_user %>
+                  <% team_participant = member.team_participant %>
                     <!-- Gets duty of member if the assignment is duty based and member has a duty -->
-                  <%unless team_user.duty_id.nil?%>
-                    <td><%= Duty.find(team_user.duty_id).name %></td>
+                  <%unless team_participant.duty_id.nil?%>
+                    <td><%= Duty.find(team_participant.duty_id).name %></td>
                   <%else%>
                       <td>
                         <%if  member.user.id == session[:user].id%>
-                            <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_user_id => team_user.id}%>
+                            <%= render :partial=>'select_duty_form', :locals => {:assignment_id => @student.assignment.id, :participant_id => member.id, :teams_participant_id => team_participant.id}%>
                         <%else%>
                             Not Selected
                         <%end%>
@@ -51,7 +51,7 @@
               <td><%= member.user.email(session[:ip]) %></td>
               <!--if you can review a teammate, display Review hyperlink; if the review has been done, display View and Edit Hyperlinks-->
               <% if @teammate_review_allowed &&
-                ((@student.assignment.duty_based_assignment? && !team_user.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
+                ((@student.assignment.duty_based_assignment? && !team_participant.duty_id.nil?) || (!@student.assignment.duty_based_assignment?))%>
                 <% if @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') != nil and member.user.id != session[:user].id %>
                   <% map = TeammateReviewResponseMap.where(['reviewer_id = ? and reviewee_id = ?', @student.id, member.id]).first
                   if map.nil?

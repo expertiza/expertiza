@@ -12,15 +12,15 @@ describe Duty do
   let(:sample_duplicate_duty) { build(:duty, id: 2, name: 'Developer', max_members_for_duty: 1, assignment_id: 1) }
   let(:sample_duty_not_taken) { build(:duty, id: 1, max_members_for_duty: 2, assignment_id: 1) }
 
-  let(:team_user1) { build(:team_user, id: 1, user: user) }
-  let(:team_user2) { build(:team_user, id: 2, user: user2) }
-  let(:team_user3) { build(:team_user, id: 3, user: user3, duty_id: 1) }
+  let(:team_participant1) { build(:team_participant, id: 1, user: user) }
+  let(:team_participant2) { build(:team_participant, id: 2, user: user2) }
+  let(:team_participant3) { build(:team_participant, id: 3, user: user3, duty_id: 1) }
 
   before(:each) do
     allow(team1).to receive(:participants).and_return([participant, participant2, participant3])
-    allow(participant).to receive(:team_user).and_return(team_user1)
-    allow(participant2).to receive(:team_user).and_return(team_user2)
-    allow(participant3).to receive(:team_user).and_return(team_user3)
+    allow(participant).to receive(:team_participant).and_return(team_participant1)
+    allow(participant2).to receive(:team_participant).and_return(team_participant2)
+    allow(participant3).to receive(:team_participant).and_return(team_participant3)
   end
 
   context 'name of the duty should be valid'

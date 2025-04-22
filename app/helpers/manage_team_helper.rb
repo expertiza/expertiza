@@ -3,7 +3,7 @@
 # This helper is used by both sign_up_sheet controller and signup controller
 module ManageTeamHelper
   # Adds a user specified by 'user' object to a team specified by 'team_id'
-  def create_team_users(user, team_id)
+  def create_team_participants(user, team_id)
     # if user does not exist flash message
     unless user
       urlCreate = url_for controller: 'users', action: 'new'
@@ -17,7 +17,7 @@ module ManageTeamHelper
 
   # check if the user specified by 'user' already belongs to team specified by 'team_id'
   def user?(user, team_id)
-    if TeamsUser.where(team_id: team_id, user_id: user.id).first
+    if TeamsParticipant.where(team_id: team_id, user_id: user.id).first
       true
     else
       false

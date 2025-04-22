@@ -100,7 +100,7 @@
                             <div id = <%= team_name_color %> style='border-top: solid; border-width: 1px;'>
                         <% end %>
                 <% end %>
-                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_users_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
+                    <%= link_to team_reviewed_link_name, :controller => 'popup', :action => 'team_participants_popup', :id => reviewer_map.reviewee_id, :id2 => reviewer_map.id, :assignment_id=>@id %>
                     <%= list_review_submissions(reviewer.id, reviewer_map.reviewee_id, reviewer_map.id) %>
                     <!--Hard-coded Dr.Kidd's question in order to display link.-->
                     <!--later we can create a hyperlink question type to deal with this situation.-->

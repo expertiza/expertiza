@@ -82,14 +82,14 @@ class JoinTeamRequestsController < ApplicationController
   def decline
     @join_team_request.status = 'D'
     @join_team_request.save
-    redirect_to view_student_teams_path student_id: params[:teams_user_id]
+    redirect_to view_student_teams_path student_id: params[:teams_participant_id]
   end
 
   private
 
   def check_team_status
     # check if the advertisement is from a team member and if so disallow requesting invitations
-    team_member = TeamsUser.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
+    team_member = TeamsParticipant.where(['team_id =? and user_id =?', params[:team_id], session[:user][:id]])
     team = Team.find(params[:team_id])
     return flash[:error] = 'This team is full.' if team.full?
     return flash[:error] = 'You are already a member of this team.' unless team_member.empty?

@@ -11,8 +11,8 @@ class User < ApplicationRecord
   has_many :participants, class_name: 'Participant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignment_participants, class_name: 'AssignmentParticipant', foreign_key: 'user_id', dependent: :destroy
   has_many :assignments, through: :participants
-  has_many :teams_users, dependent: :destroy
-  has_many :teams, through: :teams_users
+  has_many :teams_participants, dependent: :destroy
+  has_many :teams, through: :teams_participants
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: 'from_id', dependent: :destroy
   has_many :received_invitations, class_name: 'Invitation', foreign_key: 'to_id', dependent: :destroy
   has_many :children, class_name: 'User', foreign_key: 'parent_id'

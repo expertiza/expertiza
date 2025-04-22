@@ -15,7 +15,7 @@ def create_default_test_data(num_qs)
   create_assignment_due_date
   @team = create :assignment_team, assignment: @assignment
   @participant = create :participant, assignment: @assignment, user: @student
-  create :team_user, team: @team, user: @student
+  create :team_participant, team: @team, user: @student
   create :review_response_map, assignment: @assignment, reviewee: @team
 end
 
@@ -180,7 +180,7 @@ describe 'appropriate quiz taking times', js: true do
     @student1 = create(:student)
     @participant1 = create :participant, assignment: @assignment, user: @student1
     @team1 = create :assignment_team, assignment: @assignment
-    create :team_user, team: @team1, user: @student1
+    create :team_participant, team: @team1, user: @student1
     create :review_response_map, assignment: @assignment, reviewee: @team1
     @questionnaire = create :quiz_questionnaire, instructor_id: @team1.id
     choices = create_choices
@@ -204,7 +204,7 @@ describe 'appropriate quiz taking times', js: true do
   end
 
   it 'should be able to take quiz after doing review' do
-    create :team_user, team: @team2, user: @student2
+    create :team_participant, team: @team2, user: @student2
     create :review_response_map, assignment: @assignment, reviewee: @team1, reviewer_id: 2
     login_as @student2.name
     click_link @assignment.name
@@ -227,7 +227,7 @@ end
 
 def make_team
   @team1 = create :assignment_team, assignment: @assignment
-  create :team_user, team: @team1, user: @student1
+  create :team_participant, team: @team1, user: @student1
   create :review_response_map, assignment: @assignment, reviewee: @team1
 end
 

@@ -3,7 +3,7 @@ describe 'List Team' do
     create(:assignment)
     create(:assignment_node)
     assignment_team = create(:assignment_team)
-    create(:team_user)
+    create(:team_participant)
 
     login_as('instructor6')
     visit '/teams/list?id=1&type=Assignment'

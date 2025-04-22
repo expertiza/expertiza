@@ -80,7 +80,7 @@ describe PopupController do
   end
 
   # this can be called from "response_report" by clicking team names from instructor end.
-  describe '#team_users_popup' do
+  describe '#team_participants_popup' do
     it 'renders the page successfully as Instructor' do
       allow(Team).to receive(:find).and_return(team)
       allow(Assignment).to receive(:find).and_return(assignment)
@@ -100,7 +100,7 @@ describe PopupController do
 
       request_params = { id: team.id }
       user_session = { user: instructor }
-      result = get :team_users_popup, params: request_params, session: user_session
+      result = get :team_participants_popup, params: request_params, session: user_session
       expect(result.status).to eq 200
     end
   end

@@ -89,33 +89,33 @@ describe Invitation do
   describe '#update_users_topic_after_invite_accept' do
     context 'the invited user was already in another team before accepting their invitation' do
       it 'updates their team user mapping' do
-        updated_teams_user = TeamsUser.new
-        updated_teams_user.team_id = team.id
-        updated_teams_user.user_id = user3.id
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
-        allow(created_teams_user).to receive(:id).and_return(1)
+        updated_teams_participant = TeamsUser.new
+        updated_teams_participant.team_id = team.id
+        updated_teams_participant.user_id = user3.id
+        created_teams_participant = TeamsUser.new
+        created_teams_participant.team_id = team.id
+        created_teams_participant.user_id = user3.id
+        allow(created_teams_participant).to receive(:id).and_return(1)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(team2.id)
-        allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_user)
-        allow(TeamsUser).to receive(:update).with(1, team_id: team.id).and_return(updated_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+        allow(TeamsUser).to receive(:find_by).with(team_id: team2.id, user_id: user3.id).and_return(created_teams_participant)
+        allow(TeamsUser).to receive(:update).with(1, team_id: team.id).and_return(updated_teams_participant)
+        teams_participant = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+        expect(teams_participant.team_id).to eq(team.id)
+        expect(teams_participant.user_id).to eq(user3.id)
       end
     end
     context 'the invited user was never in another team before accepting their invitation' do
       it 'creates a team user mapping' do
-        created_teams_user = TeamsUser.new
-        created_teams_user.team_id = team.id
-        created_teams_user.user_id = user3.id
+        created_teams_participant = TeamsUser.new
+        created_teams_participant.team_id = team.id
+        created_teams_participant.user_id = user3.id
         allow(TeamsUser).to receive(:team_id).with(assignment.id, user2.id).and_return(team.id)
         allow(TeamsUser).to receive(:team_id).with(assignment.id, user3.id).and_return(nil)
-        allow(TeamsUser).to receive(:create).with(team_id: team.id, user_id: user3.id).and_return(created_teams_user)
-        teams_user = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
-        expect(teams_user.team_id).to eq(team.id)
-        expect(teams_user.user_id).to eq(user3.id)
+        allow(TeamsUser).to receive(:create).with(team_id: team.id, user_id: user3.id).and_return(created_teams_participant)
+        teams_participant = Invitation.update_users_topic_after_invite_accept(user2.id, user3.id, assignment.id)
+        expect(teams_participant.team_id).to eq(team.id)
+        expect(teams_participant.user_id).to eq(user3.id)
       end
     end
   end

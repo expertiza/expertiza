@@ -814,4 +814,53 @@ describe SignUpSheetController do
     end
   end
 
+  describe '#assign_mentor_to_topic_action' do
+    let(:assignment) { create(:assignment) }
+    let(:topic) { create(:topic, assignment: assignment) }
+    let(:mentor_user) { create(:student, name: 'mentor_user') }
+
+    context 'when the user does not exist' do
+      it 'sets a flash error and redirects to assignment edit page' do
+        allow(User).to receive(:find_by).with(name: 'nonexistent_user').and_return(nil)
+        get :assign_mentor_to_topic_action, params: { assignment_id: assignment.id, topic_id: topic.id, username: 'nonexistent_user' }
+        expect(flash[:error]).to eq('That user does not exist!')
+        expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+      end
+    end
+
+    context 'when the topic does not exist' do
+      it 'sets a flash error and redirects to assignment edit page' do
+        allow(User).to receive(:find_by).with(name: mentor_user.name).and_return(mentor_user)
+        allow(SignUpTopic).to receive(:find_by).with(id: topic.id.to_s).and_return(nil)
+        get :assign_mentor_to_topic_action, params: { assignment_id: assignment.id, topic_id: topic.id, username: mentor_user.name }
+        expect(flash[:error]).to eq('Invalid topic!')
+        expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+      end
+    end
+
+    context 'when the topic exists' do
+      before do
+        allow(User).to receive(:find_by).with(name: mentor_user.name).and_return(mentor_user)
+        allow(SignUpTopic).to receive(:find_by).with(id: topic.id.to_s).and_return(topic)
+      end
+
+      it 'assigns the mentor and redirects with success when update succeeds' do
+        allow(topic).to receive(:update).with(mentor_id: mentor_user.id).and_return(true)
+        get :assign_mentor_to_topic_action, params: { assignment_id: assignment.id, topic_id: topic.id, username: mentor_user.name }
+        expect(flash[:success]).to eq('Mentor successfully assigned to the topic!')
+        expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+      end
+
+      it 'sets a flash error and redirects when update fails' do
+        allow(topic).to receive(:update).with(mentor_id: mentor_user.id).and_return(false)
+        allow(topic).to receive_message_chain(:errors, :full_messages).and_return(['Some error'])
+        get :assign_mentor_to_topic_action, params: { assignment_id: assignment.id, topic_id: topic.id, username: mentor_user.name }
+        expect(flash[:error]).to eq('Failed to assign mentor: Some error')
+        expect(response).to redirect_to(controller: 'assignments', action: 'edit', id: assignment.id)
+      end
+    end
+  end
+
+
+
 end

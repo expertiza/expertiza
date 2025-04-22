@@ -101,7 +101,10 @@ class Team < ApplicationRecord
   def add_mentor(user)
     raise "The user #{user.name} is already a member of the team #{name}" if user?(user)
     # Add user record, node, and participant link
-    add_user(user)
+
+    if Participant.exists?(user_id: user.id, can_mentor: true)
+      add_user(user)
+    end
 
     begin
       MentorManagement.notify_team_of_mentor_assignment(user, self)
@@ -433,8 +436,7 @@ class Team < ApplicationRecord
         team_user_node&.destroy
         # Destroy the TeamsUser record
         t_user.destroy
-        # Remove the participant from the assignment
-        remove_participant(user)
+
       end
     end
   end

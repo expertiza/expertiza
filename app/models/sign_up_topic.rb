@@ -37,6 +37,15 @@ class SignUpTopic < ApplicationRecord
     SignedUpTeam.find_by_sql(['SELECT u.id FROM sign_up_topics t, signed_up_teams u WHERE t.id = u.topic_id and u.is_waitlisted = true and t.assignment_id = ? and u.team_id = ?', assignment_id.to_s, team_id.to_s])
   end
 
+  def participants
+    # Get all the teams signed up for this topic
+    signed_up_teams = self.signed_up_teams
+    # Collect all users from those teams
+    users = signed_up_teams.flat_map(&:team).flat_map(&:users)
+    # Get the participants associated with those users and this assignment
+    Participant.where(user_id: users.pluck(:id), parent_id: self.assignment_id)
+  end
+
   def slot_available?
     topic_id = self.id
     # Retrieve the SignUpTopic record based on the given topic_id

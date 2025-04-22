@@ -299,6 +299,28 @@ class SignUpSheetController < ApplicationController
       if topic
         # Directly update only the mentor_id
         if topic.update(mentor_id: user.id)
+
+          participant = topic.participants.first
+
+          #check if there is a team that has topic already
+          if participant != nil
+            Rails.logger.debug "Participant found: #{participant.inspect}"
+            team_user = TeamsUser.find_by(participant_id: participant.id)
+            team = Team.find_by(id: team_user.team_id)
+            if team != nil
+              Rails.logger.debug "Team found: #{team.inspect}"
+              #assign the mentor to that team
+              team.add_mentor(user)
+              Rails.logger.debug "Mentor added to team: #{team.inspect}"
+            else
+              Rails.logger.debug "No team found for participant ID: #{participant.id}"
+            end
+          else
+            Rails.logger.debug "No participant found for topic: #{topic.description}"
+          end
+
+
+
           flash[:success] = 'Mentor successfully assigned to the topic!'
           ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Mentor #{user.name} assigned to topic: #{params[:topic_id]}")
           # Redirect on success

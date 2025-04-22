@@ -9,7 +9,9 @@ module ImportTopicsHelper
     attributes['category'] = row_hash[:category].strip unless row_hash[:category].nil?
     attributes['description'] = row_hash[:description].strip unless row_hash[:description].nil?
     attributes['link'] = row_hash[:link].strip unless row_hash[:link].nil?
+
     attributes['mentor_id'] = row_hash[:mentor_id].strip unless row_hash[:mentor_id].nil?
+
     attributes
   end
 

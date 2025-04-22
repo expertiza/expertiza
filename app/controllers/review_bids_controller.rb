@@ -95,6 +95,7 @@ class ReviewBidsController < ApplicationController
   def set_participant
     @participant = AssignmentParticipant.find_by(id: params[:id])
     redirect_to(root_path, alert: "Participant not found") unless @participant
+  end
 
   def set_assignment
     @assignment = @participant.assignment

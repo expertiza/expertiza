@@ -290,6 +290,10 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'That user does not exist!'
       # Redirect here on failure as well to avoid trying to redirect later
       redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id] # Assuming assignment_id is always present
+    elsif !Participant.exists?(user_id: user.id, can_mentor: true) # Check the can_mentor flag
+      flash[:error] = "'#{user.name}' is not set to mentor topics."
+      redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+      return
     else
       topic = SignUpTopic.find_by(id: params[:topic_id])
       if topic

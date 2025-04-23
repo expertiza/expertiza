@@ -33,7 +33,7 @@
     <table style="width: 48%; display:block" class="general" align="right">
       <% i=1 %>
       <tr><%= render :partial => 'sign_up_sheet/review_bids_table_header' %></tr>
-      <tbody id="selections" data-update-url=<%= "set_priority?id=#{@participant.id}" %> class="connectedSortable">
+      <tbody id="selections" data-update-url="<%= set_priority_review_bids_path(id: @participant.id) %>" class="connectedSortable">
         <tr class="sort-disabled"><td></td><td></td></tr>
         <% for topic in @bids %>
           <tr style= "background-color:<%= get_topic_bg_color_review_bids(topic, @num_participants) %>" id="topic_<%= topic.id %>">

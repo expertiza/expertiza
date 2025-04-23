@@ -29,7 +29,6 @@ class ReviewBid < ApplicationRecord
         Rails.logger.debug "Assigning topics to reviewer #{reviewer_id} (user #{reviewer_user_id}): #{topics_to_assign.inspect}"
         topics_to_assign.each do |topic_id|
           Rails.logger.debug "Assigning topics to reviewer #{reviewer_id}: #{topics_to_assign.inspect}"
-          topics_to_assign.each do |topic|
           assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
         end
       end

@@ -17,10 +17,6 @@ class TeammateReviewResponseMap < ResponseMap
     end
   end
 
-  def contributor
-    nil
-  end
-
   def get_title
     'Teammate Review'
   end

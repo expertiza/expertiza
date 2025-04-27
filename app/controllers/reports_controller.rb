@@ -13,6 +13,7 @@ class ReportsController < ApplicationController
   def response_report
     # ACS Removed the if condition(and corresponding else) which differentiate assignments as team and individual assignments
     # to treat all assignments as team assignments
+    @assignment = Assignment.find(params[:assignment_id]) # Fetch the assignment
     @type = params.key?(:report) ? params[:report][:type] : 'basic'
     # From the ReportFormatterHelper module
     send(@type.underscore, params, session)

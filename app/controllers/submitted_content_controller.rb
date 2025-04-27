@@ -258,7 +258,7 @@ end
     team = participant.try(:team)
     SubmissionRecord.create(team_id: team.try(:id),
                             content: filename,
-                            user: participant.try(:name),
+                            user: participant.try(:username),
                             assignment_id: assignment.try(:id),
                             operation: 'Remove File')
     ExpertizaLogger.info LoggerMessage.new(controller_name, @participant.name, 'The selected file has been deleted.', request)

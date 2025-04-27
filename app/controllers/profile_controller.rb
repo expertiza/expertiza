@@ -18,12 +18,12 @@ class ProfileController < ApplicationController
       aq.update_attribute('notification_limit', params[:assignment_questionnaire][:notification_limit])
     end
     if @user.update_attributes(user_params)
-      ExpertizaLogger.info LoggerMessage.new(controller_name, @user.name, 'Your profile was successfully updated.', request)
+      ExpertizaLogger.info LoggerMessage.new(controller_name, @user.username, 'Your profile was successfully updated.', request)
       @user.etc_icons_on_homepage = params[:no_show_action] != 'not_show_actions'
       @user.save!
       flash[:success] = 'Your profile was successfully updated.'
     else
-      ExpertizaLogger.error LoggerMessage.new(controller_name, @user.name, 'An error occurred and your profile could not updated.', request)
+      ExpertizaLogger.error LoggerMessage.new(controller_name, @user.username, 'An error occurred and your profile could not updated.', request)
       flash[:error] = 'An error occurred and your profile could not updated.'
     end
 
@@ -33,7 +33,7 @@ class ProfileController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:fullname,
+    params.require(:user).permit(:name,
                                  :password,
                                  :password_confirmation,
                                  :email,

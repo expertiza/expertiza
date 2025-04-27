@@ -8,7 +8,7 @@
       - @team_users.each do |t|
         %tr
           %td
-            \- #{User.find(t.user_id).fullname(@ip)}
+            \- #{User.find(t.user_id).name(@ip)}
   - (1..@assignment.num_review_rounds).each do |round|
     - next if instance_variable_get('@response_round_' + round.to_s).nil?
     - if instance_variable_get('@scores_round_' + round.to_s).nil?
@@ -21,7 +21,7 @@
         %td{:align => "center"} --
       %br/
     - else
-      %h3= "Reviewed by #{User.find(@reviewer_id).fullname(@ip)} (Round #{round})"
+      %h3= "Reviewed by #{User.find(@reviewer_id).name(@ip)} (Round #{round})"
       %table{:class => "general", :border => "1px solid #ccc"}
         %tr
           %th{:align => "left", :width => "50%"} Question

@@ -27,7 +27,7 @@ end
         <td><%= penalty_policy.penalty_unit %></td>
         <td><%= penalty_policy.max_penalty %></td>
         <% if is_admin %>
-          <td><%= User.find(penalty_policy.instructor_id).name %></td>
+          <td><%= User.find(penalty_policy.instructor_id).username %></td>
         <% end %>
         <td style="padding-right: 10px"><%= link_to 'Edit', :action => 'edit', :id => penalty_policy %></td>
         <td><%= link_to 'Delete', penalty_policy, :method => 'delete', confirm: 'Are you sure?' %></td>

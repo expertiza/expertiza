@@ -12,7 +12,7 @@ describe CollusionCycle do
   let(:questionnaire) { build(:questionnaire, id: 1) }
   (1..4).each do |i|
     let("team#{i}".to_sym) { build(:assignment_team, id: i, name: "team#{i}", assignment: assignment) }
-    let("participant#{i}".to_sym) { build(:participant, id: i, user: build(:student, name: "stu#{i}"), assignment: assignment) }
+    let("participant#{i}".to_sym) { build(:participant, id: i, user: build(:student, username: "stu#{i}"), assignment: assignment) }
   end
   let(:response_1_2) { build(:response, id: 1) }
   let(:response_2_1) { build(:response, id: 2) }

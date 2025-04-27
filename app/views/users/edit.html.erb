@@ -2,7 +2,7 @@
 
 <%= form_tag :action => 'update', :id => @user do %>
   <p><label for="role_id">Role</label><br/>
-    <%= collection_select 'user', 'role_id', @all_roles, :id, :name %></p>
+    <%= collection_select 'user', 'role_id', @all_roles, :id, :username %></p>
 
   <%= render :partial => 'user', :locals => { :request_user =>false, :edit => true} %>
   <%= submit_tag 'Edit' %>

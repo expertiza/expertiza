@@ -38,8 +38,8 @@ describe 'peer review testing' do
 
   # User 3 navigates to the Your scores page
   def load_your_scores
-    login_as(User.where(role_id: 1).third.name)
-    expect(page).to have_content 'User: ' + User.where(role_id: 1).third.name
+    login_as(User.where(role_id: 1).third.username)
+    expect(page).to have_content 'User: ' + User.where(role_id: 1).third.username
 
     click_link 'Assignments'
     expect(page).to have_content 'TestAssignment'
@@ -55,8 +55,8 @@ describe 'peer review testing' do
 
   # User 1 adds a review to Team 2
   def add_review
-    login_as(User.where(role_id: 1).first.name)
-    expect(page).to have_content 'User: ' + User.where(role_id: 1).first.name
+    login_as(User.where(role_id: 1).first.username)
+    expect(page).to have_content 'User: ' + User.where(role_id: 1).first.username
 
     expect(page).to have_content 'TestAssignment'
 

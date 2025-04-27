@@ -1,6 +1,6 @@
 <!-- Partial to display people who have been invited to collaborate -->
 <tr>
-  <td><%= inv.to_user.name(session[:ip]) %></td>
+  <td><%= inv.to_user.username(session[:ip]) %></td>
   <td><%= inv.to_user.fullname(session[:ip]) %></td>
   <td><%= inv.to_user.email(session[:ip]) %></td>
   <% if inv.reply_status == 'A' %>

@@ -57,19 +57,19 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
 
   def login_as(user_name)
-    user = User.find_by(name: user_name)
+    user = User.find_by(username: user_name)
     msg = user.to_yaml
     File.open('log/diagnostic.txt', 'a') { |f| f.write msg }
 
     visit root_path
-    fill_in 'login_name', with: user_name
+    fill_in 'login_username', with: user_name
     fill_in 'login_password', with: 'password'
     click_button 'Sign in'
     stub_current_user(user, user.role.name, user.role)
   end
 
   def login_as_other_user(user_name)
-    # user =  User.find_by(name: user_name)
+    # user =  User.find_by(username: user_name)
     login_as(user_name)
     click_link 'Home'
     end

@@ -19,7 +19,7 @@ class InvitationsController < ApplicationController
       create_utility
     else
       ExpertizaLogger.error LoggerMessage.new('', @student.name, 'Student was already invited')
-      flash[:note] = "You have already sent an invitation to \"#{@user.name}\"."
+      flash[:note] = "You have already sent an invitation to \"#{@user.username}\"."
     end
 
     update_join_team_request @user, @student
@@ -41,8 +41,8 @@ class InvitationsController < ApplicationController
   end
 
   def auto_complete_for_user_name
-    search = params[:user][:name].to_s
-    @users = User.where('LOWER(name) LIKE ?', "%#{search}%") if search.present?
+    search = params[:user][:username].to_s
+    @users = User.where('LOWER(username) LIKE ?', "%#{search}%") if search.present?
   end
 
   def accept
@@ -86,7 +86,7 @@ class InvitationsController < ApplicationController
 
   def check_user_before_invitation
     # user is the student you are inviting to your team
-    @user = User.find_by(name: params[:user][:name].strip)
+    @user = User.find_by(username: params[:user][:username].strip)
     # User/Author has information about the participant
     @student = AssignmentParticipant.find(params[:student_id])
     @assignment = Assignment.find(@student.parent_id)
@@ -96,7 +96,7 @@ class InvitationsController < ApplicationController
 
     # check if the invited user is valid
     unless @user
-      flash[:error] = "The user \"#{params[:user][:name].strip}\" does not exist. Please make sure the name entered is correct."
+      flash[:error] = "The user \"#{params[:user][:username].strip}\" does not exist. Please make sure the username entered is correct."
       redirect_to view_student_teams_path student_id: @student.id
       return
     end
@@ -110,7 +110,7 @@ class InvitationsController < ApplicationController
       if @assignment.is_conference_assignment
         add_participant_coauthor
       else
-        flash[:error] = "The user \"#{params[:user][:name].strip}\" is not a participant in this assignment."
+        flash[:error] = "The user \"#{params[:user][:username].strip}\" is not a participant in this assignment."
         redirect_to view_student_teams_path student_id: @student.id
         return
       end
@@ -134,7 +134,7 @@ class InvitationsController < ApplicationController
 
     return if team_member.empty?
 
-    flash[:error] = "The user \"#{@user.name}\" is already a member of the team."
+    flash[:error] = "The user \"#{@user.username}\" is already a member of the team."
     redirect_to view_student_teams_path student_id: @student.id
   end
 

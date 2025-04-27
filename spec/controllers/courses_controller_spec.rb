@@ -155,7 +155,7 @@ describe CoursesController do
       allow(Role).to receive(:find_by_name).with('Teaching Assistant').and_return(true)
       allow(user).to receive(:save).and_return(true)
 
-      params = { course_id: 1, user: { name: 'Teaching Assistant' } }
+      params = { course_id: 1, user: { username: 'Teaching Assistant' } }
       post :add_ta, params: params
       expect(response).to be_redirect
     end

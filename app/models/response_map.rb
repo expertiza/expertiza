@@ -33,7 +33,7 @@ class ResponseMap < ApplicationRecord
         @array_sort.clear
         @sort_to.clear
       end
-      responses = responses.sort { |a, b| a.map.reviewer.fullname <=> b.map.reviewer.fullname }
+      responses = responses.sort { |a, b| a.map.reviewer.name <=> b.map.reviewer.name }
     end
     responses
   end

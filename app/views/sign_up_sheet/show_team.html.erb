@@ -21,8 +21,8 @@
       @join_team_requests = JoinTeamRequest.where(team_id: result[:team_id])
       @join_team_requests.each do |join_team_request|
         if join_team_request.status=='P'
-          requesters_names << User.find(Participant.find(join_team_request.participant_id).user_id).name
-          requesters << {name: User.find(Participant.find(join_team_request.participant_id).user_id).name, request_id: join_team_request.id}
+          requesters_names << User.find(Participant.find(join_team_request.participant_id).user_id).username
+          requesters << {username: User.find(Participant.find(join_team_request.participant_id).user_id).username, request_id: join_team_request.id}
         end
       end 
     %>
@@ -30,7 +30,7 @@
     <%
       team_members = []
       TeamsUser.where(team_id: result[:team_id]).each{|teamuser|
-        team_members << User.find(teamuser.user_id).name
+        team_members << User.find(teamuser.user_id).username
       }
       if result[:advertise_for_partner]|| result[:advertise_for_partner] == 1
     %>
@@ -38,7 +38,7 @@
         <td align="center" width="500"><%= result[:name] %></td>
         <td align="center" width="500"><%= team_members.join(', ') %></td>
         <td align="center" width="500"><%= result[:comments_for_advertisement] %></td>
-        <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first && !team_members.include?(session[:user].name) && !requesters_names.include?(session[:user].name) %>
+        <% if  Participant.where(parent_id: result[:assignment_id], user_id: session[:user].id).first && !team_members.include?(session[:user].username) && !requesters_names.include?(session[:user].username) %>
           <td align="center"><%= link_to "Request invitation", :controller => 'join_team_requests', :action => 'new',
             :assignment_id=>result[:assignment_id],
             :topic_id=>result[:topic_id],
@@ -47,13 +47,13 @@
           <img src="/assets/info.png" title="Send request to join this team">
           </td>
         <% else %>
-          <% if team_members.include?(session[:user].name) %>
+          <% if team_members.include?(session[:user].username) %>
             <td align="center"><img src="/assets/info.png" title="You're a member of this team and cannot request to join!"></td>
           <% else %>
             <%
               desired_id = -1
               requesters.each do |requester|
-                if requester[:name] == session[:user].name
+                if requester[:name] == session[:user].username
                   desired_id = requester[:request_id]
                 end
               end

@@ -7,6 +7,8 @@ class ReviewMappingController < ApplicationController
   # including the following helper to refactor the code in response_report function
   # include ReportFormatterHelper
 
+  after_action :create_grading_history, only: :save_grade_and_comment_for_reviewer
+
   @@time_create_last_review_mapping_record = nil
 
   # E1600
@@ -431,12 +433,12 @@ class ReviewMappingController < ApplicationController
   end
 
   def save_grade_and_comment_for_reviewer
-    review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
-    review_grade.attributes = review_mapping_params
-    review_grade.review_graded_at = Time.now
-    review_grade.reviewer_id = session[:user].id
+    @review_grade = ReviewGrade.find_or_create_by(participant_id: params[:review_grade][:participant_id])
+    @review_grade.attributes = review_mapping_params
+    @review_grade.review_graded_at = Time.now
+    @review_grade.reviewer_id = session[:user].id
     begin
-      review_grade.save!
+      @review_grade.save!
       flash[:success] = 'Grade and comment for reviewer successfully saved.'
     rescue StandardError
       flash[:error] = $ERROR_INFO
@@ -596,5 +598,15 @@ class ReviewMappingController < ApplicationController
     params
       .require(:review_grade)
       .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
+  end
+
+  # Create a new grading history record, and write log message
+  def create_grading_history
+    GradingHistoriesController.add_grading_history("Review",
+                                                    @review_grade.grade_for_reviewer,
+                                                    @review_grade.comment_for_reviewer,
+                                                    Participant.find(params[:review_grade][:participant_id]).parent_id,
+                                                    Participant.find(params[:review_grade][:participant_id]).user_id,
+                                                    session[:user])
   end
 end

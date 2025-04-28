@@ -10,11 +10,7 @@
     <th width="50%"><%=t ".topic_name"%></th>
 <% end %>
 
-<% if @assignment.has_attribute?(:mentor_column)%>
-  <th width="10%"><%=Mentor%></th>
-<% else %>
-  <th width="10%"><%=t ".mentor"%></th>
-<% end %>
+<th width="10%">Mentor</th>
 
 <% if @assignment.microtask? %>
   <th width="5%"><%=t ".micro_payment"%></th>

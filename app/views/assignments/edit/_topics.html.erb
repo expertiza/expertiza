@@ -42,9 +42,8 @@
   <% end %>
 <% end %>
 
-<input name="assignment_form[assignment][show_mentors]" type="hidden" value="false"/>
-<%= check_box_tag('assignment_form[assignment][show_mentors]', 'true')%>
-<%= label_tag('assignment_form[assignment][show_mentors]', 'Show Mentors?', {:onChange => ''}) %>
+<%= check_box_tag 'assignment_form[assignment][show_mentors]', 'false' , @show_mentors_checked, {:onChange => 'showHideMentorColumn(this)'} %>
+<%= label_tag('assignment_form[assignment][show_mentors]', 'Show Mentors?') %>
 
 <br><br>
 <% if @assignment_form.assignment.staggered_deadline == true %>
@@ -52,3 +51,58 @@
 <% else %>
     <%= render '/sign_up_sheet/add_signup_topics' %>
 <% end %>
+
+<script>
+    function showHideMentorColumn(checkbox) {
+        var table = document.getElementById("topics"); // Make sure this is the correct table ID
+        var show = !checkbox.checked; // Correctly determine show/hide based on checkbox state
+
+        //  getColumnIndex function
+        function getColumnIndex(table, columnName) {
+            var headers = table.getElementsByTagName("th");
+            for (var i = 0; i < headers.length; i++) {
+                if (headers[i].textContent.trim() === columnName) {
+                    return i;
+                }
+            }
+            return -1; // Return -1 if the column is not found
+        }
+
+        var mentorColumnIndex = getColumnIndex(table, "Mentor"); //hardcoded
+
+        if (mentorColumnIndex !== -1) {
+            // Hide/show header
+            var headerCell = table.getElementsByTagName("th")[mentorColumnIndex];
+            if (headerCell) {
+                headerCell.style.display = show ? "none" : "";
+            }
+
+            // Iterate through table rows
+            for (var i = 0; i < table.rows.length; i++) {
+                var row = table.rows[i];
+                var cell = row.cells[mentorColumnIndex];
+                if (cell) {
+                    cell.style.display = show ? "none" : "";
+                }
+            }
+        }
+        var reviewerColumnIndex = getColumnIndex(table, "Reviewer(s)"); //hardcoded
+
+        if (reviewerColumnIndex !== -1) {
+            // Hide/show header
+            var headerCell = table.getElementsByTagName("th")[reviewerColumnIndex];
+            if (headerCell) {
+                headerCell.style.display = show ? "none" : "";
+            }
+
+            // Iterate through table rows
+            for (var i = 0; i < table.rows.length; i++) {
+                var row = table.rows[i];
+                var cell = row.cells[reviewerColumnIndex];
+                if (cell) {
+                    cell.style.display = show ? "none" : "";
+                }
+            }
+        }
+    }
+</script>

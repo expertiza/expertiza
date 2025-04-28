@@ -43,18 +43,18 @@
 <td><%= render :partial => '/sign_up_sheet/topic_names', :locals => {:i => i, :topic=>topic} %></td>
 
 <!--This also needs to check the specific signup topic that this row is displaying-->
-<td>
-  <% mentor = User.find_by(id: topic.mentor_id) %>
-  <% if mentor %>
-    <%= mentor.name %>
-    <%= link_to unassign_mentor_assignment_path(@assignment.id, mentor_id: mentor.id, topic_id: topic.id), data: { turbo: false } do %>
-      <%= image_tag 'delete_icon.png', alt: 'Unassign Mentor', title: 'Unassign Mentor', size: '16x16' %>
+  <td>
+    <% mentor = User.find_by(id: topic.mentor_id) %>
+    <% if mentor %>
+      <%= mentor.name %>
+      <%= link_to unassign_mentor_assignment_path(@assignment.id, mentor_id: mentor.id, topic_id: topic.id), data: { turbo: false } do %>
+        <%= image_tag 'delete_icon.png', alt: 'Unassign Mentor', title: 'Unassign Mentor', size: '16x16' %>
+      <% end %>
+    <% else %>
+      --
+      <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :border => 0, :title => 'Assign Mentor', :align => 'middle'), assign_mentor_to_topic_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
     <% end %>
-  <% else %>
-    --
-    <%= link_to image_tag('/assets/tree_view/add-participant-24.png', :border => 0, :title => 'Assign Mentor', :align => 'middle'), assign_mentor_to_topic_sign_up_sheet_index_path( assignment_id: params[:id], topic_id: topic.id) %>
-  <% end %>
-</td>
+  </td>
 
 <% if not @assignment.is_intelligent or ['Instructor', 'Teaching Assistant', 'Administrator', 'Super-Administrator'].
   include? current_user_role?.name %>

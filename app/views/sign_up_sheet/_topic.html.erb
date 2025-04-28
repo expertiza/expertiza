@@ -26,10 +26,14 @@
     <td><%= text_area 'topic', 'description', cols: 40, rows: 5 %></td>
   </tr>
 
-  <tr>
-    <td><label for="mentor_username">Topic Mentor Username:  </label></td>
-    <td><%= text_field 'topic', 'mentor_username', size: 10 %></td>
-  </tr>
+  <% if checkbox = document.getElementById('assignment_form_assignment_show_mentors') %>
+
+    <tr>
+      <td><label for="mentor_username">Topic Mentor Username:  </label></td>
+      <td><%= text_field 'topic', 'mentor_username', size: 10 %></td>
+    </tr>
+
+  <% end %>
 
 </table> 
 

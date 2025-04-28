@@ -66,13 +66,13 @@
               <td><%= team.name %></td>
 
               <!-- Members' Names -->
-              <td><%= team.participants.map(&:name).join(', ') %></td>
+              <td><%= team.participants.reject { |p| p.can_mentor }.map(&:name).join(', ') %></td>
 
               <!-- Members' User IDs -->
-              <td><%= team.participants.map(&:handle).join(', ') %></td>
+              <td><%= team.participants.reject { |p| p.can_mentor }.map(&:handle).join(', ')%></td>
 
               <!-- Emails Concatenated -->
-              <td><%= team.participants.map(&:user_email).join(', ') %></td>
+              <td><%= team.participants.reject { |p| p.can_mentor }.map(&:user_email).join(', ')%></td>
 
               <!-- Mentor Name -->
               <% mentor = team.participants.find { |participant| participant.authorization == 'mentor'} || '--' %>

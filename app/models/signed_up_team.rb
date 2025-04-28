@@ -13,10 +13,12 @@ class SignedUpTeam < ApplicationRecord
                                   signed_up_teams.is_waitlisted as is_waitlisted, signed_up_teams.team_id as team_id')
                                 .where('sign_up_topics.assignment_id = ?', assignment_id)
     @participants.each_with_index do |participant, i|
-      participant_names = User.joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
+      participant_names = User.joins(:participants)
+                              .joins('INNER JOIN teams_users ON users.id = teams_users.user_id')
                               .joins('INNER JOIN teams ON teams.id = teams_users.team_id')
                               .select('users.name as u_name, teams.name as team_name')
-                              .where('teams.id = ?', participant.team_id)
+                              .where('teams.id = ? AND participants.can_mentor = 0', participant.team_id)
+                              .distinct
 
 
       team_name_added = false

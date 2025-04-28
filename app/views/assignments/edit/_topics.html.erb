@@ -42,6 +42,10 @@
   <% end %>
 <% end %>
 
+<input name="assignment_form[assignment][show_mentors]" type="hidden" value="false"/>
+<%= check_box_tag('assignment_form[assignment][show_mentors]', 'true')%>
+<%= label_tag('assignment_form[assignment][show_mentors]', 'Show Mentors?', {:onChange => ''}) %>
+
 <br><br>
 <% if @assignment_form.assignment.staggered_deadline == true %>
     <%= render partial: '/sign_up_sheet/add_signup_topics_staggered', locals: {review_rounds: @review_rounds, assignment_submission_due_dates: @assignment_submission_due_dates, assignment_review_due_dates: @assignment_review_due_dates} %>

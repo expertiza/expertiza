@@ -61,7 +61,8 @@ module SignUpSheetHelper
     if participants.present?
       chooser_present = false
       participants.each do |participant|
-        next unless topic.id == participant.topic_id
+        next unless (topic.id == participant.topic_id)
+
         if participant.team.teams_users.size == 0
           participant.team.destroy
           participant.destroy

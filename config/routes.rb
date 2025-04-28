@@ -1,4 +1,6 @@
 Expertiza::Application.routes.draw do
+  resources :mentor_meetings
+  resources :meetings
   get 'lti/launch'
   post 'lti/launch' => 'lti#launch'
 
@@ -65,6 +67,11 @@ Expertiza::Application.routes.draw do
       get :instant_flash
       patch :edit
       post :delete
+    end
+
+    member do
+      get :unassign_mentor
+      get :assign_mentor
     end
   end
 
@@ -422,9 +429,12 @@ Expertiza::Application.routes.draw do
       get :intelligent_sign_up
       get :intelligent_save
       get :signup_as_instructor
+      get :assign_mentor_to_topic
       get :delete_signup_as_instructor
+      get :update_existing_topic
       post :delete_all_topics_for_assignment
       post :signup_as_instructor_action
+      post :assign_mentor_to_topic_action
       post :set_priority
       post :save_topic_deadlines
       post :delete_all_selected_topics
@@ -543,6 +553,7 @@ Expertiza::Application.routes.draw do
       get :delete_all
       get :bequeath_all
     end
+    resources :meetings, only: %i[create destroy]
   end
 
   resources :teams_users, only: %i[new create update] do
@@ -668,4 +679,11 @@ Expertiza::Application.routes.draw do
   post 'student_task/publishing_rights_update', controller: :student_task, action: :publishing_rights_update, method: :put
   get 'student_view/flip_view', controller: :student_view, action: :flip_view
   # updated route and added specific controller action upon accessing this route
+
+  get '/teams/increase_table_headers', to: 'teams#increase_table_headers'
+  get '/teams/increase_table_columns', to: 'teams#increase_table_columns'
+  get '/teams/decrease_table_headers', to: 'teams#decrease_table_headers'
+  get '/teams/decrease_table_columns', to: 'teams#decrease_table_columns'
+
+
 end

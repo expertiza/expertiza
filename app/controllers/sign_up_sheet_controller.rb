@@ -109,7 +109,20 @@ class SignUpSheetController < ApplicationController
   # This deletes all topics for the given assignment
   def delete_all_topics_for_assignment
     topics = SignUpTopic.where(assignment_id: params[:assignment_id])
-    topics.each(&:destroy)
+
+    topics.each do |topic|
+      mentor_id = topic.mentor_id
+      assignment_id = topic.assignment_id
+
+      # Unassign mentor from teams under this assignment with this topic
+      if mentor_id
+        teams = Team.where(parent_id: assignment_id)
+        teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
+      end
+
+      topic.destroy
+    end
+
     flash[:success] = 'All topics have been deleted successfully.'
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) }
@@ -120,7 +133,20 @@ class SignUpSheetController < ApplicationController
   # This deletes all selected topics for the given assignment
   def delete_all_selected_topics
     load_all_selected_topics
-    @stopics.each(&:destroy)
+
+    @stopics.each do |topic|
+      mentor_id = topic.mentor_id
+      assignment_id = topic.assignment_id
+
+      # Unassign mentor from teams under this assignment with this topic
+      if mentor_id
+        teams = Team.where(parent_id: assignment_id)
+        teams.each { |team| team.remove_participant_by_user_id(mentor_id) }
+      end
+
+      topic.destroy
+    end
+
     flash[:success] = 'All selected topics have been deleted successfully.'
     respond_to do |format|
       format.html { redirect_to edit_assignment_path(params[:assignment_id]) + '#tabs-2' }
@@ -158,17 +184,6 @@ class SignUpSheetController < ApplicationController
     # Though called participants, @participants are actually records in signed_up_teams table, which
     # is a mapping table between teams and topics (waitlisted recorded are also counted)
     @participants = SignedUpTeam.find_team_participants(assignment_id, session[:ip])
-  end
-
-
-  def set_values_for_new_topic
-    @sign_up_topic = SignUpTopic.new
-    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
-    @sign_up_topic.topic_name = params[:topic][:topic_name]
-    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
-    @sign_up_topic.category = params[:topic][:category]
-    @sign_up_topic.assignment_id = params[:id]
-    @assignment = Assignment.find(params[:id])
   end
 
   # simple function that redirects ti the /add_signup_topics or the /add_signup_topics_staggered page depending on assignment type
@@ -263,6 +278,62 @@ class SignUpSheetController < ApplicationController
     redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
   end
 
+  def assign_mentor_to_topic
+    @assignment_id = params[:assignment_id]
+    @topic_id = params[:topic_id]
+    render 'sign_up_sheet/add_mentor_to_topic'
+  end
+
+  def assign_mentor_to_topic_action
+    user = User.find_by(name: params[:username])
+    if user.nil?
+      flash[:error] = 'That user does not exist!'
+      # Redirect here on failure as well to avoid trying to redirect later
+      redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id] # Assuming assignment_id is always present
+    elsif !Participant.exists?(user_id: user.id, can_mentor: true) # Check the can_mentor flag
+      flash[:error] = "'#{user.name}' is not set to mentor topics."
+      redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+      return
+    else
+      topic = SignUpTopic.find_by(id: params[:topic_id])
+      if topic
+        # Directly update only the mentor_id
+        if topic.update(mentor_id: user.id)
+
+          team = SignUpTopic.find(topic.id).teams.first
+
+          if team != nil
+            Rails.logger.debug "Team found: #{team.inspect}"
+            #assign the mentor to that team
+            team.add_mentor(user)
+            Rails.logger.debug "Mentor added to team: #{team.inspect}"
+          else
+            Rails.logger.debug "No team found for topic ID: #{topic.id}"
+          end
+
+
+
+          flash[:success] = 'Mentor successfully assigned to the topic!'
+          ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Mentor #{user.name} assigned to topic: #{params[:topic_id]}")
+          # Redirect on success
+          redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id] # Assuming assignment_id is present in params
+        else
+          # Handle potential validation errors during save, although unlikely for just mentor_id
+          flash[:error] = "Failed to assign mentor: #{topic.errors.full_messages.join(', ')}"
+          # Redirect on failure
+          redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id]
+        end
+      else
+        flash[:error] = 'Invalid topic!'
+        ExpertizaLogger.info LoggerMessage.new(controller_name, '', "Invalid topic: #{params[:topic_id]}")
+        # Redirect on failure
+        redirect_to controller: 'assignments', action: 'edit', id: params[:assignment_id] # Assuming assignment_id is always present
+      end
+    end
+    # Removed the final redirect_to as it's handled within the conditional blocks now.
+  end
+
+
   # this function is used to delete a previous signup
   def delete_signup
     participant = AssignmentParticipant.find(params[:id])
@@ -294,6 +365,7 @@ class SignUpSheetController < ApplicationController
     user = TeamsUser.find_by(team_id: team.id).user
     participant = AssignmentParticipant.find_by(user_id: user.id, parent_id: assignment.id)
     drop_topic_deadline = assignment.due_dates.find_by(deadline_type_id: 6)
+
     if !participant.team.submitted_files.empty? || !participant.team.hyperlinks.empty?
       flash[:error] = 'The student has already submitted their work, so you are not allowed to remove them.'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for already submitted work: ' + params[:topic_id].to_s)
@@ -301,6 +373,19 @@ class SignUpSheetController < ApplicationController
       flash[:error] = 'You cannot drop a student after the drop topic deadline!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Drop failed for ended work: ' + params[:topic_id].to_s)
     else
+
+      mentor_user = nil
+
+      team.users.each do |user|
+        if MentorManagement.user_a_mentor?(user)
+          mentor_user = user;
+        end
+      end
+
+      if mentor_user != nil
+        team.remove_mentor(mentor_user)
+      end
+
       delete_signup_for_topic(params[:topic_id], team.id)
       flash[:success] = 'You have successfully dropped the student from the topic!'
       ExpertizaLogger.error LoggerMessage.new(controller_name, session[:user].id, 'Student has been dropped from the topic: ' + params[:topic_id].to_s)
@@ -467,13 +552,33 @@ class SignUpSheetController < ApplicationController
     end
   end
 
+  def set_values_for_new_topic
+    @sign_up_topic = SignUpTopic.new
+    @sign_up_topic.topic_identifier = params[:topic][:topic_identifier]
+    @sign_up_topic.topic_name = params[:topic][:topic_name]
+    @sign_up_topic.max_choosers = params[:topic][:max_choosers]
+    @sign_up_topic.category = params[:topic][:category]
+    @sign_up_topic.assignment_id = params[:id]
+
+    mentor_user = User.find_by(name: params[:topic][:mentor_username])
+
+    # Find the user by name
+    if mentor_user != nil
+      @sign_up_topic.mentor_id = mentor_user.id
+    end
+
+    @assignment = Assignment.find(params[:id])
+  end
+
   def update_existing_topic(topic)
     topic.topic_identifier = params[:topic][:topic_identifier]
     update_max_choosers(topic)
     topic.category = params[:topic][:category]
     # topic.assignment_id = params[:id]
     topic.save
-    redirect_to_sign_up(params[:id])
+    if params[:assignment_id].nil?
+      redirect_to_sign_up(params[:id])
+    end
   end
 
   def update_max_choosers(topic)
@@ -481,13 +586,29 @@ class SignUpSheetController < ApplicationController
     # topic and are on waitlist, then they have to be converted to confirmed topic based on the availability. But if
     # there are choosers already and if there is an attempt to decrease the max choosers, as of now I am not allowing
     # it.
-    if SignedUpTeam.find_by(topic_id: topic.id).nil? || topic.max_choosers == params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
-    elsif topic.max_choosers.to_i < params[:topic][:max_choosers].to_i
-      topic.update_waitlisted_users params[:topic][:max_choosers]
-      topic.max_choosers = params[:topic][:max_choosers]
-    else
-      flash[:error] = 'The value of the maximum number of choosers can only be increased! No change has been made to maximum choosers.'
+
+    # *** Add a check to ensure max_choosers is provided before proceeding ***
+    unless params[:topic].key?(:max_choosers)
+      # If max_choosers wasn't passed in params[:topic], don't try to update it.
+      return
+    end
+
+    # Prevent errors if nil or empty string is passed
+    new_max_choosers_str = params[:topic][:max_choosers]
+    return if new_max_choosers_str.blank?
+    new_max_choosers = new_max_choosers_str.to_i
+    current_max_choosers = topic.max_choosers.to_i # Use to_i for consistent comparison
+
+
+    if SignedUpTeam.find_by(topic_id: topic.id).nil? || current_max_choosers == new_max_choosers
+      topic.max_choosers = new_max_choosers
+    elsif current_max_choosers < new_max_choosers
+      # Assuming update_waitlisted_users takes the integer value
+      topic.update_waitlisted_users(new_max_choosers)
+      topic.max_choosers = new_max_choosers
+      # Removed the confusing elsif topic.mentor_id != nil check
+    else # This means: teams exist AND new value <= current value
+      flash[:error] = 'The value of the maximum number of choosers can only be increased when teams are signed up! No change has been made to maximum choosers.'
     end
   end
 

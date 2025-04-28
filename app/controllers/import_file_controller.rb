@@ -29,6 +29,7 @@ class ImportFileController < ApplicationController
       @optional_count += 1 if params[:category] == 'true'
       @optional_count += 1 if params[:description] == 'true'
       @optional_count += 1 if params[:link] == 'true'
+      @optional_count += 1 if params[:mentor_id] == 'true'
     else
       @optional_count = 0
     end
@@ -107,6 +108,7 @@ class ImportFileController < ApplicationController
       end
     elsif params[:model] == 'SignUpTopic' || params[:model] == 'SignUpSheet'
       contents_hash = eval(params[:contents_hash])
+
       if params[:has_header] == 'true'
         @header_integrated_body = hash_rows_with_headers(contents_hash[:header], contents_hash[:body])
       else
@@ -122,17 +124,32 @@ class ImportFileController < ApplicationController
         elsif params[:optional_count] == '3'
           new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6]]
           @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
+        elsif params[:optional_count] == '4'
+          new_header = [params[:select1], params[:select2], params[:select3], params[:select4], params[:select5], params[:select6], params[:select7]]
+          @header_integrated_body = hash_rows_with_headers(new_header, contents_hash[:body])
         end
       end
       errors = []
+
       begin
         @header_integrated_body.each do |row_hash|
           session[:assignment_id] = params[:id]
+
+          #Remove BOM from all string values in row_hash
+          row_hash.transform_values! do |value|
+            if value.is_a?(String)
+              # Remove UTF-8 BOM and any leading/trailing whitespace
+              value.sub("\xEF\xBB\xBF", '').strip
+            else
+              value
+            end
+          end
           Object.const_get(params[:model]).import(row_hash, session, params[:id])
         end
       rescue StandardError
         errors << $ERROR_INFO
       end
+
     elsif params[:model] == 'AssignmentParticipant' || params[:model] == 'CourseParticipant'
       contents_hash = eval(params[:contents_hash])
       if params[:has_header] == 'true'

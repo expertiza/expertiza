@@ -146,6 +146,10 @@ describe TeamsController do
     end
   end
 
+  describe 'edit_meetings method' do
+
+  end
+
   describe 'delete method' do
     before(:each) { request.env['HTTP_REFERER'] = root_url }
     context 'when called and team is nil' do
@@ -261,6 +265,89 @@ describe TeamsController do
         post :bequeath_all, params: request_params, session: user_session
         expect(flash[:note]).to eq("2 teams were successfully copied to \"TestCourse\"")
       end
+    end
+  end
+
+
+  describe 'increase_table_headers method' do
+    it 'increments colNum with default session value' do
+      controller.params = { type: 'Project', id: 456 }
+      controller.send(:increase_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(2)
+      expect(session[:num_of_meeting_cols]).to eq(2)
+    end
+
+    it 'caps colNum at 5' do
+      session[:num_of_meeting_cols] = 5
+      controller.params = { type: 'Task', id: 789 }
+      controller.send(:increase_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(5)
+      expect(session[:num_of_meeting_cols]).to eq(5)
+    end
+
+    it 'handles colNum being less than zero (default session value)' do
+      controller.params = { type: 'Bug', id: 1011 }
+      controller.send(:increase_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(2)
+      expect(session[:num_of_meeting_cols]).to eq(2)
+    end
+
+    it 'handles colNum being nil (default session value)' do
+      controller.params = { type: 'Feature', id: 1213 }
+      controller.send(:increase_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(2)
+      expect(session[:num_of_meeting_cols]).to eq(2)
+    end
+
+    it 'handles missing type and id' do
+      session[:num_of_meeting_cols] = 2
+      controller.send(:increase_table_headers)
+      expect(controller.instance_variable_get(:@team_type)).to be_nil
+      expect(controller.instance_variable_get(:@ID)).to be_nil
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(3)
+      expect(session[:num_of_meeting_cols]).to eq(3)
+    end
+  end
+
+  describe 'decrease_table_headers method' do
+    it 'does not decrement colNum below 1' do
+      session[:num_of_meeting_cols] = 1
+      controller.params = { type: 'Project', id: 456 }
+      controller.send(:decrease_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(1)
+      expect(session[:num_of_meeting_cols]).to eq(1)
+    end
+
+    it 'handles colNum as a string from session' do
+      session[:num_of_meeting_cols] = 3
+      controller.params = { type: 'Task', id: 789 }
+      controller.send(:decrease_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(2)
+      expect(session[:num_of_meeting_cols]).to eq(2)
+    end
+
+    it 'handles colNum being nil' do
+      controller.params = { type: 'Assignment', id: 1213 }
+      controller.send(:decrease_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(1)
+      expect(session[:num_of_meeting_cols]).to eq(1)
+    end
+
+    it 'handles missing type and id' do
+      session[:num_of_meeting_cols] = 2
+      controller.send(:decrease_table_headers)
+      expect(controller.instance_variable_get(:@team_type)).to be_nil
+      expect(controller.instance_variable_get(:@ID)).to be_nil
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(1)
+      expect(session[:num_of_meeting_cols]).to eq(1)
+    end
+
+    it 'handles colNum being above 5' do
+      session[:num_of_meeting_cols] = 6
+      controller.params = { type: 'test', id: 1 }
+      controller.send(:decrease_table_headers)
+      expect(controller.instance_variable_get(:@num_of_meeting_cols)).to eq(5)
+      expect(session[:num_of_meeting_cols]).to eq(5)
     end
   end
 end

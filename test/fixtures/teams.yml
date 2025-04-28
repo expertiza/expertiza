@@ -1,0 +1,12 @@
+# test/fixtures/teams.yml
+one:
+  name: "Team One"
+  # other attributes
+
+two:
+  name: "Team Two"
+  # other attributes
+
+three:
+  name: "Team Three"
+  # other attributes

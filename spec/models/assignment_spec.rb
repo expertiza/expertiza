@@ -726,5 +726,18 @@ describe Assignment do
       end
     end
   end
+
+  describe '#self.get_teams_by_id' do
+    let(:assignment) {create(:assignment)}
+    let(:team1) { create(:assignment_team, parent_id: assignment.id) }
+    let(:team2) { create(:assignment_team, parent_id: assignment.id) }
+    let(:other_team) { create(:assignment_team) }
+
+    it 'returns teams associated with the given assignment ID' do
+      result = Assignment.get_teams_by_id(assignment.id)
+      expect(result).to contain_exactly(team1, team2)
+    end
+  end
+
 end
 

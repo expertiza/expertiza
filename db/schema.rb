@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20250415151755) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -481,6 +481,13 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.string "name", default: "", null: false
   end
 
+  create_table "meetings", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.date "meeting_date"
+    t.integer "team_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "menu_items", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "parent_id"
     t.string "name", default: "", null: false
@@ -804,8 +811,10 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.integer "private_to"
     t.text "description"
     t.string "link"
+    t.integer "mentor_id"
     t.index ["assignment_id"], name: "fk_sign_up_categories_sign_up_topics"
     t.index ["assignment_id"], name: "index_sign_up_topics_on_assignment_id"
+    t.index ["mentor_id"], name: "index_sign_up_topics_on_mentor_id"
   end
 
   create_table "signed_up_teams", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
@@ -1071,6 +1080,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "review_scores", "reviews", name: "fk_review_score_reviews"
   add_foreign_key "reviews", "review_mappings", name: "fk_review_mappings"
   add_foreign_key "sign_up_topics", "assignments", name: "fk_sign_up_topics_assignments"
+  add_foreign_key "sign_up_topics", "users", column: "mentor_id"
   add_foreign_key "signed_up_teams", "sign_up_topics", column: "topic_id", name: "fk_signed_up_users_sign_up_topics"
   add_foreign_key "survey_deployments", "questionnaires"
   add_foreign_key "ta_mappings", "courses", name: "fk_ta_mappings_course_id"

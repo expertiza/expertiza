@@ -127,4 +127,16 @@ describe CourseTeam do
       end
     end
   end
+
+  describe '#self.get_teams_by_id' do
+    it 'returns the teams associated with given course IDs' do
+      allow(CourseTeam).to receive(:where).with(parent_id: [1, 2]).and_return([course_team1, course_team2])
+      expect(Course.get_teams_by_id([1, 2])).to eq([course_team1, course_team2])
+    end
+
+    it 'returns an empty array if no teams are found' do
+      allow(CourseTeam).to receive(:where).with(parent_id: [3]).and_return([])
+      expect(Course.get_teams_by_id([3])).to eq([])
+    end
+  end
 end

@@ -668,5 +668,9 @@ class Assignment < ApplicationRecord
     end
   end
 
+  def self.get_teams_by_id(assignmentID)
+    Team.where(parent_id: assignmentID)
+  end
+
 end
 

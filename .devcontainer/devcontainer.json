@@ -5,6 +5,7 @@
 	"name": "Expertiza",
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 	"dockerComposeFile": [
 		"../docker-compose.yaml"
 	],

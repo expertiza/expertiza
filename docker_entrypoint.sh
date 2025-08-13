@@ -16,6 +16,7 @@ if [ ! -f .initialized ]; then
 
     # Wait for MySQL database to be created
     echo "Waiting for database expertiza_production to be created..."
+    sleep 10
     until mysql --user=root --password=expertiza --host=mysql -e "USE expertiza_production"; do
       sleep 1
     done

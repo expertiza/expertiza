@@ -16,7 +16,6 @@ services:
       redis:
         condition: service_healthy
     environment:
-      JAVA_HOME: "/usr/lib/jvm/java-8-oracle"
       RAILS_ENV: development
       REDIS_HOST: redis
     entrypoint: ["/app/docker_entrypoint.sh"]

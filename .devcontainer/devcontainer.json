@@ -5,7 +5,6 @@
 	"name": "Expertiza",
 	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
 	// The .devcontainer/docker-compose.yml file contains any overrides you need/want to make.
-	"image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 	"dockerComposeFile": [
 		"../docker-compose.yaml"
 	],
@@ -14,7 +13,7 @@
 	"service": "web",
 	// The optional 'workspaceFolder' property is the path VS Code should open by default when
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
-	"workspaceFolder": "/workspaces/Expertiza",
+	"workspaceFolder": "/workspaces/expertiza",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.shell.linux": null

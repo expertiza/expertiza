@@ -598,20 +598,36 @@ class ReviewMappingController < ApplicationController
       .permit(:grade_for_reviewer, :comment_for_reviewer, :review_graded_at)
   end
 
+  # def save_llm_grade_and_comment_for_reviewer
+  #   participant_id = params[:participant_id]
+  #   assignment_id = params[:assignment_id]
+  #   grade = params[:grade_for_reviewer]
+  #   comment = params[:comment_for_reviewer]
+
+  #   review_grade = ReviewGrade.find_or_initialize_by(participant_id: participant_id, assignment_id: assignment_id)
+  #   review_grade.grade_for_reviewer = grade
+  #   review_grade.comment_for_reviewer = comment
+  #   review_grade.save!
+
+  #   flash[:success] = 'LLM grade and comment saved successfully.'
+  #   redirect_back fallback_location: root_path
+  # end
+
   def save_llm_grade_and_comment_for_reviewer
-    participant_id = params[:participant_id]
-    assignment_id = params[:assignment_id]
-    grade = params[:grade_for_reviewer]
-    comment = params[:comment_for_reviewer]
+    if params[:accept] == "1"
+      review_grade = ReviewGrade.find_or_initialize_by(
+        participant_id: params[:participant_id],
+        assignment_id: params[:assignment_id]
+      )
+      review_grade.update!(
+        grade_for_reviewer: params[:grade_for_reviewer],
+        comment_for_reviewer: params[:comment_for_reviewer]
+      )
+      flash[:success] = 'LLM grade and comment saved successfully.'
+    else
+      flash[:notice] = 'Grade/comment not accepted and thus not saved.'
+    end
 
-    review_grade = ReviewGrade.find_or_initialize_by(participant_id: participant_id, assignment_id: assignment_id)
-    review_grade.grade_for_reviewer = grade
-    review_grade.comment_for_reviewer = comment
-    review_grade.save!
-
-    flash[:success] = 'LLM grade and comment saved successfully.'
     redirect_back fallback_location: root_path
   end
-
-
 end

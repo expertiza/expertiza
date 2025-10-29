@@ -709,5 +709,36 @@ describe ReviewMappingController do
         expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
       end
     end
+
+    describe "POST #save_llm_grade_and_comment_for_reviewer" do
+      let(:assignment) { create(:assignment) }
+      let(:participant) { create(:participant, assignment: assignment) }
+
+      it "saves grade and comment if accepted" do
+        post :save_llm_grade_and_comment_for_reviewer, params: {
+          participant_id: participant.id,
+          assignment_id: assignment.id,
+          grade_for_reviewer: 95,
+          comment_for_reviewer: "Excellent",
+          accept: "1"
+        }
+
+        expect(flash[:success]).to be_present
+        expect(ReviewGrade.last.grade_for_reviewer).to eq(95)
+      end
+
+      it "does not save if checkbox not checked" do
+        post :save_llm_grade_and_comment_for_reviewer, params: {
+          participant_id: participant.id,
+          assignment_id: assignment.id,
+          grade_for_reviewer: 95,
+          comment_for_reviewer: "Excellent",
+          accept: "0"
+        }
+
+        expect(flash[:notice]).to be_present
+        expect(ReviewGrade.find_by(participant_id: participant.id)).to be_nil
+      end
+    end
   end
 end

@@ -48,9 +48,14 @@
             <%= form_with url: save_llm_grade_and_comment_for_reviewer_review_mapping_index_path, method: :post do |form| %>
               <%= form.hidden_field :participant_id, value: reviewer[:reviewer_id] %>
               <%= form.hidden_field :assignment_id, value: @assignment.id %>
+              
+              <%= form.label :accept, "Accept grade/comment" %>
+              <%= form.check_box :accept %><br/>
+
               <%= form.number_field :grade_for_reviewer, value: reviewer[:review_grade][:grade_for_reviewer], min: 0, max: 100 %><br/>
               <%= form.text_area :comment_for_reviewer, value: reviewer[:review_grade][:comment_for_reviewer] %><br/>
-              <%= form.submit "Overwrite", class: "btn btn-warning" %>
+
+              <%= form.submit "Submit", class: "btn btn-primary" %>
             <% end %>
           </td>
         </tr>

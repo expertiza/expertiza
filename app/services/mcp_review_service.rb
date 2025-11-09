@@ -10,8 +10,8 @@ class MCPReviewService
   # Accepts either a response_id (Expertiza) or a model instance.
   # Returns MCP server response (parsed JSON).
   def send_peer_review(response_id: nil)
-    return render json: { success: true, mcp: { id: '123', response_id: response_id, score: 100, feedback: 'Great job!' } }, status: :accepted
-    response = find_response(response_id, response_obj)
+    response = find_response(response_id)
+    return response
     raise ActiveRecord::RecordNotFound, "response not found" unless response
 
     payload = build_mcp_payload_for(response).merge(extra_metadata)
@@ -99,23 +99,47 @@ class MCPReviewService
   end
 
   # Try various likely model names used in Expertiza. Adapt to your actual models.
-  def find_response(response_id, response_obj)
-    return response_obj if response_obj.present?
+  def find_response(response_id)
     return nil if response_id.blank?
 
-    # try common names - adapt to your app
-    ['Response', 'Review', 'Submission', 'SubmittedContent'].each do |const|
-      begin
-        klass = const.safe_constantize
-        next unless klass
-        rec = klass.find_by(id: response_id)
-        return rec if rec
-      rescue NameError
-        next
-      end
-    end
+    response = Response.find(response_id)
+    map       = response.map
 
-    nil
+    # same logic as `questionnaire_from_response`
+    first_score   = response.scores.first
+    questionnaire = response.questionnaire_by_answer(first_score)
+
+    questions      = questionnaire.questions.order(:seq) # like sort_questions
+    scores_by_q_id = response.scores.index_by(&:question_id)
+
+    {
+      response: {
+        id: response.id,
+        map_id: response.map_id,
+        round: response.round,
+        additional_comment: response.additional_comment,
+        is_submitted: response.is_submitted,
+        visibility: response.visibility
+      },
+      questionnaire: {
+        id: questionnaire.id,
+        name: questionnaire.name,
+        min_score: questionnaire.min_question_score,
+        max_score: questionnaire.max_question_score
+      },
+      questions: questions.map do |q|
+        score = scores_by_q_id[q.id]
+
+        {
+          id: q.id,
+          text: q.txt,
+          seq: q.seq,
+          weight: q.weight,
+          answer: score&.answer,
+          comments: score&.comments
+        }
+      end
+    }
   end
 
   def model_for_target(sym)

@@ -1,12 +1,14 @@
 # app/controllers/mcp_reviews_controller.rb
-class McpReviewsController < ApplicationController
+class McpReviewsController < ActionController::Base
   # You will likely want to lock this behind service-account auth.
   # skip_before_action :verify_authenticity_token # if API-only or using token auth
 
+
+
   def create
-    # payload: { response_id: <id> } OR { response_id: <id>, extra_metadata: {...} }
+    # payload: { response_id: <id> }
     service = MCPReviewService.new
-    mcp_response = service.send_peer_review(response_id: params[:response_id], extra_metadata: params[:extra_metadata] || {})
+    mcp_response = service.send_peer_review(response_id: params[:response_id])
     render json: { success: true, mcp: mcp_response }, status: :accepted
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found

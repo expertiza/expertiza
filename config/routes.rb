@@ -647,6 +647,10 @@ Expertiza::Application.routes.draw do
     end
   end  
 
+  resources :mcp_reviews, only: [:create, :show], defaults: { format: :json } do
+    post :finalize, on: :member, defaults: { format: :json }
+  end
+
   resources :conference
   root to: 'content_pages#view', page_name: 'home'
   post :login, to: 'auth#login'

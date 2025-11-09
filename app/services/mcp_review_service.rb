@@ -9,13 +9,15 @@ class MCPReviewService
   # Sends a review/response to the MCP server for LLM evaluation.
   # Accepts either a response_id (Expertiza) or a model instance.
   # Returns MCP server response (parsed JSON).
+  
   def send_peer_review(response_id: nil)
+    assignment_id = 1192
+    response_ids = find_response_ids(assignment_id)
+    return response_ids
+    raise ActiveRecord::RecordNotFound, "response ids not found" unless response_ids
     response = find_response(response_id)
-    return response
     raise ActiveRecord::RecordNotFound, "response not found" unless response
-
-    payload = build_mcp_payload_for(response).merge(extra_metadata)
-    @mcp.send_review(payload)
+    @mcp.send_review(build_mcp_payload_for(response))
   end
 
   # Fetch LLM-generated result from MCP server (by MCP review ID)
@@ -98,7 +100,13 @@ class MCPReviewService
     true
   end
 
-  # Try various likely model names used in Expertiza. Adapt to your actual models.
+  # Find response ids from specific assignment
+  def find_response_ids(assignment_id)
+    return nil if assignment_id.blank? 
+    Response.where(map_id: ResponseMap.where(reviewed_object_id: assignment_id, type: 'ReviewResponseMap').pluck(:id)).pluck(:id)
+  end
+
+  # Find the response and the questionnaire and scores from the response_id
   def find_response(response_id)
     return nil if response_id.blank?
 
@@ -115,27 +123,18 @@ class MCPReviewService
     {
       response: {
         id: response.id,
-        map_id: response.map_id,
+        course_name: response.map.assignment.course.name,
+        assignment_name: response.map.assignment.name,
         round: response.round,
         additional_comment: response.additional_comment,
-        is_submitted: response.is_submitted,
-        visibility: response.visibility
       },
-      questionnaire: {
-        id: questionnaire.id,
-        name: questionnaire.name,
-        min_score: questionnaire.min_question_score,
-        max_score: questionnaire.max_question_score
-      },
-      questions: questions.map do |q|
+      scores: questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }.map do |q|
         score = scores_by_q_id[q.id]
-
-        {
-          id: q.id,
-          text: q.txt,
-          seq: q.seq,
-          weight: q.weight,
-          answer: score&.answer,
+        { id: q.id,
+          question: q.txt,
+          type: q.type,
+          max_points: q.type == 'Checkbox' ? 1 : (q.weight.present? ? q.weight * questionnaire.max_question_score : "Not Applicable"),
+          awarded_points: score&.answer,
           comments: score&.comments
         }
       end

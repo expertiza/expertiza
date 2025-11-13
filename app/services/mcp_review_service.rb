@@ -6,18 +6,19 @@ class MCPReviewService
     @mcp = mcp_client
   end
 
-  # Sends a review/response to the MCP server for LLM evaluation.
-  # Accepts either a response_id (Expertiza) or a model instance.
+  # Sends  all review/response to the MCP server for LLM evaluation.
+  # Accepts either a assignment_id (Expertiza) or a model instance.
   # Returns MCP server response (parsed JSON).
   
-  def send_peer_review(response_id: nil)
-    assignment_id = 1192
+  def send_peer_review(assignment_id: nil)
+    raise ArgumentError, "assignment_id is required" if assignment_id.blank?
     response_ids = find_response_ids(assignment_id)
-    return response_ids
     raise ActiveRecord::RecordNotFound, "response ids not found" unless response_ids
-    response = find_response(response_id)
-    raise ActiveRecord::RecordNotFound, "response not found" unless response
-    @mcp.send_review(build_mcp_payload_for(response))
+    for response_id in response_ids do
+      response = find_response(response_id)
+      @mcp.send_review(response)
+    end
+    return true
   end
 
   # Fetch LLM-generated result from MCP server (by MCP review ID)
@@ -70,20 +71,7 @@ class MCPReviewService
 
   private
 
-  # Build a JSON payload expected by MCP. Adapt to the exact MCP schema you implement.
-  def build_mcp_payload_for(response)
-    {
-      request_id: SecureRandom.uuid,
-      response_id: response.try(:id) || response.try(:response_id) || response['id'],
-      review_text: response.try(:review_text) || response.try(:comments) || response.try(:body) || response.to_s,
-      author_id: response.try(:user_id) || response.try(:author_id),
-      course_id: response.try(:course_id),
-      metadata: {
-        model: 'expertiza',
-        sent_at: Time.current.iso8601
-      }
-    }
-  end
+
 
   # Very small validation example. Expand according to your rules.
   def validate_mcp_result!(result, require_llm_fields: true)
@@ -121,16 +109,14 @@ class MCPReviewService
     scores_by_q_id = response.scores.index_by(&:question_id)
 
     {
-      response: {
-        id: response.id,
+        response_id_of_expertiza: response.id,
         course_name: response.map.assignment.course.name,
         assignment_name: response.map.assignment.name,
         round: response.round,
         additional_comment: response.additional_comment,
-      },
       scores: questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }.map do |q|
         score = scores_by_q_id[q.id]
-        { id: q.id,
+        { 
           question: q.txt,
           type: q.type,
           max_points: q.type == 'Checkbox' ? 1 : (q.weight.present? ? q.weight * questionnaire.max_question_score : "Not Applicable"),

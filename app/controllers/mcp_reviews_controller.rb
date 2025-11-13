@@ -6,9 +6,9 @@ class McpReviewsController < ActionController::Base
 
 
   def create
-    # payload: { response_id: <id> }
+    # payload: { assignment_id: <id> }
     service = MCPReviewService.new
-    mcp_response = service.send_peer_review(response_id: params[:response_id])
+    mcp_response = service.send_peer_review(assignment_id: params[:assignment_id])
     render json: { success: true, mcp: mcp_response }, status: :accepted
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found

@@ -14,18 +14,18 @@ class MCPServerClient
   # payload: Hash (will be converted to JSON)
   # Returns parsed JSON response or raises on HTTP error
   def send_review(payload)
-    post("/v1/reviews", payload)
+    post("api/v1/reviews", payload)
   end
 
   # GET /v1/reviews/:id
   def get_review(id)
-    get("/v1/reviews/#{id}")
+    get("api/v1/reviews/#{id}")
   end
 
   # POST /v1/reviews/:id/finalize
   # payload: { finalized_feedback: ..., finalized_score: ... }
   def finalize_review(id, payload)
-    post("/v1/reviews/#{id}/finalize", payload)
+    post("api/v1/reviews/#{id}/finalize", payload)
   end
 
   private
@@ -50,8 +50,10 @@ class MCPServerClient
     req['Accept'] = 'application/json'
     req['Authorization'] = "Bearer #{@token}" if @token.present?
     req.body = body if body
-
+    
+    Rails.logger.info("[MCP] → #{klass.name} #{uri} body=#{body.inspect}")
     resp = http.request(req)
+    Rails.logger.info("[MCP] ← #{resp.code} #{uri} body=#{resp.body.to_s[0, 500]}")
 
     case resp
     when Net::HTTPSuccess

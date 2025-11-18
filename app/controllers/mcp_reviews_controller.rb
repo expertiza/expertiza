@@ -3,8 +3,9 @@ class McpReviewsController < ActionController::Base
   # You will likely want to lock this behind service-account auth.
   # skip_before_action :verify_authenticity_token # if API-only or using token auth
 
-
-
+# POST /mcp_reviews
+# Send peer review to MCP server
+# payload: { assignment_id: <id> }
   def create
     # payload: { assignment_id: <id> }
     service = MCPReviewService.new
@@ -16,6 +17,9 @@ class McpReviewsController < ActionController::Base
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  # GET /mcp_reviews/:id
+  # Returns the LLM-generated score and feedback for the given MCP review ID
+  # The :id parameter is the MCP review ID
   def show
     service = MCPReviewService.new
     mcp_review = service.get_llm_generated_score_and_feedback(params[:id])

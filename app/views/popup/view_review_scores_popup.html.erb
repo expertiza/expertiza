@@ -79,13 +79,85 @@
           <%=sanitize Response.find(response_id).additional_comment %>
           </td>
         <% end %>
-      </tr>  
-      <!-- Last Row LLM Evaluation Report -->
+      </tr>   
+      
+      <!-- Row LLM Evaluation Report -->
       <tr>
-        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th> 
-        <td> Text for LLM Evaluation Report will be displayed here
-      </td>
-    </tr>
-  </table>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th>
+        <% responses.each do |response_id| %>
+          <% llm_status = @llm_evaluation_data[response_id] || {} %>
+          <td width="<%= item_width %>%" style="padding: 5px;">
+            <div>
+              <div><strong>Status:</strong> <span class="badge <%= llm_status[:badge_class] %>"><%= llm_status[:status_text] %></span></div>
+              <% if llm_status[:score].present? %>
+                <div><strong>Score:</strong> <%= llm_status[:score] %>/100</div>
+              <% end %>
+              <% if llm_status[:feedback].present? %>
+                <div style="font-size: 11px; margin-top: 3px;">
+                  <strong>Feedback:</strong> <%= truncate(llm_status[:feedback], length: 80) %>
+                </div>
+              <% elsif llm_status[:error_message].present? %>
+                <div style="font-size: 11px; margin-top: 3px; color: #666;">
+                  <%= truncate(llm_status[:error_message], length: 80) %>
+                </div>
+              <% end %>
+              <% if llm_status[:show_button] %>
+                <button type="button" 
+                        class="btn btn-sm <%= llm_status[:button_class] %> show-llm-modal" 
+                        style="margin-top: 3px;"
+                        data-response-id="<%= response_id %>"
+                        data-raw-response="<%= escape_javascript(llm_status[:raw_response].to_json) %>">
+                  <%= llm_status[:button_text] %>
+                </button>
+              <% end %>
+            </div>
+          </td>
+        <% end %>
+      </tr>
+
+
+    </table>
+
+<br>
 <% end #loop for keys %>
 <br>
+
+<!-- Dialog for displaying LLM Response -->
+<div id="llmResponseModal" style="display:none;">
+  <pre id="llmResponseContent" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word; background-color: #f5f5f5; padding: 15px; border: 1px solid #ddd; margin: 0;"></pre>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('.show-llm-modal').on('click', function() {
+    var responseId = $(this).data('response-id');
+    var rawResponseJson = $(this).data('raw-response');
+    
+    // Parse and format JSON for display
+    var contentElement = $('#llmResponseContent');
+    try {
+      var rawResponse = typeof rawResponseJson === 'string' ? JSON.parse(rawResponseJson) : rawResponseJson;
+      var formattedJson = JSON.stringify(rawResponse, null, 2);
+      contentElement.text(formattedJson);
+    } catch (e) {
+      contentElement.text('Error displaying response: ' + e.message + '\n\nRaw data: ' + rawResponseJson);
+    }
+    
+    // Show jQuery UI dialog
+    $('#llmResponseModal').dialog({
+      title: 'LLM Evaluation Report - Response ID: ' + responseId,
+      modal: true,
+      width: 800,
+      maxHeight: 600,
+      resizable: true,
+      draggable: true,
+      buttons: {
+        "Close": function() {
+          $(this).dialog("close");
+        }
+      }
+    });
+  });
+});
+</script>
+ 

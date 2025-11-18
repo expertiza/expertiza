@@ -87,7 +87,142 @@ class PopupController < ApplicationController
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
     @reviews = []
+    @mcp_service = MCPReviewService.new
+    @llm_evaluation_data = prepare_llm_evaluation_data
   end
+
+  private
+
+  # Prepare LLM evaluation display data for all responses
+  # Returns hash keyed by response_id with display information
+  def prepare_llm_evaluation_data
+    llm_data = {}
+    return llm_data unless @review_final_versions
+    
+    @review_final_versions.each do |_key, version_data|
+      version_data[:response_ids].each do |response_id|
+        next if llm_data[response_id] # Skip if already processed
+        
+        raw_response = get_raw_mcp_response(response_id)
+        mcp_review = extract_mcp_review_from_response(raw_response)
+        status_hash = calculate_llm_status(mcp_review)
+        status_hash[:raw_response] = raw_response # Include raw response for popup display
+        llm_data[response_id] = status_hash
+      end
+    end
+    
+    llm_data
+  end
+
+  # Get raw MCP response (before processing)
+  def get_raw_mcp_response(response_id)
+    begin
+      @mcp_service.get_llm_generated_score_and_feedback(response_id)
+    rescue => e
+      # Return error hash for debugging
+      { "error" => e.message, "exception_class" => e.class.name }
+    end
+  end
+
+  # Extract MCP review data from raw response
+  # Handles both error responses and success responses (wrapped or unwrapped)
+  def extract_mcp_review_from_response(raw_response)
+    return nil unless raw_response.is_a?(Hash)
+    
+    # Handle error response structure: {"error": "..."}
+    return nil if raw_response['error'].present?
+    
+    # Handle wrapped success structure: {"success": true, "mcp": {...}}
+    if raw_response['success'] && raw_response['mcp'].present?
+      return raw_response['mcp']
+    end
+    
+    # Handle direct mcp data structure (unwrapped)
+    raw_response
+  end
+
+  # Calculate LLM evaluation status and return display hash
+  # Returns hash with: status_text, badge_class, score, feedback, error_message, show_button, button_text, button_class, mcp_review_id
+  def calculate_llm_status(mcp_review)
+    return default_not_sent_status if mcp_review.nil?
+
+    status = mcp_review['status']
+    
+    # Failed or error status - this means it was sent but processing failed
+    if status == 'failed' || status == 'error'
+      return {
+        status_text: 'Processing failed',
+        badge_class: 'badge-danger',
+        score: nil,
+        feedback: nil,
+        error_message: mcp_review['llm_details_reasoning'],
+        show_button: mcp_review['id'].present?,
+        button_text: 'View Details',
+        button_class: 'btn-warning',
+        mcp_review_id: mcp_review['id']
+      }
+    end
+
+    # Success but not generated yet
+    if mcp_review['llm_generated_feedback'].nil? && mcp_review['llm_generated_score'].nil?
+      return {
+        status_text: 'Not generated yet',
+        badge_class: 'badge-warning',
+        score: nil,
+        feedback: nil,
+        error_message: nil,
+        show_button: mcp_review['id'].present?,
+        button_text: 'View Details',
+        button_class: 'btn-info',
+        mcp_review_id: mcp_review['id']
+      }
+    end
+
+    # Generated but not finalized
+    if mcp_review['finalized_feedback'].nil? && mcp_review['finalized_score'].nil?
+      return {
+        status_text: 'Generated but not finalized',
+        badge_class: 'badge-info',
+        score: mcp_review['llm_generated_score'],
+        feedback: mcp_review['llm_generated_feedback'],
+        error_message: nil,
+        show_button: mcp_review['id'].present?,
+        button_text: 'View Full Report',
+        button_class: 'btn-primary',
+        mcp_review_id: mcp_review['id']
+      }
+    end
+
+    # Finalized
+    {
+      status_text: 'Finalized',
+      badge_class: 'badge-success',
+      score: mcp_review['finalized_score'] || mcp_review['llm_generated_score'],
+      feedback: mcp_review['finalized_feedback'] || mcp_review['llm_generated_feedback'],
+      error_message: nil,
+      show_button: mcp_review['id'].present?,
+      button_text: 'View Full Report',
+      button_class: 'btn-success',
+      mcp_review_id: mcp_review['id']
+    }
+  end
+
+  # Default status when no data found
+  def default_not_sent_status
+    {
+      status_text: 'Not sent for processing yet',
+      badge_class: 'badge-secondary',
+      score: nil,
+      feedback: nil,
+      error_message: 'No LLM evaluation data found',
+      show_button: false,
+      button_text: nil,
+      button_class: nil,
+      mcp_review_id: nil
+    }
+  end
+
+  public
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup

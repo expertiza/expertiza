@@ -21,52 +21,13 @@ class MCPReviewService
     return true
   end
 
-  # Fetch LLM-generated result from MCP server (by MCP review ID)
+  # Fetch LLM-generated result from MCP server (by expertiza response_id)
   # Returns parsed JSON (expects llm_generated_score, llm_generated_feedback, ...).
-  def get_llm_generated_score_and_feedback(mcp_review_id)
-    result = @mcp.get_review(mcp_review_id)
-    validate_mcp_result!(result)
+  def get_llm_generated_score_and_feedback(response_id)
+    result = @mcp.get_review(response_id)
+    return result
+    #validate_mcp_result!(result)
     result
-  end
-
-  # Persist finalized grade/feedback to Expertiza DB.
-  # target_model_sym can be :review_grades, :review_scores, :review_of_review_scores (defaults to :review_scores)
-  # Returns the created ActiveRecord object (or raises).
-  def publish_or_finalize_grade(mcp_review_id:, finalized_score:, finalized_feedback:, target_model_sym: :review_scores, actor: nil)
-    # fetch MCP review to map to expertiza response_id if not provided separately
-    mcp_review = @mcp.get_review(mcp_review_id)
-    validate_mcp_result!(mcp_review, require_llm_fields: false) # allow finalize without llm fields
-
-    response_id = mcp_review['response_id_of_expertiza'] || mcp_review['response_id'] || mcp_review['response_id_expertiza']
-    raise "response_id not present in MCP record; include response_id when finalizing" if response_id.blank?
-
-    unless VALID_SCORE_RANGE.include?(finalized_score.to_i)
-      raise ArgumentError, "finalized_score must be within #{VALID_SCORE_RANGE}"
-    end
-
-    model = model_for_target(target_model_sym)
-    raise "Unknown target model #{target_model_sym}" unless model
-
-    # Try to create a record using a few common column names. Update as per your schema.
-    attrs = {
-      response_id: response_id,
-      score: finalized_score,
-      comments: finalized_feedback,
-      created_at: Time.current,
-      updated_at: Time.current
-    }
-
-    # If the model has different column names, adapt here (or provide exact model name).
-    record = model.create!(attrs)
-    # Optionally update the MCP record with finalized data
-    begin
-      @mcp.finalize_review(mcp_review_id, { finalized_score: finalized_score, finalized_feedback: finalized_feedback })
-    rescue => e
-      Rails.logger.warn("Failed to notify MCP of finalize: #{e.message}")
-      # Not fatal for local save; MCP should be updated but we don't want finalize to completely fail
-    end
-
-    record
   end
 
   private

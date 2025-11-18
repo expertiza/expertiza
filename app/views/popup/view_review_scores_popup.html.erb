@@ -70,7 +70,7 @@
         <% end %>
       <% end %>  
 
-      <!-- Last Row additional Comments -->
+      <!-- Row additional Comments -->
       <tr>
         <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Additional Comments</b></th>
         <% responses.each do |response_id| %>  
@@ -79,12 +79,13 @@
           <%=sanitize Response.find(response_id).additional_comment %>
           </td>
         <% end %>
-      </tr>      
-
-
-    </table>
-
-<br>
+      </tr>  
+      <!-- Last Row LLM Evaluation Report -->
+      <tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th> 
+        <td> Text for LLM Evaluation Report will be displayed here
+      </td>
+    </tr>
+  </table>
 <% end #loop for keys %>
 <br>
- 

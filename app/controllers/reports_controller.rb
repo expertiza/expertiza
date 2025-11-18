@@ -38,7 +38,25 @@ class ReportsController < ApplicationController
   def llm_evaluation_report(params, session)
     assignment_id = params[:id]
     @assignment = Assignment.find(assignment_id)
-    @llm_response_data = LlmEvaluationService.call(params)
+  end
+
+  def send_to_llm
+    @assignment = Assignment.find(params[:id])
+    
+    begin
+      service = MCPReviewService.new
+      service.send_peer_review(assignment_id: @assignment.id)
+      
+      # Update the flag to indicate assignment has been sent to LLM
+      @assignment.update(is_sent_to_llm_for_processing: true)
+      
+      flash[:success] = "Assignment successfully sent to LLM for processing."
+    rescue => e
+      Rails.logger.error "Error sending assignment to LLM: #{e.message}"
+      flash[:error] = "Error sending assignment to LLM: #{e.message}"
+    end
+    
+    redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
 end

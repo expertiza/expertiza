@@ -99,32 +99,89 @@ class MCPReviewService
     return nil if response_id.blank?
 
     response = Response.find(response_id)
-    map       = response.map
+    questionnaire = get_questionnaire_from_response(response)
+    
+    build_response_data(response, questionnaire)
+  end
 
-    # same logic as `questionnaire_from_response`
-    first_score   = response.scores.first
-    questionnaire = response.questionnaire_by_answer(first_score)
+  # Build the complete response data hash
+  def build_response_data(response, questionnaire)
+    {
+      response_id_of_expertiza: response.id,
+      course_name: response.map.assignment.course.name,
+      assignment_name: response.map.assignment.name,
+      round: response.round,
+      scores: build_current_round_scores(response, questionnaire),
+      additional_comment: response.additional_comment,
+      previous_round_review: build_previous_round_review(response, questionnaire)
+    }
+  end
 
-    questions      = questionnaire.questions.order(:seq) # like sort_questions
+  # Get questionnaire from response (same logic as `questionnaire_from_response`)
+  def get_questionnaire_from_response(response)
+    first_score = response.scores.first
+    response.questionnaire_by_answer(first_score)
+  end
+
+  # Build scores for current round
+  def build_current_round_scores(response, questionnaire)
+    questions = questionnaire.questions.order(:seq)
     scores_by_q_id = response.scores.index_by(&:question_id)
 
+    filter_header_questions(questions).map do |question|
+      score = scores_by_q_id[question.id]
+      format_score_data(question, score, questionnaire)
+    end
+  end
+
+  # Build previous round review data
+  def build_previous_round_review(response, questionnaire)
+    prev_response = Response.where(map_id: response.map_id, round: response.round - 1).first
+    
+    return "No previous round review" if prev_response.nil?
+
     {
-        response_id_of_expertiza: response.id,
-        course_name: response.map.assignment.course.name,
-        assignment_name: response.map.assignment.name,
-        round: response.round,
-        additional_comment: response.additional_comment,
-      scores: questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }.map do |q|
-        score = scores_by_q_id[q.id]
-        { 
-          question: q.txt,
-          type: q.type,
-          max_points: q.type == 'Checkbox' ? 1 : (q.weight.present? ? q.weight * questionnaire.max_question_score : "Not Applicable"),
-          awarded_points: score&.answer,
-          comments: score&.comments
-        }
-      end
+      scores: build_previous_round_scores(prev_response, questionnaire),
+      additional_comment: prev_response.additional_comment
     }
+  end
+
+  # Build scores for previous round
+  def build_previous_round_scores(prev_response, questionnaire)
+    filtered_scores = prev_response.scores.reject do |score|
+      score.question.type == 'SectionHeader' || score.question.type == 'QuestionHeader'
+    end
+
+    filtered_scores.map do |score|
+      format_score_data(score.question, score, questionnaire)
+    end
+  end
+
+  # Format individual score data into hash
+  def format_score_data(question, score, questionnaire)
+    {
+      question: question.txt,
+      type: question.type,
+      max_points: calculate_max_points(question, questionnaire),
+      awarded_points: score&.answer,
+      comments: score&.comments
+    }
+  end
+
+  # Calculate max points for a question
+  def calculate_max_points(question, questionnaire)
+    if question.type == 'Checkbox'
+      1
+    elsif question.weight.present?
+      question.weight * questionnaire.max_question_score
+    else
+      "Not Applicable"
+    end
+  end
+
+  # Filter out header question types
+  def filter_header_questions(questions)
+    questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }
   end
 
   def model_for_target(sym)

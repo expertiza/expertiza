@@ -331,6 +331,7 @@ Expertiza::Application.routes.draw do
     collection do
       post :response_report
       get :response_report
+      post :send_to_llm
     end
   end
 

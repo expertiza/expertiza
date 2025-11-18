@@ -1,65 +1,13 @@
 <div class='reviewreport'>
-  <table id="myTable" class="table table-striped">
-    <thead>
-      <tr bgcolor='#CCCCCC'>
-        <th>Reviewer</th>
-        <th>Reviews done</th>
-        <th>Team reviewed</th>
-        <th>Score awarded</th>
-        <th>Avg Score</th>
-        <th>Metrics</th>
-        <th>Assign grade and comment</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @llm_response_data[:reviewers].each_with_index do |reviewer, index| %>
-        <tr>
-          <td>
-            <%= "#{index + 1}. #{reviewer[:reviewer_name]} (#{reviewer[:unity_id]})" %>
-          </td>
-          <td>
-            <%= reviewer[:reviews_done] %>
-          </td>
-          <td>
-            <% reviewer[:reviewed_teams].each do |team| %>
-              <div>
-                <%= team[:reviewed] ? "✓ #{team[:team_name]}" : team[:team_name] %>
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <% reviewer[:reviewed_teams].each do |team| %>
-              <div>
-                <%= team[:score_awarded] || "N/A" %>
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <% reviewer[:reviewed_teams].each do |team| %>
-              <div>
-                <%= team[:average_score] || "N/A" %>
-              </div>
-            <% end %>
-          </td>
-          <td>
-            <%= reviewer[:metrics] %>
-          </td>
-          <td>
-            <%= form_with url: save_llm_grade_and_comment_for_reviewer_review_mapping_index_path, method: :post do |form| %>
-              <%= form.hidden_field :participant_id, value: reviewer[:reviewer_id] %>
-              <%= form.hidden_field :assignment_id, value: @assignment.id %>
-              
-              <%= form.label :accept, "Accept grade/comment" %>
-              <%= form.check_box :accept %><br/>
-
-              <%= form.number_field :grade_for_reviewer, value: reviewer[:review_grade][:grade_for_reviewer], min: 0, max: 100 %><br/>
-              <%= form.text_area :comment_for_reviewer, value: reviewer[:review_grade][:comment_for_reviewer] %><br/>
-
-              <%= form.submit "Submit", class: "btn btn-primary" %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <% if @assignment.is_sent_to_llm_for_processing %>
+    <div class="alert alert-info">
+      <p><strong>Assignment is already sent to LLM for processing. Resend to LLM for reprocessing.</strong></p>
+      <%= button_to 'Resend to LLM', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-primary' %>
+    </div>
+  <% else %>
+    <div class="alert alert-warning">
+      <p>This assignment has not been sent to LLM for processing yet.</p>
+      <%= button_to 'Send for Processing', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-success' %>
+    </div>
+  <% end %>
 </div>

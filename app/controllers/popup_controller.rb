@@ -126,11 +126,18 @@ class PopupController < ApplicationController
 
   # Extract MCP review data from raw response
   # Handles both error responses and success responses (wrapped or unwrapped)
+  # Returns nil if no data, or a hash with error info if there's an error
   def extract_mcp_review_from_response(raw_response)
     return nil unless raw_response.is_a?(Hash)
     
-    # Handle error response structure: {"error": "..."}
-    return nil if raw_response['error'].present?
+    # Handle error response structure: {"error": "...", "exception_class": "..."}
+    if raw_response['error'].present?
+      return {
+        'status' => 'error',
+        'error_message' => raw_response['error'],
+        'exception_class' => raw_response['exception_class']
+      }
+    end
     
     # Handle wrapped success structure: {"success": true, "mcp": {...}}
     if raw_response['success'] && raw_response['mcp'].present?
@@ -142,27 +149,46 @@ class PopupController < ApplicationController
   end
 
   # Calculate LLM evaluation status and return display hash
-  # Returns hash with: status_text, badge_class, score, feedback, error_message, show_button, button_text, button_class, mcp_review_id
+  # Returns hash with: status_text, badge_class, score, feedback, error_message, show_button, button_text, button_class, mcp_review_id, rubric_breakdown, total_score
   def calculate_llm_status(mcp_review)
     return default_not_sent_status if mcp_review.nil?
 
     status = mcp_review['status']
     
+    # HTTP/API error - this means the request to MCP server failed
+    if status == 'error' && mcp_review['error_message'].present?
+      return {
+        status_text: 'Request failed',
+        badge_class: 'badge-danger',
+        score: nil,
+        feedback: nil,
+        error_message: mcp_review['error_message'],
+        show_button: false,
+        button_text: nil,
+        button_class: nil,
+        mcp_review_id: nil,
+        rubric_breakdown: nil,
+        total_score: nil
+      }
+    end
+    
     # Failed or error status - this means it was sent but processing failed
     if status == 'failed' || status == 'error'
       return {
         status_text: 'Processing failed',
-        badge_class: 'badge-danger',
+        badge_class: 'badge-dark',
         score: nil,
         feedback: nil,
-        error_message: mcp_review['llm_details_reasoning'],
+        error_message: mcp_review['llm_details_reasoning'] || mcp_review['error_message'],
         show_button: mcp_review['id'].present?,
         button_text: 'View Details',
-        button_class: 'btn-warning',
-        mcp_review_id: mcp_review['id']
+        button_class: 'btn-dark',
+        mcp_review_id: mcp_review['id'],
+        rubric_breakdown: nil,
+        total_score: nil
       }
     end
-
+    
     # Success but not generated yet
     if mcp_review['llm_generated_feedback'].nil? && mcp_review['llm_generated_score'].nil?
       return {
@@ -173,38 +199,187 @@ class PopupController < ApplicationController
         error_message: nil,
         show_button: mcp_review['id'].present?,
         button_text: 'View Details',
-        button_class: 'btn-info',
-        mcp_review_id: mcp_review['id']
+        button_class: 'btn-warning',
+        mcp_review_id: mcp_review['id'],
+        rubric_breakdown: nil,
+        total_score: nil
       }
     end
-
-    # Generated but not finalized
-    if mcp_review['finalized_feedback'].nil? && mcp_review['finalized_score'].nil?
+    
+    # Get score (prioritize finalized, fallback to generated)
+    raw_score = mcp_review['finalized_score'] || mcp_review['llm_generated_score']
+    feedback = mcp_review['finalized_feedback'] || mcp_review['llm_generated_feedback']
+    
+    # Get explanations from llm_details_reasoning or nested in llm_generated_output
+    llm_details_reasoning = mcp_review['llm_details_reasoning']
+ 
+    
+    # Parse score JSON and calculate breakdown
+    rubric_data = parse_score_json(raw_score)
+    # Parse explanations from llm_details_reasoning
+    explanations = parse_explanations(llm_details_reasoning)
+    # Merge explanations into rubric data
+    rubric_data = merge_explanations_into_rubric(rubric_data, explanations) if rubric_data
+    total_score = calculate_total_score(rubric_data)
+    
+    # Generated but not finalized (has generated data but no finalized data)
+    if mcp_review['finalized_feedback'].nil? && mcp_review['finalized_score'].nil? && 
+       (mcp_review['llm_generated_feedback'].present? || mcp_review['llm_generated_score'].present?)
       return {
         status_text: 'Generated but not finalized',
-        badge_class: 'badge-info',
-        score: mcp_review['llm_generated_score'],
-        feedback: mcp_review['llm_generated_feedback'],
+        badge_class: 'badge-success',
+        score: raw_score,
+        feedback: feedback,
         error_message: nil,
         show_button: mcp_review['id'].present?,
         button_text: 'View Full Report',
-        button_class: 'btn-primary',
-        mcp_review_id: mcp_review['id']
+        button_class: 'btn-success',
+        mcp_review_id: mcp_review['id'],
+        rubric_breakdown: rubric_data,
+        total_score: total_score
       }
     end
-
-    # Finalized
+    
+    # Finalized (has finalized data)
     {
       status_text: 'Finalized',
       badge_class: 'badge-success',
-      score: mcp_review['finalized_score'] || mcp_review['llm_generated_score'],
-      feedback: mcp_review['finalized_feedback'] || mcp_review['llm_generated_feedback'],
+      score: raw_score,
+      feedback: feedback,
       error_message: nil,
       show_button: mcp_review['id'].present?,
       button_text: 'View Full Report',
       button_class: 'btn-success',
-      mcp_review_id: mcp_review['id']
+      mcp_review_id: mcp_review['id'],
+      rubric_breakdown: rubric_data,
+      total_score: total_score
     }
+  end
+
+  # Parse score JSON string into structured data
+  def parse_score_json(score)
+    return nil if score.nil?
+    
+    parsed_hash = nil
+    
+    # If score is already a hash, use it directly
+    if score.is_a?(Hash)
+      parsed_hash = score
+    # If score is a string, try to parse it as JSON
+    elsif score.is_a?(String)
+      begin
+        parsed = JSON.parse(score)
+        parsed_hash = parsed if parsed.is_a?(Hash)
+      rescue JSON::ParserError
+        return nil
+      end
+    else
+      return nil
+    end
+    
+    # Normalize keys to strings and ensure nested structure is correct
+    return nil unless parsed_hash.is_a?(Hash)
+    
+    normalized = {}
+    parsed_hash.each do |key, value|
+      string_key = key.to_s
+      # Ensure value is a hash with 'score' and 'justification' keys
+      if value.is_a?(Hash)
+        normalized[string_key] = {
+          'score' => value['score'] || value[:score],
+          'justification' => value['justification'] || value[:justification]
+        }
+      end
+    end
+    
+    normalized
+  end
+
+  # Calculate total score from rubric breakdown
+  def calculate_total_score(rubric_data)
+    return nil unless rubric_data.is_a?(Hash)
+    
+    total = 0
+    rubric_data.each do |_rubric_name, rubric_info|
+      next unless rubric_info.is_a?(Hash)
+      
+      score_value = rubric_info['score']
+      # Only add numeric scores, skip "N/A" or other non-numeric values
+      if score_value.is_a?(Numeric)
+        total += score_value
+      end
+    end
+    
+    total > 0 ? total : nil
+  end
+
+  # Parse explanations from llm_details_reasoning
+  def parse_explanations(llm_details_reasoning)
+    return {} if llm_details_reasoning.nil?
+    
+    parsed_explanations = {}
+    
+    # If it's already a hash, use it directly
+    if llm_details_reasoning.is_a?(Hash)
+      parsed_explanations = llm_details_reasoning
+    # If it's a string, try to parse it as JSON
+    elsif llm_details_reasoning.is_a?(String)
+      # First, try direct JSON parsing
+      begin
+        parsed = JSON.parse(llm_details_reasoning)
+        parsed_explanations = parsed if parsed.is_a?(Hash)
+      rescue JSON::ParserError
+        # Try to handle escaped JSON strings (multiple levels of escaping)
+        begin
+          # Handle common escape patterns
+          unescaped = llm_details_reasoning
+          # Remove outer quotes if present
+          unescaped = unescaped.gsub(/^["']|["']$/, '')
+          # Unescape quotes and backslashes
+          unescaped = unescaped.gsub(/\\"/, '"').gsub(/\\\\/, '\\')
+          parsed = JSON.parse(unescaped)
+          parsed_explanations = parsed if parsed.is_a?(Hash)
+        rescue JSON::ParserError
+          # Last attempt: try to extract JSON from within the string
+          begin
+            # Look for JSON-like structure
+            if unescaped.match(/\{.*\}/)
+              json_match = unescaped.match(/\{.*\}/)
+              parsed = JSON.parse(json_match[0])
+              parsed_explanations = parsed if parsed.is_a?(Hash)
+            else
+              return {}
+            end
+          rescue JSON::ParserError
+            return {}
+          end
+        end
+      end
+    end
+    
+    # Normalize keys to strings
+    normalized = {}
+    parsed_explanations.each do |key, value|
+      normalized[key.to_s] = value.to_s if value.present?
+    end
+    
+    normalized
+  end
+
+  # Merge explanations into rubric breakdown data
+  def merge_explanations_into_rubric(rubric_data, explanations)
+    return rubric_data if rubric_data.nil? || explanations.empty?
+    
+    merged = {}
+    rubric_data.each do |rubric_name, rubric_info|
+      merged[rubric_name] = rubric_info.dup
+      # Add explanation if available
+      if explanations[rubric_name].present?
+        merged[rubric_name]['explanation'] = explanations[rubric_name]
+      end
+    end
+    
+    merged
   end
 
   # Default status when no data found
@@ -218,7 +393,9 @@ class PopupController < ApplicationController
       show_button: false,
       button_text: nil,
       button_class: nil,
-      mcp_review_id: nil
+      mcp_review_id: nil,
+      rubric_breakdown: nil,
+      total_score: nil
     }
   end
 

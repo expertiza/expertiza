@@ -89,21 +89,54 @@
           <td width="<%= item_width %>%" style="padding: 5px;">
             <div>
               <div><strong>Status:</strong> <span class="badge <%= llm_status[:badge_class] %>"><%= llm_status[:status_text] %></span></div>
-              <% if llm_status[:score].present? %>
-                <div><strong>Score:</strong> <%= llm_status[:score] %>/100</div>
+              <% if llm_status[:total_score].present? %>
+                <div style="margin-top: 5px;"><strong>Total Score:</strong> <%= llm_status[:total_score] %></div>
+              <% elsif llm_status[:score].present? %>
+                <div style="margin-top: 5px;"><strong>Score:</strong> <%= llm_status[:score] %></div>
+              <% end %>
+              <% if llm_status[:rubric_breakdown].present? && llm_status[:rubric_breakdown].is_a?(Hash) %>
+                <div style="margin-top: 5px; max-height: 300px; overflow-y: auto;">
+                  <table border="1" style="width: 100%; font-size: 9px; border-collapse: collapse; table-layout: fixed;">
+                    <thead>
+                      <tr style="background-color: #f0f0f0; position: sticky; top: 0;">
+                        <th style="padding: 2px; text-align: left; width: 20%; word-wrap: break-word;">Rubric</th>
+                        <th style="padding: 2px; text-align: center; width: 10%;">Points</th>
+                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Reason</th>
+                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Explanation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% llm_status[:rubric_breakdown].each do |rubric_name, rubric_info| %>
+                        <% next unless rubric_info.is_a?(Hash) %>
+                        <tr>
+                          <td style="padding: 2px; vertical-align: top; word-wrap: break-word; font-size: 8px;"><%= rubric_name.to_s.humanize %></td>
+                          <td style="padding: 2px; text-align: center; vertical-align: top;">
+                            <%= rubric_info['score'].is_a?(Numeric) ? rubric_info['score'] : rubric_info['score'].to_s %>
+                          </td>
+                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
+                            <%= truncate(rubric_info['justification'].to_s, length: 800) %>
+                          </td>
+                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
+                            <%= rubric_info['explanation'].present? ? truncate(rubric_info['explanation'].to_s, length: 800) : '-' %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
               <% end %>
               <% if llm_status[:feedback].present? %>
                 <div style="font-size: 11px; margin-top: 3px;">
-                  <strong>Feedback:</strong> <%= truncate(llm_status[:feedback], length: 80) %>
+                  <strong>Feedback:</strong> <%= truncate(llm_status[:feedback], length: 800) %>
                 </div>
               <% elsif llm_status[:error_message].present? %>
                 <div style="font-size: 11px; margin-top: 3px; color: #666;">
                   <%= truncate(llm_status[:error_message], length: 80) %>
                 </div>
               <% end %>
-              <% if llm_status[:show_button] %>
+              <% if llm_status[:show_button] && llm_status[:button_class].present? %>
                 <button type="button" 
-                        class="btn btn-sm <%= llm_status[:button_class] %> show-llm-modal" 
+                        class="btn btn-sm <%= llm_status[:button_class].to_s %> show-llm-modal" 
                         style="margin-top: 3px;"
                         data-response-id="<%= response_id %>"
                         data-raw-response="<%= escape_javascript(llm_status[:raw_response].to_json) %>">

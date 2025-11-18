@@ -25,7 +25,7 @@ class MCPServerClient
   # POST /v1/reviews/:id/finalize
   # payload: { finalized_feedback: ..., finalized_score: ... }
   def finalize_review(id, payload)
-    post("api/v1/reviews/#{id}/finalize", payload)
+    post("api/v1/reviews/#{id}/accept", payload)
   end
 
   private

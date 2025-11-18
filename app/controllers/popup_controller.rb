@@ -168,7 +168,8 @@ class PopupController < ApplicationController
         button_class: nil,
         mcp_review_id: nil,
         rubric_breakdown: nil,
-        total_score: nil
+        total_score: nil,
+        can_finalize: false
       }
     end
     
@@ -180,12 +181,13 @@ class PopupController < ApplicationController
         score: nil,
         feedback: nil,
         error_message: mcp_review['llm_details_reasoning'] || mcp_review['error_message'],
-        show_button: mcp_review['id'].present?,
-        button_text: 'View Details',
-        button_class: 'btn-dark',
+        show_button: false,
+        button_text: nil,
+        button_class: nil,
         mcp_review_id: mcp_review['id'],
         rubric_breakdown: nil,
-        total_score: nil
+        total_score: nil,
+        can_finalize: false
       }
     end
     
@@ -197,12 +199,13 @@ class PopupController < ApplicationController
         score: nil,
         feedback: nil,
         error_message: nil,
-        show_button: mcp_review['id'].present?,
-        button_text: 'View Details',
-        button_class: 'btn-warning',
+        show_button: false,
+        button_text: nil,
+        button_class: nil,
         mcp_review_id: mcp_review['id'],
         rubric_breakdown: nil,
-        total_score: nil
+        total_score: nil,
+        can_finalize: false
       }
     end
     
@@ -231,28 +234,30 @@ class PopupController < ApplicationController
         score: raw_score,
         feedback: feedback,
         error_message: nil,
-        show_button: mcp_review['id'].present?,
-        button_text: 'View Full Report',
-        button_class: 'btn-success',
+        show_button: false,
+        button_text: nil,
+        button_class: nil,
         mcp_review_id: mcp_review['id'],
         rubric_breakdown: rubric_data,
-        total_score: total_score
+        total_score: total_score,
+        can_finalize: true
       }
     end
     
-    # Finalized (has finalized data)
+    # Finalized (has finalized data) - can still be edited and re-finalized
     {
       status_text: 'Finalized',
       badge_class: 'badge-success',
       score: raw_score,
       feedback: feedback,
       error_message: nil,
-      show_button: mcp_review['id'].present?,
-      button_text: 'View Full Report',
-      button_class: 'btn-success',
+      show_button: false,
+      button_text: nil,
+      button_class: nil,
       mcp_review_id: mcp_review['id'],
       rubric_breakdown: rubric_data,
-      total_score: total_score
+      total_score: total_score,
+      can_finalize: true
     }
   end
 
@@ -395,11 +400,59 @@ class PopupController < ApplicationController
       button_class: nil,
       mcp_review_id: nil,
       rubric_breakdown: nil,
-      total_score: nil
+      total_score: nil,
+      can_finalize: false
     }
   end
 
   public
+
+  # Finalize the LLM evaluation score and feedback
+  # POST /popup/finalize_llm_evaluation
+  def finalize_llm_evaluation
+    response_id = params[:response_id]
+    mcp_review_id = params[:mcp_review_id]
+    rubric_data = params[:rubric_data] || {}
+    feedback = params[:feedback] || ''
+    
+    begin
+      # Build finalized_score JSON from rubric data
+      finalized_score_hash = {}
+      rubric_data.each do |rubric_name, rubric_info|
+        finalized_score_hash[rubric_name] = {
+          'score' => rubric_info['score'],
+          'justification' => rubric_info['justification']
+        }
+      end
+      
+      # Convert to JSON string
+      finalized_score = finalized_score_hash.to_json
+      
+      # Call MCP service to finalize
+      @mcp_service = MCPReviewService.new
+      mcp_client = @mcp_service.instance_variable_get(:@mcp)
+      
+      payload = {
+        finalized_score: finalized_score,
+        finalized_feedback: feedback
+      }
+      
+      result = mcp_client.finalize_review(response_id, payload)
+      
+      render json: { 
+        success: true, 
+        message: 'Score finalized successfully',
+        result: result
+      }, status: :ok
+    rescue => e
+      Rails.logger.error("Error finalizing LLM evaluation: #{e.message}")
+      Rails.logger.error(e.backtrace.join("\n"))
+      render json: { 
+        success: false, 
+        error: e.message 
+      }, status: :unprocessable_entity
+    end
+  end
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup

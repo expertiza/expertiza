@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20251118044955) do
+ActiveRecord::Schema.define(version: 20260223193411) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -304,6 +304,15 @@ ActiveRecord::Schema.define(version: 20251118044955) do
     t.string "name", default: "", null: false
   end
 
+  create_table "instructor_response_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+    t.integer "response_id", null: false
+    t.float "score", limit: 24
+    t.text "feedback"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["response_id"], name: "index_instructor_response_scores_on_response_id", unique: true
+  end
+
   create_table "invitations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "assignment_id"
     t.integer "from_id"
@@ -537,7 +546,7 @@ ActiveRecord::Schema.define(version: 20251118044955) do
 
   create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "participant_id"
-    t.integer "grade_for_reviewer"
+    t.float "grade_for_reviewer", limit: 24
     t.text "comment_for_reviewer"
     t.datetime "review_graded_at"
     t.integer "reviewer_id"
@@ -809,6 +818,7 @@ ActiveRecord::Schema.define(version: 20251118044955) do
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
   add_foreign_key "duties", "assignments"
+  add_foreign_key "instructor_response_scores", "responses"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"

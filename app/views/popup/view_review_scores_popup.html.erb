@@ -80,12 +80,25 @@
           </td>
         <% end %>
       </tr>  
-      <!-- Last Row LLM Evaluation Report -->
+
+      <!-- Row Score and Feedback (from instructor_response_scores) -->
       <tr>
-        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th> 
-        <td> Text for LLM Evaluation Report will be displayed here
-      </td>
-    </tr>
-  </table>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Score and Feedback</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%" style="padding: 8px;">
+          <% instr_score = InstructorResponseScore.find_by(response_id: response_id) %>
+          <% if instr_score %>
+            <div><strong>Score:</strong> <%= instr_score.score %></div>
+            <% if instr_score.feedback.present? %>
+              <div style="margin-top: 4px; font-size: 0.95em;"><%= instr_score.feedback %></div>
+            <% end %>
+          <% else %>
+            —
+          <% end %>
+          </td>
+        <% end %>
+      </tr>
+
+    </table>
 <% end #loop for keys %>
 <br>

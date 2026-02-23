@@ -333,6 +333,9 @@ Expertiza::Application.routes.draw do
       get :response_report
       post :send_to_llm
     end
+    member do
+      get :get_llm_evaluation
+    end
   end
 
   resources :reputation_web_service, only: [] do

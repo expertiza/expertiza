@@ -70,3 +70,97 @@
   font-size: 25px;
   color: forestgreen;
 }
+
+/* Grade and comment display in review report */
+.grade-comment-cell {
+  padding: 8px 12px;
+  vertical-align: top;
+}
+
+.grade-comment-block {
+  width: 100%;
+}
+
+.grade-comment-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.grade-comment-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+.grade-comment-value {
+  font-size: 14px;
+  color: #212529;
+  line-height: 1.4;
+}
+
+.grade-comment-text {
+  max-height: 80px;
+  overflow-y: auto;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Review grade card on response view page */
+.response-review-grade-card {
+  margin: 6px 0 4px 0;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: 80%;
+}
+
+.response-review-grade-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.response-review-grade-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.3px;
+}
+
+.response-review-grade-score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 14px;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #6bc97d 0%, #4caf50 50%, #3d8b40 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.35);
+}
+
+.response-review-grade-comment {
+  width: 100%;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #334155;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

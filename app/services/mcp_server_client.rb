@@ -22,6 +22,12 @@ class MCPServerClient
     get("api/v1/reviews/#{id}")
   end
 
+  # GET /api/v1/reviews/finalized/:expertiza_response_id
+  # Returns { total_finalized_score: int or null, student_feedback: string or null }
+  def get_finalized_review(expertiza_response_id)
+    get("api/v1/reviews/finalized/#{expertiza_response_id}")
+  end
+
   # POST /v1/reviews/:id/finalize
   # payload: { finalized_feedback: ..., finalized_score: ... }
   def finalize_review(id, payload)
@@ -48,7 +54,7 @@ class MCPServerClient
     req = klass.new(uri)
     req['Content-Type'] = 'application/json'
     req['Accept'] = 'application/json'
-    req['Authorization'] = "Bearer #{@token}" if @token.present?
+    req['X-API-Key'] = @token if @token.present?
     req.body = body if body
     
     Rails.logger.info("[MCP] → #{klass.name} #{uri} body=#{body.inspect}")

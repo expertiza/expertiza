@@ -36,8 +36,8 @@ class ReportsController < ApplicationController
   end
   
   def llm_evaluation_report(params, session)
-    assignment_id = params[:id]
-    @assignment = Assignment.find(assignment_id)
+    @id = params[:id]
+    @assignment = Assignment.find(@id)
   end
 
   def send_to_llm
@@ -59,6 +59,77 @@ class ReportsController < ApplicationController
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
+  def get_llm_evaluation
+    @assignment = Assignment.find(params[:id])
+    mcp_client = MCPServerClient.new
+    response_ids = Response.where(
+      map_id: ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').pluck(:id)
+    ).pluck(:id)
+    saved = 0
+    errors = []
+    Array(response_ids).each do |response_id|
+      begin
+        data = mcp_client.get_finalized_review(response_id)
+        score = data['total_finalized_score']
+        feedback = data['student_feedback']
+        next if score.nil?
+        record = InstructorResponseScore.find_or_initialize_by(response_id: response_id)
+        record.score = score
+        record.feedback = feedback
+        record.save!
+        saved += 1
+      rescue => e
+        errors << "Response #{response_id}: #{e.message}"
+      end
+    end
+    if saved > 0
+      sync_review_grades_from_instructor_scores(@assignment)
+      flash[:success] = "Saved LLM evaluation for #{saved} review(s) and synced participant grades."
+    end
+    if errors.any?
+      flash[:error] = "Some fetches failed: #{errors.first(3).join('; ')}#{errors.size > 3 ? '...' : ''}"
+    end
+    redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
+  end
+
+  private
+
+  # Calculate and save ReviewGrade for each participant based on their InstructorResponseScores.
+  # grade_for_reviewer = total (sum) of all scores; comment = "N reviews | Scores: x, y, z"
+  # Aggregates across ALL response_maps for each participant (not per-map).
+  def sync_review_grades_from_instructor_scores(assignment)
+    map_ids = ResponseMap.where(reviewed_object_id: assignment.id, type: 'ReviewResponseMap').pluck(:id)
+    all_response_ids = Response.where(map_id: map_ids).pluck(:id)
+    return if all_response_ids.empty?
+
+    # Build response_id -> reviewer_id map (batch)
+    response_to_map = Response.where(id: all_response_ids).pluck(:id, :map_id).to_h
+    map_to_reviewer = ResponseMap.where(id: response_to_map.values.uniq).pluck(:id, :reviewer_id).to_h
+
+    # Group InstructorResponseScores by participant
+    participant_scores = {}
+    InstructorResponseScore.where(response_id: all_response_ids).each do |irs|
+      reviewer_id = map_to_reviewer[response_to_map[irs.response_id]]
+      next if reviewer_id.nil?
+      participant_scores[reviewer_id] ||= []
+      participant_scores[reviewer_id] << irs.score
+    end
+
+    participant_scores.each do |participant_id, score_values|
+      next if score_values.empty?
+
+      total = score_values.sum.round(0)
+      count = score_values.size
+      feedback_text = "#{count} review#{'s' if count != 1} | Scores: #{score_values.join(', ')}"
+
+      rg = ReviewGrade.find_or_initialize_by(participant_id: participant_id)
+      rg.grade_for_reviewer = total
+      rg.comment_for_reviewer = feedback_text
+      rg.review_graded_at = Time.current
+      rg.reviewer_id = session[:user].id
+      rg.save!
+    end
+  end
 end
 
 

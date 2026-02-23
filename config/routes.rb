@@ -567,6 +567,7 @@ Expertiza::Application.routes.draw do
       get :view_review_scores_popup
       get :self_review_popup
       get :author_feedback_popup
+      post :finalize_llm_evaluation
     end
   end
 

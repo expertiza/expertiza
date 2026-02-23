@@ -1,6 +1,8 @@
 = render :partial => 'searchbox'
 - if @type == "ReviewResponseMap"
   = render :partial => 'review_report'
+- elsif @type == "LLMEvaluationReport"
+  = render partial: 'llm_evaluation_report'
 - elsif @type == "SelfReview"
   = render :partial => 'self_review_report'
 - elsif @type == "FeedbackResponseMap"

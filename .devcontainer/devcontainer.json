@@ -25,18 +25,17 @@
 		"wingrunr21.vscode-ruby"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [
-		3000
-	],
+	"forwardPorts": [3000, 3306, 6379],
+
+	"postCreateCommand": "bundle install",
+
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
-	"runServices": [
-		"mysql",
-		"redis"
-	],
+	"runServices": ["web", "mysql", "redis"],
 	// Uncomment the next line if you want to keep your containers running after VS Code shuts down.
 	//"shutdownAction": "none",
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
 	// "postCreateCommand": "apt-get update && apt-get install -y curl",
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
+	"remoteUser": "root"
 }

@@ -331,6 +331,10 @@ Expertiza::Application.routes.draw do
     collection do
       post :response_report
       get :response_report
+      post :send_to_llm
+    end
+    member do
+      get :get_llm_evaluation
     end
   end
 
@@ -356,6 +360,8 @@ Expertiza::Application.routes.draw do
       get :run_get_notification
       post :edit
       post :delete
+      
+
     end
   end
 
@@ -391,6 +397,7 @@ Expertiza::Application.routes.draw do
       post :delete_metareviewer
       post :delete_all_metareviewers
       post :delete_outstanding_reviewers
+      post :save_llm_grade_and_comment_for_reviewer
     end
   end
 
@@ -560,6 +567,7 @@ Expertiza::Application.routes.draw do
       get :view_review_scores_popup
       get :self_review_popup
       get :author_feedback_popup
+      post :finalize_llm_evaluation
     end
   end
 
@@ -642,6 +650,10 @@ Expertiza::Application.routes.draw do
       get :redirect_to_assignment
       get :new
     end
+  end  
+
+  resources :mcp_reviews, only: [:create, :show], defaults: { format: :json } do
+    post :finalize, on: :member, defaults: { format: :json }
   end
 
   resources :conference

@@ -70,7 +70,7 @@
         <% end %>
       <% end %>  
 
-      <!-- Last Row additional Comments -->
+      <!-- Row additional Comments -->
       <tr>
         <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Additional Comments</b></th>
         <% responses.each do |response_id| %>  
@@ -79,12 +79,221 @@
           <%=sanitize Response.find(response_id).additional_comment %>
           </td>
         <% end %>
-      </tr>      
+<<<<<<< HEAD
+      </tr>  
 
+      <!-- Row Score and Feedback (from instructor_response_scores) -->
+      <tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Score and Feedback</b></th>
+        <% responses.each do |response_id| %>  
+          <td width="<%= item_width %>%" style="padding: 8px;">
+          <% instr_score = InstructorResponseScore.find_by(response_id: response_id) %>
+          <% if instr_score %>
+            <div><strong>Score:</strong> <%= instr_score.score %></div>
+            <% if instr_score.feedback.present? %>
+              <div style="margin-top: 4px; font-size: 0.95em;"><%= instr_score.feedback %></div>
+            <% end %>
+          <% else %>
+            —
+          <% end %>
+=======
+      </tr>   
+      
+      <!-- Row LLM Evaluation Report -->
+      <tr>
+        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th>
+        <% responses.each do |response_id| %>
+          <% llm_status = @llm_evaluation_data[response_id] || {} %>
+          <td width="<%= item_width %>%" style="padding: 5px;">
+            <div>
+              <div><strong>Status:</strong> <span class="badge <%= llm_status[:badge_class] %>"><%= llm_status[:status_text] %></span></div>                <div class="total-score-display" style="margin-top: 5px;"><strong>Total Score:</strong> <span class="total-score-value"><%= llm_status[:total_score] %></span></div>
+          
+              <% if llm_status[:rubric_breakdown].present? && llm_status[:rubric_breakdown].is_a?(Hash) %>
+                <div style="margin-top: 5px; max-height: 300px; overflow-y: auto;">
+                  <table border="1" style="width: 100%; font-size: 9px; border-collapse: collapse; table-layout: fixed;" 
+                         id="rubric-table-<%= response_id %>" 
+                         data-response-id="<%= response_id %>"
+                         data-mcp-review-id="<%= llm_status[:mcp_review_id] %>">
+                    <thead>
+                      <tr style="background-color: #f0f0f0; position: sticky; top: 0;">
+                        <th style="padding: 2px; text-align: left; width: 20%; word-wrap: break-word;">Rubric</th>
+                        <th style="padding: 2px; text-align: center; width: 10%;">Points</th>
+                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Reason</th>
+                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Explanation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% llm_status[:rubric_breakdown].each do |rubric_name, rubric_info| %>
+                        <% next unless rubric_info.is_a?(Hash) %>
+                        <tr data-rubric="<%= rubric_name %>" 
+                            data-justification="<%= escape_javascript(rubric_info['justification'].to_s) %>">
+                          <td style="padding: 2px; vertical-align: top; word-wrap: break-word; font-size: 8px;"><%= rubric_name.to_s.humanize %></td>
+                          <td style="padding: 2px; text-align: center; vertical-align: top;">
+                            <input type="text" 
+                                   class="rubric-score-input" 
+                                   data-rubric="<%= rubric_name %>"
+                                   value="<%= rubric_info['score'].is_a?(Numeric) ? rubric_info['score'] : rubric_info['score'].to_s %>"
+                                   style="width: 100%; font-size: 9px; text-align: center; padding: 1px; border: 1px solid #ccc;"
+                                   size="5">
+                          </td>
+                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
+                            <%= rubric_info['justification'].to_s %>
+                          </td>
+                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
+                            <%= rubric_info['explanation'].present? ? truncate(rubric_info['explanation'].to_s, length: 800) : '-' %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% end %>
+              <% if llm_status[:feedback].present? %>
+                <div style="font-size: 11px; margin-top: 3px;">
+                  <strong>Feedback:</strong>
+                  <textarea class="feedback-input" 
+                            data-response-id="<%= response_id %>"
+                            style="width: 100%; font-size: 10px; padding: 3px; border: 1px solid #ccc; resize: vertical; min-height: 50px; margin-top: 3px;"
+                            rows="3"><%= llm_status[:feedback].to_s %></textarea>
+                </div>
+              <% elsif llm_status[:error_message].present? %>
+                <div style="font-size: 11px; margin-top: 3px; color: #666;">
+                  <%= truncate(llm_status[:error_message], length: 80) %>
+                </div>
+              <% end %>
+              <% if llm_status[:can_finalize] && llm_status[:mcp_review_id].present? %>
+                <button type="button" 
+                        class="btn btn-sm btn-primary finalize-score-btn" 
+                        style="margin-top: 5px;"
+                        data-response-id="<%= response_id %>"
+                        data-mcp-review-id="<%= llm_status[:mcp_review_id] %>">
+                  Finalize Score
+                </button>
+              <% end %>
+            </div>
+>>>>>>> 1eb6cc2a86a432b61814d657c3db82ec73467b62
+          </td>
+        <% end %>
+      </tr>
+
+<<<<<<< HEAD
+    </table>
+=======
 
     </table>
 
 <br>
+>>>>>>> 1eb6cc2a86a432b61814d657c3db82ec73467b62
 <% end #loop for keys %>
 <br>
+
+<!-- Dialog for displaying LLM Response -->
+<div id="llmResponseModal" style="display:none;">
+  <pre id="llmResponseContent" style="max-height: 500px; overflow-y: auto; white-space: pre-wrap; word-wrap: break-word; background-color: #f5f5f5; padding: 15px; border: 1px solid #ddd; margin: 0;"></pre>
+</div>
+
+<script>
+$(document).ready(function() {
+  // Handle Finalize Score button click
+  $('.finalize-score-btn').on('click', function() {
+    var $btn = $(this);
+    var responseId = $btn.data('response-id');
+    var mcpReviewId = $btn.data('mcp-review-id');
+    var $table = $('#rubric-table-' + responseId);
+    
+    if (!mcpReviewId) {
+      alert('Error: MCP Review ID not found');
+      return;
+    }
+    
+    // Collect rubric data from editable fields (score) and original justification from data attribute
+    var rubricData = {};
+    $table.find('tr[data-rubric]').each(function() {
+      var $row = $(this);
+      var rubricName = $row.data('rubric');
+      var score = $row.find('.rubric-score-input').val();
+      // Use original justification from data attribute, not from input field
+      var justification = $row.data('justification') || '';
+      
+      rubricData[rubricName] = {
+        score: score === 'N/A' ? 'N/A' : (isNaN(parseFloat(score)) ? null : parseFloat(score)),
+        justification: justification
+      };
+    });
+    
+    // Get feedback from editable textarea
+    var $feedbackTextarea = $table.closest('td').find('.feedback-input');
+    var feedback = $feedbackTextarea.length ? $feedbackTextarea.val() : '';
+    
+    // Disable button and show loading state
+    $btn.prop('disabled', true).text('Finalizing...');
+    
+    // Send AJAX request to finalize
+    $.ajax({
+      url: '<%= url_for(controller: "popup", action: "finalize_llm_evaluation") %>',
+      method: 'POST',
+      data: {
+        response_id: responseId,
+        mcp_review_id: mcpReviewId,
+        rubric_data: rubricData,
+        feedback: feedback
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          alert('Score finalized successfully!');
+          // Reload the page to show updated status
+          location.reload();
+        } else {
+          alert('Error: ' + (response.error || 'Failed to finalize score'));
+          $btn.prop('disabled', false).text('Finalize Score');
+        }
+      },
+      error: function(xhr, status, error) {
+        var errorMsg = 'Failed to finalize score';
+        try {
+          var response = JSON.parse(xhr.responseText);
+          errorMsg = response.error || errorMsg;
+        } catch (e) {
+          errorMsg = error || errorMsg;
+        }
+        alert('Error: ' + errorMsg);
+        $btn.prop('disabled', false).text('Finalize Score');
+      }
+    });
+  });
+  
+  // Update total score when points are edited
+  $('.rubric-score-input').on('change blur', function() {
+    var $table = $(this).closest('table');
+    var $td = $table.closest('td');
+    var total = 0;
+    var hasValidScores = false;
+    
+    $table.find('.rubric-score-input').each(function() {
+      var score = $(this).val();
+      if (score && score !== 'N/A' && !isNaN(parseFloat(score))) {
+        total += parseFloat(score);
+        hasValidScores = true;
+      }
+    });
+    
+    if (hasValidScores) {
+      // Find and update total score display using specific class selector
+      var $totalScoreValue = $td.find('.total-score-value');
+      if ($totalScoreValue.length) {
+        // Update only the value, not the entire div
+        $totalScoreValue.text(total);
+      } else {
+        // If total score div doesn't exist, find the status div and add total score after it
+        var $statusDiv = $td.find('div').first();
+        if ($statusDiv.length && $statusDiv.text().indexOf('Status:') !== -1) {
+          // Insert total score after status div
+          $statusDiv.after('<div class="total-score-display" style="margin-top: 5px;"><strong>Total Score:</strong> <span class="total-score-value">' + total + '</span></div>');
+        }
+      }
+    }
+  });
+});
+</script>
  

@@ -1,9 +1,24 @@
 # app/controllers/mcp_reviews_controller.rb
-class McpReviewsController < ActionController::Base
-  # You will likely want to lock this behind service-account auth.
-  # skip_before_action :verify_authenticity_token # if API-only or using token auth
+# MCP API - requires logged-in user with TA/instructor/admin privileges. Cannot be called without authentication.
+class McpReviewsController < ApplicationController
+  include AuthorizationHelper
+  before_action :require_api_auth, prepend: true
+  protect_from_forgery with: :null_session
 
-# POST /mcp_reviews
+  def action_allowed?
+    current_user_has_ta_privileges?
+  end
+
+  private
+
+  def require_api_auth
+    return if current_user
+
+    render json: { error: 'Unauthorized. Login required to access this API.' }, status: :unauthorized
+    false  # halt filter chain
+  end
+
+  # POST /mcp_reviews
 # Send peer review to MCP server
 # payload: { assignment_id: <id> }
   def create

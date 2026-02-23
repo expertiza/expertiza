@@ -345,12 +345,13 @@ class PopupController < ApplicationController
           parsed = JSON.parse(unescaped)
           parsed_explanations = parsed if parsed.is_a?(Hash)
         rescue JSON::ParserError
-          # Last attempt: try to extract JSON from within the string
+          # Last attempt: extract JSON object via string indexing (avoids ReDoS from regex)
           begin
-            # Look for JSON-like structure
-            if unescaped.match(/\{.*\}/)
-              json_match = unescaped.match(/\{.*\}/)
-              parsed = JSON.parse(json_match[0])
+            start_idx = unescaped.index('{')
+            end_idx = unescaped.rindex('}')
+            if start_idx && end_idx && start_idx < end_idx
+              json_str = unescaped[start_idx..end_idx]
+              parsed = JSON.parse(json_str)
               parsed_explanations = parsed if parsed.is_a?(Hash)
             else
               return {}

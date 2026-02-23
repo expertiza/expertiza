@@ -1,15 +1,20 @@
 <div class='reviewreport'>
   <% if @assignment.is_sent_to_llm_for_processing %>
     <div class="alert alert-info">
-      <p><strong>Assignment is already sent to LLM for processing. Resend to LLM for reprocessing.</strong></p>
-      <%= button_to 'Resend to LLM', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-primary' %>
+      <p><strong>Peer reviews for this assignment have already been sent to the LLM server for processing.</strong></p>
+      <p>Resend to LLM to send reviews that are not yet on the LLM server. The LLM server will discard the previous data and sync only the reviews that were not previously sent.</p>
+      <div style="margin-top: 10px;"><%= button_to 'Resend to LLM', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-primary' %></div>
     </div>
   <% else %>
     <div class="alert alert-warning">
-      <p>This assignment has not been sent to LLM for processing yet.</p>
-      <%= button_to 'Send for Processing', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-success' %>
+      <p><strong>Peer reviews for this assignment have not been sent to the LLM server yet.</strong></p>
+      <p>Click the button below to send all peer reviews to the LLM server. The LLM will evaluate each review and produce scores and feedback. After processing, use "Get LLM Evaluation" to fetch and save the results.</p>
+      <div style="margin-top: 10px;"><%= button_to 'Send for Processing', { controller: 'reports', action: 'send_to_llm', id: @assignment.id }, method: :post, class: 'btn btn-success' %></div>
     </div>
   <% end %>
-  <p style="margin-top: 10px;"></p>
-  <%= button_to 'Get LLM Evaluation', get_llm_evaluation_report_path(@assignment.id), method: :get, class: 'btn btn-info' %>
+  <div class="alert alert-info" style="margin-top: 16px;">
+    <p><strong>Get LLM Evaluation</strong></p>
+    <p>Fetch the evaluated scores and feedback from the LLM server and save them to this assignment. This will update each review's grade and comment with the LLM's evaluation, and sync the reviewer grades shown in the report.</p>
+    <div style="margin-top: 10px;"><%= button_to 'Get LLM Evaluation', get_llm_evaluation_report_path(@assignment.id), method: :get, class: 'btn btn-info' %></div>
+  </div>
 </div>

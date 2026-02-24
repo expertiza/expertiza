@@ -1,7 +1,5 @@
 # app/services/mcp_review_service.rb
 class MCPReviewService
-  VALID_SCORE_RANGE = (0..100) # adjust if your rubric uses different scale
-
   def initialize(mcp_client: MCPServerClient.new)
     @mcp = mcp_client
   end
@@ -21,33 +19,7 @@ class MCPReviewService
     return true
   end
 
-  # Fetch LLM-generated result from MCP server (by expertiza response_id)
-  # Returns parsed JSON (expects llm_generated_score, llm_generated_feedback, ...).
-  def get_llm_generated_score_and_feedback(response_id)
-    result = @mcp.get_review(response_id)
-    return result
-    #validate_mcp_result!(result)
-    result
-  end
-
   private
-
-
-
-  # Very small validation example. Expand according to your rules.
-  def validate_mcp_result!(result, require_llm_fields: true)
-    raise "Invalid MCP result: blank" if result.blank? || !result.is_a?(Hash)
-    if require_llm_fields
-      unless result['llm_generated_score'] && result['llm_generated_feedback']
-        raise "MCP result missing llm_generated_score or llm_generated_feedback"
-      end
-      score = result['llm_generated_score'].to_i
-      unless VALID_SCORE_RANGE.include?(score)
-        raise "LLM-generated score #{score} outside allowed range #{VALID_SCORE_RANGE}"
-      end
-    end
-    true
-  end
 
   # Find response ids from specific assignment
   def find_response_ids(assignment_id)

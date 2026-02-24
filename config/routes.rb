@@ -567,7 +567,6 @@ Expertiza::Application.routes.draw do
       get :view_review_scores_popup
       get :self_review_popup
       get :author_feedback_popup
-      post :finalize_llm_evaluation
     end
   end
 
@@ -651,8 +650,6 @@ Expertiza::Application.routes.draw do
       get :new
     end
   end  
-
-  resources :mcp_reviews, only: [:create, :show], defaults: { format: :json }
 
   resources :conference
   root to: 'content_pages#view', page_name: 'home'

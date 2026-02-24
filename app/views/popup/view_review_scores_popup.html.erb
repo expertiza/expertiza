@@ -79,7 +79,6 @@
           <%=sanitize Response.find(response_id).additional_comment %>
           </td>
         <% end %>
-<<<<<<< HEAD
       </tr>  
 
       <!-- Row Score and Feedback (from instructor_response_scores) -->
@@ -96,94 +95,11 @@
           <% else %>
             —
           <% end %>
-=======
-      </tr>   
-      
-      <!-- Row LLM Evaluation Report -->
-      <tr>
-        <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>LLM Evaluation Report</b></th>
-        <% responses.each do |response_id| %>
-          <% llm_status = @llm_evaluation_data[response_id] || {} %>
-          <td width="<%= item_width %>%" style="padding: 5px;">
-            <div>
-              <div><strong>Status:</strong> <span class="badge <%= llm_status[:badge_class] %>"><%= llm_status[:status_text] %></span></div>                <div class="total-score-display" style="margin-top: 5px;"><strong>Total Score:</strong> <span class="total-score-value"><%= llm_status[:total_score] %></span></div>
-          
-              <% if llm_status[:rubric_breakdown].present? && llm_status[:rubric_breakdown].is_a?(Hash) %>
-                <div style="margin-top: 5px; max-height: 300px; overflow-y: auto;">
-                  <table border="1" style="width: 100%; font-size: 9px; border-collapse: collapse; table-layout: fixed;" 
-                         id="rubric-table-<%= response_id %>" 
-                         data-response-id="<%= response_id %>"
-                         data-mcp-review-id="<%= llm_status[:mcp_review_id] %>">
-                    <thead>
-                      <tr style="background-color: #f0f0f0; position: sticky; top: 0;">
-                        <th style="padding: 2px; text-align: left; width: 20%; word-wrap: break-word;">Rubric</th>
-                        <th style="padding: 2px; text-align: center; width: 10%;">Points</th>
-                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Reason</th>
-                        <th style="padding: 2px; text-align: left; width: 35%; word-wrap: break-word;">Explanation</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <% llm_status[:rubric_breakdown].each do |rubric_name, rubric_info| %>
-                        <% next unless rubric_info.is_a?(Hash) %>
-                        <tr data-rubric="<%= rubric_name %>" 
-                            data-justification="<%= escape_javascript(rubric_info['justification'].to_s) %>">
-                          <td style="padding: 2px; vertical-align: top; word-wrap: break-word; font-size: 8px;"><%= rubric_name.to_s.humanize %></td>
-                          <td style="padding: 2px; text-align: center; vertical-align: top;">
-                            <input type="text" 
-                                   class="rubric-score-input" 
-                                   data-rubric="<%= rubric_name %>"
-                                   value="<%= rubric_info['score'].is_a?(Numeric) ? rubric_info['score'] : rubric_info['score'].to_s %>"
-                                   style="width: 100%; font-size: 9px; text-align: center; padding: 1px; border: 1px solid #ccc;"
-                                   size="5">
-                          </td>
-                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
-                            <%= rubric_info['justification'].to_s %>
-                          </td>
-                          <td style="padding: 2px; vertical-align: top; font-size: 8px; word-wrap: break-word;">
-                            <%= rubric_info['explanation'].present? ? truncate(rubric_info['explanation'].to_s, length: 800) : '-' %>
-                          </td>
-                        </tr>
-                      <% end %>
-                    </tbody>
-                  </table>
-                </div>
-              <% end %>
-              <% if llm_status[:feedback].present? %>
-                <div style="font-size: 11px; margin-top: 3px;">
-                  <strong>Feedback:</strong>
-                  <textarea class="feedback-input" 
-                            data-response-id="<%= response_id %>"
-                            style="width: 100%; font-size: 10px; padding: 3px; border: 1px solid #ccc; resize: vertical; min-height: 50px; margin-top: 3px;"
-                            rows="3"><%= llm_status[:feedback].to_s %></textarea>
-                </div>
-              <% elsif llm_status[:error_message].present? %>
-                <div style="font-size: 11px; margin-top: 3px; color: #666;">
-                  <%= truncate(llm_status[:error_message], length: 80) %>
-                </div>
-              <% end %>
-              <% if llm_status[:can_finalize] && llm_status[:mcp_review_id].present? %>
-                <button type="button" 
-                        class="btn btn-sm btn-primary finalize-score-btn" 
-                        style="margin-top: 5px;"
-                        data-response-id="<%= response_id %>"
-                        data-mcp-review-id="<%= llm_status[:mcp_review_id] %>">
-                  Finalize Score
-                </button>
-              <% end %>
-            </div>
->>>>>>> 1eb6cc2a86a432b61814d657c3db82ec73467b62
           </td>
         <% end %>
       </tr>
 
-<<<<<<< HEAD
     </table>
-=======
-
-    </table>
-
-<br>
->>>>>>> 1eb6cc2a86a432b61814d657c3db82ec73467b62
 <% end #loop for keys %>
 <br>
 

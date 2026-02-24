@@ -174,14 +174,4 @@ class MCPReviewService
   def filter_header_questions(questions)
     questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }
   end
-
-  def model_for_target(sym)
-    mapping = {
-      review_grades: 'ReviewGrade',
-      review_scores: 'ReviewScore',
-      review_of_review_scores: 'ReviewOfReviewScore'
-    }
-    klass_name = mapping[sym.to_sym]
-    klass_name.safe_constantize
-  end
 end

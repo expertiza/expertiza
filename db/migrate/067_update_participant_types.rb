@@ -1,24 +1,48 @@
 class UpdateParticipantTypes < ActiveRecord::Migration[4.2]
-  def up
-    # Drop old foreign key and index if they exist
-    execute("ALTER TABLE participants DROP FOREIGN KEY fk_participant_assignments") rescue nil
-    execute("ALTER TABLE participants DROP INDEX fk_participant_assignments") rescue nil
+  def self.up    
+    add_column :participants, :type, :string
 
-    # Only rename if old column exists
-    if column_exists?(:participants, :assignment_id)
-      rename_column(:participants, :assignment_id, :parent_id)
+    begin
+      execute "ALTER TABLE `participants`
+             DROP FOREIGN KEY `fk_participant_assignments`"
+    rescue StandardError
     end
 
-    # Add type column only if missing
-    add_column(:participants, :type, :string) unless column_exists?(:participants, :type)
+    begin
+      execute "ALTER TABLE `participants`
+             DROP INDEX `fk_participant_assignments`"
+    rescue StandardError
+    end
+
+    rename_column :participants, :assignment_id, :parent_id
+
+    participants = Participant.all
+    participants.each  do |participant|
+      participant.type = 'AssignmentParticipant'
+      participant.save
+    end
+
+    course_users = CoursesUsers.all
+    course_users.each do |user|
+      CourseParticipant.create(user_id: user.user_id, parent_id: user.course_id)
+    end
+    drop_table :courses_users
   end
 
-  def down
-    # Reverse safely
-    if column_exists?(:participants, :parent_id)
-      rename_column(:participants, :parent_id, :assignment_id)
+  def self.down
+    create_table :courses_users do |t|
+      t.column :user_id, :integer
+      t.column :course_id, :integer
+      t.column :active, :boolean
     end
 
-    remove_column(:participants, :type) if column_exists?(:participants, :type)
+    course_users = CourseParticipant.all
+    course_users.each do |user|
+      CoursesUser.create(user_id: user.user_id, course_id: user.parent_id)
+      user.destroy
+    end
+
+    rename_column :participants, :parent_id, :assignment_id
+    remove_column :participants, :type
   end
 end

@@ -1,47 +1,66 @@
 class CreateQuestionnaireFolderNodes < ActiveRecord::Migration[4.2]
   def self.up
-    add_column :tree_folders, :parent_id, :integer, null: true unless column_exists?(:tree_folders, :parent_id)
+    add_column :tree_folders, :parent_id, :integer, null: true
 
-    # Destroy old nodes if present
-    if defined?(Node)
-      Node.where(type: ['QuestionnaireTypeNode', 'QuestionnaireNode']).find_each(&:destroy)
+    Node.where(['type in ("QuestionnaireTypeNode","QuestionnaireNode")']).find_each(&:destroy)
+
+    parent = TreeFolder.find_by_name('Questionnaires')
+    pNode = FolderNode.find_by_node_object_id(parent.id)
+
+    fnode = TreeFolder.create(name: 'Review', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
+
+    ReviewQuestionnaire.find_each do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
     end
 
-    parent = TreeFolder.find_by(name: 'Questionnaires')
-    return unless parent
+    fnode = TreeFolder.create(name: 'Metareview', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
 
-    pNode = FolderNode.find_by(node_object_id: parent.id)
-    return unless pNode
+    MetareviewQuestionnaire.find_each  do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
 
-    # Helper to create safely
-    create_questionnaire_folder('Review', pNode, defined?(ReviewQuestionnaire) ? ReviewQuestionnaire : nil)
-    create_questionnaire_folder('Metareview', pNode, defined?(MetareviewQuestionnaire) ? MetareviewQuestionnaire : nil)
-    create_questionnaire_folder('Author Feedback', pNode, defined?(AuthorFeedbackQuestionnaire) ? AuthorFeedbackQuestionnaire : nil)
-    create_questionnaire_folder('Teammate Review', pNode, defined?(TeammateReviewQuestionnaire) ? TeammateReviewQuestionnaire : nil)
-    create_questionnaire_folder('Survey', pNode, defined?(SurveyQuestionnaire) ? SurveyQuestionnaire : nil)
-    create_questionnaire_folder('Global Survey', pNode, defined?(GlobalSurveyQuestionnaire) ? GlobalSurveyQuestionnaire : nil)
-    create_questionnaire_folder('Course Evaluation', pNode, defined?(CourseEvaluationQuestionnaire) ? CourseEvaluationQuestionnaire : nil)
+    fnode = TreeFolder.create(name: 'Author Feedback', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
 
-    # Update parents if present
-    TreeFolder.where(child_type: 'QuestionnaireNode').each do |folder|
+    AuthorFeedbackQuestionnaire.find_each do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
+
+    fnode = TreeFolder.create(name: 'Teammate Review', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
+
+    TeammateReviewQuestionnaire.find_each do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
+
+    fnode = TreeFolder.create(name: 'Survey', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
+
+    SurveyQuestionnaire.find_each do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
+
+    fnode = TreeFolder.create(name: 'Global Survey', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
+
+    GlobalSurveyQuestionnaire.find_each do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
+
+    fnode = TreeFolder.create(name: 'Course Evaluation', child_type: 'QuestionnaireNode')
+    pfNode = FolderNode.create(parent_id: pNode.id, node_object_id: fnode.id)
+
+    CourseEvaluationQuestionnaire.find_each  do |questionnaire|
+      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
+    end
+
+    folders = TreeFolder.where(child_type: 'QuestionnaireNode')
+    folders.each do |folder|
       folder.update_attribute('parent_id', parent.id)
     end
   end
 
-  def self.down
-    remove_column :tree_folders, :parent_id if column_exists?(:tree_folders, :parent_id)
-  end
-
-  private_class_method def self.create_questionnaire_folder(name, parent_node, model_class)
-    fnode = TreeFolder.create(name: name, child_type: 'QuestionnaireNode')
-    pfNode = FolderNode.create(parent_id: parent_node.id, node_object_id: fnode.id)
-
-    return unless model_class
-
-    model_class.find_each do |questionnaire|
-      QuestionnaireNode.create(parent_id: pfNode.id, node_object_id: questionnaire.id)
-    end
-  rescue StandardError => e
-    Rails.logger.warn "Skipping folder #{name} due to error: #{e.message}"
-  end
+  def self.down; end
 end

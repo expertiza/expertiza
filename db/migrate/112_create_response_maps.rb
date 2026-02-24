@@ -114,25 +114,22 @@ class CreateResponseMaps < ActiveRecord::Migration[4.2]
   
   def self.create_response_map(map, review_type, map_type, questionnaire_type, assignment)
     response = nil
-    rmap = nil
-
-    today = Time.now
-    oldest_allowed_time = Time.local(today.year - 1, today.month, today.day, 0, 0, 0)
-
-    review = ActiveRecord::Base.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
-    rmap = Object.const_get(map_type).create(
-      reviewed_object_id: map['reviewed_object_id'].to_i,
-      reviewer_id: map['reviewer_id'].to_i,
-      reviewee_id: map['reviewee_id'].to_i
-    )
-
-    if review[0].present?
-      questionnaire = assignment.questionnaires.find_by(type: questionnaire_type)
-      if questionnaire.present?
-        response = create_response(review[0], rmap, questionnaire.questions)
+    rmap = nil 
+   
+    today = Time.now             
+    oldest_allowed_time = Time.local(today.year - 1,today.month,today.day,0,0,0)    
+       review = ActiveRecord::Base.connection.select_all("select * from #{review_type} where mapping_id = #{map['id']}")
+        rmap = Object.const_get(map_type).create(
+                  :reviewed_object_id => map['reviewed_object_id'].to_i,
+                  :reviewer_id => map['reviewer_id'].to_i,
+                  :reviewee_id => map['reviewee_id'].to_i)                 
+        if review[0] != nil     
+          questionnaire = assignment.questionnaires.find_by_type(questionnaire_type)          
+          if questionnaire != nil
+            response = create_response(review[0], rmap, questionnaire.questions)
+          end
+        end
       end
-    end
-
     return rmap, response
   end
   

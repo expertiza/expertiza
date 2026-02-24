@@ -35,6 +35,7 @@ class ReportsController < ApplicationController
     return csv unless detail_options
   end
   
+  # Renders LLM evaluation report view for an assignment (Send to LLM / Get LLM Evaluation UI).
   def llm_evaluation_report(params, session)
     @id = params[:id]
     @assignment = Assignment.find(@id)
@@ -59,6 +60,7 @@ class ReportsController < ApplicationController
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
+  # Fetches finalized LLM evaluation scores from MCP server, saves to InstructorResponseScore, and syncs ReviewGrades.
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new

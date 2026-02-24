@@ -67,15 +67,45 @@ class MCPReviewService
 
   # Build the complete response data hash
   def build_response_data(response, questionnaire)
+    map = response.map
+    assignment = map.assignment
+
     {
       response_id_of_expertiza: response.id,
-      course_name: response.map.assignment.course.name,
-      assignment_name: response.map.assignment.name,
+      course_name: assignment.course.name,
+      assignment_name: assignment.name,
       round: response.round,
+      team_or_author_name: reviewee_display_name(map, assignment),
+      reviewer_name: reviewer_display_name(map),
       scores: build_current_round_scores(response, questionnaire),
       additional_comment: response.additional_comment,
       previous_round_review: build_previous_round_review(response, questionnaire)
     }
+  end
+
+  # Team or author name: team name for team assignments, author fullname for individual
+  def reviewee_display_name(map, assignment)
+    return nil unless Team.exists?(map.reviewee_id)
+
+    if assignment.max_team_size == 1
+      teams_user = TeamsUser.where(team_id: map.reviewee_id).first
+      teams_user&.user&.fullname
+    else
+      Team.find(map.reviewee_id).name
+    end
+  end
+
+  # Reviewer display name (Participant or AssignmentTeam when team_reviewing_enabled)
+  def reviewer_display_name(map)
+    assignment = map.assignment
+    reviewer = if assignment.team_reviewing_enabled
+                 AssignmentTeam.find_by(id: map.reviewer_id)
+               else
+                 AssignmentParticipant.find_by(id: map.reviewer_id)
+               end
+    return nil if reviewer.nil?
+
+    reviewer.respond_to?(:fullname) ? reviewer.fullname : reviewer.try(:name)
   end
 
   # Get questionnaire from response (same logic as `questionnaire_from_response`)

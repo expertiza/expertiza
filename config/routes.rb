@@ -397,7 +397,6 @@ Expertiza::Application.routes.draw do
       post :delete_metareviewer
       post :delete_all_metareviewers
       post :delete_outstanding_reviewers
-      post :save_llm_grade_and_comment_for_reviewer
     end
   end
 
@@ -567,7 +566,6 @@ Expertiza::Application.routes.draw do
       get :view_review_scores_popup
       get :self_review_popup
       get :author_feedback_popup
-      post :finalize_llm_evaluation
     end
   end
 
@@ -651,10 +649,6 @@ Expertiza::Application.routes.draw do
       get :new
     end
   end  
-
-  resources :mcp_reviews, only: [:create, :show], defaults: { format: :json } do
-    post :finalize, on: :member, defaults: { format: :json }
-  end
 
   resources :conference
   root to: 'content_pages#view', page_name: 'home'

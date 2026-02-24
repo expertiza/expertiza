@@ -17,21 +17,10 @@ class MCPServerClient
     post("api/v1/reviews", payload)
   end
 
-  # GET /v1/reviews/:id
-  def get_review(id)
-    get("api/v1/reviews/#{id}")
-  end
-
   # GET /api/v1/reviews/finalized/:expertiza_response_id
   # Returns { total_finalized_score: int or null, student_feedback: string or null }
   def get_finalized_review(expertiza_response_id)
     get("api/v1/reviews/finalized/#{expertiza_response_id}")
-  end
-
-  # POST /v1/reviews/:id/finalize
-  # payload: { finalized_feedback: ..., finalized_score: ... }
-  def finalize_review(id, payload)
-    post("api/v1/reviews/#{id}/accept", payload)
   end
 
   private

@@ -397,7 +397,6 @@ Expertiza::Application.routes.draw do
       post :delete_metareviewer
       post :delete_all_metareviewers
       post :delete_outstanding_reviewers
-      post :save_llm_grade_and_comment_for_reviewer
     end
   end
 

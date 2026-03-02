@@ -37,7 +37,9 @@ class MCPReviewService
     build_response_data(response, questionnaire)
   end
 
-  # Build the complete response data hash
+  # Builds the full review payload sent to the MCP server for a single peer review,
+  # including course/assignment metadata, reviewer and team/author names,
+  # rubric scores for the current round, additional comments, and a summary of the previous round's review.
   def build_response_data(response, questionnaire)
     map = response.map
     assignment = map.assignment
@@ -86,15 +88,11 @@ class MCPReviewService
     response.questionnaire_by_answer(first_score)
   end
 
-  # Build scores for current round
+  # Builds the rubric-question score details for this peer-review response (current round).
+  # Returns an array of per-question hashes with: question text, question type, max points, awarded points, and reviewer comments.
+  # Excludes SectionHeader/QuestionHeader items.
   def build_current_round_scores(response, questionnaire)
-    questions = questionnaire.questions.order(:seq)
-    scores_by_q_id = response.scores.index_by(&:question_id)
-
-    filter_header_questions(questions).map do |question|
-      score = scores_by_q_id[question.id]
-      format_score_data(question, score, questionnaire)
-    end
+    build_round_scores(response, questionnaire, include_unscored: true)
   end
 
   # Build previous round review data
@@ -111,28 +109,37 @@ class MCPReviewService
 
   # Build scores for previous round
   def build_previous_round_scores(prev_response, questionnaire)
-    filtered_scores = prev_response.scores.reject do |score|
-      score.question.type == 'SectionHeader' || score.question.type == 'QuestionHeader'
-    end
-
-    filtered_scores.map do |score|
-      format_score_data(score.question, score, questionnaire)
-    end
+    build_round_scores(prev_response, questionnaire, include_unscored: false)
   end
 
-  # Format individual score data into hash
-  def format_score_data(question, score, questionnaire)
+  # Builds rubric-question score hashes for a given response and questionnaire.
+  # When include_unscored is true, questions with no Score record are included with nil awarded_points/comments.
+  def build_round_scores(response, questionnaire, include_unscored:)
+    questions = filter_out_header_questions(questionnaire.questions.order(:seq))
+    scores_by_q_id = response.scores.index_by(&:question_id)
+
+    questions.map do |question|
+      score = scores_by_q_id[question.id]
+      next if score.nil? && !include_unscored
+
+      question_score_payload(question, score, questionnaire)
+    end.compact
+  end
+
+  # Builds the per-question score payload hash sent to the MCP server.
+  def question_score_payload(question, score, questionnaire)
+    max_points_possible = max_points_possible_for_question(question, questionnaire)
     {
       question: question.txt,
       type: question.type,
-      max_points: calculate_max_points(question, questionnaire),
+      max_points_possible: max_points_possible,
       awarded_points: score&.answer,
       comments: score&.comments
     }
   end
 
-  # Calculate max points for a question
-  def calculate_max_points(question, questionnaire)
+  # Maximum points possible for a question (based on type/weight and questionnaire scale)
+  def max_points_possible_for_question(question, questionnaire)
     if question.type == 'Checkbox'
       1
     elsif question.weight.present?
@@ -143,7 +150,7 @@ class MCPReviewService
   end
 
   # Filter out header question types
-  def filter_header_questions(questions)
+  def filter_out_header_questions(questions)
     questions.reject { |q| q.type == 'SectionHeader' || q.type == 'QuestionHeader' }
   end
 end

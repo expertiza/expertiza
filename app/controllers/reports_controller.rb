@@ -96,6 +96,9 @@ class ReportsController < ApplicationController
     if errors.any?
       flash[:error] = "Some fetches failed: #{errors.first(3).join('; ')}#{errors.size > 3 ? '...' : ''}"
     end
+    if saved.zero? && errors.empty?
+      flash[:info] = 'No finalized LLM evaluations are available yet for this assignment.'
+    end
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
@@ -138,6 +141,5 @@ class ReportsController < ApplicationController
     end
   end
 end
-
 
 

@@ -60,7 +60,9 @@ class ReportsController < ApplicationController
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
-  # Fetches finalized LLM evaluation scores from MCP server, saves to InstructorResponseScore, and syncs ReviewGrades.
+  # Fetches finalized LLM-generated evaluation scores and feedback for peer reviews from the MCP server,
+  # and saves them to InstructorResponseScore for each response (peer review).
+  # ReviewGrades then use InstructorResponseScore to derive the “Score and Feedback” for each reviewer.
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new
@@ -69,6 +71,9 @@ class ReportsController < ApplicationController
     ).pluck(:id)
     saved = 0
     errors = []
+    # Iterate over each response (peer review) 
+    # and fetch the LLM-generated evaluation scores and feedback from the MCP server.
+    # Save the scores and feedback to InstructorResponseScore for each response.
     Array(response_ids).each do |response_id|
       begin
         data = mcp_client.get_finalized_review(response_id)
@@ -85,21 +90,24 @@ class ReportsController < ApplicationController
       end
     end
     if saved > 0
-      sync_review_grades_from_instructor_scores(@assignment)
-      flash[:success] = "Saved LLM evaluation for #{saved} review(s) and synced participant grades."
+      save_review_grades_from_instructor_scores(@assignment)
+      flash[:success] = "Saved LLM evaluation for #{saved} peer review(s) and calculated reviewer grades."
     end
     if errors.any?
       flash[:error] = "Some fetches failed: #{errors.first(3).join('; ')}#{errors.size > 3 ? '...' : ''}"
+    end
+    if saved.zero? && errors.empty?
+      flash[:info] = 'No finalized LLM evaluations are available yet for this assignment.'
     end
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
   private
 
-  # Calculate and save ReviewGrade for each participant based on their InstructorResponseScores.
+  # Calculate and save ReviewGrade for each reviewer based on their InstructorResponseScores.
   # grade_for_reviewer = total (sum) of all scores; comment = "N reviews | Scores: x, y, z"
-  # Aggregates across ALL response_maps for each participant (not per-map).
-  def sync_review_grades_from_instructor_scores(assignment)
+  # Aggregates across ALL response_maps for each reviewer (not per-map).
+  def save_review_grades_from_instructor_scores(assignment)
     map_ids = ResponseMap.where(reviewed_object_id: assignment.id, type: 'ReviewResponseMap').pluck(:id)
     all_response_ids = Response.where(map_id: map_ids).pluck(:id)
     return if all_response_ids.empty?
@@ -133,6 +141,5 @@ class ReportsController < ApplicationController
     end
   end
 end
-
 
 

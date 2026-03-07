@@ -95,19 +95,25 @@ class MCPReviewService
     build_round_scores(response, questionnaire, include_unscored: true)
   end
 
-  # Build previous round review data
+  # Builds previous-round review data to provide context for the current round review.
+  # First checks if there is a previous round review. If not, returns a fallback string.
+  # If there is a previous round review, it builds the scores and additional comment.
+  # Unlike the current-round payload (which includes metadata such as response ID, author/reviewer names, course, and assignment), 
+  # the previous-round payload only includes scores and the additional comment.
   def build_previous_round_review(response, questionnaire)
     prev_response = Response.where(map_id: response.map_id, round: response.round - 1).first
     
     return "No previous round review" if prev_response.nil?
 
     {
+      previous_round: prev_response.round,
+      current_round: response.round,
       scores: build_previous_round_scores(prev_response, questionnaire),
       additional_comment: prev_response.additional_comment
     }
   end
 
-  # Build scores for previous round
+  # Builds per-question scores for a previous round and skips questions with no score record.
   def build_previous_round_scores(prev_response, questionnaire)
     build_round_scores(prev_response, questionnaire, include_unscored: false)
   end

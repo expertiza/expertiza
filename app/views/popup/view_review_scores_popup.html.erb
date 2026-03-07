@@ -81,12 +81,12 @@
         <% end %>
       </tr>  
 
-      <!-- Row Score and Feedback (from instructor_response_scores) -->
+      <!-- Row Score and Feedback (from instructor review scores) -->
       <tr>
         <th colspan="3" style="background-color:#DDDDBB" width="<%= item_width %>%" > <b>Score and Feedback</b></th>
         <% responses.each do |response_id| %>  
           <td width="<%= item_width %>%" style="padding: 8px;">
-          <% instr_score = InstructorResponseScore.find_by(response_id: response_id) %>
+          <% instr_score = InstructorReviewScore.find_by(response_id: response_id) %>
           <% if instr_score %>
             <div><strong>Score:</strong> <%= instr_score.score %></div>
             <% if instr_score.feedback.present? %>

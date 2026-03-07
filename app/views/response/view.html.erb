@@ -3,14 +3,14 @@
 <%= link_to "Email the author", author_response_index_path(email: @participant.user.email,response: @response.id) %>
 </div>
 
-<% if @instructor_response_score %>
+<% if @instructor_review_score %>
   <div class="response-review-grade-card">
     <div class="response-review-grade-header">
       <span class="response-review-grade-label">Your review grade</span>
-      <span class="response-review-grade-score"><%= @instructor_response_score.score %></span>
+      <span class="response-review-grade-score"><%= @instructor_review_score.score %></span>
     </div>
-    <% if @instructor_response_score.feedback.present? %>
-      <div class="response-review-grade-comment"><%= @instructor_response_score.feedback %></div>
+    <% if @instructor_review_score.feedback.present? %>
+      <div class="response-review-grade-comment"><%= @instructor_review_score.feedback %></div>
     <% end %>
   </div>
 <% end %>

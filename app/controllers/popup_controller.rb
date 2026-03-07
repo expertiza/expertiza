@@ -81,7 +81,7 @@ class PopupController < ApplicationController
   end
 
   # Prepares data for the review-scores for a given reviewer and assignment.
-  # The view uses InstructorResponseScore to render the “Score and Feedback” row.
+  # The view uses InstructorReviewScore to render the "Score and Feedback" row.
   def view_review_scores_popup
     @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]

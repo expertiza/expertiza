@@ -61,8 +61,8 @@ class ReportsController < ApplicationController
   end
 
   # Fetches finalized LLM-generated evaluation scores and feedback for peer reviews from the MCP server,
-  # and saves them to InstructorResponseScore for each response (peer review).
-  # ReviewGrades then use InstructorResponseScore to derive the “Score and Feedback” for each reviewer.
+  # and saves them to InstructorReviewScore for each peer review in each round.
+  # ReviewGrades then use InstructorReviewScore to derive the "Score and Feedback" for each reviewer.
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new
@@ -71,16 +71,16 @@ class ReportsController < ApplicationController
     ).pluck(:id)
     saved = 0
     errors = []
-    # Iterate over each response (peer review) 
+    # Iterate over each peer review in each round
     # and fetch the LLM-generated evaluation scores and feedback from the MCP server.
-    # Save the scores and feedback to InstructorResponseScore for each response.
+    # Save the scores and feedback to InstructorReviewScore for each peer review.
     Array(response_ids).each do |response_id|
       begin
         data = mcp_client.get_finalized_review(response_id)
         score = data['total_finalized_score']
         feedback = data['student_feedback']
         next if score.nil?
-        record = InstructorResponseScore.find_or_initialize_by(response_id: response_id)
+        record = InstructorReviewScore.find_or_initialize_by(response_id: response_id)
         record.score = score
         record.feedback = feedback
         record.save!
@@ -104,7 +104,7 @@ class ReportsController < ApplicationController
 
   private
 
-  # Calculate and save ReviewGrade for each reviewer based on their InstructorResponseScores.
+  # Calculate and save ReviewGrade for each reviewer based on their InstructorReviewScores.
   # grade_for_reviewer = total (sum) of all scores; comment = "N reviews | Scores: x, y, z"
   # Aggregates across ALL response_maps for each reviewer (not per-map).
   def save_review_grades_from_instructor_scores(assignment)
@@ -116,9 +116,9 @@ class ReportsController < ApplicationController
     response_to_map = Response.where(id: all_response_ids).pluck(:id, :map_id).to_h
     map_to_reviewer = ResponseMap.where(id: response_to_map.values.uniq).pluck(:id, :reviewer_id).to_h
 
-    # Group InstructorResponseScores by participant
+    # Group InstructorReviewScores by participant
     participant_scores = {}
-    InstructorResponseScore.where(response_id: all_response_ids).each do |irs|
+    InstructorReviewScore.where(response_id: all_response_ids).each do |irs|
       reviewer_id = map_to_reviewer[response_to_map[irs.response_id]]
       next if reviewer_id.nil?
       participant_scores[reviewer_id] ||= []
@@ -141,5 +141,3 @@ class ReportsController < ApplicationController
     end
   end
 end
-
-

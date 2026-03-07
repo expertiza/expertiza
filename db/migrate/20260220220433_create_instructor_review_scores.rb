@@ -1,4 +1,4 @@
-class CreateResponseGrades < ActiveRecord::Migration[5.1]
+class CreateInstructorReviewScores < ActiveRecord::Migration[5.1]
   def change
     create_table :instructor_review_scores do |t|
       t.integer :response_id, null: false

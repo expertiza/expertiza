@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20231203230237) do
+ActiveRecord::Schema.define(version: 20260223182602) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -133,6 +133,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.boolean "duty_based_assignment?"
     t.boolean "questionnaire_varies_by_duty"
     t.boolean "enable_pair_programming", default: false
+    t.boolean "is_sent_to_llm_for_processing", default: false, null: false
     t.index ["course_id"], name: "fk_assignments_courses"
     t.index ["instructor_id"], name: "fk_assignments_instructors"
     t.index ["late_policy_id"], name: "fk_late_policy_id"
@@ -429,6 +430,15 @@ ActiveRecord::Schema.define(version: 20231203230237) do
     t.string "name", default: "", null: false
   end
 
+  create_table "instructor_review_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.integer "response_id", null: false
+    t.float "score", limit: 24
+    t.text "feedback"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["response_id"], name: "index_instructor_review_scores_on_response_id", unique: true
+  end
+
   create_table "invitations", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "assignment_id"
     t.integer "from_id"
@@ -685,7 +695,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
 
   create_table "review_grades", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "participant_id"
-    t.integer "grade_for_reviewer"
+    t.float "grade_for_reviewer", limit: 24
     t.text "comment_for_reviewer"
     t.datetime "review_graded_at"
     t.integer "reviewer_id"
@@ -1039,6 +1049,7 @@ ActiveRecord::Schema.define(version: 20231203230237) do
   add_foreign_key "due_dates", "deadline_rights", column: "submission_allowed_id", name: "fk_due_date_submission_allowed"
   add_foreign_key "due_dates", "deadline_types", name: "fk_deadline_type_due_date"
   add_foreign_key "duties", "assignments"
+  add_foreign_key "instructor_review_scores", "responses"
   add_foreign_key "invitations", "assignments", name: "fk_invitation_assignments"
   add_foreign_key "invitations", "users", column: "from_id", name: "fk_invitationfrom_users"
   add_foreign_key "invitations", "users", column: "to_id", name: "fk_invitationto_users"

@@ -36,13 +36,13 @@ class CourseNode < Node
   def self.get_course_query_conditions(show = nil, user_id = nil)
     current_user = User.find_by(id: user_id)
     conditions = if show && current_user
-                   if !current_user.teaching_assistant?
+                   if current_user.teaching_assistant? == false
                      "courses.instructor_id = #{user_id}"
                    else
                      'courses.id in (?)'
                    end
                  else
-                   if !current_user.teaching_assistant?
+                   if current_user.teaching_assistant? == false
                      "(courses.private = 0 or courses.instructor_id = #{user_id})"
                    else
                      "(courses.private = 0 or courses.id in (?))"

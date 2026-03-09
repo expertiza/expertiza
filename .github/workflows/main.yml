@@ -58,13 +58,14 @@ jobs:
           DB_PORT: 3306
           RAILS_ENV: test
       
-      - name: Upload coverage to Code Climate
+      - name: Upload coverage to Codecov
         if: always()
-        uses: paambaati/codeclimate-action@v9.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        uses: codecov/codecov-action@v4
         with:
-          coverageLocations: coverage/.resultset.json:simplecov
+          files: coverage/.resultset.json
+          flags: ${{ matrix.folder }}
+          fail_ci_if_error: false
+          verbose: true
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4

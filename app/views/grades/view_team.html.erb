@@ -70,8 +70,7 @@
 </div><br><br>
 <!-- For each of the models in the list, generate a heatgrid table. this is the outer most loop -->
 <% @vmlist.each_with_index do |vm, table_count| %>
-    <% if (vm.questionnaire_display_type == "Metareview" || vm.questionnaire_display_type == "Author Feedback" || vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
-    <% else %>
+    <% if show_grades_questionnaire?(vm.questionnaire_display_type) %>
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
@@ -133,13 +132,8 @@
               <th class="sorter-true">Question<span></span></th>
               <% i_final = 0 %>
               <% vm.list_of_reviews.each_with_index do |review, i| %>
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: nil} %>
-                  <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                    <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
-                  <% end %>
+                  <% user_name = grades_reviewer_label(review, vm.questionnaire_display_type, i, @assignment) %>
+                  <%= render :partial => 'add_icon_to_name', :locals => {review: review, i: i, user_name: user_name} %>
                   <% i_final = 0%>
               <% end %>
 
@@ -211,7 +205,7 @@
                         </thead>
                         <% (0.upto(row.score_row.length - 1)).each do |index| %>
                             <tr>
-                              <td><%=t ".review"%> <%=index + 1%></td>
+                              <td><%= grades_reviewer_label(vm.list_of_reviews[index], vm.questionnaire_display_type, index, @assignment) %></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <% if vm.questionnaire_type == "ReviewQuestionnaire" %>
                                 <!-- E2100 : Set id and data of this <td> to be queried by jQuery for the tagging report

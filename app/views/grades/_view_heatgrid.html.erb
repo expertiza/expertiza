@@ -64,8 +64,7 @@ function toggleFunction(elementId) {
 <% table_count = 0 %>
 <% @vmlist.each do |vm| %>
 
-    <% if (vm.questionnaire_display_type == "Metareview" or vm.questionnaire_display_type == "Author Feedback" or vm.questionnaire_display_type == "Teammate Review") and @current_role_name.eql?'Student' %>
-    <% else %>
+    <% if show_grades_questionnaire?(vm.questionnaire_display_type) %>
         <% if vm.list_of_reviewers.length > 0 %>
 
           <!-- display the list of questions for this questionnaire -->
@@ -118,16 +117,8 @@ function toggleFunction(elementId) {
               
               <% i = 1 %>
               <% vm.list_of_reviews.each do |review| %>
-                  <!-- instructors (or higher level users) see reviewer name, students see anonymized string -->
-                  <% if (['Student'].include? @current_role_name) && @assignment.is_anonymous%>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= "Review " + i.to_s %></a>  </th>
-                  <% elsif vm.questionnaire_display_type == "Author Feedback" %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewee_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
-                  <% else %>
-                      <% user_name = User.find(Participant.find(ResponseMap.find(Response.find(review.id).map_id).reviewer_id).user_id).fullname(session[:ip]).to_s %>
-                      <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name.to_s %></a>  </th>
-                  <% end %>
+                  <% user_name = grades_reviewer_label(review, vm.questionnaire_display_type, i - 1, @assignment) %>
+                  <th class="sorter-false"> <a target="_blank" href="../response/view?id=<%= review.id.to_s %>"  data-toggle="tooltip" data-placement="right" title="Click to see details"><%= user_name %></a>  </th>
                   <% i += 1 %>
               <% end %>
 
@@ -198,11 +189,7 @@ function toggleFunction(elementId) {
                         <% for index in 0 .. row.score_row.length - 1 %>
                             <tr>
                             <% next if vm.list_of_reviewers[index].nil? %>
-                              <% if vm.questionnaire_display_type == "Author Feedback" %>
-                                <td><%= vm.list_of_reviewers[index].user_id %></td>
-                              <% else %>
-                                <td>Review <%=index + 1%></td>
-                              <% end %>
+                              <td><%= grades_reviewer_label(vm.list_of_reviews[index], vm.questionnaire_display_type, index, @assignment) %></td>
                               <td class="<%= row.score_row[index].color_code.to_s %>" align="center" ><%= row.score_row[index].score_value.to_s %></td>
                               <td>
                                 <%= row.score_row[index].comment.html_safe unless row.score_row[index].comment.nil? %>

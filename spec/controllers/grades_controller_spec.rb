@@ -274,29 +274,42 @@ describe GradesController do
   end
 
   describe '#action_allowed' do
-    context 'when the student does not belong to a team' do
+    context 'when no user is logged in' do
       it 'returns false' do
-        params = { action: 'view_team' }
-        session[:user].role.name = 'Student'
+        controller.params = { id: 4, action: 'view_team' }
+        session[:user] = nil
         expect(controller.action_allowed?).to eq(false)
       end
     end
     context 'when the user is an instructor' do
       it 'returns true' do
-        params = { action: 'view_team' }
+        controller.params = { id: 4, action: 'view_team' }
         session[:user].role.name = 'Instructor'
         expect(controller.action_allowed?).to eq(true)
       end
     end
-    context 'when the user is an student' do
+    context 'when the user is a student on another team' do
       before(:each) do
         controller.params = { id: 4, action: 'view_team' }
       end
       it 'only see the heat map for their own team' do
         stub_current_user(student, student.role.name, student.role)
         allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
-        allow(AssignmentParticipant).to receive(:exist?).with(parent_id: 2, user_id: 2).and_return(false)
+        allow(participant4).to receive(:team).and_return(team2)
+        allow(team2).to receive(:user?).with(student).and_return(false)
         expect(controller.action_allowed?).to eq(false)
+      end
+    end
+    context 'when the user is a student on the requested team' do
+      before(:each) do
+        controller.params = { id: 4, action: 'view_team' }
+      end
+      it 'returns true' do
+        stub_current_user(student, student.role.name, student.role)
+        allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+        allow(participant4).to receive(:team).and_return(team2)
+        allow(team2).to receive(:user?).with(student).and_return(true)
+        expect(controller.action_allowed?).to eq(true)
       end
     end
   end

@@ -16,9 +16,12 @@ class GradesController < ApplicationController
         are_needed_authorizations_present?(params[:id], 'reader', 'reviewer') &&
         self_review_finished?
     when 'view_team'
+      return false unless user_logged_in?
+
       if current_user_is_a? 'Student' # students can only see the heat map for their own team
         participant = AssignmentParticipant.find(params[:id])
-        current_user_is_assignment_participant?(participant.assignment.id)
+        team = participant.team
+        team.nil? ? current_user_has_id?(participant.user_id) : team.user?(session[:user])
       else
         true
       end

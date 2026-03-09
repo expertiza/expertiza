@@ -7,6 +7,9 @@
     <option value='ReviewResponseMap' selected>
       Review report
     </option>
+    <option value='LLMEvaluationReport'>
+      Evaluate using LLM
+    </option>
     <option value='FeedbackResponseMap' >
       Author feedback report
     </option>
@@ -74,6 +77,8 @@
       </div>
       <br>
     </div>
+<% elsif @type == "LLMEvaluationReport" %>
+  <h1> Evaluate using LLM for <%= @assignment.name %> </h1>
 
 <% elsif @type == "FeedbackResponseMap" %>
   <h1> Author feedback report for <%= @assignment.name%> </h1>

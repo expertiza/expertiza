@@ -80,7 +80,8 @@ class PopupController < ApplicationController
     @similar_assignments = @similar_assignments.sort_by { |sim_assignment| -sim_assignment.id }
   end
 
-  # Views tone analysis report and heatmap
+  # Prepares data for the review-scores for a given reviewer and assignment.
+  # The view uses InstructorReviewScore to render the "Score and Feedback" row.
   def view_review_scores_popup
     @ip = session[:ip]
     @reviewer_id = params[:reviewer_id]
@@ -88,6 +89,10 @@ class PopupController < ApplicationController
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
     @reviews = []
   end
+
+  private
+
+  public
 
   # this can be called from "response_report" by clicking reviewer names from instructor end.
   def reviewer_details_popup

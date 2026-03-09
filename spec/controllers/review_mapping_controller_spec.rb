@@ -709,5 +709,6 @@ describe ReviewMappingController do
         expect(response).to redirect_to('/submitted_content/1/edit?msg=Self+review+already+assigned%21')
       end
     end
+
   end
 end

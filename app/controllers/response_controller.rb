@@ -207,6 +207,7 @@ class ResponseController < ApplicationController
   # view response
   def view
     set_content
+    @instructor_review_score = InstructorReviewScore.find_by(response_id: @response.id)
   end
 
   def create

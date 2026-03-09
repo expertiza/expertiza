@@ -331,6 +331,10 @@ Expertiza::Application.routes.draw do
     collection do
       post :response_report
       get :response_report
+      post :send_to_llm
+    end
+    member do
+      get :get_llm_evaluation
     end
   end
 
@@ -356,6 +360,8 @@ Expertiza::Application.routes.draw do
       get :run_get_notification
       post :edit
       post :delete
+      
+
     end
   end
 
@@ -642,7 +648,7 @@ Expertiza::Application.routes.draw do
       get :redirect_to_assignment
       get :new
     end
-  end
+  end  
 
   resources :conference
   root to: 'content_pages#view', page_name: 'home'

@@ -38,7 +38,7 @@
 <% end %>
 
 <% if @model == 'Question' %>
-  <h2>Export Advices</h2>
+  <h2>Export Advice</h2>
   <%= form_tag({:controller => 'export_file', :action => 'export_advices'}, {:method => 'post', :multipart => true, :name => 'export_advices'}) do %>
     <table>
       <tr>

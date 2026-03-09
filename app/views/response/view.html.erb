@@ -3,6 +3,18 @@
 <%= link_to "Email the author", author_response_index_path(email: @participant.user.email,response: @response.id) %>
 </div>
 
+<% if @instructor_review_score %>
+  <div class="response-review-grade-card">
+    <div class="response-review-grade-header">
+      <span class="response-review-grade-label">Your review grade</span>
+      <span class="response-review-grade-score"><%= @instructor_review_score.score %></span>
+    </div>
+    <% if @instructor_review_score.feedback.present? %>
+      <div class="response-review-grade-comment"><%= @instructor_review_score.feedback %></div>
+    <% end %>
+  </div>
+<% end %>
+
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !(@map.instance_of? BookmarkRatingResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
   <%= render :partial => 'submitted_content/main', :locals => {:participant => @contributor.participants.first, :stage => @assignment.current_stage(topic_id)} %>

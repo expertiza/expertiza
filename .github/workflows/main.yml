@@ -45,7 +45,7 @@ jobs:
 
       - name: Set up code climate test-reporter
         run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          curl -fsSL https://github.com/qltysh-archive/test-reporter/releases/download/v0.11.1/test-reporter-0.11.1-linux-amd64 -o ./cc-test-reporter
           chmod +x ./cc-test-reporter
           ./cc-test-reporter before-build
 
@@ -87,7 +87,7 @@ jobs:
       - name: Upload code coverage report
         run: |
           export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          curl -fsSL https://github.com/qltysh-archive/test-reporter/releases/download/v0.11.1/test-reporter-0.11.1-linux-amd64 -o ./cc-test-reporter
           chmod +x ./cc-test-reporter
           ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
           ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}

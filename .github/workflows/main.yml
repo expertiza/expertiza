@@ -43,12 +43,6 @@ jobs:
           ruby-version: 2.4
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
 
-      - name: Set up code climate test-reporter
-        run: |
-          curl -fsSL https://github.com/qltysh-archive/test-reporter/releases/download/v0.11.1/test-reporter-0.11.1-linux-amd64 -o ./cc-test-reporter
-          chmod +x ./cc-test-reporter
-          ./cc-test-reporter before-build
-
       - name: Start redis
         uses: supercharge/redis-github-action@1.4.0
 
@@ -64,33 +58,19 @@ jobs:
           DB_PORT: 3306
           RAILS_ENV: test
       
-      - name: Format code coverage report
-        run: ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.${{ matrix.folder }}.json"
+      - name: Upload coverage to Code Climate
+        if: always()
+        uses: paambaati/codeclimate-action@v9.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageLocations: coverage/.resultset.json:simplecov
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-artifacts-${{ matrix.folder }}
           path: coverage/
-  
-  # Publish code coverage report to code climate 
-  publish-code-coverage:
-    needs: test
-    if: github.event_name == 'push'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v4
-        with:
-          name: code-coverage-artifacts
-          path: coverage
-      - name: Upload code coverage report
-        run: |
-          export GIT_BRANCH="${GITHUB_REF/refs\/heads\//}"
-          curl -fsSL https://github.com/qltysh-archive/test-reporter/releases/download/v0.11.1/test-reporter-0.11.1-linux-amd64 -o ./cc-test-reporter
-          chmod +x ./cc-test-reporter
-          ./cc-test-reporter sum-coverage coverage/codeclimate.*.json 
-          ./cc-test-reporter after-build -t simplecov -r ${{ secrets.CC_TEST_REPORTER_ID }}
   
   # Deploy the latest version of Expertiza development branch to the development server 
   # when changes are pushed to the development branch

@@ -41,7 +41,7 @@ before_script:
   - bundle install
   - bundle exec rails db:setup
   # Test coverage offered by Code Climate
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-0.7.0-linux-amd64 > ./cc-test-reporter
+  - curl -fsSL https://github.com/qltysh-archive/test-reporter/releases/download/v0.11.1/test-reporter-0.11.1-linux-amd64 -o ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
   # Using xvfb to Run Tests That Require a GUI (https://docs.travis-ci.com/user/gui-and-headless-browsers/)

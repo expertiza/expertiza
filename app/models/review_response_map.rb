@@ -107,6 +107,11 @@ class ReviewResponseMap < ResponseMap
     responses
   end
 
+  # Checks if there is at least one associated Response for this review response map.
+  def has_response?
+    response.any?
+  end
+
   # E-1973 - returns the reviewer of the response, either a participant or a team
   def get_reviewer
     ReviewResponseMap.get_reviewer_with_id(assignment.id, reviewer_id)

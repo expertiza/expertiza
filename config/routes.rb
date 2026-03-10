@@ -48,6 +48,7 @@ Expertiza::Application.routes.draw do
     collection do
       get :course_student_grade_summary
       get :all_students_all_reviews
+      get :combined_course_summary
       get :assignment_grade_summary
       get :insure_existence_of
     end

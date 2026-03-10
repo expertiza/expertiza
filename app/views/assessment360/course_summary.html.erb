@@ -1,0 +1,599 @@
+<style>
+  /* Main container styles */
+  .table-container {
+    width: 100%; /* Increased from 95% to 98% */
+    margin: 0 auto;
+    padding: 0px;
+    overflow-x: auto; /* Allows horizontal scrolling if needed */
+  }
+
+  /* Table styles */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0;
+    white-space: wrap; /* Prevents text wrapping */
+    font-size: 0.9em; /* Slightly smaller font to fit more content */
+    overflow-x: auto;
+  }
+
+  /* Header styles */
+  th {
+    background-color: #f5f5f5;
+    padding: 8px 4px;
+    text-align: center;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+  }
+
+  /* Cell styles */
+  td {
+    padding: 6px 4px;
+    text-align: center;
+    border: 1px solid #ddd;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Fixed-width columns for consistent layout */
+  .name-column {
+    min-width: 150px;
+    max-width: 200px;
+    text-align: left;
+    padding-left: 10px;
+    width: 200px;
+  }
+
+  .username-column {
+    min-width: 100px;
+    max-width: 120px;
+    text-align: left;
+    padding-left: 10px;
+    width: 150px;
+  }
+
+  .count-column {
+    min-width: 60px;
+    width: 100px;
+  }
+
+  .grade-column {
+    min-width: 70px;
+  }
+
+  .topic-column {
+    min-width: 150px;
+    max-width: 200px;
+  }
+
+  /* Topic cell specific styles */
+  td.topic {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Hover effect for better readability */
+  tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  /* Stripe effect */
+  tr:nth-child(even) {
+    background-color: #f8f8f8;
+  }
+
+  /* Make the table header stick to the top when scrolling */
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+    z-index: 1;
+  }
+
+  /* Responsive design */
+  @media screen and (max-width: 1200px) {
+    .table-container {
+      width: 100%;
+      padding: 5px;
+    }
+  }
+
+  /* Add these styles to your existing style section */
+  .info {
+    background-color: #d9edf7 !important; /* Light blue background */
+    color: #31708f !important; /* Darker blue text */
+    font-weight: 500;
+  }
+  
+  .info:hover {
+    background-color: #c4e3f3 !important; /* Slightly darker on hover */
+  }
+
+  /* Ensure the average rows dont get affected by zebra striping */
+  .average-row-top tr,
+  .average-row-bottom tr {
+    border-top: 2px solid #ddd;
+    border-bottom: 2px solid #ddd;
+  }
+
+  /* Add smooth transitions for column visibility */
+  td, th {
+    transition: all 0.3s ease;
+  }
+
+  /* Ensure hidden columns dont take space */
+  .hidden-column {
+    display: none !important;
+  }
+
+  /* Hide columns without disrupting layout */
+  td[style*="display: none"],
+  th[style*="display: none"] {
+    padding: 0;
+    border: none;
+    width: 0;
+  }
+
+  /* Maintain structure for visible columns */
+  td:visible,
+  th:visible {
+    min-width: 100px;
+  }
+
+  /* Ensure proper alignment */
+  tr > td:first-child,
+  tr > th:first-child {
+    border-left: 1px solid #ddd;
+  }
+
+  tr > td:last-child,
+  tr > th:last-child {
+    border-right: 1px solid #ddd;
+  }
+
+  /* Table container */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    display: block;
+  }
+
+
+  /* Table styles */
+  table {
+    border-collapse: collapse;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Base cell styles */
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Specific column widths - adjusted problematic columns */
+  .name-column {
+    min-width: 180px;
+    width: 180px;
+    text-align: left;
+  }
+
+  .username-column {
+    min-width: 120px;
+    width: 120px;
+    text-align: left;
+  }
+
+  /* Increased Teammate Count width */
+  .count-column {
+    min-width: 120px !important;
+    width: 120px !important;
+  }
+
+  .meta-column {
+    min-width: 100px;
+    width: 100px;
+  }
+
+  /* Increased Teammate column width */
+  .teammate-column {
+    min-width: 130px !important;
+    width: 130px !important;
+  }
+
+  .topic-column {
+    min-width: 120px;
+    width: 120px;
+  }
+
+  .peer-column {
+    min-width: 120px;
+    width: 120px;
+  }
+
+  /* Increased Instructor Grade column width significantly */
+  th[class*="instructor"], 
+  td[class*="instructor"],
+  .instructor-column,
+  .instructor-grade-column {
+    min-width: 150px !important;
+    width: 250px !important;
+    text-align: center !important;
+  }
+
+  /* Total and Final Grade columns */
+  .total-grade-column {
+    min-width: 150px !important;
+    width: 150px !important;
+  }
+
+  .final-grade-column {
+    min-width: 120px !important;
+    width: 120px !important;
+  }
+
+  /* Make sure the text is centered in these columns */
+  .count-column,
+  .instructor-column,
+  .teammate-column {
+    text-align: center !important;
+  }
+
+  /* Header styling */
+  th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    vertical-align: middle;
+    padding: 10px 8px; /* Slightly increased padding for headers */
+  }
+
+  /* Class average row */
+  .info {
+    background-color: #d9edf7;
+  }
+
+  /* Hidden columns */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Column toggles */
+  .column-toggles {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .checkbox-inline {
+    display: inline-block;
+    margin-right: 15px;
+    padding: 5px 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .checkbox-inline:hover {
+    background: #f0f0f0;
+  }
+
+  /* Ensure content is properly centered */
+  td, th {
+    vertical-align: middle;
+  }
+
+  /* Add some spacing between columns */
+  td, th {
+    border-right: 2px solid #ddd;
+  }
+
+  /* Make sure the last column of each section has a stronger border */
+  .instructor-column,
+  .total-grade-column,
+  .final-grade-column {
+    border-right: 2px solid #bbb !important;
+  }
+
+  /* Make sure text does not wrap */
+  th span, td span {
+    white-space: nowrap;
+    display: block;
+  }
+
+  /* Add these styles */
+  .alert {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+
+  .alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+  }
+
+  /* Ensure these columns are always visible */
+  .name-column,
+  .username-column,
+  .count-column {
+    display: table-cell !important;
+  }
+
+  /* Ensure basic table structure */
+  table {
+    width: 100%;
+    table-layout: auto;
+  }
+
+  /* Minimum width for basic columns */
+  .name-column { min-width: 180px; width: 180px; }
+  .username-column { min-width: 120px; width: 120px; }
+  .count-column { min-width: 80px; width: 80px; }
+
+  /* Style for final grade column */
+  .final-grade-column {
+    min-width: 100px;
+    width: 100px;
+  }
+
+  /* Ensure smooth transitions */
+  td, th {
+    transition: all 0.3s ease;
+  }
+
+  /* Hidden columns */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Maintain table structure */
+  tr {
+    display: table-row !important;
+  }
+</style>
+
+<script>
+    $(function() {
+        $(".sortable").tablesorter({
+            sortList: [[0,0]]
+        });
+    });
+</script>
+
+<div class="table-container">
+  <div class="column-toggles">
+    <div style="font-weight: bold; margin-right: 10px;margin-bottom: 10px;" >
+
+    Please select the columns you would like to display: 
+    </div>
+    <label class="checkbox-inline">
+      <input type="checkbox" class="toggle-column" data-column="meta" checked> Meta Reviews
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" class="toggle-column" data-column="teammate" checked> Teammate Reviews
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" class="toggle-column" data-column="topic" checked> Topics
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" class="toggle-column" data-column="peer" checked> Peer Scores
+    </label>
+    <label class="checkbox-inline">
+      <input type="checkbox" class="toggle-column" data-column="instructor" checked> Instructor Grades
+    </label>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table sortable">
+      <thead>
+        <tr>
+          <th rowspan="2" class="name-column">Student Name</th>
+          <th rowspan="2" class="username-column">Username</th>
+          <th rowspan="2" class="count-column">Teammate Count</th>
+          <% @assignments.each do |assignment| %>
+            <th colspan="5" class="assignment-header"><%= assignment.name %></th>
+          <% end %>
+          <th colspan="5" class="overall-header">Overall Scores</th>
+        </tr>
+        <tr>
+          <% @assignments.each do %>
+            <th class="col-meta">Meta</th>
+            <th class="col-teammate">Teammate</th>
+            <th class="col-topic">Topic</th>
+            <th class="col-peer">Peer Score</th>
+            <th class="col-instructor">Instructor Grade</th>
+          <% end %>
+          <th class="col-meta">Meta Avg</th>
+          <th class="col-teammate">Teammate Avg</th>
+          <th class="col-peer">Peer Avg</th>
+          <th class="col-instructor">Instructor Avg</th>
+          <th>Final Grade</th>
+        </tr>
+      </thead>
+
+      <tbody class="average-row-top">
+        <!-- Class Average Row -->
+        <tr class="info">
+          <td colspan="2" class="name-column">Class Average</td>
+          <td class="count-column"></td>
+          <% @assignments.each do |assignment| %>
+            <td class="col-meta"><%= "#{@overall_meta_review_grades[assignment.id] / @overall_meta_review_count[assignment.id]}" %></td>
+            <td class="col-teammate"><%= "#{@overall_teammate_review_grades[assignment.id] / @overall_teammate_review_count[assignment.id]}" %></td>
+            <td class="col-topic">-</td>
+            <td class="col-peer"><%= calculate_average_peer_score(assignment) %></td>
+            <td class="col-instructor"><%= calculate_average_instructor_grade(assignment) %></td>
+          <% end %>
+          
+          <!-- Overall Scores -->
+          <td class="col-meta">
+            <% total_meta = @overall_meta_review_grades.values.sum %>
+            <% total_meta_count = @overall_meta_review_count.values.sum %>
+            <%= total_meta_count.zero? ? '-' : "#{(total_meta.to_f / total_meta_count).round(2)}" %>
+          </td>
+          
+          <td class="col-teammate">
+            <% total_teammate = @overall_teammate_review_grades.values.sum %>
+            <% total_teammate_count = @overall_teammate_review_count.values.sum %>
+            <%= total_teammate_count.zero? ? '-' : "#{(total_teammate.to_f / total_teammate_count).round(2)}" %>
+          </td>
+          
+          <td class="col-peer">
+            <% peer_scores = [] %>
+            <% @assignments.each do |assignment| %>
+              <% @course_participants.each do |cp| %>
+                <% score = @peer_review_scores.dig(cp.id, assignment.id) %>
+                <% peer_scores << score if score && score != 'NaN' && score.to_s != 'NaN' %>
+              <% end %>
+            <% end %>
+            <%= peer_scores.empty? ? '-' : "#{(peer_scores.sum.to_f / peer_scores.length).round(2)}" %>
+          </td>
+          
+          <td class="col-instructor">
+            <% instructor_grades = [] %>
+            <% @assignments.each do |assignment| %>
+              <% @course_participants.each do |cp| %>
+                <% grade = @assignment_grades.dig(cp.id, assignment.id) %>
+                <% instructor_grades << grade if grade && grade != 'NaN' && grade.to_s != 'NaN' %>
+              <% end %>
+            <% end %>
+            <%= instructor_grades.empty? ? '-' : "#{(instructor_grades.sum.to_f / instructor_grades.length).round(2)}" %>
+          </td>
+          
+          <td>
+            <%= calculate_class_final_grade %>
+          </td>
+        </tr>
+      </tbody>
+
+      <tbody class="student-rows">
+        <% @course_participants.each do |cp| %>
+          <tr>
+            <td class="name-column"><%= cp.fullname(session[:ip]) %></td>
+            <td class="username-column"><%= cp.name(session[:ip]) %></td>
+            <td class="count-column"><%= @teamed_count[cp.id] %></td>
+            
+            <% @assignments.each do |assignment| %>
+              <td class="col-meta"><%= format_score(@meta_review[cp.id][assignment.id]) %></td>
+              <td class="col-teammate"><%= format_score(@teammate_review[cp.id][assignment.id]) %></td>
+              <td class="col-topic"><%= format_topic(@topics[cp.id][assignment.id]) %></td>
+              <td class="col-peer"><%= format_score(@peer_review_scores[cp.id][assignment.id]) %></td>
+              <td class="col-instructor"><%= format_score(@assignment_grades[cp.id][assignment.id]) %></td>
+            <% end %>
+            
+            <!-- Student Overall Scores -->
+            <td class="col-meta">
+              <% meta_scores = @assignments.map { |a| @meta_review.dig(cp.id, a.id) }
+                         .compact
+                         .reject { |score| score.blank? || score == 'NaN' || score.to_s == 'NaN' || (score.to_f.nan? rescue true) } %>
+              <%= meta_scores.empty? ? '-' : "#{(meta_scores.sum.to_f / meta_scores.length).round(2)}" %>
+            </td>
+            
+            <td class="col-teammate">
+              <% teammate_scores = @assignments.map { |a| @teammate_review.dig(cp.id, a.id) }
+                         .compact
+                         .reject { |score| score.blank? || score == 'NaN' || score.to_s == 'NaN' || (score.to_f.nan? rescue true) }
+                         .map{ |x| x.to_f } %>
+              <%= teammate_scores.empty? ? '-' : "#{(teammate_scores.sum.to_f / teammate_scores.length).round(2)}" %>
+            </td>
+            
+            <td class="col-peer">
+              <% peer_scores = @assignments.map { |a| @peer_review_scores.dig(cp.id, a.id) }
+                         .compact
+                         .reject { |score| score.blank? || score == 'NaN' || score.to_s == 'NaN' || (score.to_f.nan? rescue true) } %>
+              <%= peer_scores.empty? ? '-' : "#{(peer_scores.sum.to_f / peer_scores.length).round(2)}" %>
+            </td>
+            
+            <td class="col-instructor">
+              <% instructor_grades = @assignments.map { |a| @assignment_grades.dig(cp.id, a.id) }
+                          .compact
+                         .reject { |score| score.blank? || score == 'NaN' || score.to_s == 'NaN' || (score.to_f.nan? rescue true) } %>
+              <%= instructor_grades.empty? ? '-' : "#{(instructor_grades.sum.to_f / instructor_grades.length).round(2)}" %>
+            </td>
+            
+            <td>
+              <%= calculate_final_grade(cp) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  $('.toggle-column').change(function() {
+    var columnType = $(this).data('column');
+    var isChecked = $(this).prop('checked');
+    
+    // Toggle column visibility
+    $('.col-' + columnType).each(function() {
+      $(this).toggle(isChecked);
+    });
+
+    // Check if any columns are visible
+    var anyVisible = false;
+    $('.toggle-column').each(function() {
+      if ($(this).prop('checked')) {
+        anyVisible = true;
+        return false; // break the loop
+      }
+    });
+
+    // If no columns are visible, show only essential columns
+    if (!anyVisible) {
+      // Show only name, username, teammate count, and final grade
+      $('td, th').hide();
+      $('.name-column, .username-column, .count-column').show();
+      $('tr').each(function() {
+        $(this).find('td:last, th:last').show(); // Show final grade
+      });
+    }
+
+    // Update header visibility
+    updateHeaders();
+  });
+
+  function updateHeaders() {
+    var visibleTypes = {
+      meta: $('.toggle-column[data-column="meta"]').prop('checked'),
+      teammate: $('.toggle-column[data-column="teammate"]').prop('checked'),
+      topic: $('.toggle-column[data-column="topic"]').prop('checked'),
+      peer: $('.toggle-column[data-column="peer"]').prop('checked'),
+      instructor: $('.toggle-column[data-column="instructor"]').prop('checked')
+    };
+
+    // Count visible columns for each section
+    var visibleCount = Object.values(visibleTypes).filter(Boolean).length;
+
+    // Update assignment headers
+    $('.assignment-header').each(function() {
+      $(this).attr('colspan', visibleCount || 1);
+      $(this).toggle(visibleCount > 0);
+    });
+
+    // Update overall scores header
+    $('.overall-header').attr('colspan', (visibleCount || 0) + 1); // +1 for final grade
+  }
+
+  // Initial setup
+  updateHeaders();
+});
+</script> 

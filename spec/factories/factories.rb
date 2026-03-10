@@ -5,13 +5,13 @@ FactoryBot.define do
 
   factory :markup_style, class: MarkupStyle do
     name 'Duy Test'
-  end 
+  end
 
   factory :lock, class: Lock do
     lockable_id 123
     lockable_type 'Duy lockable test'
     user_id 1234
-  end 
+  end
 
   factory :review_bid, class: ReviewBid do
     priority 2
@@ -263,6 +263,17 @@ FactoryBot.define do
     sequence(:name) { |n| "team#{n}" }
     assignment { Assignment.first || association(:assignment) }
     type 'AssignmentTeam'
+    comments_for_advertisement nil
+    advertise_for_partner nil
+    submitted_hyperlinks '---
+- https://www.expertiza.ncsu.edu'
+    directory_num 0
+  end
+
+  factory :mentored_team, class: MentoredTeam do
+    sequence(:name) { |n| "team#{n}" }
+    assignment { Assignment.first || association(:assignment) }
+    type 'MentoredTeam'
     comments_for_advertisement nil
     advertise_for_partner nil
     submitted_hyperlinks '---

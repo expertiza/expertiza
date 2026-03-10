@@ -87,7 +87,7 @@ class StudentTeamsController < ApplicationController
       #
       TeamNode.create parent_id: parent.id, node_object_id: team.id
       user = User.find(student.user_id)
-      team.add_member(user, team.parent_id)
+      team.add_member(user)
       team_created_successfully(team)
       redirect_to view_student_teams_path student_id: student.id
 
@@ -126,7 +126,7 @@ class StudentTeamsController < ApplicationController
     # if your old team does not have any members, delete the entry for the team
     if TeamsUser.where(team_id: params[:team_id]).empty?
       old_team = AssignmentTeam.find params[:team_id]
-      if (old_team && Team.size(params[:team_id]) == 0 && !old_team.received_any_peer_review?)
+      if old_team && (old_team.size == 0) && !old_team.received_any_peer_review?
         old_team.destroy
         # if assignment has signup sheet then the topic selected by the team has to go back to the pool
         # or to the first team in the waitlist

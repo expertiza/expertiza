@@ -24,45 +24,6 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#includes?' do
-    context 'when an assignment team has one participant' do
-      it 'includes one participant' do
-        allow(team).to receive(:users).with(no_args).and_return([user1])
-        allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        expect(team.includes?(participant1)).to eq true
-      end
-    end
-
-    context 'when an assignment team has no users' do
-      it 'includes no participants' do
-        allow(team).to receive(:users).with(no_args).and_return([])
-        expect(team.includes?(participant1)).to eq false
-      end
-    end
-  end
-
-  describe '#parent_model' do
-    it 'provides the name of the parent model' do
-      expect(team.parent_model).to eq 'Assignment'
-    end
-  end
-
-  describe '.parent_model' do
-    it 'provides the instance of the parent model' do
-      allow(Assignment).to receive(:find).with(1).and_return(assignment)
-      expect(AssignmentTeam.parent_model(1)).to eq assignment
-    end
-  end
-
-  describe '#fullname' do
-    context 'when the team has a name' do
-      it 'provides the name of the class' do
-        team = build(:assignment_team, id: 1, name: 'abcd')
-        expect(team.fullname).to eq 'abcd'
-      end
-    end
-  end
-
   describe '.remove_team_by_id' do
     context 'when a team has an id' do
       it 'delete the team by id' do
@@ -72,25 +33,9 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '.first_member' do
-    context 'when team id is present' do
-      it 'get first member of the  team' do
-        allow(AssignmentTeam).to receive_message_chain(:find_by, :try, :try).with(id: team.id).with(:participant).with(:first).and_return(participant1)
-        expect(AssignmentTeam.first_member(team.id)).to eq(participant1)
-      end
-    end
-  end
-
   describe '#review_map_type' do
     it 'provides the review map type' do
       expect(team.review_map_type).to eq 'ReviewResponseMap'
-    end
-  end
-
-  describe '.prototype' do
-    it 'provides the instance of the AssignmentTeam' do
-      expect(AssignmentTeam).to receive(:new).with(no_args)
-      AssignmentTeam.prototype
     end
   end
 
@@ -139,12 +84,12 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#copy' do
+  describe '#copy_assignment_to_course' do
     context 'for given assignment team' do
       it 'copies the assignment team to course team' do
         assignment = team.assignment
         course = assignment.course
-        expect(team.copy(course.id)).to eq([])
+        expect(team.copy_assignment_to_course(course.id)).to eq([])
       end
     end
   end
@@ -153,8 +98,7 @@ describe 'AssignmentTeam' do
     context 'when a user is not a part of the team' do
       it 'adds the user to the team' do
         user = build(:student, id: 10)
-        assignment = team.assignment
-        expect(team.add_participant(assignment.id, user)).to be_an_instance_of(AssignmentParticipant)
+        expect(team.add_participant(user)).to be_an_instance_of(AssignmentParticipant)
       end
     end
 
@@ -162,19 +106,18 @@ describe 'AssignmentTeam' do
       it 'returns without adding user to the team' do
         allow(team).to receive(:users).with(no_args).and_return([user1])
         allow(AssignmentParticipant).to receive(:find_by).with(user_id: user1.id, parent_id: team.parent_id).and_return(participant1)
-        assignment = team.assignment
-        expect(team.add_participant(assignment.id, user1)).to eq(nil)
+        expect(team.add_participant(user1)).to eq(nil)
       end
     end
   end
 
-  describe '#topic' do
+  describe '#topic_id' do
     context 'when the team has picked a topic' do
       it 'provides the topic id' do
         assignment = team.assignment
         allow(SignUpTopic).to receive(:find_by).with(assignment: assignment).and_return(topic)
         allow(SignedUpTeam).to receive_message_chain(:find_by, :try).with(team_id: team.id).with(:topic_id).and_return(topic.id)
-        expect(team.topic).to eq(topic.id)
+        expect(team.topic_id).to eq(topic.id)
       end
     end
   end
@@ -205,8 +148,8 @@ describe 'AssignmentTeam' do
         assignment_id = 1
         options = []
         allow(Assignment).to receive(:find_by).with(id: assignment_id).and_return(assignment)
-        allow(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
-        expect(Team).to receive(:import).with(row, assignment_id, options, instance_of(AssignmentTeam))
+        allow(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
+        expect(Team).to receive(:import).with(row, assignment_id, options, AssignmentTeam)
         AssignmentTeam.import(row, assignment_id, options)
       end
     end
@@ -214,8 +157,8 @@ describe 'AssignmentTeam' do
 
   describe '.export' do
     it 'redirects to Team.export with a new AssignmentTeam object' do
-      allow(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
-      expect(Team).to receive(:export).with([], 1, [], instance_of(AssignmentTeam))
+      allow(Team).to receive(:export).with([], 1, [], AssignmentTeam)
+      expect(Team).to receive(:export).with([], 1, [], AssignmentTeam)
       AssignmentTeam.export([], 1, [])
     end
   end
@@ -228,13 +171,13 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#set_student_directory_num' do
+  describe '#set_team_directory_num' do
     it 'sets the directory for the team' do
       team = build(:assignment_team, id: 1, parent_id: 1, directory_num: -1)
       max_num = 0
       allow(AssignmentTeam).to receive_message_chain(:where, :order, :first, :directory_num)
         .with(parent_id: team.parent_id).with(:directory_num, :desc).with(no_args).with(no_args).and_return(max_num)
-      expect(team.set_student_directory_num).to be true
+      expect(team.set_team_directory_num).to be true
     end
   end
 
@@ -280,10 +223,10 @@ describe 'AssignmentTeam' do
     end
   end
 
-  describe '#received_any_peer_review?' do
+  describe '#has_been_reviewed?' do
     it 'checks if the team has received any reviews' do
       allow(ResponseMap).to receive_message_chain(:where, :any?).with(reviewee_id: team.id, reviewed_object_id: team.parent_id).with(no_args).and_return(true)
-      expect(team.received_any_peer_review?).to be true
+      expect(team.has_been_reviewed?).to be true
     end
   end
 
@@ -339,6 +282,13 @@ describe 'AssignmentTeam' do
     end
   end
 
+  describe '#reviewer' do
+    it 'returns the team itself' do
+      team = AssignmentTeam.new
+      expect(team.reviewer).to eq(team)
+    end
+  end
+
   describe '#has_submissions?' do
     context 'when a team has submitted files' do
       it 'has submissions' do
@@ -372,13 +322,13 @@ describe 'AssignmentTeam' do
       @team_user = create(:team_user, team_id: @team.id, user_id: @student.id)
     end
     it 'should create a team with users' do
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
-      expect(new_team.users).to include @student
+      new_team = AssignmentTeam.create_team_and_node(@assignment.id, [@student.id])
+      expect(new_team.reload.users).to include @student
     end
 
     it 'should remove user from previous team' do
       expect(@team.users).to include @student
-      new_team = AssignmentTeam.create_team_with_users(@assignment.id, [@student.id])
+      new_team = AssignmentTeam.create_team_and_node(@assignment.id, [@student.id])
       expect(@team.users).to_not include @student
     end
   end

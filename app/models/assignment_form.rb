@@ -442,6 +442,13 @@ class AssignmentForm
       AssignmentDueDate.copy(old_assign.id, new_assign.id)
       new_assign.create_node
       new_assign_id = new_assign.id
+
+      # Copies all calibration submissions along with Participants, Teams, TeamUsers, SubmissionRecords and Responses
+      # of the old assignment on to the new Assignment
+      if old_assign.is_calibrated
+        old_assign.copy_calibration_submissions(new_assign)
+      end
+
       # also copy topics from old assignment
       topics = SignUpTopic.where(assignment_id: old_assign.id)
       topics.each do |topic|

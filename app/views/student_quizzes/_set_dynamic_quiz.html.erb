@@ -14,7 +14,7 @@
   :reviewer_id => session[:user].id,
   :participant_id => @participant.id do %>
 
-    <% candidate_quizzes = StudentQuizzesController.take_quiz(assignment.id, session[:user].id) %>
+    <% candidate_quizzes = StudentQuizzesController.get_quiz_questionnaire(assignment.id, session[:user].id) %>
 
     <% unless candidate_quizzes.empty? %>
     <p><b><%=t ".select_topic"%>:</b></p>

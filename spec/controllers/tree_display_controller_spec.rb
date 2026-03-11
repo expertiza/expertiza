@@ -164,7 +164,7 @@ describe TreeDisplayController do
 
       # service should not return anything as the user is student
       output = JSON.parse(response.body)['Courses']
-      expect(output.length).to eq 1
+      expect(output.length).to eq 0
     end
 
     it 'returns a list of course objects ta is supposed to ta in as json' do
@@ -200,7 +200,7 @@ describe TreeDisplayController do
 
       # service should not return anything as there is no mapping
       output = JSON.parse(response.body)['Courses']
-      expect(output.length).to eq 1
+      expect(output.length).to eq 0
     end
 
     it 'returns only the course he is ta of when ta is a student of another course at the same time' do

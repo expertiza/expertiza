@@ -62,6 +62,15 @@ class Team < ApplicationRecord
     names
   end
 
+  # Get the hyperlink of the review responses
+  def hyperlinks
+    return [] if submitted_hyperlinks.blank?
+
+    YAML.safe_load(submitted_hyperlinks)
+  rescue Psych::Exception
+    []
+  end
+
   # Check if the user exist
   def user?(user)
     users.include? user

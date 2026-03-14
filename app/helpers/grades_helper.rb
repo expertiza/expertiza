@@ -149,6 +149,39 @@ module GradesHelper
     render 'grades/view_heatgrid.html.erb'
   end
 
+  def privileged_grades_viewer?(role_name = @current_role_name)
+    ['Teaching Assistant', 'Instructor', 'Administrator', 'Super-Administrator'].include?(role_name)
+  end
+
+  def restricted_grades_questionnaire?(questionnaire_display_type)
+    ['Metareview', 'Author Feedback', 'Teammate Review'].include?(questionnaire_display_type)
+  end
+
+  def show_grades_questionnaire?(questionnaire_display_type, role_name = @current_role_name)
+    !restricted_grades_questionnaire?(questionnaire_display_type) || privileged_grades_viewer?(role_name)
+  end
+
+  def show_grades_reviewer_identity?(assignment, questionnaire_display_type, role_name = @current_role_name)
+    return true if privileged_grades_viewer?(role_name)
+    return false if restricted_grades_questionnaire?(questionnaire_display_type)
+
+    !assignment.is_anonymous
+  end
+
+  def grades_reviewer_label(review, questionnaire_display_type, index, assignment, role_name = @current_role_name)
+    return "Review #{index + 1}" unless show_grades_reviewer_identity?(assignment, questionnaire_display_type, role_name)
+
+    response_map = Response.find(review.id).response_map
+    participant_id = if questionnaire_display_type == 'Author Feedback'
+                       response_map.reviewee_id
+                     else
+                       response_map.reviewer_id
+                     end
+
+    user = User.find(Participant.find(participant_id).user_id)
+    user.fullname(session[:ip]).to_s
+  end
+
   def type_and_max(row)
     question = Question.find(row.question_id)
     if question.type == 'Checkbox'

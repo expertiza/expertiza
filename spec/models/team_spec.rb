@@ -46,6 +46,18 @@ describe Team do
     end
   end
 
+  describe '#hyperlinks' do
+    it 'returns [] when submitted_hyperlinks is blank' do
+      team.submitted_hyperlinks = nil
+      expect(team.hyperlinks).to eq([])
+    end
+
+    it 'returns parsed hyperlinks when submitted_hyperlinks is present' do
+      team.submitted_hyperlinks = YAML.dump(['https://www.expertiza.ncsu.edu'])
+      expect(team.hyperlinks).to eq(['https://www.expertiza.ncsu.edu'])
+    end
+  end
+
   describe '#user?' do
     context 'when users in current team includes the parameterized user' do
       it 'returns true' do

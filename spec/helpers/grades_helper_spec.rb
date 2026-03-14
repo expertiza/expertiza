@@ -276,6 +276,44 @@ describe GradesHelper, type: :helper do
     end
   end
 
+  describe 'grades visibility helpers' do
+    it 'treats only teaching staff and admins as privileged viewers' do
+      expect(privileged_grades_viewer?('Student')).to eq(false)
+      expect(privileged_grades_viewer?(nil)).to eq(false)
+      expect(privileged_grades_viewer?('Instructor')).to eq(true)
+    end
+
+    it 'hides restricted questionnaires from non-staff viewers' do
+      expect(show_grades_questionnaire?('Author Feedback', 'Student')).to eq(false)
+      expect(show_grades_questionnaire?('Teammate Review', nil)).to eq(false)
+      expect(show_grades_questionnaire?('Review', 'Student')).to eq(true)
+      expect(show_grades_questionnaire?('Author Feedback', 'Instructor')).to eq(true)
+    end
+
+    it 'masks reviewer identities for non-staff viewers on anonymous assignments' do
+      anonymous_assignment = build(:assignment, is_anonymous: true)
+      review = build(:response, id: 1)
+
+      expect(grades_reviewer_label(review, 'Review', 0, anonymous_assignment, 'Student')).to eq('Review 1')
+      expect(grades_reviewer_label(review, 'Author Feedback', 1, anonymous_assignment, nil)).to eq('Review 2')
+    end
+
+    it 'shows reviewer identities to privileged viewers' do
+      review = build(:response, id: 1)
+      response_map = instance_double(ReviewResponseMap, reviewer_id: 7, reviewee_id: 8)
+      participant = build(:participant, user_id: 9)
+      user = build(:student)
+
+      allow(Response).to receive(:find).with(1).and_return(review)
+      allow(review).to receive(:response_map).and_return(response_map)
+      allow(Participant).to receive(:find).with(7).and_return(participant)
+      allow(User).to receive(:find).with(9).and_return(user)
+      allow(user).to receive(:fullname).with(anything).and_return('Visible Reviewer')
+
+      expect(grades_reviewer_label(review, 'Review', 0, assignment, 'Instructor')).to eq('Visible Reviewer')
+    end
+  end
+
   describe 'penalties' do
     context 'when giving an assignment id' do
       it 'calculates all the penalties' do

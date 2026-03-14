@@ -534,6 +534,18 @@ describe AuthorizationHelper do
       expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
     end
 
+    it 'returns true if map is of type ReviewResponseMap and reviewee is a legacy Team row' do
+      stub_current_user(student, student.role.name, student.role)
+      reviewer = create(:participant)
+      map = create(:review_response_map, reviewer: reviewer)
+      legacy_team = instance_double(Team)
+      allow(map).to receive(:reviewee).and_return(nil)
+      allow(map).to receive(:reviewee_id).and_return(12_345)
+      allow(Team).to receive(:find_by).with(id: 12_345).and_return(legacy_team)
+      allow(legacy_team).to receive(:user?).with(session[:user]).and_return(true)
+      expect(response_edit_allowed?(map, map.reviewer.user_id)).to be true
+    end
+
     it 'returns true if map is of type ReviewResponseMap and user is an admin' do
       stub_current_user(admin, admin.role.name, admin.role)
       map = create(:review_response_map)

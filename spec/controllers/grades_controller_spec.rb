@@ -35,6 +35,15 @@ describe GradesController do
     allow(AssignmentParticipant).to receive(:find).with('3').and_return(participant3)
     allow(AssignmentParticipant).to receive(:find).with('4').and_return(participant4)
     allow(AssignmentParticipant).to receive(:find).with('5').and_return(participant5)
+    allow(AssignmentParticipant).to receive(:find_by) do |args|
+      case args[:id].to_s
+      when '1' then participant
+      when '3' then participant3
+      when '4' then participant4
+      when '5' then participant5
+      else nil
+      end
+    end
     allow(AssignmentDueDate).to receive(:where).and_return([assignment_due_date])
     allow(participant).to receive(:team).and_return(team)
     stub_current_user(instructor, instructor.role.name, instructor.role)
@@ -274,6 +283,21 @@ describe GradesController do
   end
 
   describe '#action_allowed' do
+    context 'when id is missing' do
+      it 'returns false' do
+        controller.params = { action: 'view_team' }
+        expect(controller.action_allowed?).to eq(false)
+      end
+    end
+
+    context 'when id is invalid' do
+      it 'returns false' do
+        controller.params = { id: 999_999, action: 'view_team' }
+        allow(AssignmentParticipant).to receive(:find_by).with(id: 999_999).and_return(nil)
+        expect(controller.action_allowed?).to eq(false)
+      end
+    end
+
     context 'when no user is logged in' do
       it 'returns false' do
         controller.params = { id: 4, action: 'view_team' }
@@ -294,7 +318,7 @@ describe GradesController do
       end
       it 'only see the heat map for their own team' do
         stub_current_user(student, student.role.name, student.role)
-        allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+        allow(AssignmentParticipant).to receive(:find_by).with(id: 4).and_return(participant4)
         allow(participant4).to receive(:team).and_return(team2)
         allow(team2).to receive(:user?).with(student).and_return(false)
         expect(controller.action_allowed?).to eq(false)
@@ -306,7 +330,7 @@ describe GradesController do
       end
       it 'returns true' do
         stub_current_user(student, student.role.name, student.role)
-        allow(AssignmentParticipant).to receive(:find).with(4).and_return(participant4)
+        allow(AssignmentParticipant).to receive(:find_by).with(id: 4).and_return(participant4)
         allow(participant4).to receive(:team).and_return(team2)
         allow(team2).to receive(:user?).with(student).and_return(true)
         expect(controller.action_allowed?).to eq(true)

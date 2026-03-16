@@ -1,0 +1,132 @@
+#This github action is designed to automate the process of taking daily backup from production server and storing it in test server and development server.
+#It is triggered by a cron job which runs exactly at midnight everyday and it runs a job called "data_transfer"
+name: Automatic data transfer
+
+on:
+  #set up cron job to run at 12 AM everyday
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *"
+
+jobs:
+  data_transfer:
+    runs-on: ubuntu-latest
+    steps:
+      #Create a VPN to access the production server from your system
+      - name: create wireguard tunnel to backup data on a private network
+        run: |
+          sudo apt install wireguard
+          echo "${{ secrets.WIREGUARD_PRIVATE_KEY }}" > privatekey
+          sudo ip link add wg0 type wireguard
+          sudo ip address add 10.0.0.2/24 dev wg0
+          sudo wg set wg0 private-key privatekey
+          sudo ip link set wg0 up
+          sudo wg set wg0 peer ${{ secrets.WIREGUARD_SERVER_PUBLIC_KEY }} allowed-ips 10.0.0.1/32 endpoint 152.14.92.215:50000
+          ping -c 4 10.0.0.1
+
+        #This step uses the actions/checkout@v3 action to check out the code from the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+        #This step uses appleboy/ssh-action@master to login to the source server
+        #A sql dump of all the tables is created on the source server and stored in production_db_dump.sql
+        #A copy of the production_db_dump.sql file is created and stored in the backup location
+      - name: Create dump on production server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.PROD_KEY }}
+          script: |
+            mysqldump -u root -p"${{ secrets.MYSQL_ROOT_PASSWORD }}" ${{ secrets.MYSQL_DB }} > production_db_dump.sql
+            mkdir -p ${{ secrets.BACKUP_LOCATION }}
+            cp production_db_dump.sql ${{ secrets.BACKUP_LOCATION }}/production_db_dump_$(date -d "today" +"%Y%m%d%H%M").sql
+            echo "backup copied to ${{ secrets.BACKUP_LOCATION }}">> log_file.txt
+
+        #To access the source details, add the source key to a id_rsa file in .ssh folder
+        #Give the user permissions to read and write on the file with chmod 600
+        #Use ssh-keyscan to add source key to the known_hosts file
+      - name: Copy Source key to runner
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.PROD_HOST }} >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PROD_KEY }}
+
+      #Use scp to copy the file from the production server to the github workspace
+      - name: Copy file from production server to github workspace
+        run: |
+          scp -r -i ~/.ssh/id_rsa ${{ secrets.USER }}@${{ secrets.PROD_HOST }}:/home/expertiza/production_db_dump.sql $GITHUB_WORKSPACE
+
+      #      Use appleboy/scp-action@master to copy the file from github workspace to the target server
+      - name: Copy from github workspace to test server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.STAGING_KEY }}
+          source: "production_db_dump.sql"
+          target: "/home/expertiza/"
+
+      - name: Copy from github workspace to dev server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.DEV_KEY }}
+          source: "production_db_dump.sql"
+          target: "/home/expertiza/"
+
+  data_transfer_target:
+    runs-on: ubuntu-latest
+    needs: [data_transfer]
+    strategy:
+      matrix:
+        server: [TEST_SERVER, DEVELOPMENT_SERVER]
+        include:
+          - server: TEST_SERVER
+            target_key: STAGING_KEY
+            target_host: STAGING_HOST
+            port_num: STAGING_PORT
+          - server: DEVELOPMENT_SERVER
+            target_key: DEV_KEY
+            target_host: DEV_HOST
+            port_num: DEV_PORT
+    steps:
+      #This step uses appleboy/ssh-action@master to login to the target server
+      #Run cp command to take backup of the production_db_dump.sql in the backup location
+      - name: Login to ${{ matrix.server }} server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets[matrix.target_host] }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets[matrix.target_key] }}
+          script: |
+            mkdir -p ${{ secrets.BACKUP_LOCATION }}
+            cp production_db_dump.sql ${{ secrets.BACKUP_LOCATION }}/production_db_dump_$(date -d "today" +"%Y%m%d%H%M").sql
+
+        #To access the target details, add the target key to a id_rsa file in .ssh folder
+        #Give the user permissions to read and write on the file with chmod 600
+        #Use ssh-keyscan to add target key to the known_hosts file
+      - name: Copy ${{ matrix.server }} key to runner
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets[matrix.target_key] }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets[matrix.target_host] }} >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets[matrix.target_key] }}
+
+      #Drop the existing database on target server
+      - name: Drop database if it exists
+        run: ssh ${{ secrets.USER }}@${{ secrets[matrix.target_host] }} "sudo mysql -u root -p'${{ secrets.MYSQL_ROOT_PASSWORD }}' -e 'DROP DATABASE IF EXISTS ${{ secrets.MYSQL_DB }}'"
+
+      #Create a database on the target server
+      - name: Create database on ${{ matrix.server }} server
+        run: ssh ${{ secrets.USER }}@${{ secrets[matrix.target_host] }} "sudo mysql -u root -p'${{ secrets.MYSQL_ROOT_PASSWORD }}' -e 'CREATE DATABASE ${{ secrets.MYSQL_DB }}'"
+
+      #Import the production_db_dump.sql in the database on the target server
+      - name: Import table on ${{ matrix.server }} database
+        run: ssh ${{ secrets.USER }}@${{ secrets[matrix.target_host] }} "sudo mysql -u root -p'${{ secrets.MYSQL_ROOT_PASSWORD }}' ${{ secrets.MYSQL_DB }} < /home/expertiza/production_db_dump.sql"

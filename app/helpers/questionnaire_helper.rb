@@ -58,6 +58,7 @@ module QuestionnaireHelper
     questionnaire = QUESTIONNAIRE_MAP[type]
     if questionnaire.nil?
       flash[:error] = 'Error: Undefined Questionnaire'
+      return nil
     else
       questionnaire.new
     end

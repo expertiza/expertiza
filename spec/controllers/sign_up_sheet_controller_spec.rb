@@ -517,14 +517,14 @@ describe SignUpSheetController do
     end
   end
 
-  describe '#signup_as_instructor_action' do
+  describe '#sign_up_as_instructor_action' do
     context 'when user cannot be found' do
       it 'shows an flash error message and redirects to assignment#edit page' do
         allow(User).to receive(:find_by).with(name: 'no name').and_return(nil)
         allow(User).to receive(:find).with(8).and_return(student)
         allow(Team).to receive(:find).with(1).and_return(team)
         request_params = { username: 'no name', assignment_id: 1 }
-        get :signup_as_instructor_action, params: request_params
+        get :sign_up_as_instructor_action, params: request_params
         expect(flash[:error]).to eq('That student does not exist!')
         expect(response).to redirect_to('/assignments/1/edit')
       end
@@ -554,7 +554,7 @@ describe SignUpSheetController do
               assignment_id: 1,
               topic_id: 1
             }
-            get :signup_as_instructor_action, params: request_params
+            get :sign_up_as_instructor_action, params: request_params
             expect(flash[:success]).to eq('You have successfully signed up the student for the topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
@@ -571,7 +571,7 @@ describe SignUpSheetController do
               username: 'no name',
               assignment_id: 1
             }
-            get :signup_as_instructor_action, params: request_params
+            get :sign_up_as_instructor_action, params: request_params
             expect(flash[:error]).to eq('The student has already signed up for a topic!')
             expect(response).to redirect_to('/assignments/1/edit')
           end
@@ -585,7 +585,7 @@ describe SignUpSheetController do
             username: 'no name',
             assignment_id: 1
           }
-          get :signup_as_instructor_action, params: request_params
+          get :sign_up_as_instructor_action, params: request_params
           expect(flash[:error]).to eq('The student is not registered for the assignment!')
           expect(response).to redirect_to('/assignments/1/edit')
         end

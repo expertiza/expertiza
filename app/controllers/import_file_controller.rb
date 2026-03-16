@@ -145,10 +145,12 @@ class ImportFileController < ApplicationController
       begin
         if params[:model] == 'AssignmentParticipant'
           @header_integrated_body.each do |row_hash|
+            row_hash[:username] = row_hash[:username].gsub("\uFEFF", '') if row_hash[:username]  
             AssignmentParticipant.import(row_hash, session, params[:id])
           end
         elsif params[:model] == 'CourseParticipant'
           @header_integrated_body.each do |row_hash|
+            row_hash[:username] = row_hash[:username].gsub("\uFEFF", '') if row_hash[:username]
             CourseParticipant.import(row_hash, session, params[:id])
           end
         end

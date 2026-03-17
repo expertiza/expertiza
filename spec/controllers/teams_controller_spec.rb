@@ -1,6 +1,11 @@
 require './spec/support/teams_shared.rb'
 
 describe TeamsController do
+
+    before(:each) do
+      # Mock the logger to prevent permission errors
+      allow(ExpertizaLogger).to receive(:info).and_return(nil)
+    end
   # Performs authorization check for user
   include_context 'object initializations'
 

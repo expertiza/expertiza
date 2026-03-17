@@ -1,0 +1,19 @@
+<!-- Partial view for rendering response maps -->
+<tr>
+  <!-- Render partial view corresponding to the overall score awarded to a team -->
+  <td align='left'>
+    <% data[:response_maps].each do |reviewer_map| %>
+      <% if (team = Team.from_response_map(reviewer_map)) %>
+        <%= render partial: 'team_score_score_awarded', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+      <% end %>
+    <% end %>
+  </td>
+  <!-- Render partial view corresponding to the average score awarded to a team -->
+  <td align='left'>
+    <% data[:response_maps].each do |reviewer_map| %>
+      <% if (team = Team.from_response_map(reviewer_map)) %>
+        <%= render partial: 'team_score', locals: {bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id} %>
+      <% end %>
+    <% end %>
+  </td>
+</tr>

@@ -1,4 +1,4 @@
-module PenaltyHelper
+module ScoreCalculationHelper
   def calculate_penalty(participant_id)
     @submission_deadline_type_id = 1
     @review_deadline_type_id = 2
@@ -105,5 +105,10 @@ module PenaltyHelper
     when 'Day'
       time_difference / 86_400
     end
+  end
+
+  def apply_penalty(score, penalty)
+    raise ArgumentError, 'Penalty cannot be negative' if penalty.negative?
+    score - (score * penalty / 100.0)
   end
 end

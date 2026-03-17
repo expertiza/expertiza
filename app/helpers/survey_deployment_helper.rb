@@ -1,6 +1,7 @@
 module SurveyDeploymentHelper
   # Returns an array containing the number of responses for a question in a survey deployment
   def get_responses_for_question_in_a_survey_deployment(q_id, sd_id)
+    return [] unless @range_of_scores # guard clause
     question = Question.find(q_id)
     responses = []
     type_of_response_map = %w[AssignmentSurveyResponseMap CourseSurveyResponseMap GlobalSurveyResponseMap]

@@ -22,43 +22,55 @@ class AssignmentsController < ApplicationController
     @default_num_metareviews_required = 3
   end
 
-  # creates a new assignment via the assignment form
+  # E2327 - Refactoring to improve readability
+  # Finds whether existing assignment with same name and course id exists
+  def assignment_unique?(name, course_id)
+    find_existing_assignment = Assignment.find_by(name: name, course_id: course_id)
+    !find_existing_assignment
+  end
+
+  # Finds whether existing directory with same directory path and course id exists
+  def directory_unique?(dir_path, course_id)
+    find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: course_id)
+    !find_existing_directory
+  end
+
   def create
     @assignment_form = AssignmentForm.new(assignment_form_params)
     if params[:button]
-      # E2138 issue #3
-      find_existing_assignment = Assignment.find_by(name: @assignment_form.assignment.name, course_id: @assignment_form.assignment.course_id)
-      dir_path = assignment_form_params[:assignment][:directory_path]
-      find_existing_directory = Assignment.find_by(directory_path: dir_path, course_id: @assignment_form.assignment.course_id)
-      if !find_existing_assignment && !find_existing_directory && @assignment_form.save # No existing names/directories
+      assignment_unique = assignment_unique?(@assignment_form.assignment.name, @assignment_form.assignment.course_id)
+      directory_unique = directory_unique?(assignment_form_params[:assignment][:directory_path],
+                                                   @assignment_form.assignment.course_id)
+      if assignment_unique && directory_unique && @assignment_form.save # No existing names/directories
         @assignment_form.create_assignment_node
-        exist_assignment = Assignment.find(@assignment_form.assignment.id)
-        assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
+        existing_assignment_id = Assignment.find(@assignment_form.assignment.id).id
+        assignment_form_params[:assignment][:id] = existing_assignment_id.to_s
         if assignment_form_params[:assignment][:directory_path].blank?
           assignment_form_params[:assignment][:directory_path] = "assignment_#{assignment_form_params[:assignment][:id]}"
         end
         ques_array = assignment_form_params[:assignment_questionnaire]
         due_array = assignment_form_params[:due_date]
         ques_array.each do |cur_questionnaire|
-          cur_questionnaire[:assignment_id] = exist_assignment.id.to_s
+          cur_questionnaire[:assignment_id] = existing_assignment_id.to_s
         end
         due_array.each do |cur_due|
-          cur_due[:parent_id] = exist_assignment.id.to_s
+          cur_due[:parent_id] = existing_assignment_id.to_s
         end
         assignment_form_params[:assignment_questionnaire] = ques_array
         assignment_form_params[:due_date] = due_array
         @assignment_form.update(assignment_form_params, current_user)
-        aid = Assignment.find(@assignment_form.assignment.id).id
+        assignment_id = Assignment.find(@assignment_form.assignment.id).id
         ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-        redirect_to edit_assignment_path aid
+        session[:assignment_id] = assignment_id #passing it in session so that redirect works
+        redirect_to edit_assignment_path assignment_id
         undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
         return
       else
         flash[:error] = 'Failed to create assignment.'
-        if find_existing_assignment
+        unless assignment_unique
           flash[:error] << '<br>  ' + @assignment_form.assignment.name + ' already exists as an assignment name'
         end
-        if find_existing_directory
+        unless directory_unique
           flash[:error] << '<br>  ' + dir_path + ' already exists as a submission directory name'
         end
         redirect_to '/assignments/new?private=1'
@@ -71,6 +83,7 @@ class AssignmentsController < ApplicationController
 
   # edits an assignment's deadlines and assigned rubrics
   def edit
+    session[:assignment_id] = nil
     user_timezone_specified
     edit_params_setting
     assignment_staggered_deadline?
@@ -85,6 +98,8 @@ class AssignmentsController < ApplicationController
     @badges = Badge.all
     @use_bookmark = @assignment.use_bookmark
     @duties = Duty.where(assignment_id: @assignment_form.assignment.id)
+    assignment_id = Assignment.find(@assignment_form.assignment.id.to_s).id
+    session[:assignment_id] = assignment_id
   end
 
   # updates an assignment via an assignment form
@@ -109,7 +124,9 @@ class AssignmentsController < ApplicationController
 
   # displays an assignment via ID
   def show
+    session[:assignment_id] = nil
     @assignment = Assignment.find(params[:id])
+    session[:assignment_id] = @assignment.id
   end
 
   # gets an assignment's path/url
@@ -301,9 +318,9 @@ class AssignmentsController < ApplicationController
     assignment_form_params[:assignment][:id] = exist_assignment.id.to_s
     fix_assignment_missing_path
     update_assignment_form(exist_assignment)
-    aid = Assignment.find_by(name: @assignment_form.assignment.name).id
+    assignment_id = Assignment.find_by(name: @assignment_form.assignment.name).id
     ExpertizaLogger.info "Assignment created: #{@assignment_form.as_json}"
-    redirect_to edit_assignment_path aid
+    redirect_to edit_assignment_path assignment_id
     undo_link("Assignment \"#{@assignment_form.assignment.name}\" has been created successfully. ")
   end
 
@@ -516,3 +533,4 @@ class AssignmentsController < ApplicationController
     params.require(:assignment_form).permit!
   end
 end
+

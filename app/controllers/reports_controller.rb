@@ -128,7 +128,7 @@ class ReportsController < ApplicationController
     participant_scores.each do |participant_id, score_values|
       next if score_values.empty?
 
-      total = score_values.sum.round(0)
+      total = score_values.sum
       count = score_values.size
       feedback_text = "#{count} review#{'s' if count != 1} | Scores: #{score_values.join(', ')}"
 

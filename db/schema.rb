@@ -430,7 +430,7 @@ ActiveRecord::Schema.define(version: 20260223182602) do
     t.string "name", default: "", null: false
   end
 
-  create_table "instructor_review_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "instructor_review_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "response_id", null: false
     t.float "score", limit: 24
     t.text "feedback"

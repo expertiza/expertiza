@@ -84,6 +84,8 @@ module ReviewMappingHelper
     subm_created_at = submission.where(created_at: assignment_created..submission_due_date)
     if round > 1
       submission_due_last_round = assignment_due_dates.where(round: round - 1, deadline_type_id: 1).try(:first).try(:due_at)
+      return false if submission_due_last_round.nil?
+
       subm_created_at = submission.where(created_at: submission_due_last_round..submission_due_date)
     end
     !subm_created_at.try(:first).try(:created_at).nil?
@@ -92,6 +94,8 @@ module ReviewMappingHelper
   # returns hyperlink of the assignment that has been submitted on the due date
   def submitted_hyperlink(round, response_map, assignment_created, assignment_due_dates)
     submission_due_date = assignment_due_dates.where(round: round, deadline_type_id: 1).try(:first).try(:due_at)
+    return nil if submission_due_date.nil?
+
     subm_hyperlink = SubmissionRecord.where(team_id: response_map.reviewee_id, operation: 'Submit Hyperlink')
     submitted_h = subm_hyperlink.where(created_at: assignment_created..submission_due_date)
     submitted_h.try(:last).try(:content)

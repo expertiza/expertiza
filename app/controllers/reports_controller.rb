@@ -66,9 +66,7 @@ class ReportsController < ApplicationController
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new
-    response_ids = Response.where(
-      map_id: ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').pluck(:id)
-    ).pluck(:id)
+    response_ids = Response.latest_submitted_review_response_ids_for_assignment(@assignment.id)
     saved = 0
     errors = []
     # Iterate over each peer review in each round
@@ -108,8 +106,7 @@ class ReportsController < ApplicationController
   # grade_for_reviewer = total (sum) of all scores; comment = "N reviews | Scores: x, y, z"
   # Aggregates across ALL response_maps for each reviewer (not per-map).
   def save_review_grades_from_instructor_scores(assignment)
-    map_ids = ResponseMap.where(reviewed_object_id: assignment.id, type: 'ReviewResponseMap').pluck(:id)
-    all_response_ids = Response.where(map_id: map_ids).pluck(:id)
+    all_response_ids = Response.latest_submitted_review_response_ids_for_assignment(assignment.id)
     return if all_response_ids.empty?
 
     # Build response_id -> reviewer_id map (batch)

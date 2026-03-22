@@ -23,6 +23,12 @@ class MCPServerClient
     get("api/v1/reviews/finalized/#{expertiza_response_id}")
   end
 
+  # GET /api/v1/reviews/finalized/:expertiza_response_id/detailed-evaluation
+  # Returns rubric-style detailed evaluation with per-dimension scores and reasoning.
+  def get_detailed_evaluation(expertiza_response_id)
+    get("api/v1/reviews/finalized/#{expertiza_response_id}/detailed-evaluation")
+  end
+
   private
 
   def get(path)

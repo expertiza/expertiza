@@ -24,7 +24,7 @@ class MCPReviewService
   # Find response ids from specific assignment
   def find_response_ids(assignment_id)
     return nil if assignment_id.blank? 
-    Response.where(map_id: ResponseMap.where(reviewed_object_id: assignment_id, type: 'ReviewResponseMap').pluck(:id)).pluck(:id)
+    Response.latest_submitted_review_response_ids_for_assignment(assignment_id)
   end
 
   # Find the response and the questionnaire and scores from the response_id

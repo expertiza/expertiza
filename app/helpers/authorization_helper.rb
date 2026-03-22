@@ -99,11 +99,15 @@ module AuthorizationHelper
     assignment = map.reviewer.assignment
     # if it is a review response map, all the members of reviewee team should be able to view the response (can be done from heat map)
     if map.is_a? ReviewResponseMap
-      reviewee_team = AssignmentTeam.find(map.reviewee_id)
+      reviewee_team = AssignmentTeam.find_by(id: map.reviewee_id)
+      if reviewee_team.nil?
+        reviewee_participant = AssignmentParticipant.find_by(id: map.reviewee_id)
+        reviewee_team = AssignmentTeam.team(reviewee_participant) if reviewee_participant
+      end
       return user_logged_in? &&
              (
                current_user_has_id?(user_id) ||
-               reviewee_team.user?(session[:user]) ||
+               (reviewee_team && reviewee_team.user?(session[:user])) ||
                current_user_has_admin_privileges? ||
                (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
                (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))

@@ -6,14 +6,42 @@
 <% if @instructor_review_score %>
   <div class="response-review-grade-card">
     <div class="response-review-grade-header">
-      <span class="response-review-grade-label">Your review grade</span>
-      <span class="response-review-grade-score"><%= @instructor_review_score.score %></span>
+      <div class="response-review-grade-summary">
+        <span class="response-review-grade-label">Your review grade</span>
+        <span class="response-review-grade-score"><%= @instructor_review_score.score %></span>
+      </div>
+      <div class="response-review-grade-actions">
+        <button type="button"
+                id="get-detailed-evaluation-button"
+                class="btn btn-info btn-sm"
+                data-url="<%= detailed_evaluation_response_index_path(id: @response.id) %>">
+          Get detailed evaluation
+        </button>
+      </div>
     </div>
     <% if @instructor_review_score.feedback.present? %>
       <div class="response-review-grade-comment"><%= @instructor_review_score.feedback %></div>
     <% end %>
   </div>
 <% end %>
+
+<div id="detailed-evaluation-overlay" class="response-detailed-evaluation-overlay" style="display: none;">
+  <div class="response-detailed-evaluation-panel" role="dialog" aria-labelledby="detailedEvaluationTitle" aria-modal="true">
+    <div class="response-detailed-evaluation-panel-header">
+      <h4 id="detailedEvaluationTitle" class="response-detailed-evaluation-panel-title">Detailed evaluation</h4>
+      <button type="button" id="close-detailed-evaluation" class="response-detailed-evaluation-close" aria-label="Close">
+        &times;
+      </button>
+    </div>
+    <div class="response-detailed-evaluation-panel-body">
+      <div id="detailed-evaluation-loading" class="response-detailed-evaluation-state" style="display: none;">
+        Loading detailed evaluation...
+      </div>
+      <div id="detailed-evaluation-error" class="response-detailed-evaluation-state response-detailed-evaluation-error" style="display: none;"></div>
+      <div id="detailed-evaluation-content"></div>
+    </div>
+  </div>
+</div>
 
 <% if !(@map.instance_of? TeammateReviewResponseMap) && !(@map.instance_of? BookmarkRatingResponseMap) %>
   <% topic_id = SignedUpTeam.topic_id(@participant.parent_id, @participant.user_id) %>
@@ -88,6 +116,82 @@
         },
         "dataType":"json"
       });
+      }
+    });
+
+    $("#get-detailed-evaluation-button").on("click", function() {
+      var overlay = $("#detailed-evaluation-overlay");
+      var loading = $("#detailed-evaluation-loading");
+      var error = $("#detailed-evaluation-error");
+      var content = $("#detailed-evaluation-content");
+      var url = $(this).data("url");
+
+      loading.show();
+      error.hide().text("");
+      content.empty();
+      overlay.show();
+      $("body").addClass("response-detailed-evaluation-open");
+
+      $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json"
+      }).done(function(data) {
+        loading.hide();
+        var details = data.detailed_evaluation || {};
+        var categories = data.categories || Object.keys(details);
+        var html = "";
+
+        categories.forEach(function(category) {
+          var entry = details[category];
+          if (!entry) { return; }
+
+          var label = category.replace(/_/g, " ").replace(/\b\w/g, function(letter) {
+            return letter.toUpperCase();
+          });
+
+          html += '<div class="response-detailed-evaluation-item">';
+          html +=   '<div class="response-detailed-evaluation-item-header">';
+          html +=     '<span class="response-detailed-evaluation-item-label">' + $("<div>").text(label).html() + '</span>';
+          html +=     '<span class="response-detailed-evaluation-item-score">Score: ' + $("<div>").text(entry.score == null ? "" : entry.score).html() + '</span>';
+          html +=   '</div>';
+          html +=   '<div class="response-detailed-evaluation-item-reasoning">' + $("<div>").text(entry.justification_reasoning || "").html() + '</div>';
+          html += '</div>';
+        });
+
+        if (html.length === 0) {
+          html = '<div class="response-detailed-evaluation-state">No detailed evaluation data was returned.</div>';
+        }
+
+        content.html(html);
+      }).fail(function(xhr) {
+        loading.hide();
+        var message = "Unable to load detailed evaluation.";
+        if (xhr.responseJSON && xhr.responseJSON.error) {
+          message = xhr.responseJSON.error;
+        }
+        error.text(message).show();
+      });
+    });
+
+    function closeDetailedEvaluation() {
+      $("#detailed-evaluation-overlay").hide();
+      $("body").removeClass("response-detailed-evaluation-open");
+    }
+
+    $("#close-detailed-evaluation").on("click", function() {
+      closeDetailedEvaluation();
+    });
+
+    $("#detailed-evaluation-overlay").on("click", function(e) {
+      if (e.target === this) {
+        closeDetailedEvaluation();
+      }
+    });
+
+    $(document).on("keydown", function(e) {
+      if (e.key === "Escape") {
+        closeDetailedEvaluation();
       }
     });
   });

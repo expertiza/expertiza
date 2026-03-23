@@ -27,6 +27,8 @@ describe ReportsController do
     describe 'review_response_map' do
       context 'when type is ReviewResponseMap' do
         it 'renders response_report page with corresponding data' do
+          allow(assignment).to receive(:varying_rubrics_by_round?).and_return(false)
+          allow(assignment).to receive(:contributors).and_return([])
           allow(ReviewResponseMap).to receive(:review_response_report)
             .with('1', assignment, 'ReviewResponseMap', 'no one')
             .and_return([participant, participant1])
@@ -133,6 +135,36 @@ describe ReportsController do
           expect(response).to render_template(:response_report)
         end
       end
+    end
+  end
+
+  describe 'get_llm_evaluation' do
+    it 'stores formative and summative review data on instructor review scores' do
+      mcp_client = instance_double(MCPServerClient)
+      instructor_review_score = instance_double(InstructorReviewScore, save!: true)
+
+      allow(MCPServerClient).to receive(:new).and_return(mcp_client)
+      allow(Response).to receive(:latest_submitted_review_response_ids_for_assignment).with(1).and_return([10])
+      allow(mcp_client).to receive(:get_finalized_review).with(10).and_return(
+        'summative_feedback_score' => 4.0,
+        'formative_feedback_score' => 3.5,
+        'feedback_of_summative_feedback' => 'Strong final review.',
+        'feedback_of_formative_feedback' => 'Add more actionable suggestions.'
+      )
+      allow(InstructorReviewScore).to receive(:find_or_initialize_by).with(response_id: 10).and_return(instructor_review_score)
+      allow(instructor_review_score).to receive(:score_for_summative=).with(4.0)
+      allow(instructor_review_score).to receive(:score_for_formative=).with(3.5)
+      allow(instructor_review_score).to receive(:feedback_for_summative=).with('Strong final review.')
+      allow(instructor_review_score).to receive(:feedback_for_formative=).with('Add more actionable suggestions.')
+      allow(controller).to receive(:save_review_grades_from_instructor_scores)
+
+      get :get_llm_evaluation, params: { id: 1 }
+
+      expect(instructor_review_score).to have_received(:score_for_summative=).with(4.0)
+      expect(instructor_review_score).to have_received(:score_for_formative=).with(3.5)
+      expect(instructor_review_score).to have_received(:feedback_for_summative=).with('Strong final review.')
+      expect(instructor_review_score).to have_received(:feedback_for_formative=).with('Add more actionable suggestions.')
+      expect(controller).to have_received(:save_review_grades_from_instructor_scores).with(assignment)
     end
   end
 end

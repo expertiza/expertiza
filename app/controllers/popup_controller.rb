@@ -87,10 +87,46 @@ class PopupController < ApplicationController
     @reviewer_id = params[:reviewer_id]
     @assignment_id = params[:assignment_id]
     @review_final_versions = ReviewResponseMap.final_versions_from_reviewer(@assignment_id, @reviewer_id)
+    @review_comparison_data = build_review_comparison_data(@review_final_versions)
     @reviews = []
   end
 
   private
+
+  def build_review_comparison_data(review_final_versions)
+    response_ids = review_final_versions.values.flat_map { |entry| entry[:response_ids] }.compact.uniq
+    return {} if response_ids.empty?
+
+    responses = Response.includes(:instructor_review_score).where(id: response_ids).index_by(&:id)
+    maps = ResponseMap.where(id: responses.values.map(&:map_id).uniq).index_by(&:id)
+
+    response_ids.each_with_object({}) do |response_id, details|
+      response = responses[response_id]
+      next unless response
+
+      map = maps[response.map_id]
+      next unless map
+
+      other_scores = Response.joins(:response_map)
+                             .where(response_maps: { reviewee_id: map.reviewee_id, type: 'ReviewResponseMap' },
+                                    round: response.round,
+                                    is_submitted: true)
+                             .where.not(id: response.id)
+                             .order(updated_at: :desc, id: :desc)
+                             .to_a
+                             .group_by(&:map_id)
+                             .values
+                             .map(&:first)
+                             .map(&:average_score)
+                             .reject { |score| score.blank? || score == 'N/A' }
+
+      details[response_id] = {
+        estimated_true_score: response.instructor_review_score&.score_for_summative,
+        reviewer_assigned_score: response.average_score,
+        other_assigned_scores: other_scores
+      }
+    end
+  end
 
   public
 

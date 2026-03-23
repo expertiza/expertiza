@@ -40,15 +40,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_DEV }}
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - uses: miloserdow/capistrano-deploy@master
-        with:
-          target: development
-          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
-          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
+      - name: Deploy with Capistrano
+        run: bundle exec cap development deploy
 
   test:
     if: inputs.environment == 'test'

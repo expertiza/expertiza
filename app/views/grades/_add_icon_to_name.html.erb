@@ -1,8 +1,15 @@
 <!-- Add an icon to identify if this review was done by TA/instructor -->
-<% reviewer = user_name.nil? ? "Review #{i}" : user_name.to_s %>
-<% staff_icon = review.done_by_staff_participant? ? '<img data-toggle="tooltip" data-placement="right" title="Icon indicates this review was done by course staff" class="img_icon" src="/assets/staff.png">' : '' %>
+<% reviewer = user_name.present? ? user_name.to_s : "Review #{i + 1}" %>
 
 <th class="sorter-false">
-    <%= staff_icon %>
+    <% if review.done_by_staff_participant? %>
+      <%= image_tag(
+            'staff.png',
+            class: 'img_icon',
+            'data-toggle': 'tooltip',
+            'data-placement': 'right',
+            title: 'Icon indicates this review was done by course staff'
+          ) %>
+    <% end %>
     <a target="_blank" href="../response/view?id=<%= review.id.to_s %>" data-toggle="tooltip" data-placement="right" title="Click to see details"><%= reviewer %></a>
 </th>

@@ -108,6 +108,7 @@ module AuthorizationHelper
              (
                current_user_has_id?(user_id) ||
                (reviewee_team && reviewee_team.user?(session[:user])) ||
+
                current_user_has_admin_privileges? ||
                (current_user_is_a?('Instructor') && current_user_instructs_assignment?(assignment)) ||
                (current_user_is_a?('Teaching Assistant') && current_user_has_ta_mapping_for_assignment?(assignment))

@@ -24,6 +24,7 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
+          echo "Secret length: $(echo '${{ secrets.SSH_PRIVATE_KEY_PROD_B64 }}' | wc -c)"
           echo "${{ secrets.SSH_PRIVATE_KEY_PROD_B64 }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 152.14.199.156 >> ~/.ssh/known_hosts

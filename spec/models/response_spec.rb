@@ -190,6 +190,31 @@ describe Response do
     end
   end
 
+  describe '.latest_submitted_review_response_ids_for_assignment' do
+    it 'returns only the latest submitted response for each review map and round' do
+      assignment = create(:assignment, directory_path: "final_test_#{SecureRandom.hex(4)}")
+      reviewer = create(:participant, assignment: assignment)
+      reviewee = create(:assignment_team, assignment: assignment)
+      map = create(:review_response_map, assignment: assignment, reviewer: reviewer, reviewee: reviewee)
+      second_reviewee = create(:assignment_team, assignment: assignment)
+      second_map = create(:review_response_map, assignment: assignment, reviewer: reviewer, reviewee: second_reviewee)
+
+      round_1_response = create(:response, response_map: map, round: 1, is_submitted: true, created_at: 2.days.ago)
+      older_round_2_response = create(:response, response_map: map, round: 2, is_submitted: true, created_at: 2.days.ago)
+      latest_round_2_response = create(:response, response_map: map, round: 2, is_submitted: true, created_at: 1.day.ago)
+      create(:response, response_map: map, round: 2, is_submitted: false, created_at: Time.current)
+      second_map_response = create(:response, response_map: second_map, round: 2, is_submitted: true, created_at: 3.hours.ago)
+
+      response_ids = Response.latest_submitted_review_response_ids_for_assignment(assignment.id)
+
+      expect(response_ids).to match_array([
+        round_1_response.id,
+        latest_round_2_response.id,
+        second_map_response.id
+      ])
+    end
+  end
+
   describe '#questionnaire_by_answer' do
     before(:each) do
       allow(SignedUpTeam).to receive(:find_by).with(team_id: team.id).and_return(signed_up_team)

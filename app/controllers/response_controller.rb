@@ -6,14 +6,14 @@ class ResponseController < ApplicationController
   helper :file
 
   before_action :authorize_show_calibration_results, only: %i[show_calibration_results_for_student]
-  before_action :set_response, only: %i[update delete view]
+  before_action :set_response, only: %i[update delete view detailed_evaluation]
 
   # E2218: Method to check if that action is allowed for the user.
   def action_allowed?
     response = user_id = nil
     action = params[:action]
     # Initialize response and user id if action is edit or delete or update or view.
-    if %w[edit delete update view].include?(action)
+    if %w[edit delete update view detailed_evaluation].include?(action)
       response = Response.find(params[:id])
       user_id = response.map.reviewer.user_id if response.map.reviewer
     end
@@ -28,7 +28,7 @@ class ResponseController < ApplicationController
     # Deny access to anyone except reviewer & author's team
     when 'delete', 'update'
       current_user_is_reviewer?(response.map, user_id)
-    when 'view'
+    when 'view', 'detailed_evaluation'
       response_edit_allowed?(response.map, user_id)
     else
       user_logged_in?
@@ -207,7 +207,21 @@ class ResponseController < ApplicationController
   # view response
   def view
     set_content
-    @instructor_review_score = InstructorReviewScore.find_by(response_id: @response.id)
+    load_review_grade_data
+  end
+
+  def detailed_evaluation
+    unless InstructorReviewScore.exists?(response_id: @response.id)
+      return render json: { error: 'Detailed evaluation is only available after a review grade has been saved.' },
+                    status: :unprocessable_entity
+    end
+
+    begin
+      @detailed_evaluation = MCPServerClient.new.get_detailed_evaluation(@response.id)
+      render json: { detailed_evaluation: @detailed_evaluation, categories: detailed_evaluation_categories }
+    rescue StandardError => e
+      render json: { error: "Unable to load detailed evaluation: #{e.message}" }, status: :bad_gateway
+    end
   end
 
   def create
@@ -289,6 +303,23 @@ class ResponseController < ApplicationController
       reviewer_id = @map.response_map.reviewer.get_logged_in_reviewer_id(current_user.try(:id))
       redirect_to controller: 'student_review', action: 'list', id: reviewer_id
     end
+  end
+
+  private
+
+  def load_review_grade_data
+    @instructor_review_score = InstructorReviewScore.find_by(response_id: @response.id)
+    @detailed_evaluation_categories = detailed_evaluation_categories
+  end
+
+  def detailed_evaluation_categories
+    %w[
+      supported_by_justification
+      actionability
+      conciseness
+      localization
+      factual_consistency
+    ]
   end
 
   # This method set the appropriate values to the instance variables used in the 'show_calibration_results_for_student' page

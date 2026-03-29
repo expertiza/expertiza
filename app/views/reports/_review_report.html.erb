@@ -42,10 +42,16 @@
     <thead>
     <tr bgcolor='#CCCCCC'>
       <!-- class value decides whether the column should be sortable or not  -->
-      <th width="16%" class="sorter-true">Reviewer <span></span></th>
-      <th width="10%" class="sorter-true">Reviews done<span></span></th>
-      <th width="24%" class="sorter-true">Team reviewed <span></span></th>
-      <th class="sorter-false">Grade and comment <span></span></th>
+      <th rowspan="2" width="16%" class="sorter-true">Reviewer <span></span></th>
+      <th rowspan="2" width="10%" class="sorter-true">Reviews done<span></span></th>
+      <th rowspan="2" width="24%" class="sorter-true">Team reviewed <span></span></th>
+      <th width="6%" colspan="2" class="sorter-false">Scores<span></span></th>
+      <th rowspan="2" width="14%" class="sorter-true">Metrics <span></span></th>
+      <th rowspan="2" class="sorter-false">Assign grade and write comments <span></span></th>
+    </tr>
+    <tr bgcolor='#CCCCCC'>
+      <th width="6%" class="sorter-true">Score awarded <span></span></th>
+      <th width="6%" class="sorter-true">AVG Score <span></span></th>
     </tr>
     </thead>
     <tbody>
@@ -57,8 +63,8 @@
         <% unless reviewer.id == 1 %>
           <% user = Participant.find(reviewer.id).user %>
             <!--reviewer-->
-			
-			<!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
+
+            <!-- added class attribute and span tag to extract full name and unityID of the user for scraping (Used in export to CSV functionality) -->
             <td>
               <%= index + 1 %>.
               <%= link_to user.name(session[:ip]), impersonate_impersonate_path(:user => {:name => user.name(session[:ip])}), :method => :post, :class => "user_unityID" %>
@@ -103,18 +109,49 @@
               <% end %>
             <% end %>
           </td>
-          <!--Grade and comment (read-only display)-->
-          <td align='left' class="grade-comment-cell">
-            <div class="grade-comment-block">
-              <div class="grade-comment-row">
-                <span class="grade-comment-label">Score</span>
-                <span class="grade-comment-value" data-export-grade><%= reviewer.review_grade.try(:grade_for_reviewer).present? ? reviewer.review_grade.grade_for_reviewer : '—' %></span>
-              </div>
-              <div class="grade-comment-row">
-                <span class="grade-comment-label">Comment</span>
-                <span class="grade-comment-value grade-comment-text" data-export-comment><%= reviewer.review_grade.try(:comment_for_reviewer).presence || '—' %></span>
-              </div>
-            </div>
+          <!--Render partial view corresponding to the overall score awarded to a team-->
+          <td align='left'>
+            <% @response_maps.each_with_index do |reviewer_map, score_index| %>
+              <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                <% @team = Team.find(reviewer_map.reviewee_id) %>
+                <%= render partial: 'team_score_score_awarded', locals: { bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id } %>
+              <% end %>
+            <% end %>
+          </td>
+          <!--Render partial view corresponding to the average score awarded to a team-->
+          <td align='left'>
+            <% @response_maps.each_with_index do |reviewer_map, score_index| %>
+              <% if Team.where(id: reviewer_map.reviewee_id).length > 0 %>
+                <% @team = Team.find(reviewer_map.reviewee_id) %>
+                <%= render partial: 'team_score', locals: { bgcolor: @bgcolor, team_id: @team.id, reviewer_id: reviewer.id } %>
+              <% end %>
+            <% end %>
+          </td>
+          <!--Metrics-->
+          <td align='left'>
+            <%= display_volume_metric_chart(reviewer) %>
+          </td>
+          <!--Assign grade and write comments-->
+          <td align='left'>
+            <%= form_with model: reviewer.review_grade ? reviewer.review_grade : ReviewGrade.new, url: save_grade_and_comment_for_reviewer_review_mapping_index_path, method: 'post' do |form| %>
+              <%= form.hidden_field :participant_id, value: reviewer.id %>
+              <%= form.hidden_field :assignment_id, value: @id %>
+              <%= form.number_field :grade_for_reviewer, value: reviewer.review_grade.try(:grade_for_reviewer), min: 0, max: 100, maxlength: 3, size: 3, placeholder: 'Grade', data: { export_grade: true } %>
+              <br/>
+              <%= form.text_area :comment_for_reviewer, value: reviewer.review_grade.try(:comment_for_reviewer), placeholder: 'Comment', class: "awesome_input", 'data-multiple' => '', 'data-minchars' => "1", data: { export_comment: true } %>
+              <table class="inline-transparent">
+                <tr>
+                  <td>
+                    <%= image_tag 'text_macro.png', border: 2, title: 'Text Macro/Pastebin', style: 'width: 24px; height:30px', onclick: 'show_text_macros()' %>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <%= form.submit 'Save' %>
+                  </td>
+                </tr>
+              </table>
+            <% end %>
           </td>
         <% end %>
       </tr>
@@ -122,13 +159,35 @@
     </table>
  </div>
 
+<%= render partial: '/user_pastebins/save_text_macros' %>
+
 <script>
     $(function () {
         /*Function for sorting the table */
         $("#myTable").tablesorter({
             sortList: [[0, 0]], //sort First Column by default when page loads
-            widgets: ['zebra']
+            widgets: ['zebra'],
+            headers: {
+                5: {
+                    sorter: 'customParser'
+                }
+            }
         });
+    });
+</script>
+
+<script>
+    $.tablesorter.addParser({
+        id: "customParser",
+        is: function (stringValue) {
+            return false;
+        },
+        format: function (stringValue) {
+            var stringNumericPart = stringValue.split(" ");
+            var numericValue = parseInt(stringNumericPart[2], 10);
+            return isNaN(numericValue) ? 0 : numericValue;
+        },
+        type: 'numeric'
     });
 </script>
 
@@ -172,13 +231,13 @@
     for (var i = 1; i < rows.length; i++) {
 			var row = [];
 			
-			reviewer_name = "\"" + rows[i].querySelector("td span.user_name").innerHTML + "\"";
+			reviewer_name = '"' + rows[i].querySelector("td span.user_name").innerHTML + '"';
 			reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
 			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
 			var gradeEl = rows[i].querySelector("[data-export-grade]");
 			var commentEl = rows[i].querySelector("[data-export-comment]");
-			reviewer_grade = gradeEl ? (gradeEl.textContent || "").trim() : "";
-			reviewer_comment = commentEl ? "\"" + (commentEl.textContent || "").trim().replace(/"/g, "'") + "\"" : "\"\"";
+			reviewer_grade = gradeEl ? (gradeEl.value || "").trim() : "";
+			reviewer_comment = commentEl ? '"' + (commentEl.value || "").trim().replace(/"/g, "'") + '"' : '""';
 			
       // push the information to set the information. 
 			row.push(reviewer_name);
@@ -191,7 +250,7 @@
               
 		}
 	
-		downloadCSV(csv.join("\n"), filename);
+		downloadCSV(csv.join('\n'), filename);
 	}
 	
 	// Method to set names of header columns in Exported CSV file

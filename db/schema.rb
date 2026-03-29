@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20260223182602) do
+ActiveRecord::Schema.define(version: 20260322130000) do
 
   create_table "account_requests", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "name"
@@ -430,12 +430,14 @@ ActiveRecord::Schema.define(version: 20260223182602) do
     t.string "name", default: "", null: false
   end
 
-  create_table "instructor_review_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "instructor_review_scores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer "response_id", null: false
-    t.float "score", limit: 24
-    t.text "feedback"
+    t.float "score_for_summative", limit: 24
+    t.text "feedback_for_formative"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "score_for_formative", limit: 24
+    t.text "feedback_for_summative"
     t.index ["response_id"], name: "index_instructor_review_scores_on_response_id", unique: true
   end
 
@@ -509,7 +511,7 @@ ActiveRecord::Schema.define(version: 20260223182602) do
     t.string "type"
   end
 
-  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+  create_table "notifications", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.string "subject"
     t.text "description"
     t.date "expiration_date"
@@ -677,7 +679,7 @@ ActiveRecord::Schema.define(version: 20260223182602) do
   create_table "review_comment_paste_bins", id: :integer, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "review_grade_id"
     t.string "title"
-    t.text "review_comment"
+    t.text "review_comment", limit: 16777215
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["review_grade_id"], name: "fk_rails_0a539bcc81"

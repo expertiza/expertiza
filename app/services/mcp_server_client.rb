@@ -18,9 +18,15 @@ class MCPServerClient
   end
 
   # GET /api/v1/reviews/finalized/:expertiza_response_id
-  # Returns { total_finalized_score: int or null, student_feedback: string or null }
+  # Returns the finalized formative/summative evaluation payload for a response.
   def get_finalized_review(expertiza_response_id)
     get("api/v1/reviews/finalized/#{expertiza_response_id}")
+  end
+
+  # GET /api/v1/reviews/finalized/:expertiza_response_id/detailed-evaluation
+  # Returns rubric-style detailed evaluation with per-dimension scores and reasoning.
+  def get_detailed_evaluation(expertiza_response_id)
+    get("api/v1/reviews/finalized/#{expertiza_response_id}/detailed-evaluation")
   end
 
   private
@@ -48,13 +54,15 @@ class MCPServerClient
     
     Rails.logger.info("[MCP] → #{klass.name} #{uri} body=#{body.inspect}")
     resp = http.request(req)
-    Rails.logger.info("[MCP] ← #{resp.code} #{uri} body=#{resp.body.to_s[0, 500]}")
+    response_body = normalize_string_encoding(resp.body.to_s)
+    Rails.logger.info("[MCP] ← #{resp.code} #{uri} body=#{response_body[0, 500]}")
 
     case resp
     when Net::HTTPSuccess
       begin
-        return JSON.parse(resp.body) unless resp.body.nil? || resp.body.strip.empty?
-        return {}
+        return {} if response_body.strip.empty?
+
+        return normalize_parsed_json(JSON.parse(response_body))
       rescue JSON::ParserError
         raise "MCP returned non-JSON response"
       end
@@ -62,5 +70,24 @@ class MCPServerClient
       # bubble up a meaningful error for caller
       raise "MCP request failed: #{resp.code} - #{resp.body}"
     end
+  end
+
+  def normalize_parsed_json(value)
+    case value
+    when Hash
+      value.each_with_object({}) do |(key, nested_value), normalized_hash|
+        normalized_hash[normalize_string_encoding(key)] = normalize_parsed_json(nested_value)
+      end
+    when Array
+      value.map { |item| normalize_parsed_json(item) }
+    when String
+      normalize_string_encoding(value)
+    else
+      value
+    end
+  end
+
+  def normalize_string_encoding(value)
+    value.to_s.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
   end
 end

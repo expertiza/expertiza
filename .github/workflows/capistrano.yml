@@ -18,7 +18,7 @@ on:
 jobs:
   production:
     if: inputs.environment == 'production'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up Java Path

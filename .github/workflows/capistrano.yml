@@ -17,32 +17,20 @@ on:
 
 jobs:
   production:
-    if: ${{ inputs.environment == 'production' }}
+    if: inputs.environment == 'production'
     runs-on: self-hosted
-    container:
-      image: ruby:2.4.10-slim-buster
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up Java Path
         run: |
           echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-
-      - name: Install required packages
-        run: |
-          apt-get update
-          apt-get install -y git openssh-client
-
-      - name: Install bundler
-        run: gem install bundler -v 2.4.22
-
-      - name: Install gems
-        run: bundle install
-
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
       - uses: miloserdow/capistrano-deploy@master
         with:
-          target: production
+          target: production # Defines the environment for the deployment
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 

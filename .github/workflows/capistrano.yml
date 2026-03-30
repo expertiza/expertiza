@@ -16,6 +16,7 @@ on:
           - test
 
 jobs:
+  production:
     if: inputs.environment == 'production'
     runs-on: self-hosted
     steps:
@@ -32,7 +33,6 @@ jobs:
           target: production # Defines the environment for the deployment
           enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_PROD }}
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
-      
 
 # development and test jobs are identical - with different target environment and server keys
   development:
@@ -40,20 +40,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_DEV_B64 }}" | base64 -d > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 152.7.179.114 >> ~/.ssh/known_hosts
-          eval $(ssh-agent -s)
-          ssh-add ~/.ssh/id_rsa
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4
           bundler-cache: true
-      - name: Deploy with Capistrano
-        run: bundle exec cap development deploy
+      - uses: miloserdow/capistrano-deploy@master
+        with:
+          target: development
+          enc_rsa_key_val: ${{ secrets.ENCRYPTED_PRIVATE_KEY_DEV }}
+          deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
   test:
     if: inputs.environment == 'test'

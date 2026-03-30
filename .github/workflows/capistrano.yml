@@ -27,11 +27,15 @@ jobs:
       - name: Set up Ruby on self-hosted runner
         shell: bash
         run: |
-          USER_GEM_BIN="$(ruby -rrubygems -e 'print Gem.user_dir')/bin"
+          USER_GEM_HOME="$(ruby -rrubygems -e 'print Gem.user_dir')"
+          USER_GEM_BIN="$USER_GEM_HOME/bin"
           echo "$USER_GEM_BIN" >> "$GITHUB_PATH"
+          export GEM_HOME="$USER_GEM_HOME"
+          export GEM_PATH="$USER_GEM_HOME:$(ruby -rrubygems -e 'print Gem.path.join(\":\")')"
+          export PATH="$USER_GEM_BIN:$PATH"
           ruby -v
-          ruby -S gem install bundler -v 1.17.3 --user-install --no-document
-          "$USER_GEM_BIN/bundle" _1.17.3_ install --path vendor/bundle --without development test --jobs 4 --retry 3
+          ruby -S gem install bundler -v 1.17.3 --user-install --bindir "$USER_GEM_BIN" --no-document
+          bundle _1.17.3_ install --path vendor/bundle --without development test --jobs 4 --retry 3
       - uses: miloserdow/capistrano-deploy@master
         with:
           target: production # Defines the environment for the deployment

@@ -18,7 +18,7 @@ on:
 jobs:
   production:
     if: inputs.environment == 'production'
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Set up Java Path
@@ -37,7 +37,7 @@ jobs:
 # development and test jobs are identical - with different target environment and server keys
   development:
     if: inputs.environment == 'development'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
@@ -52,7 +52,7 @@ jobs:
 
   test:
     if: inputs.environment == 'test'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1

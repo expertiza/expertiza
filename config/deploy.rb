@@ -46,7 +46,7 @@ set :linked_files, %w[config/database.yml
                       config/secrets.yml
                       public.pem
                       private.pem
-                      .env.production]
+                      .env]
 
 # Default value for linked_dirs is []
 # append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system"

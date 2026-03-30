@@ -7,7 +7,7 @@ This document provides steps for implementing automated deployments on successfu
 
 | Expertiza Branch | Capistrano Environment | Target Server                                           | IP Address    | Deployment User | Deployment Directory |
 |------------------|------------------------|---------------------------------------------------------|---------------|-----------------|----------------------|
-| main             | production             | [Production Server](lin-res103.csc.ncsu.edu)            | 152.14.92.215 | expertiza       | `/var/www`           |
+| main             | production             | [Production Server](lin-res103.csc.ncsu.edu)            | 152.14.199.156 | expertiza       | `/var/www`           |
 | main             | staging                | [Testing Server](https://vclvm177-58.vcl.ncsu.edu/)     | 152.7.177.58  | expertiza       | `/var/www`           |
 | development      | development            | [Development Server](https://vclvm178-10.vcl.ncsu.edu/) | 152.7.178.10  | expertiza       | `/var/www`           |
 

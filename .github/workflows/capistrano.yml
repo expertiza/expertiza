@@ -18,16 +18,20 @@ on:
 jobs:
   production:
     if: inputs.environment == 'production'
-    runs-on: ubuntu-22.04
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
       - name: Set up Java Path
         run: |
-          echo "JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64" >> $GITHUB_ENV
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.4
-          bundler-cache: true
+          echo "JAVA_HOME=/usr/jdk-11" >> $GITHUB_ENV
+      - name: Set up Ruby on self-hosted runner
+        shell: bash
+        run: |
+          USER_GEM_BIN="$(ruby -rrubygems -e 'print Gem.user_dir')/bin"
+          echo "$USER_GEM_BIN" >> "$GITHUB_PATH"
+          ruby -v
+          ruby -S gem install bundler -v 1.17.3 --user-install --no-document
+          "$USER_GEM_BIN/bundle" _1.17.3_ install --path vendor/bundle --without development test --jobs 4 --retry 3
       - uses: miloserdow/capistrano-deploy@master
         with:
           target: production # Defines the environment for the deployment

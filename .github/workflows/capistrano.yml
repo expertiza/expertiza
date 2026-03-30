@@ -22,13 +22,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up SSH key
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY_PROD_B64 }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_PROD_B64 }}" | base64 -d > ~/.ssh/id_rsa
+          echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa || echo "base64 decode failed"
+          echo "Key file size: $(wc -c < ~/.ssh/id_rsa)"
+          head -1 ~/.ssh/id_rsa
+          tail -1 ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 152.14.199.156 >> ~/.ssh/known_hosts
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     echo "${{ secrets.SSH_PRIVATE_KEY_PROD_B64 }}" | base64 -d > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     ssh-keyscan 152.14.199.156 >> ~/.ssh/known_hosts
+      #     eval $(ssh-agent -s)
+      #     ssh-add ~/.ssh/id_rsa
+      
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.4

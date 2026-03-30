@@ -250,6 +250,20 @@ class Response < ApplicationRecord
     Class.new.extend(Scoring).assessment_score(params)
   end
 
+  # For MCP syncing, treat the latest submitted response for each
+  # (review map, round) pair as the canonical review artifact.
+  def self.latest_submitted_review_response_ids_for_assignment(assignment_id)
+    review_map_ids = ResponseMap.where(reviewed_object_id: assignment_id, type: 'ReviewResponseMap').pluck(:id)
+    return [] if review_map_ids.empty?
+
+    where(map_id: review_map_ids, is_submitted: true)
+      .order(:map_id, :round, created_at: :desc, id: :desc)
+      .to_a
+      .group_by { |response| [response.map_id, response.round] }
+      .values
+      .map { |responses| responses.first.id }
+  end
+
   private
 
   def construct_instructor_html(identifier, self_id, count)

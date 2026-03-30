@@ -60,29 +60,32 @@ class ReportsController < ApplicationController
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
-  # Fetches finalized LLM-generated evaluation scores and feedback for peer reviews from the MCP server,
+  # Fetches finalized LLM-generated formative/summative evaluation data for peer reviews from the MCP server,
   # and saves them to InstructorReviewScore for each peer review in each round.
-  # ReviewGrades then use InstructorReviewScore to derive the "Score and Feedback" for each reviewer.
+  # ReviewGrades then use the summative scores to derive the reviewer grade summary.
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new
-    response_ids = Response.where(
-      map_id: ResponseMap.where(reviewed_object_id: @assignment.id, type: 'ReviewResponseMap').pluck(:id)
-    ).pluck(:id)
+    response_ids = Response.latest_submitted_review_response_ids_for_assignment(@assignment.id)
     saved = 0
     errors = []
     # Iterate over each peer review in each round
-    # and fetch the LLM-generated evaluation scores and feedback from the MCP server.
-    # Save the scores and feedback to InstructorReviewScore for each peer review.
+    # and fetch the LLM-generated evaluation payload from the MCP server.
+    # Save the formative/summative scores and feedback to InstructorReviewScore for each peer review.
     Array(response_ids).each do |response_id|
       begin
         data = mcp_client.get_finalized_review(response_id)
-        score = data['total_finalized_score']
-        feedback = data['student_feedback']
-        next if score.nil?
+        score_for_summative = data['summative_feedback_score'] || data['score_for_summative'] || data['total_finalized_score']
+        score_for_formative = data['formative_feedback_score'] || data['score_for_formative']
+        feedback_for_summative = data['feedback_of_summative_feedback'] || data['feedback_for_summative']
+        feedback_for_formative = data['feedback_of_formative_feedback'] || data['feedback_for_formative'] || data['student_feedback']
+        next if score_for_summative.nil? && score_for_formative.nil? &&
+                feedback_for_summative.nil? && feedback_for_formative.nil?
         record = InstructorReviewScore.find_or_initialize_by(response_id: response_id)
-        record.score = score
-        record.feedback = feedback
+        record.score_for_summative = score_for_summative
+        record.score_for_formative = score_for_formative
+        record.feedback_for_summative = feedback_for_summative
+        record.feedback_for_formative = feedback_for_formative
         record.save!
         saved += 1
       rescue => e
@@ -104,12 +107,12 @@ class ReportsController < ApplicationController
 
   private
 
-  # Calculate and save ReviewGrade for each reviewer based on their InstructorReviewScores.
-  # grade_for_reviewer = total (sum) of all scores; comment = "N reviews | Scores: x, y, z"
+  # Calculate and save ReviewGrade for each reviewer using both summative and formative InstructorReviewScores.
+  # grade_for_reviewer = sum of per-review averages, where each review average is
+  # (summative score + formative score) / 2.
   # Aggregates across ALL response_maps for each reviewer (not per-map).
   def save_review_grades_from_instructor_scores(assignment)
-    map_ids = ResponseMap.where(reviewed_object_id: assignment.id, type: 'ReviewResponseMap').pluck(:id)
-    all_response_ids = Response.where(map_id: map_ids).pluck(:id)
+    all_response_ids = Response.latest_submitted_review_response_ids_for_assignment(assignment.id)
     return if all_response_ids.empty?
 
     # Build response_id -> reviewer_id map (batch)
@@ -121,16 +124,32 @@ class ReportsController < ApplicationController
     InstructorReviewScore.where(response_id: all_response_ids).each do |irs|
       reviewer_id = map_to_reviewer[response_to_map[irs.response_id]]
       next if reviewer_id.nil?
-      participant_scores[reviewer_id] ||= []
-      participant_scores[reviewer_id] << irs.score
+      next if irs.score_for_summative.nil? || irs.score_for_formative.nil?
+
+      participant_scores[reviewer_id] ||= {
+        summative_scores: [],
+        formative_scores: [],
+        combined_scores: []
+      }
+
+      participant_scores[reviewer_id][:summative_scores] << irs.score_for_summative
+      participant_scores[reviewer_id][:formative_scores] << irs.score_for_formative
+      participant_scores[reviewer_id][:combined_scores] << ((irs.score_for_summative + irs.score_for_formative) / 2.0)
     end
 
-    participant_scores.each do |participant_id, score_values|
-      next if score_values.empty?
+    participant_scores.each do |participant_id, score_data|
+      next if score_data[:combined_scores].empty?
 
-      total = score_values.sum.round(0)
-      count = score_values.size
-      feedback_text = "#{count} review#{'s' if count != 1} | Scores: #{score_values.join(', ')}"
+      total = score_data[:combined_scores].sum
+      count = score_data[:combined_scores].size
+      total_summative = score_data[:summative_scores].sum
+      total_formative = score_data[:formative_scores].sum
+      feedback_text = "#{count} review#{'s' if count != 1} | " \
+                      "Summative scores: #{score_data[:summative_scores].join(', ')} | " \
+                      "Total summative score: #{total_summative.round(2)} | " \
+                      "Formative scores: #{score_data[:formative_scores].join(', ')} | " \
+                      "Total formative score: #{total_formative.round(2)} | " \
+                      "Combined per-review scores: #{score_data[:combined_scores].map { |score| score.round(2) }.join(', ')}"
 
       rg = ReviewGrade.find_or_initialize_by(participant_id: participant_id)
       rg.grade_for_reviewer = total

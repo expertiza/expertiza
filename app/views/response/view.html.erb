@@ -6,16 +6,19 @@
 <% if @instructor_review_score %>
   <% summative_score = @instructor_review_score.score_for_summative %>
   <% formative_score = @instructor_review_score.score_for_formative %>
+  <% formative_max = 5 %>
+  <% summative_max = 2 %>
+  <% total_max = formative_max + summative_max %>
   <% total_score = [summative_score, formative_score].compact.sum %>
   <div style="margin: 12px 0; padding: 12px 14px; border: 1px solid #cfd8dc; border-radius: 8px; background-color: #f8fbf9;">
     <div>
       <strong>Total:</strong>
       <span style="color: #2e8b57; font-weight: 700; font-size: 1.25em;">
-        <%= total_score %> out of 10
+        <%= total_score %> out of <%= total_max %>
       </span>
       <% if summative_score.present? || formative_score.present? %>
         <span>
-          (<%= formative_score || 0 %> out of 5 for feedback, <%= summative_score || 0 %> out of 5 for accuracy)
+          (<%= formative_score || 0 %> out of <%= formative_max %> for feedback, <%= summative_score || 0 %> out of <%= summative_max %> for accuracy)
         </span>
       <% end %>
       <button type="button"

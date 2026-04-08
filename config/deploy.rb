@@ -45,7 +45,8 @@ set :rvm_ruby_version, '2.4'
 set :linked_files, %w[config/database.yml
                       config/secrets.yml
                       public.pem
-                      private.pem]
+                      private.pem
+                      .env]
 
 # Default value for linked_dirs is []
 # append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system"

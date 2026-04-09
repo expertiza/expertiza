@@ -24,3 +24,7 @@ production:
 staging:
   <<: *default
   database: expertiza_staging
+
+anonymized:
+  <<: *default
+  database: expertiza_anonymized

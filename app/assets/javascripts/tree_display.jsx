@@ -153,14 +153,8 @@ const node_attributes = {
       },
       {
         title: 'View grade summary by student',
-        href: '/assessment360/course_student_grade_summary?course_id=',
+        href: '/assessment360/combined_course_summary?course_id=',
         src: '/assets/tree_view/360-dashboard-24.png'
-      },
-      {
-        title: 'View aggregated teammate & meta reviews',
-        href: '/assessment360/all_students_all_reviews?course_id=',
-        src: null,
-        extra: <span style={{ fontSize: '22px', top: '8px' }} className="glyphicon glyphicon-list-alt" />
       }
     ],
     getActions: function(id) {

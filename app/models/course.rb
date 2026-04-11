@@ -27,7 +27,7 @@ class Course < ApplicationRecord
   end
 
   def get_participants
-    CourseParticipant.where(parent_id: id)
+    CourseParticipant.includes(:user).where(parent_id: id)
   end
 
   def get_participant(user_id)

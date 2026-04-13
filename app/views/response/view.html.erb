@@ -4,46 +4,70 @@
 </div>
 
 <% if @instructor_review_score %>
+  <% student_viewer = current_user&.student? %>
   <% summative_score = @instructor_review_score.score_for_summative %>
   <% formative_score = @instructor_review_score.score_for_formative %>
+  <% formative_feedback = @instructor_review_score.feedback_for_formative %>
+  <% summative_feedback = @instructor_review_score.feedback_for_summative %>
   <% formative_max = 5 %>
   <% summative_max = 2 %>
   <% total_max = formative_max + summative_max %>
   <% total_score = [summative_score, formative_score].compact.sum %>
-  <div style="margin: 12px 0; padding: 12px 14px; border: 1px solid #cfd8dc; border-radius: 8px; background-color: #f8fbf9;">
-    <div>
-      <strong>Total:</strong>
-      <span style="color: #2e8b57; font-weight: 700; font-size: 1.25em;">
-        <%= total_score %> out of <%= total_max %>
-      </span>
-      <% if summative_score.present? || formative_score.present? %>
-        <span>
-          (<%= formative_score || 0 %> out of <%= formative_max %> for feedback, <%= summative_score || 0 %> out of <%= summative_max %> for accuracy)
-        </span>
-      <% end %>
-      <button type="button"
-              id="get-detailed-evaluation-button"
-              class="btn btn-info btn-sm"
-              data-url="<%= detailed_evaluation_response_index_path(id: @response.id) %>"
-              style="margin-left: 10px;">
-        Get detailed evaluation
-      </button>
-    </div>
-    <% if @instructor_review_score.feedback_for_summative.present? || @instructor_review_score.feedback_for_formative.present? %>
-      <div style="margin-top: 8px;">
-        <strong>Feedback:</strong>
-        <% if @instructor_review_score.feedback_for_formative.present? %>
-          <span><%= sanitize(@instructor_review_score.feedback_for_formative) %></span>
+  <% visible_score_present = student_viewer ? formative_score.present? : summative_score.present? || formative_score.present? %>
+  <% visible_feedback_present = student_viewer ? formative_feedback.present? : summative_feedback.present? || formative_feedback.present? %>
+  <% if visible_score_present || visible_feedback_present %>
+    <div style="margin: 12px 0; padding: 12px 14px; border: 1px solid #cfd8dc; border-radius: 8px; background-color: #f8fbf9;">
+      <div>
+        <% if student_viewer %>
+          <% if formative_score.present? %>
+            <strong>Score:</strong>
+            <span style="color: #2e8b57; font-weight: 700; font-size: 1.25em;">
+              <%= formative_score %> out of <%= formative_max %>
+            </span>
+          <% end %>
+        <% else %>
+          <strong>Total:</strong>
+          <span style="color: #2e8b57; font-weight: 700; font-size: 1.25em;">
+            <%= total_score %> out of <%= total_max %>
+          </span>
+          <% if summative_score.present? || formative_score.present? %>
+            <span>
+              (<%= formative_score || 0 %> out of <%= formative_max %> for feedback, <%= summative_score || 0 %> out of <%= summative_max %> for accuracy)
+            </span>
+          <% end %>
         <% end %>
-        <% if @instructor_review_score.feedback_for_formative.present? && @instructor_review_score.feedback_for_summative.present? %>
-          <span> </span>
-        <% end %>
-        <% if @instructor_review_score.feedback_for_summative.present? %>
-          <span><%= sanitize(@instructor_review_score.feedback_for_summative) %></span>
-        <% end %>
+
+        <button type="button"
+                id="get-detailed-evaluation-button"
+                class="btn btn-info btn-sm"
+                data-url="<%= detailed_evaluation_response_index_path(id: @response.id) %>"
+                style="margin-left: 10px;">
+          Get detailed evaluation
+        </button>
       </div>
-    <% end %>
-  </div>
+      <% if student_viewer %>
+        <% if formative_feedback.present? %>
+          <div style="margin-top: 8px;">
+            <strong>Feedback:</strong>
+            <span><%= sanitize(formative_feedback) %></span>
+          </div>
+        <% end %>
+      <% elsif summative_feedback.present? || formative_feedback.present? %>
+        <div style="margin-top: 8px;">
+          <strong>Feedback:</strong>
+          <% if formative_feedback.present? %>
+            <span><%= sanitize(formative_feedback) %></span>
+          <% end %>
+          <% if formative_feedback.present? && summative_feedback.present? %>
+            <span> </span>
+          <% end %>
+          <% if summative_feedback.present? %>
+            <span><%= sanitize(summative_feedback) %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 <% end %>
 
 <div id="detailed-evaluation-overlay" class="response-detailed-evaluation-overlay" style="display: none;">

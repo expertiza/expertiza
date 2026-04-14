@@ -82,11 +82,13 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1
+          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1 || true
           eval $(ssh-agent -s)
-          ssh-add ~/.ssh/id_rsa
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+          ssh-add /tmp/deploy_key
       - name: Set up Java Path
         run: |
           echo "JAVA_HOME=/usr/jdk-11" >> $GITHUB_ENV

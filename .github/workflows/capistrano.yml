@@ -81,20 +81,15 @@ jobs:
       - uses: actions/checkout@v3
       - name: Set up SSH key
         run: |
-          set +e
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > ~/.ssh/id_rsa
-          echo "base64 exit code: $?"
           chmod 600 ~/.ssh/id_rsa
-          head -1 ~/.ssh/id_rsa
-          tail -1 ~/.ssh/id_rsa
-          wc -l ~/.ssh/id_rsa
           ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1
-          echo "keyscan exit code: $?"
           eval $(ssh-agent -s)
-          echo "agent exit code: $?"
-          ssh-add ~/.ssh/id_rsa 2>&1
-          echo "ssh-add exit code: $?"
+          ssh-add ~/.ssh/id_rsa
+      - name: Set up Java Path
+        run: |
+          echo "JAVA_HOME=/usr/jdk-11" >> $GITHUB_ENV
       - name: Set up Ruby on self-hosted runner
         shell: bash
         run: |

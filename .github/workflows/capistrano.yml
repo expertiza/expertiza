@@ -75,34 +75,52 @@ jobs:
           deploy_key: ${{ secrets.DEPLOY_ENC_KEY }}
 
   anonymized:
-    if: inputs.environment == 'anonymized' || github.ref == 'refs/heads/anonymized_server'
-    runs-on: ubuntu-22.04
+    # if: inputs.environment == 'anonymized' || github.ref == 'refs/heads/anonymized_server'
+    # runs-on: ubuntu-22.04
+    # steps:
+    #   - uses: actions/checkout@v3
+    #   - name: Set up SSH key
+    #     run: |
+    #       mkdir -p ~/.ssh
+    #       echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > /tmp/deploy_key
+    #       chmod 600 /tmp/deploy_key
+    #       ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1 || true
+    #       eval $(ssh-agent -s)
+    #       echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+    #       echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+    #       ssh-add /tmp/deploy_key
+    #   - name: Set up Java Path
+    #     run: |
+    #       echo "JAVA_HOME=/usr/jdk-11" >> $GITHUB_ENV
+    #   - name: Set up Ruby on self-hosted runner
+    #     shell: bash
+    #     run: |
+    #       USER_GEM_HOME="$(ruby -rrubygems -e 'print Gem.user_dir')"
+    #       USER_GEM_BIN="$USER_GEM_HOME/bin"
+    #       echo "$USER_GEM_BIN" >> "$GITHUB_PATH"
+    #       export GEM_HOME="$USER_GEM_HOME"
+    #       export GEM_PATH="$USER_GEM_HOME:$(ruby -rrubygems -e 'print Gem.path.join(\":\")')"
+    #       export PATH="$USER_GEM_BIN:$PATH"
+    #       ruby -v
+    #       ruby -S gem install bundler -v 1.17.3 --user-install --bindir "$USER_GEM_BIN" --no-document
+    #       bundle _1.17.3_ install --path vendor/bundle --without development test --jobs 4 --retry 3
+    #   - name: Deploy with Capistrano
+    #     run: bundle exec cap anonymized deploy
+    if: inputs.environment == 'anonymized'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > /tmp/deploy_key
-          chmod 600 /tmp/deploy_key
-          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1 || true
+          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts
           eval $(ssh-agent -s)
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
-          ssh-add /tmp/deploy_key
-      - name: Set up Java Path
-        run: |
-          echo "JAVA_HOME=/usr/jdk-11" >> $GITHUB_ENV
-      - name: Set up Ruby on self-hosted runner
-        shell: bash
-        run: |
-          USER_GEM_HOME="$(ruby -rrubygems -e 'print Gem.user_dir')"
-          USER_GEM_BIN="$USER_GEM_HOME/bin"
-          echo "$USER_GEM_BIN" >> "$GITHUB_PATH"
-          export GEM_HOME="$USER_GEM_HOME"
-          export GEM_PATH="$USER_GEM_HOME:$(ruby -rrubygems -e 'print Gem.path.join(\":\")')"
-          export PATH="$USER_GEM_BIN:$PATH"
-          ruby -v
-          ruby -S gem install bundler -v 1.17.3 --user-install --bindir "$USER_GEM_BIN" --no-document
-          bundle _1.17.3_ install --path vendor/bundle --without development test --jobs 4 --retry 3
+          ssh-add ~/.ssh/id_rsa
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.4
+          bundler-cache: true
       - name: Deploy with Capistrano
-        run: bundle exec cap anonymized deploy
+        run: bundle exec cap development deploy

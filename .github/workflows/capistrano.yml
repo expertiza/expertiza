@@ -82,9 +82,14 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > ~/.ssh/id_rsa
+          echo "Decoding key..."
+          echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" > /tmp/key_b64.txt
+          wc -c /tmp/key_b64.txt
+          base64 -d /tmp/key_b64.txt > ~/.ssh/id_rsa
+          echo "Decode done"
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts
+          head -1 ~/.ssh/id_rsa
+          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts 2>&1
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_rsa
       - uses: ruby/setup-ruby@v1

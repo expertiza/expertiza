@@ -76,7 +76,7 @@ jobs:
 
   anonymized:
     if: inputs.environment == 'anonymized' || github.ref == 'refs/heads/anonymized_server'
-    runs-on: self-hosted
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - name: Set up SSH key

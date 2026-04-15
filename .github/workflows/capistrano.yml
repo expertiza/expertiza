@@ -123,4 +123,4 @@ jobs:
           ruby-version: 2.4
           bundler-cache: true
       - name: Deploy with Capistrano
-        run: bundle exec cap development deploy
+        run: bundle exec cap anonymized deploy

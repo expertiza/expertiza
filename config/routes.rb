@@ -65,6 +65,8 @@ Expertiza::Application.routes.draw do
       get :instant_flash
       patch :edit
       post :delete
+      patch :hide_review_round
+      patch :reset_hidden_rounds
     end
   end
 

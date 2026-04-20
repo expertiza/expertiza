@@ -119,4 +119,12 @@ class Mailer < ActionMailer::Base
     mail(subject: defn[:subject],
          to: defn[:to])
   end
+
+  # deletes job with jid == job_id from mailer queue
+  def delete_job_from_mailer_queue(job_id)
+    queue = Sidekiq::Queue.new('mailers')
+    queue.each do |job|
+      job.delete if job.jid == job_id
+    end
+  end
 end

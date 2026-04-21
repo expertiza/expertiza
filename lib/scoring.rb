@@ -252,7 +252,9 @@ module Scoring
   def compute_reviews_hash(assignment)
     review_scores = {}
     response_type = 'ReviewResponseMap'
+    puts assignment.id
     response_maps = ResponseMap.where(reviewed_object_id: assignment.id, type: response_type)
+    puts response_maps
     if assignment.varying_rubrics_by_round?
       review_scores = scores_varying_rubrics(assignment, review_scores, response_maps)
     else
@@ -315,10 +317,12 @@ end
 
 def scores_varying_rubrics(assignment, review_scores, response_maps)
   rounds = assignment.rounds_of_reviews
+  puts rounds
   (1..rounds).each do |round|
     response_maps.each do |response_map|
       questions = peer_review_questions_for_team(assignment, response_map.reviewee, round)
       reviewer = review_scores[response_map.reviewer_id]
+      puts reviewer
       corresponding_response = Response.where('map_id = ?', response_map.id)
       corresponding_response = corresponding_response.select { |response| response.round == round } unless corresponding_response.empty?
       respective_scores = {}

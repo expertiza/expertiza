@@ -120,8 +120,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_ANONYMIZED_B64 }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 152.7.179.77 >> ~/.ssh/known_hosts
-          eval $(ssh-agent -s)
+          ssh-keyscan -H 152.7.179.77 >> ~/.ssh/known_hosts 2>/dev/null || true
+          eval "$(ssh-agent -s)"
           ssh-add ~/.ssh/id_rsa
       - uses: ruby/setup-ruby@v1
         with:

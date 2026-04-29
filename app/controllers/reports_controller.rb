@@ -62,7 +62,7 @@ class ReportsController < ApplicationController
 
   # Fetches finalized LLM-generated formative/summative evaluation data for peer reviews from the MCP server,
   # and saves them to InstructorReviewScore for each peer review in each round.
-  # ReviewGrades then use the summative scores to derive the reviewer grade summary.
+  # ReviewGrades are then recalculated from formative scores only for the reviewer-facing summary.
   def get_llm_evaluation
     @assignment = Assignment.find(params[:id])
     mcp_client = MCPServerClient.new
@@ -107,56 +107,84 @@ class ReportsController < ApplicationController
 
   private
 
-  # Calculate and save ReviewGrade for each reviewer using both summative and formative InstructorReviewScores.
-  # grade_for_reviewer = sum of per-review averages, where each review average is
-  # (summative score + formative score) / 2.
+  SINGLE_ROUND_NORMALIZATION_FACTOR = 2.0
+
+  # Calculate and save ReviewGrade for each reviewer using formative InstructorReviewScores only.
+  # Summative scores remain stored on InstructorReviewScore for backend/staff use, but they are not
+  # included in the assigned reviewer grade/comment shown on the response report page.
   # Aggregates across ALL response_maps for each reviewer (not per-map).
   def save_review_grades_from_instructor_scores(assignment)
     all_response_ids = Response.latest_submitted_review_response_ids_for_assignment(assignment.id)
     return if all_response_ids.empty?
 
     # Build response_id -> reviewer_id map (batch)
-    response_to_map = Response.where(id: all_response_ids).pluck(:id, :map_id).to_h
+    response_rows = Response.where(id: all_response_ids).pluck(:id, :map_id, :round)
+    response_to_map = response_rows.to_h { |response_id, map_id, _round| [response_id, map_id] }
+    response_to_round = response_rows.to_h { |response_id, _map_id, round| [response_id, round.presence || 1] }
     map_to_reviewer = ResponseMap.where(id: response_to_map.values.uniq).pluck(:id, :reviewer_id).to_h
+    round_count = [assignment.num_review_rounds, response_to_round.values.compact.max || 1].max
+    round_count = 1 if round_count.zero?
 
     # Group InstructorReviewScores by participant
     participant_scores = {}
     InstructorReviewScore.where(response_id: all_response_ids).each do |irs|
       reviewer_id = map_to_reviewer[response_to_map[irs.response_id]]
+      round = response_to_round[irs.response_id] || 1
       next if reviewer_id.nil?
-      next if irs.score_for_summative.nil? || irs.score_for_formative.nil?
+      next if irs.score_for_formative.nil?
 
       participant_scores[reviewer_id] ||= {
-        summative_scores: [],
-        formative_scores: [],
-        combined_scores: []
+        reviews: Hash.new { |review_scores, map_id| review_scores[map_id] = {} }
       }
 
-      participant_scores[reviewer_id][:summative_scores] << irs.score_for_summative
-      participant_scores[reviewer_id][:formative_scores] << irs.score_for_formative
-      participant_scores[reviewer_id][:combined_scores] << ((irs.score_for_summative + irs.score_for_formative) / 2.0)
+      participant_scores[reviewer_id][:reviews][response_to_map[irs.response_id]][round] = irs.score_for_formative
     end
 
     participant_scores.each do |participant_id, score_data|
-      next if score_data[:combined_scores].empty?
+      next if score_data[:reviews].empty?
 
-      total = score_data[:combined_scores].sum
-      count = score_data[:combined_scores].size
-      total_summative = score_data[:summative_scores].sum
-      total_formative = score_data[:formative_scores].sum
-      feedback_text = "#{count} review#{'s' if count != 1} | " \
-                      "Summative scores: #{score_data[:summative_scores].join(', ')} | " \
-                      "Total summative score: #{total_summative.round(2)} | " \
-                      "Formative scores: #{score_data[:formative_scores].join(', ')} | " \
-                      "Total formative score: #{total_formative.round(2)} | " \
-                      "Combined per-review scores: #{score_data[:combined_scores].map { |score| score.round(2) }.join(', ')}"
+      total = 0.0
+      feedback_text = if round_count == 1
+                        normalized_scores = score_data[:reviews].sort.filter_map do |_map_id, round_scores|
+                          score = round_scores[1] || round_scores.values.first
+                          next if score.nil?
+
+                          normalized_score = score.to_f * SINGLE_ROUND_NORMALIZATION_FACTOR
+                          total += normalized_score
+                          format_llm_score(normalized_score)
+                        end
+                        next if normalized_scores.empty?
+
+                        "Your scores are #{normalized_scores.join(', ')}"
+                      else
+                        review_totals = []
+                        review_comments = score_data[:reviews].sort.each_with_index.filter_map do |(_map_id, round_scores), index|
+                          next if round_scores.empty?
+
+                          review_total = round_scores.values.sum(&:to_f)
+                          total += review_total
+                          review_totals << format_llm_score(review_total)
+                          round_text = round_scores.sort.map do |round, score|
+                            "round #{round}: #{format_llm_score(score)}"
+                          end.join(' ')
+                          "Review #{index + 1} #{round_text}, total #{format_llm_score(review_total)}"
+                        end
+                        next if review_comments.empty?
+
+                        "Your scores are #{review_totals.join(', ')} | #{review_comments.join(' | ')}"
+                      end
 
       rg = ReviewGrade.find_or_initialize_by(participant_id: participant_id)
-      rg.grade_for_reviewer = total
+      rg.grade_for_reviewer = total.round(2)
       rg.comment_for_reviewer = feedback_text
       rg.review_graded_at = Time.current
       rg.reviewer_id = session[:user].id
       rg.save!
     end
+  end
+
+  def format_llm_score(score)
+    rounded_score = score.to_f.round(2)
+    rounded_score == rounded_score.to_i ? rounded_score.to_i.to_s : rounded_score.to_s
   end
 end

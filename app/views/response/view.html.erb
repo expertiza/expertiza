@@ -11,6 +11,18 @@
   <% summative_feedback = @instructor_review_score.feedback_for_summative %>
   <% formative_max = 5 %>
   <% summative_max = 2 %>
+  <% single_review_round = @assignment.num_review_rounds.to_i <= 1 %>
+  <% student_formative_max = single_review_round ? 10 : formative_max %>
+  <% student_formative_score = if formative_score.present? && single_review_round
+                                 formative_score.to_f * 2
+                               else
+                                 formative_score
+                               end %>
+  <% student_formative_score = if student_formative_score.is_a?(Numeric) && student_formative_score == student_formative_score.to_i
+                                 student_formative_score.to_i
+                               else
+                                 student_formative_score
+                               end %>
   <% total_max = formative_max + summative_max %>
   <% total_score = [summative_score, formative_score].compact.sum %>
   <% visible_score_present = student_viewer ? formative_score.present? : summative_score.present? || formative_score.present? %>
@@ -22,7 +34,7 @@
           <% if formative_score.present? %>
             <strong>Score:</strong>
             <span style="color: #2e8b57; font-weight: 700; font-size: 1.25em;">
-              <%= formative_score %> out of <%= formative_max %>
+              <%= student_formative_score %> out of <%= student_formative_max %>
             </span>
           <% end %>
         <% else %>

@@ -191,7 +191,7 @@ describe Response do
   end
 
   describe '.latest_submitted_review_response_ids_for_assignment' do
-    it 'returns only the latest submitted response for each review map and round' do
+    it 'prefers the latest submitted response for each review map and round' do
       assignment = create(:assignment, directory_path: "final_test_#{SecureRandom.hex(4)}")
       reviewer = create(:participant, assignment: assignment)
       reviewee = create(:assignment_team, assignment: assignment)
@@ -212,6 +212,21 @@ describe Response do
         latest_round_2_response.id,
         second_map_response.id
       ])
+    end
+
+    it 'falls back to the latest saved response when a review map and round has no submitted response' do
+      assignment = create(:assignment, directory_path: "final_test_#{SecureRandom.hex(4)}")
+      reviewer = create(:participant, assignment: assignment)
+      reviewee = create(:assignment_team, assignment: assignment)
+      map = create(:review_response_map, assignment: assignment, reviewer: reviewer, reviewee: reviewee)
+
+      older_saved_response = create(:response, response_map: map, round: 1, is_submitted: false, created_at: 2.days.ago)
+      latest_saved_response = create(:response, response_map: map, round: 1, is_submitted: false, created_at: 1.day.ago)
+
+      response_ids = Response.latest_submitted_review_response_ids_for_assignment(assignment.id)
+
+      expect(response_ids).to match_array([latest_saved_response.id])
+      expect(response_ids).not_to include(older_saved_response.id)
     end
   end
 

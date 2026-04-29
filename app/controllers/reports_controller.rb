@@ -119,8 +119,12 @@ class ReportsController < ApplicationController
 
     # Build response_id -> reviewer_id map (batch)
     response_rows = Response.where(id: all_response_ids).pluck(:id, :map_id, :round)
-    response_to_map = response_rows.to_h { |response_id, map_id, _round| [response_id, map_id] }
-    response_to_round = response_rows.to_h { |response_id, _map_id, round| [response_id, round.presence || 1] }
+    response_to_map = {}
+    response_to_round = {}
+    response_rows.each do |response_id, map_id, round|
+      response_to_map[response_id] = map_id
+      response_to_round[response_id] = round.presence || 1
+    end
     map_to_reviewer = ResponseMap.where(id: response_to_map.values.uniq).pluck(:id, :reviewer_id).to_h
     round_count = [assignment.num_review_rounds, response_to_round.values.compact.max || 1].max
     round_count = 1 if round_count.zero?
@@ -145,20 +149,20 @@ class ReportsController < ApplicationController
 
       total = 0.0
       feedback_text = if round_count == 1
-                        normalized_scores = score_data[:reviews].sort.filter_map do |_map_id, round_scores|
+                        normalized_scores = score_data[:reviews].sort.map do |_map_id, round_scores|
                           score = round_scores[1] || round_scores.values.first
                           next if score.nil?
 
                           normalized_score = score.to_f * SINGLE_ROUND_NORMALIZATION_FACTOR
                           total += normalized_score
                           format_llm_score(normalized_score)
-                        end
+                        end.compact
                         next if normalized_scores.empty?
 
                         "Your scores are #{normalized_scores.join(', ')}"
                       else
                         review_totals = []
-                        review_comments = score_data[:reviews].sort.each_with_index.filter_map do |(_map_id, round_scores), index|
+                        review_comments = score_data[:reviews].sort.each_with_index.map do |(_map_id, round_scores), index|
                           next if round_scores.empty?
 
                           review_total = round_scores.values.sum(&:to_f)
@@ -168,7 +172,7 @@ class ReportsController < ApplicationController
                             "round #{round}: #{format_llm_score(score)}"
                           end.join(' ')
                           "Review #{index + 1} #{round_text}, total #{format_llm_score(review_total)}"
-                        end
+                        end.compact
                         next if review_comments.empty?
 
                         "Your scores are #{review_totals.join(', ')} | #{review_comments.join(' | ')}"

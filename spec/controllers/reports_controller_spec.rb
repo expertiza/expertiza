@@ -198,7 +198,7 @@ describe ReportsController do
       controller.send(:save_review_grades_from_instructor_scores, assignment)
 
       expect(review_grade).to have_received(:grade_for_reviewer=).with(16.0)
-      expect(review_grade).to have_received(:comment_for_reviewer=).with('Your scores are 7, 9 | Review 1 round 1: 4 round 2: 3, total 7 | Review 2 round 1: 5 round 2: 4, total 9')
+      expect(review_grade).to have_received(:comment_for_reviewer=).with("Your scores are 7, 9\n\nReview 1\nRound 1: 4\nRound 2: 3\nTotal: 7\n\nReview 2\nRound 1: 5\nRound 2: 4\nTotal: 9")
       expect(review_grade).to have_received(:reviewer_id=).with(99)
       expect(review_grade).to have_received(:save!)
     end

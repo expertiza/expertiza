@@ -168,14 +168,11 @@ class ReportsController < ApplicationController
                           review_total = round_scores.values.sum(&:to_f)
                           total += review_total
                           review_totals << format_llm_score(review_total)
-                          round_text = round_scores.sort.map do |round, score|
-                            "round #{round}: #{format_llm_score(score)}"
-                          end.join(' ')
-                          "Review #{index + 1} #{round_text}, total #{format_llm_score(review_total)}"
+                          format_review_breakdown(index, round_scores, review_total)
                         end.compact
                         next if review_comments.empty?
 
-                        "Your scores are #{review_totals.join(', ')} | #{review_comments.join(' | ')}"
+                        "Your scores are #{review_totals.join(', ')}\n\n#{review_comments.join("\n\n")}"
                       end
 
       rg = ReviewGrade.find_or_initialize_by(participant_id: participant_id)
@@ -190,5 +187,14 @@ class ReportsController < ApplicationController
   def format_llm_score(score)
     rounded_score = score.to_f.round(2)
     rounded_score == rounded_score.to_i ? rounded_score.to_i.to_s : rounded_score.to_s
+  end
+
+  def format_review_breakdown(index, round_scores, review_total)
+    breakdown_lines = ["Review #{index + 1}"]
+    round_scores.sort.each do |round, score|
+      breakdown_lines << "Round #{round}: #{format_llm_score(score)}"
+    end
+    breakdown_lines << "Total: #{format_llm_score(review_total)}"
+    breakdown_lines.join("\n")
   end
 end

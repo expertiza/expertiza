@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe MCPReviewService do
   describe '#send_peer_review' do
-    it 'sends only the latest submitted response ids selected for the assignment' do
+    it 'sends the selected canonical response ids for the assignment' do
       mcp_client = instance_double(MCPServerClient)
       service = described_class.new(mcp_client: mcp_client)
       assignment_id = 101

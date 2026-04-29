@@ -9,7 +9,7 @@
 server '152.14.199.156', user: 'expertiza', roles: %w[web app]
 
 set :default_env, 'JAVA_HOME' => '/usr/jdk-11'
-set :branch, 'main'
+set :branch, 'production_deployment'
 set :rvm_ruby_version, '2.4'
 
 # role-based syntax

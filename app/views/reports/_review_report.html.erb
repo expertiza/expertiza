@@ -197,7 +197,7 @@
 		var downloadLink;
 
 		// CSV file
-		csvFile = new Blob([csv], {type: "text/csv"});
+		csvFile = new Blob(["\uFEFF" + csv], {type: "text/csv;charset=utf-8;"});
 
 		// Download link
 		downloadLink = document.createElement("a");
@@ -217,40 +217,48 @@
 		// Click download link
 		downloadLink.click();
 	}
+
+	function csvEscape(value) {
+		var normalizedValue = value == null ? "" : String(value);
+		return '"' + normalizedValue.replace(/"/g, '""') + '"';
+	}
 	
 	// Method to extract review report fields data from HTML Table and convert the data into CSV format.
 	// Currently, it will extract and store data for 'Full Name, Unity ID, Email ID, Grade and Comment' fields into CSV file 
 	function exportTableToCSV(filename) {  	
 		var csv = [];
-		var rows = document.querySelector("table#myTable").rows;
+		var rows = document.querySelectorAll("table#myTable tbody tr");
 		var row = [];
 		row = setHeaderForCSV();
 		csv.push(row.join(","));
 		
     // for each row of information, pull the review report fields and save them to the corresponding variables
-    for (var i = 1; i < rows.length; i++) {
+    for (var i = 0; i < rows.length; i++) {
 			var row = [];
-			
-			reviewer_name = '"' + rows[i].querySelector("td span.user_name").innerHTML + '"';
-			reviewer_unityid = rows[i].querySelector("td a.user_unityID").innerHTML;
-			reviewer_emailid = reviewer_unityid + "@ncsu.edu";
+			var userNameEl = rows[i].querySelector("td span.user_name");
+			var unityIdEl = rows[i].querySelector("td a.user_unityID");
 			var gradeEl = rows[i].querySelector("[data-export-grade]");
 			var commentEl = rows[i].querySelector("[data-export-comment]");
-			reviewer_grade = gradeEl ? (gradeEl.value || "").trim() : "";
-			reviewer_comment = commentEl ? '"' + (commentEl.value || "").trim().replace(/"/g, "'") + '"' : '""';
+			if (!userNameEl || !unityIdEl) { continue; }
+
+			var reviewer_name = userNameEl.textContent.trim();
+			var reviewer_unityid = unityIdEl.textContent.trim();
+			var reviewer_emailid = reviewer_unityid + "@ncsu.edu";
+			var reviewer_grade = gradeEl ? (gradeEl.value || "").trim() : "";
+			var reviewer_comment = commentEl ? (commentEl.value || "").trim() : "";
 			
       // push the information to set the information. 
-			row.push(reviewer_name);
-			row.push(reviewer_unityid);
-			row.push(reviewer_emailid);
-			row.push(reviewer_grade);
-			row.push(reviewer_comment);
+			row.push(csvEscape(reviewer_name));
+			row.push(csvEscape(reviewer_unityid));
+			row.push(csvEscape(reviewer_emailid));
+			row.push(csvEscape(reviewer_grade));
+			row.push(csvEscape(reviewer_comment));
 			
 			csv.push(row.join(","));
               
 		}
 	
-		downloadCSV(csv.join('\n'), filename);
+		downloadCSV(csv.join('\r\n'), filename);
 	}
 	
 	// Method to set names of header columns in Exported CSV file

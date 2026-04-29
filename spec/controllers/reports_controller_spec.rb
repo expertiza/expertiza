@@ -167,4 +167,72 @@ describe ReportsController do
       expect(controller).to have_received(:save_review_grades_from_instructor_scores).with(assignment)
     end
   end
+
+  describe '#save_review_grades_from_instructor_scores' do
+    it 'keeps two-round reviews on the original 5 plus 5 scale' do
+      response_relation = instance_double(ActiveRecord::Relation)
+      response_map_relation = instance_double(ActiveRecord::Relation)
+      review_grade = instance_double(ReviewGrade, save!: true)
+      instructor_user = instance_double(User, id: 99)
+      instructor_review_scores = [
+        instance_double(InstructorReviewScore, response_id: 10, score_for_summative: 1.0, score_for_formative: 4.0),
+        instance_double(InstructorReviewScore, response_id: 11, score_for_summative: 5.0, score_for_formative: 3.0),
+        instance_double(InstructorReviewScore, response_id: 12, score_for_summative: 2.0, score_for_formative: 5.0),
+        instance_double(InstructorReviewScore, response_id: 13, score_for_summative: 4.0, score_for_formative: 4.0)
+      ]
+
+      allow(assignment).to receive(:num_review_rounds).and_return(2)
+      allow(Response).to receive(:latest_submitted_review_response_ids_for_assignment).with(1).and_return([10, 11, 12, 13])
+      allow(Response).to receive(:where).with(id: [10, 11, 12, 13]).and_return(response_relation)
+      allow(response_relation).to receive(:pluck).with(:id, :map_id, :round).and_return([[10, 100, 1], [11, 100, 2], [12, 101, 1], [13, 101, 2]])
+      allow(ResponseMap).to receive(:where).with(id: [100, 101]).and_return(response_map_relation)
+      allow(response_map_relation).to receive(:pluck).with(:id, :reviewer_id).and_return([[100, 1], [101, 1]])
+      allow(InstructorReviewScore).to receive(:where).with(response_id: [10, 11, 12, 13]).and_return(instructor_review_scores)
+      allow(ReviewGrade).to receive(:find_or_initialize_by).with(participant_id: 1).and_return(review_grade)
+      allow(review_grade).to receive(:grade_for_reviewer=)
+      allow(review_grade).to receive(:comment_for_reviewer=)
+      allow(review_grade).to receive(:review_graded_at=)
+      allow(review_grade).to receive(:reviewer_id=)
+      allow(controller).to receive(:session).and_return(user: instructor_user)
+
+      controller.send(:save_review_grades_from_instructor_scores, assignment)
+
+      expect(review_grade).to have_received(:grade_for_reviewer=).with(16.0)
+      expect(review_grade).to have_received(:comment_for_reviewer=).with("Your scores are 7, 9\n\nReview 1\nRound 1: 4\nRound 2: 3\nTotal: 7\n\nReview 2\nRound 1: 5\nRound 2: 4\nTotal: 9")
+      expect(review_grade).to have_received(:reviewer_id=).with(99)
+      expect(review_grade).to have_received(:save!)
+    end
+
+    it 'normalizes single-round reviews from 5 points to 10 points' do
+      response_relation = instance_double(ActiveRecord::Relation)
+      response_map_relation = instance_double(ActiveRecord::Relation)
+      review_grade = instance_double(ReviewGrade, save!: true)
+      instructor_user = instance_double(User, id: 99)
+      instructor_review_scores = [
+        instance_double(InstructorReviewScore, response_id: 10, score_for_summative: 1.0, score_for_formative: 3.5),
+        instance_double(InstructorReviewScore, response_id: 11, score_for_summative: 5.0, score_for_formative: 4.5)
+      ]
+
+      allow(assignment).to receive(:num_review_rounds).and_return(1)
+      allow(Response).to receive(:latest_submitted_review_response_ids_for_assignment).with(1).and_return([10, 11])
+      allow(Response).to receive(:where).with(id: [10, 11]).and_return(response_relation)
+      allow(response_relation).to receive(:pluck).with(:id, :map_id, :round).and_return([[10, 100, 1], [11, 101, 1]])
+      allow(ResponseMap).to receive(:where).with(id: [100, 101]).and_return(response_map_relation)
+      allow(response_map_relation).to receive(:pluck).with(:id, :reviewer_id).and_return([[100, 1], [101, 1]])
+      allow(InstructorReviewScore).to receive(:where).with(response_id: [10, 11]).and_return(instructor_review_scores)
+      allow(ReviewGrade).to receive(:find_or_initialize_by).with(participant_id: 1).and_return(review_grade)
+      allow(review_grade).to receive(:grade_for_reviewer=)
+      allow(review_grade).to receive(:comment_for_reviewer=)
+      allow(review_grade).to receive(:review_graded_at=)
+      allow(review_grade).to receive(:reviewer_id=)
+      allow(controller).to receive(:session).and_return(user: instructor_user)
+
+      controller.send(:save_review_grades_from_instructor_scores, assignment)
+
+      expect(review_grade).to have_received(:grade_for_reviewer=).with(16.0)
+      expect(review_grade).to have_received(:comment_for_reviewer=).with('Your scores are 7, 9')
+      expect(review_grade).to have_received(:reviewer_id=).with(99)
+      expect(review_grade).to have_received(:save!)
+    end
+  end
 end

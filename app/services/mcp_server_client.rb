@@ -17,6 +17,33 @@ class MCPServerClient
     post("api/v1/reviews", payload)
   end
 
+  # POST /api/v1/teammate-reviews/ingest-assignment
+  # payload: assignment-level teammate review snapshot
+  def send_teammate_assignment(payload)
+    post("api/v1/teammate-reviews/ingest-assignment", payload)
+  end
+
+  # POST /api/v1/teammate-reviews/:course_id/:assignment_id/generate
+  def generate_teammate_summaries(course_id, assignment_id, student_ids: nil, force_rerun: false)
+    post(
+      "api/v1/teammate-reviews/#{course_id}/#{assignment_id}/generate",
+      {
+        student_ids: student_ids,
+        force_rerun: force_rerun
+      }
+    )
+  end
+
+  # GET /api/v1/teammate-reviews/:course_id/:assignment_id/summaries/:student_id
+  def get_teammate_student_summary(course_id, assignment_id, student_id)
+    get("api/v1/teammate-reviews/#{course_id}/#{assignment_id}/summaries/#{student_id}")
+  end
+
+  # GET /api/v1/teammate-reviews/:course_id/:assignment_id/summaries
+  def get_teammate_assignment_summaries(course_id, assignment_id)
+    get("api/v1/teammate-reviews/#{course_id}/#{assignment_id}/summaries")
+  end
+
   # GET /api/v1/reviews/finalized/:expertiza_response_id
   # Returns the finalized formative/summative evaluation payload for a response.
   def get_finalized_review(expertiza_response_id)

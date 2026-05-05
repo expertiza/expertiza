@@ -60,6 +60,21 @@ class ReportsController < ApplicationController
     redirect_to action: 'response_report', id: @assignment.id, report: { type: 'LLMEvaluationReport' }
   end
 
+  def send_teammate_reviews_to_mcp
+    @assignment = Assignment.find(params[:id])
+
+    begin
+      service = MCPTeammateReviewService.new
+      service.send_teammate_reviews(assignment_id: @assignment.id)
+      flash[:success] = 'Teammate reviews were successfully synced to the MCP server for summarization.'
+    rescue => e
+      Rails.logger.error "Error sending teammate reviews to MCP: #{e.message}"
+      flash[:error] = "Error sending teammate reviews to MCP: #{e.message}"
+    end
+
+    redirect_to action: 'response_report', id: @assignment.id, report: { type: 'TeammateReviewResponseMap' }
+  end
+
   # Fetches finalized LLM-generated formative/summative evaluation data for peer reviews from the MCP server,
   # and saves them to InstructorReviewScore for each peer review in each round.
   # ReviewGrades then use the summative scores to derive the reviewer grade summary.

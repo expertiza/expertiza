@@ -11,7 +11,12 @@
 </script>
 
  <!--E2084: table teammateReviewTable modified-->
- <div class = 'reviewreport'>
+ <div class='reviewreport'>
+ <div class="alert alert-info" style="margin-bottom: 16px;">
+   <p><strong>Teammate Review Summaries</strong></p>
+   <p>Send the latest submitted teammate reviews for this assignment to the MCP server. The server ingests the assignment snapshot and generates per-student teammate feedback summaries that can be shown on the student team page.</p>
+   <div style="margin-top: 10px;"><%= button_to 'Sync Teammate Reviews to MCP', { controller: 'reports', action: 'send_teammate_reviews_to_mcp', id: @assignment.id }, method: :post, class: 'btn btn-primary' %></div>
+ </div>
  <table id= "teammateReviewTable" cellspacing='0' cellpadding='2' border=0 class="table table-striped">
  <thead>
  <!--E2084: "sorter-true" included to sort the table using each attribute-->

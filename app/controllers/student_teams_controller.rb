@@ -56,6 +56,7 @@ class StudentTeamsController < ApplicationController
     # this line generates a list of users on the waiting list for the topic of a student's team,
     @users_on_waiting_list = (SignUpTopic.find(@student.team.topic).users_on_waiting_list if student_team_requirements_met?)
     @teammate_review_allowed = DueDate.teammate_review_allowed(@student)
+    load_teammate_summary
   end
  # E2351 Adding a new view for mentors to be able to see all teams that they are mentoring for the selected assignment
  # This replaces the typical student view where the team they are on would be displayed
@@ -172,5 +173,17 @@ class StudentTeamsController < ApplicationController
 
     # checks that the student has selected some topics
     @student.assignment.topics?
+  end
+
+  def load_teammate_summary
+    return unless @student.assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire')
+
+    service = MCPTeammateReviewService.new
+    @teammate_summary = service.get_student_summary(assignment_participant: @student)
+  rescue => e
+    return if e.message.include?('404')
+
+    Rails.logger.error "Error loading teammate summary for participant #{@student.id}: #{e.message}"
+    @teammate_summary_error = e.message
   end
 end

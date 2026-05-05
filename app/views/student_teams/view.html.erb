@@ -125,6 +125,49 @@
     <%# <% end %> <!--end self contribution for Cake questions-->
   </table>
 <% end %>
+
+<% if @teammate_summary.present? %>
+  <br/>
+  <div class="well">
+    <h3>Peer Feedback Summary About You</h3>
+    <% if @teammate_summary['summary'].present? %>
+      <p><%= @teammate_summary['summary'] %></p>
+    <% end %>
+
+    <% if @teammate_summary['strengths'].present? %>
+      <h4>Strengths</h4>
+      <ul>
+        <% @teammate_summary['strengths'].each do |item| %>
+          <li><%= item %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @teammate_summary['concerns'].present? %>
+      <h4>Concerns</h4>
+      <ul>
+        <% @teammate_summary['concerns'].each do |item| %>
+          <li><%= item %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <% if @teammate_summary['advice'].present? %>
+      <h4>Advice</h4>
+      <p><%= @teammate_summary['advice'] %></p>
+    <% end %>
+
+    <% if @teammate_summary['generated_at'].present? %>
+      <p><small>Generated at: <%= @teammate_summary['generated_at'] %></small></p>
+    <% end %>
+  </div>
+<% elsif @teammate_summary_error.present? %>
+  <br/>
+  <div class="alert alert-warning">
+    Peer feedback summary is temporarily unavailable.
+  </div>
+<% end %>
+
 <% if @student.assignment.pair_programming_enabled? %>
   <% if !@student.team.nil? && Team.find(@student.team.id).pair_programming_request!=0 && !button_enabled %>
     <div>

@@ -332,6 +332,7 @@ Expertiza::Application.routes.draw do
       post :response_report
       get :response_report
       post :send_to_llm
+      post :send_teammate_reviews_to_mcp
     end
     member do
       get :get_llm_evaluation

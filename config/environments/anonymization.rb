@@ -11,6 +11,9 @@ Expertiza::Application.configure do
     config.action_mailer.default_url_options = { host: '152.7.98.82:8080', protocol: 'http' }
     # Do not eager load code on boot.
     config.eager_load = false
+
+    config.force_ssl = false
+    config.use_ssl = false
   
     # Show full error reports and disable caching.
     config.consider_all_requests_local       = true

@@ -3,58 +3,118 @@ class ReviewBid < ApplicationRecord
   belongs_to :participant, class_name: 'Participant'
   belongs_to :assignment, class_name: 'Assignment'
 
-  # method to get bidding data
-  # returns the bidding data needed for the assigning algorithm
-  # student_ids, topic_ids, student_preferences, topic_preferences, max reviews allowed
+  class << self
+    # method to get bidding data
+    def bidding_data(assignment_id, reviewer_ids)
+      bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => nil }
+      bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
+      bidding_data['max_accepted_proposals'] = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
 
-  def self.bidding_data(assignment_id, reviewer_ids)
-    # create basic hash and set basic hash data
-    bidding_data = { 'tid' => [], 'users' => {}, 'max_accepted_proposals' => [] }
-    bidding_data['tid'] = SignUpTopic.where(assignment_id: assignment_id).ids
-    bidding_data['max_accepted_proposals'] = Assignment.where(id: assignment_id).pluck(:num_reviews_allowed).first
-
-    # loop through reviewer_ids to get reviewer specific bidding data
-    reviewer_ids.each do |reviewer_id|
-      bidding_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
+      reviewer_ids.each do |reviewer_id|
+        bidding_data['users'][reviewer_id] = reviewer_bidding_data(reviewer_id, assignment_id)
+      end
+      bidding_data
     end
-    bidding_data
-  end
 
-  # assigns topics to reviews as matched by the webservice algorithm
-  def self.assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
-    # if review response map already created, delete it
-    if ReviewResponseMap.where(reviewed_object_id: assignment_id)
+    def assign_review_topics(assignment_id, reviewer_ids, matched_topics, _min_num_reviews = 2)
       ReviewResponseMap.where(reviewed_object_id: assignment_id).destroy_all
-    end
-    # loop through reviewer_ids to assign reviews to each reviewer
-    reviewer_ids.each do |reviewer_id|
-      topics_to_assign = matched_topics[reviewer_id.to_s]
-      topics_to_assign.each do |topic|
-        assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+      reviewer_ids.each do |reviewer_id|
+        topics_to_assign = matched_topics[reviewer_id.to_s] || []
+        Rails.logger.debug "Assigning topics to reviewer #{reviewer_id}: #{topics_to_assign.inspect}"
+        topics_to_assign.each do |topic|
+          assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+        end
       end
     end
-  end
 
-  # method to assign a single topic to a reviewer
-  def self.assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
-    team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
-    team_to_review.nil? ? [] : ReviewResponseMap.create(reviewed_object_id: assignment_id, reviewer_id: reviewer_id, reviewee_id: team_to_review, type: 'ReviewResponseMap')
-  end
-
-  # method for getting individual reviewer_ids bidding data
-  # returns user's bidding data hash
-  def self.reviewer_bidding_data(reviewer_id, assignment_id)
-    reviewer_user_id = AssignmentParticipant.find(reviewer_id).user_id
-    self_topic = SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
-    bidding_data = { 'tid' => [], 'otid' => self_topic, 'priority' => [], 'time' => [] }
-    bids = ReviewBid.where(participant_id: reviewer_id)
-
-    # loop through each bid for a topic to get specific data
-    bids.each do |bid|
-      bidding_data['tid'] << bid.signuptopic_id
-      bidding_data['priority'] << bid.priority
-      bidding_data['time'] << bid.updated_at
+    # method to assign a single topic to a reviewer
+    def assign_topic_to_reviewer(assignment_id, reviewer_id, topic)
+      team_to_review = SignedUpTeam.where(topic_id: topic).pluck(:team_id).first
+      Rails.logger.debug "team_to_review: #{team_to_review}"
+      return [] if team_to_review.nil?
+      ReviewResponseMap.create(
+        reviewed_object_id: assignment_id,
+        reviewer_id: reviewer_id,
+        reviewee_id: team_to_review,
+        type: 'ReviewResponseMap'
+      )
     end
-    bidding_data
+
+    # method for getting individual reviewer_ids bidding data
+    def reviewer_bidding_data(reviewer_id, assignment_id)
+      reviewer_user_id = find_reviewer_user_id(reviewer_id)
+      self_topic = fetch_self_topic(assignment_id, reviewer_user_id)
+      team_id = fetch_team_id(assignment_id, reviewer_user_id)
+      bidding_data = { 'bids' => [], 'otid' => self_topic }
+      return bidding_data unless team_id
+      bids = fetch_team_bids(team_id)
+      bidding_data['bids'] = bids.map { |bid| format_bid(bid) }
+      bidding_data
+    end
+
+    # method for feedback algorithm
+    def fallback_algorithm(assignment_id, reviewer_ids)
+      Rails.logger.debug "Fallback algorithm triggered for assignment_id: #{assignment_id}"
+      topics = SignUpTopic.where(assignment_id: assignment_id).pluck(:id)
+      topic_queue = sorted_topic_queue(topics)
+      assign_topics(assignment_id, reviewer_ids, topic_queue)
+    end
+
+    private
+
+    def sorted_topic_queue(topics)
+      topic_counts = SignedUpTeam.where(topic_id: topics).joins(:team)
+                                 .joins('LEFT JOIN teams_users ON teams.id = teams_users.team_id')
+                                 .group(:topic_id).count('teams_users.user_id')
+      sorted_topics = topic_counts.sort_by { |_, count| -count }.map(&:first)
+      Rails.logger.debug "Teams sorted by size: #{topic_counts.inspect}"
+      sorted_topics
+    end
+
+    def assign_topics(assignment_id, reviewer_ids, topic_queue)
+      matched_topics = {}
+      topic_index = 0
+      reviewer_ids.each do |reviewer_id|
+        assigned_topic = find_available_topic(assignment_id, reviewer_id, topic_queue, topic_index)
+        matched_topics[reviewer_id.to_s] = assigned_topic ? [assigned_topic] : []
+        topic_index += 1 if assigned_topic
+      end
+      Rails.logger.debug "Final matched topics after fallback: #{matched_topics.inspect}"
+      matched_topics
+    end
+
+    def find_available_topic(assignment_id, reviewer_id, topic_queue, _topic_index)
+      self_topic = fetch_self_topic(assignment_id, reviewer_id)
+      topic_queue.each { |topic_id| return topic_id if topic_id != self_topic }
+      nil
+    end
+
+    def reviewer_team_id(reviewer_id)
+      TeamsUser.where(user_id: AssignmentParticipant.find(reviewer_id).user_id).pluck(:team_id).first
+    end
+
+    def find_reviewer_user_id(reviewer_id)
+      AssignmentParticipant.find(reviewer_id).user_id
+    end
+
+    def fetch_self_topic(assignment_id, reviewer_user_id)
+      SignedUpTeam.topic_id(assignment_id, reviewer_user_id)
+    end
+
+    def fetch_team_id(assignment_id, reviewer_user_id)
+      TeamsUser.team_id(assignment_id, reviewer_user_id)
+    end
+
+    def fetch_team_bids(team_id)
+      Bid.where(team_id: team_id)
+    end
+
+    def format_bid(bid)
+      {
+        'tid' => bid.topic_id,
+        'priority' => bid.priority,
+        'timestamp' => bid.updated_at.strftime('%a, %d %b %Y %H:%M:%S %Z %:z')
+      }
+    end
   end
 end

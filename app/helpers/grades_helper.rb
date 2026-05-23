@@ -149,25 +149,32 @@ module GradesHelper
     render 'grades/view_heatgrid.html.erb'
   end
 
-  def privileged_grades_viewer?(role_name = @current_role_name)
-    ['Teaching Assistant', 'Instructor', 'Administrator', 'Super-Administrator'].include?(role_name)
-  end
-
   def restricted_grades_questionnaire?(questionnaire_display_type)
     ['Metareview', 'Author Feedback', 'Teammate Review'].include?(questionnaire_display_type)
   end
 
-  def show_grades_questionnaire?(questionnaire_display_type, role_name = @current_role_name)
-    !restricted_grades_questionnaire?(questionnaire_display_type) || privileged_grades_viewer?(role_name)
+  # Controls whether a questionnaire section should be visible in the grades view.
+  # Restricted questionnaire types are hidden unless the current user is teaching
+  # staff for the assignment (instructor or mapped TA).
+  def show_grades_questionnaire?(questionnaire_display_type, assignment = @assignment)
+    return true unless restricted_grades_questionnaire?(questionnaire_display_type)
+
+    assignment&.id && current_user_teaching_staff_of_assignment?(assignment.id)
   end
 
+  # Determines whether reviewer identity can be displayed for a review column.
+  # Teaching staff for the assignment can always see identities; non-staff users
+  # are further constrained by questionnaire type and assignment anonymity rules.
   def show_grades_reviewer_identity?(assignment, questionnaire_display_type, role_name = @current_role_name)
-    return true if privileged_grades_viewer?(role_name)
+    return true if assignment&.id && current_user_teaching_staff_of_assignment?(assignment.id)
     return false if restricted_grades_questionnaire?(questionnaire_display_type)
 
     !assignment.is_anonymous
   end
 
+  # Returns the header label shown for each review column in the heatgrid.
+  # Uses a neutral "Review N" label when identity should be hidden, and resolves
+  # the actual reviewer/reviewee full name only when identity disclosure is allowed.
   def grades_reviewer_label(review, questionnaire_display_type, index, assignment, role_name = @current_role_name)
     return "Review #{index + 1}" unless show_grades_reviewer_identity?(assignment, questionnaire_display_type, role_name)
 

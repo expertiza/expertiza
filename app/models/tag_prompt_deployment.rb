@@ -12,6 +12,8 @@ class TagPromptDeployment < ApplicationRecord
 
   def get_number_of_taggable_answers(user_id)
     team = Team.joins(:teams_users).where(team_users: { parent_id: assignment_id }, user_id: user_id)
+    return 0 if team.nil?
+    
     responses = Response.joins(:response_maps).where(response_maps: { reviewed_object_id: assignment.id, reviewee_id: team.id })
     questions = Question.where(questionnaire_id: questionnaire.id, type: question_type)
 

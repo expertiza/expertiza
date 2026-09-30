@@ -3,7 +3,7 @@
 # It is triggered by a manual event (workflow_dispatch) and runs a job called "setup".
 
 # The job consists of two steps:
-# Checkout: This step uses the actions/checkout@v3 action to check out the code from the repository.
+# Checkout: This step uses the actions/checkout@v6 action to check out the code from the repository.
 #           This is necessary so that the Ansible playbook can be executed on the system.
 # Run playbook: This step uses the dawidd6/action-ansible-playbook@v2 action to run an Ansible playbook called "setup/setup_playbook.yml".
 #          The playbook is executed with the following parameters:
@@ -22,9 +22,9 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
       - name: Run playbook
-        uses: dawidd6/action-ansible-playbook@v2
+        uses: dawidd6/action-ansible-playbook@v9
         with:
           playbook: setup/setup_playbook.yml
           key: ${{ secrets.SSH_PRIVATE_KEY }}

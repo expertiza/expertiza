@@ -10,7 +10,7 @@
 * [Docker](https://www.docker.com/)
 * [Docker-Compose](https://docs.docker.com/compose/install/)
 * Make sure that you place the **'scrubbed_db'** in the scrubbed_db folder.
-   * Download the scrubbed database from: https://goo.gl/60RnWx
+   * Download the scrubbed database from: https://drive.google.com/file/d/15671YsduemWtaLihs-qnNfVhFpsxV6o-/view
 
 
 ### Installation steps: 

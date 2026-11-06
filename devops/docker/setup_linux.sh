@@ -17,7 +17,7 @@ if [ -f expertiza_scrubbed_db.sql.tar.gz ]; then
 else
    echo
    echo "The file expertiza_scrubbed_db.sql.tar.gz not found."
-   echo "Download the scrubbed database here, from: https://goo.gl/60RnWx"
+   echo "Download the scrubbed database here, from: https://drive.google.com/file/d/15671YsduemWtaLihs-qnNfVhFpsxV6o-/view"
    echo "EXITING..."
    echo
    exit 0

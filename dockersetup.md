@@ -13,7 +13,7 @@ docker-compose -v
 ```
 
 
-5) Download the [scrubbed database](https://drive.google.com/u/0/uc?id=1CwM7H0GMeU5rEfCIZyoXeUvzrS1M2i64&export=download)
+5) Download the [scrubbed database](https://drive.google.com/file/d/15671YsduemWtaLihs-qnNfVhFpsxV6o-/view)
 Add it to the project root directory and rename it to **expertiza.sql**
 
 
